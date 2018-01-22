@@ -1,0 +1,25 @@
+<thekogans_make organization = "thekogans"
+                project = "encryptfile"
+                project_type = "program"
+                major_version = "0"
+                minor_version = "1"
+                patch_version = "0"
+                guid = "2EB0EF8D80835E67E3F17274A0C041BF"
+                schema_version = "2">
+  <dependencies>
+    <project organization = "thekogans"
+             name = "util"/>
+    <project organization = "thekogans"
+             name = "crypto"/>
+    <toolchain organization = "thekogans"
+               name = "openssl_ssl"/>
+    <toolchain organization = "thekogans"
+               name = "openssl_crypto"/>
+  </dependencies>
+  <cpp_sources prefix = "src">
+    <cpp_source>main.cpp</cpp_source>
+  </cpp_sources>
+  <if condition = "$(TOOLCHAIN_OS) == 'Windows'">
+    <subsystem>Console</subsystem>
+  </if>
+</thekogans_make>

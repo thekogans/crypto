@@ -1,0 +1,102 @@
+<thekogans_make organization = "thekogans"
+                project = "crypto"
+                project_type = "library"
+                major_version = "0"
+                minor_version = "1"
+                patch_version = "0"
+                guid = "51807feb568098447581aabaefb41bf0"
+                schema_version = "2">
+  <features>
+    <feature>THEKOGANS_CRYPTO_HAVE_TESTS</feature>
+  </features>
+  <dependencies>
+    <project organization = "thekogans"
+             name = "util"/>
+    <toolchain organization = "thekogans"
+               name = "openssl_ssl"/>
+    <toolchain organization = "thekogans"
+               name = "openssl_crypto"/>
+    <toolchain organization = "thekogans"
+               name = "pugixml"/>
+    <choose>
+      <when condition = "$(TOOLCHAIN_OS) == 'Windows'">
+        <library>Crypt32.lib</library>
+      </when>
+      <when condition = "$(TOOLCHAIN_OS) == 'OSX'">
+        <framework>CoreFoundation</framework>
+        <framework>Security</framework>
+      </when>
+    </choose>
+  </dependencies>
+  <if condition = "$(config) == 'Debug'">
+    <cpp_preprocessor_definitions>
+      <cpp_preprocessor_definition>THEKOGANS_CRYPTO_TESTING</cpp_preprocessor_definition>
+    </cpp_preprocessor_definitions>
+  </if>
+  <cpp_headers prefix = "include"
+               install = "yes">
+    <cpp_header>$(organization)/$(project_directory)/AsymmetricKey.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Authenticator.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Cipher.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/CipherSuite.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/CiphertextHeader.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Config.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/CMAC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/DH.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/DSA.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/EC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/FrameHeader.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/HMAC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/ID.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Key.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/KeyExchange.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/KeyRing.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Keys.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/MAC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/MessageDigest.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLInit.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLUtils.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/SymmetricKey.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/SystemCACertificates.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
+  </cpp_headers>
+  <cpp_sources prefix = "src">
+    <cpp_source>AsymmetricKey.cpp</cpp_source>
+    <cpp_source>Authenticator.cpp</cpp_source>
+    <cpp_source>Cipher.cpp</cpp_source>
+    <cpp_source>CipherSuite.cpp</cpp_source>
+    <cpp_source>CMAC.cpp</cpp_source>
+    <cpp_source>DH.cpp</cpp_source>
+    <cpp_source>DSA.cpp</cpp_source>
+    <cpp_source>EC.cpp</cpp_source>
+    <cpp_source>HMAC.cpp</cpp_source>
+    <cpp_source>ID.cpp</cpp_source>
+    <cpp_source>Key.cpp</cpp_source>
+    <cpp_source>KeyExchange.cpp</cpp_source>
+    <cpp_source>KeyRing.cpp</cpp_source>
+    <cpp_source>Keys.cpp</cpp_source>
+    <cpp_source>MAC.cpp</cpp_source>
+    <cpp_source>MessageDigest.cpp</cpp_source>
+    <cpp_source>OpenSSLInit.cpp</cpp_source>
+    <cpp_source>OpenSSLUtils.cpp</cpp_source>
+    <cpp_source>RSA.cpp</cpp_source>
+    <cpp_source>SymmetricKey.cpp</cpp_source>
+    <cpp_source>SystemCACertificates.cpp</cpp_source>
+    <cpp_source>Version.cpp</cpp_source>
+  </cpp_sources>
+  <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_TESTS)">
+    <cpp_tests prefix = "tests">
+      <cpp_test>test_Authenticator.cpp</cpp_test>
+      <cpp_test>test_Cipher.cpp</cpp_test>
+      <cpp_test>test_CipherSuite.cpp</cpp_test>
+      <cpp_test>test_KeyRing.cpp</cpp_test>
+      <cpp_test>test_KeyExchange.cpp</cpp_test>
+      <cpp_test>test_Keys.cpp</cpp_test>
+      <cpp_test>test_MAC.cpp</cpp_test>
+      <cpp_test>test_MessageDigest.cpp</cpp_test>
+      <cpp_test>test_Params.cpp</cpp_test>
+      <cpp_test>test_SystemCACertificates.cpp</cpp_test>
+    </cpp_tests>
+  </if>
+</thekogans_make>
