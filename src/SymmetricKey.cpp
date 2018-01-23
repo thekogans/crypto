@@ -52,10 +52,10 @@ namespace thekogans {
                 std::size_t secretLength,
                 const void *salt,
                 std::size_t saltLength,
-                const std::string &name,
-                const std::string &description,
                 const EVP_MD *md,
-                std::size_t count) {
+                std::size_t count,
+                const std::string &name,
+                const std::string &description) {
             if (keyLength > 0 &&
                     secret != 0 && secretLength > 0 &&
                     md != 0 && count > 0) {
@@ -107,31 +107,27 @@ namespace thekogans {
         SymmetricKey::Ptr SymmetricKey::FromRandom (
                 std::size_t keyLength,
                 std::size_t randomLength,
-                const std::string &name,
-                const std::string &description,
+                const void *salt,
+                std::size_t saltLength,
                 const EVP_MD *md,
-                std::size_t count) {
-            if (md != 0 && count > 0) {
-                if (randomLength < MIN_RANDOM_LENGTH) {
-                    randomLength = MIN_RANDOM_LENGTH;
-                }
-                util::SecureVector<util::ui8> random (randomLength);
-                util::GlobalRandomSource::Instance ().GetBytes (&random[0], randomLength);
-                return FromSecretAndSalt (
-                    keyLength,
-                    &random[0],
-                    randomLength,
-                    0,
-                    0,
-                    name,
-                    description,
-                    md,
-                    count);
+                std::size_t count,
+                const std::string &name,
+                const std::string &description) {
+            if (randomLength < MIN_RANDOM_LENGTH) {
+                randomLength = MIN_RANDOM_LENGTH;
             }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
+            util::SecureVector<util::ui8> random (randomLength);
+            util::GlobalRandomSource::Instance ().GetBytes (&random[0], randomLength);
+            return FromSecretAndSalt (
+                keyLength,
+                &random[0],
+                randomLength,
+                salt,
+                saltLength,
+                md,
+                count,
+                name,
+                description);
         }
 
         std::size_t SymmetricKey::Size (bool includeType) const {

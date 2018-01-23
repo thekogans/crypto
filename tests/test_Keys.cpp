@@ -54,6 +54,8 @@ TEST (thekogans, SymmetricKey) {
                 secret.size (),
                 salt.c_str (),
                 salt.size (),
+                THEKOGANS_CRYPTO_DEFAULT_MD,
+                1,
                 "test",
                 "test key");
         util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size (false));
@@ -69,6 +71,10 @@ TEST (thekogans, SymmetricKey) {
             crypto::SymmetricKey::FromRandom (
                 32,
                 crypto::SymmetricKey::MIN_RANDOM_LENGTH,
+                0,
+                0,
+                THEKOGANS_CRYPTO_DEFAULT_MD,
+                1,
                 "test",
                 "test key");
         util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size ());

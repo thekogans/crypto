@@ -54,17 +54,24 @@ namespace thekogans {
             explicit SymmetricKey (util::Serializer &serializer);
 
             /// \brief
+            /// Return the key length.
+            /// \return Key length.
+            inline std::size_t Length () const {
+                return GetDataAvailableForReading ();
+            }
+
+            /// \brief
             /// ctor.
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] secret Shared secret from which to derive the key.
             /// \param[in] secretLength Shared secret length.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
-            /// \param[in] name Optional key name.
-            /// \param[in] description Optional key description.
             /// \param[in] md OpenSSL message digest to use for the signing operation.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
             /// \return A new symmetric key.
             static Ptr FromSecretAndSalt (
                 std::size_t keyLength,
@@ -72,10 +79,10 @@ namespace thekogans {
                 std::size_t secretLength,
                 const void *salt = 0,
                 std::size_t saltLength = 0,
-                const std::string &name = std::string (),
-                const std::string &description = std::string (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
-                std::size_t count = 1);
+                std::size_t count = 1,
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
 
             enum {
                 /// \brief
@@ -88,19 +95,23 @@ namespace thekogans {
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] randomLength Length of random buffer from which
             /// keying material is derived.
-            /// \param[in] name Optional key name.
-            /// \param[in] description Optional key description.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
             /// \param[in] md OpenSSL message digest to use for the signing operation.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
             /// \return A random symmetric key.
             static Ptr FromRandom (
                 std::size_t keyLength,
                 std::size_t randomLength = MIN_RANDOM_LENGTH,
-                const std::string &name = std::string (),
-                const std::string &description = std::string (),
+                const void *salt = 0,
+                std::size_t saltLength = 0,
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
-                std::size_t count = 1);
+                std::size_t count = 1,
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
 
             /// \brief
             /// Return the serialized key size.

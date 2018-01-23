@@ -71,9 +71,18 @@ namespace thekogans {
         Cipher::Encryptor::Encryptor (
                 const SymmetricKey &key,
                 const EVP_CIPHER *cipher) {
-            if (EVP_EncryptInit_ex (&context, cipher, OpenSSLInit::engine, key.GetReadPtr (), 0) != 1 ||
+            if (EVP_EncryptInit_ex (
+                    &context,
+                    cipher,
+                    OpenSSLInit::engine,
+                    key.GetReadPtr (),
+                    0) != 1 ||
                     (Cipher::GetMode (cipher) == EVP_CIPH_GCM_MODE &&
-                        EVP_CIPHER_CTX_ctrl (&context, EVP_CTRL_GCM_SET_IVLEN, (util::i32)GetIVLength (), 0) != 1)) {
+                        EVP_CIPHER_CTX_ctrl (
+                            &context,
+                            EVP_CTRL_GCM_SET_IVLEN,
+                            (util::i32)GetIVLength (),
+                            0) != 1)) {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
         }
@@ -121,7 +130,11 @@ namespace thekogans {
         }
 
         std::size_t Cipher::Encryptor::GetTag (void *tag) {
-            if (EVP_CIPHER_CTX_ctrl (&context, EVP_CTRL_GCM_GET_TAG, EVP_GCM_TLS_TAG_LEN, tag) == 1) {
+            if (EVP_CIPHER_CTX_ctrl (
+                    &context,
+                    EVP_CTRL_GCM_GET_TAG,
+                    EVP_GCM_TLS_TAG_LEN,
+                    tag) == 1) {
                 return EVP_GCM_TLS_TAG_LEN;
             }
             else {
@@ -132,9 +145,18 @@ namespace thekogans {
         Cipher::Decryptor::Decryptor (
                 const SymmetricKey &key,
                 const EVP_CIPHER *cipher) {
-            if (EVP_DecryptInit_ex (&context, cipher, OpenSSLInit::engine, key.GetReadPtr (), 0) != 1 ||
+            if (EVP_DecryptInit_ex (
+                    &context,
+                    cipher,
+                    OpenSSLInit::engine,
+                    key.GetReadPtr (),
+                    0) != 1 ||
                     (Cipher::GetMode (cipher) == EVP_CIPH_GCM_MODE &&
-                        EVP_CIPHER_CTX_ctrl (&context, EVP_CTRL_GCM_SET_IVLEN, (util::i32)GetIVLength (), 0) != 1)) {
+                        EVP_CIPHER_CTX_ctrl (
+                            &context,
+                            EVP_CTRL_GCM_SET_IVLEN,
+                            (util::i32)GetIVLength (),
+                            0) != 1)) {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
         }
@@ -148,7 +170,12 @@ namespace thekogans {
             std::size_t ivLength = GetIVLength ();
             util::i32 updateLength = 0;
             util::i32 finalLength = 0;
-            if (EVP_DecryptInit_ex (&context, 0, 0, 0, (const util::ui8 *)ivAndCiphertext) == 1 &&
+            if (EVP_DecryptInit_ex (
+                    &context,
+                    0,
+                    0,
+                    0,
+                    (const util::ui8 *)ivAndCiphertext) == 1 &&
                     (associatedData == 0 || EVP_DecryptUpdate (
                         &context,
                         0,
@@ -176,7 +203,11 @@ namespace thekogans {
         bool Cipher::Decryptor::SetTag (
                 const void *tag,
                 std::size_t tagLength) {
-            if (EVP_CIPHER_CTX_ctrl (&context, EVP_CTRL_GCM_SET_TAG, (util::i32)tagLength, (void *)tag) == 1) {
+            if (EVP_CIPHER_CTX_ctrl (
+                    &context,
+                    EVP_CTRL_GCM_SET_TAG,
+                    (util::i32)tagLength,
+                    (void *)tag) == 1) {
                 return true;
             }
             else {
@@ -237,7 +268,8 @@ namespace thekogans {
 
         bool Cipher::IsAEAD (const EVP_CIPHER *cipher) {
             if (cipher != 0) {
-                return util::Flags<unsigned long> (EVP_CIPHER_flags (cipher)).Test (EVP_CIPH_FLAG_AEAD_CIPHER);
+                return util::Flags<unsigned long> (EVP_CIPHER_flags (cipher)).Test (
+                    EVP_CIPH_FLAG_AEAD_CIPHER);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

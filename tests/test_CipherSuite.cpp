@@ -19,70 +19,102 @@
 #include <CppUnitXLite/CppUnitXLite.cpp>
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/CipherSuite.h"
+#include "thekogans/crypto/EC.h"
+#include "thekogans/crypto/DH.h"
+#include "thekogans/crypto/DSA.h"
 #include "thekogans/crypto/RSA.h"
 
 using namespace thekogans;
 
 namespace {
+    crypto::AsymmetricKey::Ptr GetKeyForAlgorithm (const std::string &algorithm) {
+        if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_ECDHE ||
+                algorithm == crypto::CipherSuite::AUTHENTICATOR_ECDSA) {
+            return crypto::AsymmetricKey::FromParams (
+                *crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192));
+        }
+        if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_DHE) {
+            return crypto::AsymmetricKey::FromParams (
+                *crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_1536));
+        }
+        if (algorithm == crypto::CipherSuite::AUTHENTICATOR_DSA) {
+            return crypto::AsymmetricKey::FromParams (
+                *crypto::DSA::ParamsFromKeyLength (512));
+        }
+        if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_RSA ||
+                algorithm == crypto::CipherSuite::AUTHENTICATOR_RSA) {
+            return crypto::RSA::CreateKey (512);
+        }
+        return crypto::AsymmetricKey::Ptr ();
+    }
+
     bool TestCipherSuite (const crypto::CipherSuite &cipherSuite) {
-        std::cout << cipherSuite.ToString () << "...";
-        bool result = cipherSuite.IsValid ();
-        if (result) {
-            result = crypto::CipherSuite (cipherSuite.ToString ()) == cipherSuite;
+        THEKOGANS_UTIL_TRY {
+            std::cout << cipherSuite.ToString () << "...";
+            bool result = cipherSuite.IsValid ();
             if (result) {
-                util::Buffer buffer (util::HostEndian, cipherSuite.Size ());
-                buffer << cipherSuite;
-                crypto::CipherSuite cipherSuite_;
-                buffer >> cipherSuite_;
-                result = cipherSuite_ == cipherSuite;
+                result = crypto::CipherSuite (cipherSuite.ToString ()) == cipherSuite;
                 if (result) {
-                    crypto::AsymmetricKey::Ptr privateKey = crypto::RSA::CreateKey (512);
-                    crypto::KeyExchange::Ptr keyExchange = cipherSuite.GetKeyExchange (privateKey);
-                    result = keyExchange.Get () != 0;
+                    util::Buffer buffer (util::HostEndian, cipherSuite.Size ());
+                    buffer << cipherSuite;
+                    crypto::CipherSuite cipherSuite_;
+                    buffer >> cipherSuite_;
+                    result = cipherSuite_ == cipherSuite;
                     if (result) {
-                        crypto::Authenticator::Ptr authenticator =
-                            cipherSuite.GetAuthenticator (crypto::Authenticator::Sign, privateKey);
-                        result = authenticator.Get () != 0;
+                        crypto::KeyExchange::Ptr keyExchange =
+                            cipherSuite.GetKeyExchange (GetKeyForAlgorithm (cipherSuite.keyExchange));
+                        result = keyExchange.Get () != 0;
                         if (result) {
-                            crypto::Cipher::Ptr cipher = cipherSuite.GetCipher (
-                                crypto::SymmetricKey::FromRandom (
-                                    crypto::Cipher::GetKeyLength (
-                                        cipherSuite.GetOpenSSLCipher (cipherSuite.cipher))));
-                            result = cipher.Get () != 0;
+                            crypto::Authenticator::Ptr authenticator =
+                                cipherSuite.GetAuthenticator (
+                                    crypto::Authenticator::Sign,
+                                    GetKeyForAlgorithm (cipherSuite.authenticator));
+                            result = authenticator.Get () != 0;
                             if (result) {
-                                crypto::MessageDigest::Ptr messageDigest = cipherSuite.GetMessageDigest ();
-                                result = messageDigest.Get () != 0;
-                                if (!result) {
-                                    std::cout << "fail messageDigest.Get () == 0" << std::endl;
+                                crypto::Cipher::Ptr cipher = cipherSuite.GetCipher (
+                                    crypto::SymmetricKey::FromRandom (
+                                        crypto::Cipher::GetKeyLength (
+                                            cipherSuite.GetOpenSSLCipher (cipherSuite.cipher))));
+                                result = cipher.Get () != 0;
+                                if (result) {
+                                    crypto::MessageDigest::Ptr messageDigest = cipherSuite.GetMessageDigest ();
+                                    result = messageDigest.Get () != 0;
+                                    if (!result) {
+                                        std::cout << "fail messageDigest.Get () == 0" << std::endl;
+                                    }
+                                }
+                                else {
+                                    std::cout << "fail cipher.Get () == 0" << std::endl;
                                 }
                             }
                             else {
-                                std::cout << "fail cipher.Get () == 0" << std::endl;
+                                std::cout << "fail authenticator.Get () == 0" << std::endl;
                             }
                         }
                         else {
-                            std::cout << "fail authenticator.Get () == 0" << std::endl;
+                            std::cout << "fail keyExchange.Get () == 0" << std::endl;
                         }
                     }
                     else {
-                        std::cout << "fail keyExchange.Get () == 0" << std::endl;
+                        std::cout << "fail cipherSuite_ == cipherSuite" << std::endl;
                     }
                 }
                 else {
-                    std::cout << "fail cipherSuite_ == cipherSuite" << std::endl;
+                    std::cout << "fail CipherSuite (cipherSuite.ToString ()) != cipherSuite" << std::endl;
                 }
             }
             else {
-                std::cout << "fail CipherSuite (cipherSuite.ToString ()) != cipherSuite" << std::endl;
+                std::cout << "fail !cipherSuite.IsValid ()" << std::endl;
             }
+            if (result) {
+                std::cout << "pass" << std::endl;
+            }
+            return result;
         }
-        else {
-            std::cout << "fail !cipherSuite.IsValid ()" << std::endl;
+        THEKOGANS_UTIL_CATCH (util::Exception) {
+            std::cout << "fail " << exception.what ();
+            return false;
         }
-        if (result) {
-            std::cout << "pass" << std::endl;
-        }
-        return result;
     }
 }
 

@@ -27,10 +27,10 @@ namespace thekogans {
                 std::size_t keyLength,
                 const void *salt,
                 std::size_t saltLength,
-                const std::string &name,
-                const std::string &description,
                 const EVP_MD *md,
-                std::size_t count) {
+                std::size_t count,
+                const std::string &name,
+                const std::string &description) {
             if (publicKey.Get () != 0 && keyLength > 0 && md != 0) {
                 std::size_t secretLength = 0;
                 EVP_PKEY_CTXPtr ctx (
@@ -47,10 +47,10 @@ namespace thekogans {
                             secretLength,
                             salt,
                             saltLength,
-                            name,
-                            description,
                             md,
-                            count);
+                            count,
+                            name,
+                            description);
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

@@ -62,21 +62,21 @@ namespace thekogans {
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
-            /// \param[in] name Optional key name.
-            /// \param[in] description Optional key description.
             /// \param[in] md OpenSSL message digest to use for the signing operation.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
             /// \return Shared \see{SymmetricKey}.
             SymmetricKey::Ptr DeriveSharedSymmetricKey (
                 AsymmetricKey::Ptr publicKey,
                 std::size_t keyLength,
                 const void *salt = 0,
                 std::size_t saltLength = 0,
-                const std::string &name = std::string (),
-                const std::string &description = std::string (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
-                std::size_t count = 1);
+                std::size_t count = 1,
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
 
             /// \brief
             /// KeyExchange is neither copy constructable, nor assignable.

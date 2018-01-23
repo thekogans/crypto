@@ -68,6 +68,55 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL CipherSuite {
             /// \brief
+            /// "ECDHE"
+            static const char * const KEY_EXCHANGE_ECDHE;
+            /// \brief
+            /// "DHE"
+            static const char * const KEY_EXCHANGE_DHE;
+            /// \brief
+            /// "RSA"
+            static const char * const KEY_EXCHANGE_RSA;
+
+            /// \brief
+            /// "ECDSA"
+            static const char * const AUTHENTICATOR_ECDSA;
+            /// \brief
+            /// "DSA"
+            static const char * const AUTHENTICATOR_DSA;
+            /// \brief
+            /// "RSA"
+            static const char * const AUTHENTICATOR_RSA;
+
+            /// \brief
+            /// "AES-256-GCM"
+            static const char * const CIPHER_AES_256_GCM;
+            /// \brief
+            /// "AES-192-GCM"
+            static const char * const CIPHER_AES_192_GCM;
+            /// \brief
+            /// "AES-128-GCM"
+            static const char * const CIPHER_AES_128_GCM;
+            /// \brief
+            /// "AES-256-CBC"
+            static const char * const CIPHER_AES_256_CBC;
+            /// \brief
+            /// "AES-192-CBC"
+            static const char * const CIPHER_AES_192_CBC;
+            /// \brief
+            /// "AES-128-CBC"
+            static const char * const CIPHER_AES_128_CBC;
+
+            /// \brief
+            /// "SHA2-512"
+            static const char * const MESSAGE_DIGEST_SHA2_512;
+            /// \brief
+            /// "SHA2-384"
+            static const char * const MESSAGE_DIGEST_SHA2_384;
+            /// \brief
+            /// "SHA2-256"
+            static const char * const MESSAGE_DIGEST_SHA2_256;
+
+            /// \brief
             /// \see{KeyExchange}.
             std::string keyExchange;
             /// \brief

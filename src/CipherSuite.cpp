@@ -20,6 +20,25 @@
 namespace thekogans {
     namespace crypto {
 
+        const char * const CipherSuite::KEY_EXCHANGE_ECDHE = "ECDHE";
+        const char * const CipherSuite::KEY_EXCHANGE_DHE = "DHE";
+        const char * const CipherSuite::KEY_EXCHANGE_RSA = "RSA";
+
+        const char * const CipherSuite::AUTHENTICATOR_ECDSA = "ECDSA";
+        const char * const CipherSuite::AUTHENTICATOR_DSA = "DSA";
+        const char * const CipherSuite::AUTHENTICATOR_RSA = "RSA";
+
+        const char * const CipherSuite::CIPHER_AES_256_GCM = "AES-256-GCM";
+        const char * const CipherSuite::CIPHER_AES_192_GCM = "AES-192-GCM";
+        const char * const CipherSuite::CIPHER_AES_128_GCM = "AES-128-GCM";
+        const char * const CipherSuite::CIPHER_AES_256_CBC = "AES-256-CBC";
+        const char * const CipherSuite::CIPHER_AES_192_CBC = "AES-192-CBC";
+        const char * const CipherSuite::CIPHER_AES_128_CBC = "AES-128-CBC";
+
+        const char * const CipherSuite::MESSAGE_DIGEST_SHA2_512 = "SHA2-512";
+        const char * const CipherSuite::MESSAGE_DIGEST_SHA2_384 = "SHA2-384";
+        const char * const CipherSuite::MESSAGE_DIGEST_SHA2_256 = "SHA2-256";
+
         CipherSuite::CipherSuite (const std::string &cipherSuite) {
             std::string::size_type keyExchangeSeparator = cipherSuite.find_first_of ('_');
             keyExchange = cipherSuite.substr (0, keyExchangeSeparator++);
@@ -38,16 +57,16 @@ namespace thekogans {
 
         namespace {
             const char *keyExchanges[] = {
-                "ECDHE",
-                "DHE",
-                "RSA"
+                CipherSuite::KEY_EXCHANGE_ECDHE,
+                CipherSuite::KEY_EXCHANGE_DHE,
+                CipherSuite::KEY_EXCHANGE_RSA
             };
             const std::size_t keyExchangesSize = THEKOGANS_UTIL_ARRAY_SIZE (keyExchanges);
 
             const char *authenticators[] = {
-                "ECDSA",
-                "DSA",
-                "RSA"
+                CipherSuite::AUTHENTICATOR_ECDSA,
+                CipherSuite::AUTHENTICATOR_DSA,
+                CipherSuite::AUTHENTICATOR_RSA
             };
             const std::size_t authenticatorsSize = THEKOGANS_UTIL_ARRAY_SIZE (authenticators);
 
@@ -55,12 +74,12 @@ namespace thekogans {
                 const char *name;
                 const EVP_CIPHER *cipher;
             } const ciphers[] = {
-                {"AES-256-GCM", EVP_aes_256_gcm ()},
-                {"AES-192-GCM", EVP_aes_192_gcm ()},
-                {"AES-128-GCM", EVP_aes_128_gcm ()},
-                {"AES-256-CBC", EVP_aes_256_cbc ()},
-                {"AES-192-CBC", EVP_aes_192_cbc ()},
-                {"AES-128-CBC", EVP_aes_128_cbc ()}
+                {CipherSuite::CIPHER_AES_256_GCM, EVP_aes_256_gcm ()},
+                {CipherSuite::CIPHER_AES_192_GCM, EVP_aes_192_gcm ()},
+                {CipherSuite::CIPHER_AES_128_GCM, EVP_aes_128_gcm ()},
+                {CipherSuite::CIPHER_AES_256_CBC, EVP_aes_256_cbc ()},
+                {CipherSuite::CIPHER_AES_192_CBC, EVP_aes_192_cbc ()},
+                {CipherSuite::CIPHER_AES_128_CBC, EVP_aes_128_cbc ()}
             };
             const std::size_t ciphersSize = THEKOGANS_UTIL_ARRAY_SIZE (ciphers);
 
@@ -68,9 +87,9 @@ namespace thekogans {
                 const char *name;
                 const EVP_MD *md;
             } const messageDigests[] = {
-                {"SHA2-512", EVP_sha512 ()},
-                {"SHA2-384", EVP_sha384 ()},
-                {"SHA2-256", EVP_sha256 ()}
+                {CipherSuite::MESSAGE_DIGEST_SHA2_512, EVP_sha512 ()},
+                {CipherSuite::MESSAGE_DIGEST_SHA2_384, EVP_sha384 ()},
+                {CipherSuite::MESSAGE_DIGEST_SHA2_256, EVP_sha256 ()}
             };
             const std::size_t messageDigestsSize = THEKOGANS_UTIL_ARRAY_SIZE (messageDigests);
 
@@ -107,6 +126,18 @@ namespace thekogans {
                     messageDigests_.push_back (messageDigests[i].name);
                 }
                 return messageDigests_;
+            }
+
+            bool MatchAsymmetricKey (
+                    const std::string &algorithm,
+                    AsymmetricKey::Ptr key) {
+                return
+                    (algorithm == CipherSuite::KEY_EXCHANGE_ECDHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
+                    (algorithm == CipherSuite::KEY_EXCHANGE_DHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DH) ||
+                    (algorithm == CipherSuite::KEY_EXCHANGE_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA) ||
+                    (algorithm == CipherSuite::AUTHENTICATOR_ECDSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
+                    (algorithm == CipherSuite::AUTHENTICATOR_DSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DSA) ||
+                    (algorithm == CipherSuite::AUTHENTICATOR_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA);
             }
         }
 
@@ -190,7 +221,7 @@ namespace thekogans {
         }
 
         KeyExchange::Ptr CipherSuite::GetKeyExchange (AsymmetricKey::Ptr privateKey) const {
-            if (privateKey.Get () != 0) {
+            if (privateKey.Get () != 0 && MatchAsymmetricKey (keyExchange, privateKey)) {
                 return KeyExchange::Ptr (new KeyExchange (privateKey));
             }
             else {
@@ -202,9 +233,15 @@ namespace thekogans {
         Authenticator::Ptr CipherSuite::GetAuthenticator (
                 Authenticator::Op op,
                 AsymmetricKey::Ptr key) const {
-            if (key.Get () != 0) {
+            if (key.Get () != 0 &&
+                    ((op == Authenticator::Sign && key->IsPrivate ()) ||
+                        (op == Authenticator::Verify && !key->IsPrivate ())) &&
+                    MatchAsymmetricKey (authenticator, key)) {
                 return Authenticator::Ptr (
-                    new Authenticator (op, key, GetOpenSSLMessageDigest (messageDigest)));
+                    new Authenticator (
+                        op,
+                        key,
+                        GetOpenSSLMessageDigest (messageDigest)));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -213,9 +250,13 @@ namespace thekogans {
         }
 
         Cipher::Ptr CipherSuite::GetCipher (SymmetricKey::Ptr key) const {
-            if (key.Get () != 0) {
+            if (key.Get () != 0 &&
+                    Cipher::GetKeyLength (GetOpenSSLCipher (cipher)) == key->Length ()) {
                 return Cipher::Ptr (
-                    new Cipher (key, GetOpenSSLCipher (cipher), GetOpenSSLMessageDigest (messageDigest)));
+                    new Cipher (
+                        key,
+                        GetOpenSSLCipher (cipher),
+                        GetOpenSSLMessageDigest (messageDigest)));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

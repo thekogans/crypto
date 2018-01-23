@@ -41,10 +41,10 @@ namespace thekogans {
                     secretLength,
                     salt,
                     saltLength,
-                    std::string (),
-                    std::string (),
                     THEKOGANS_CRYPTO_DEFAULT_MD,
-                    count);
+                    count,
+                    name,
+                    description);
                 EVP_PKEY *key = 0;
                 EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new_id (EVP_PKEY_CMAC, OpenSSLInit::engine));
                 if (ctx.get () != 0 &&
