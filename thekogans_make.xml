@@ -2,8 +2,8 @@
                 project = "crypto"
                 project_type = "library"
                 major_version = "0"
-                minor_version = "1"
-                patch_version = "1"
+                minor_version = "2"
+                patch_version = "0"
                 guid = "51807feb568098447581aabaefb41bf0"
                 schema_version = "2">
   <features>
@@ -48,15 +48,16 @@
     <cpp_header>$(organization)/$(project_directory)/FrameHeader.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/HMAC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/ID.h</cpp_header>
-    <cpp_header>$(organization)/$(project_directory)/Key.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/KeyExchange.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/KeyRing.h</cpp_header>
-    <cpp_header>$(organization)/$(project_directory)/Keys.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/MAC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/MessageDigest.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLInit.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLUtils.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Serializable.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Serializables.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SystemCACertificates.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
@@ -72,15 +73,16 @@
     <cpp_source>EC.cpp</cpp_source>
     <cpp_source>HMAC.cpp</cpp_source>
     <cpp_source>ID.cpp</cpp_source>
-    <cpp_source>Key.cpp</cpp_source>
     <cpp_source>KeyExchange.cpp</cpp_source>
     <cpp_source>KeyRing.cpp</cpp_source>
-    <cpp_source>Keys.cpp</cpp_source>
     <cpp_source>MAC.cpp</cpp_source>
     <cpp_source>MessageDigest.cpp</cpp_source>
     <cpp_source>OpenSSLInit.cpp</cpp_source>
     <cpp_source>OpenSSLUtils.cpp</cpp_source>
+    <cpp_source>Params.cpp</cpp_source>
     <cpp_source>RSA.cpp</cpp_source>
+    <cpp_source>Serializable.cpp</cpp_source>
+    <cpp_source>Serializables.cpp</cpp_source>
     <cpp_source>SymmetricKey.cpp</cpp_source>
     <cpp_source>SystemCACertificates.cpp</cpp_source>
     <cpp_source>Version.cpp</cpp_source>

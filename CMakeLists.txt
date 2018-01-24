@@ -15,7 +15,7 @@ endif()
 add_definitions(
     -DTOOLCHAIN_ARCH_x86_64
     -DTHEKOGANS_CRYPTO_MAJOR_VERSION=0
-    -DTHEKOGANS_CRYPTO_MINOR_VERSION=1
+    -DTHEKOGANS_CRYPTO_MINOR_VERSION=2
     -DTHEKOGANS_CRYPTO_PATCH_VERSION=0)
 
 if(KRAGLE_DEPS)
@@ -40,15 +40,16 @@ set(SOURCES
     src/EC.cpp
     src/HMAC.cpp
     src/ID.cpp
-    src/Key.cpp
     src/KeyExchange.cpp
     src/KeyRing.cpp
-    src/Keys.cpp
     src/MAC.cpp
     src/MessageDigest.cpp
     src/OpenSSLInit.cpp
     src/OpenSSLUtils.cpp
+    src/Params.cpp
     src/RSA.cpp
+    src/Serializable.cpp
+    src/Serializables.cpp
     src/SymmetricKey.cpp
     src/SystemCACertificates.cpp
     src/Version.cpp)

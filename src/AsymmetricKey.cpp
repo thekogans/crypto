@@ -36,10 +36,12 @@ namespace thekogans {
             #define THEKOGANS_CRYPTO_MIN_ASYMMETRIC_KEYS_IN_PAGE 16
         #endif // !defined (THEKOGANS_CRYPTO_MIN_ASYMMETRIC_KEYS_IN_PAGE)
 
-        THEKOGANS_CRYPTO_IMPLEMENT_KEY (AsymmetricKey, THEKOGANS_CRYPTO_MIN_ASYMMETRIC_KEYS_IN_PAGE)
+        THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
+            AsymmetricKey,
+            THEKOGANS_CRYPTO_MIN_ASYMMETRIC_KEYS_IN_PAGE)
 
         AsymmetricKey::AsymmetricKey (util::Serializer &serializer) :
-                Key (serializer) {
+                Serializable (serializer) {
             util::i32 type;
             util::i32 keyLength;
             serializer >> isPrivate >> type >> keyLength;
@@ -49,23 +51,6 @@ namespace thekogans {
             key.reset (isPrivate ?
                 d2i_PrivateKey (type, 0, &keyData, keyLength) :
                 d2i_PublicKey (type, 0, &keyData, keyLength));
-        }
-
-        AsymmetricKey::Ptr AsymmetricKey::FromParams (
-                EVP_PKEY &params,
-                const std::string &name,
-                const std::string &description) {
-            EVP_PKEY *key = 0;
-            EVP_PKEY_CTXPtr ctx (
-                EVP_PKEY_CTX_new (&params, OpenSSLInit::engine));
-            if (ctx.get () != 0 &&
-                    EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
-                    EVP_PKEY_keygen (ctx.get (), &key) == 1) {
-                return Ptr (new AsymmetricKey (key, true, name, description));
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
         }
 
         AsymmetricKey::Ptr AsymmetricKey::LoadPrivateKeyFromFile (
@@ -78,7 +63,7 @@ namespace thekogans {
             if (bio.get () != 0) {
                 return Ptr (
                     new AsymmetricKey (
-                        PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData),
+                        EVP_PKEYPtr (PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData)),
                         true,
                         name,
                         description));
@@ -98,7 +83,7 @@ namespace thekogans {
             if (bio.get () != 0) {
                 return Ptr (
                     new AsymmetricKey (
-                        PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData),
+                        EVP_PKEYPtr (PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData)),
                         false,
                         name,
                         description));
@@ -120,7 +105,7 @@ namespace thekogans {
                 if (certificate.get () != 0) {
                     return Ptr (
                         new AsymmetricKey (
-                            X509_get_pubkey (certificate.get ()),
+                            EVP_PKEYPtr (X509_get_pubkey (certificate.get ())),
                             false,
                             name,
                             description));
@@ -141,7 +126,7 @@ namespace thekogans {
             if (PEM_write_bio_PUBKEY (bio.get (), key.get ()) == 1) {
                 AsymmetricKey::Ptr publicKey (
                     new AsymmetricKey (
-                        PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0),
+                        EVP_PKEYPtr (PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0)),
                         false,
                         name,
                         description));
@@ -165,49 +150,59 @@ namespace thekogans {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
             return
-                Key::Size (includeType) +
+                Serializable::Size (includeType) +
                 util::BOOL_SIZE + // isPrivate
                 util::I32_SIZE + // type
                 util::I32_SIZE + // keyLength
                 keyLength;
         }
 
+        namespace {
+            void SerializeKey (
+                    bool isPrivate,
+                    EVP_PKEY &key,
+                    util::SecureVector<util::ui8> &keyBuffer) {
+                if (isPrivate) {
+                    util::i32 keyLength = i2d_PrivateKey (&key, 0);
+                    if (keyLength > 0) {
+                        keyBuffer.resize (keyLength);
+                        util::ui8 *keyData = &keyBuffer[0];
+                        i2d_PrivateKey (&key, &keyData);
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    util::i32 keyLength = i2d_PublicKey (&key, 0);
+                    if (keyLength > 0) {
+                        keyBuffer.resize (keyLength);
+                        util::ui8 *keyData = &keyBuffer[0];
+                        i2d_PublicKey (&key, &keyData);
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+            }
+        }
+
         void AsymmetricKey::Serialize (
                 util::Serializer &serializer,
                 bool includeType) const {
-            Key::Serialize (serializer, includeType);
-            util::i32 type = EVP_PKEY_base_id (key.get ());
-            util::i32 keyLength = 0;
+            Serializable::Serialize (serializer, includeType);
             util::SecureVector<util::ui8> keyBuffer;
-            if (isPrivate) {
-                keyLength = i2d_PrivateKey (key.get (), 0);
-                if (keyLength > 0) {
-                    keyBuffer.resize (keyLength);
-                    util::ui8 *keyData = &keyBuffer[0];
-                    i2d_PrivateKey (key.get (), &keyData);
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                keyLength = i2d_PublicKey (key.get (), 0);
-                if (keyLength > 0) {
-                    keyBuffer.resize (keyLength);
-                    util::ui8 *keyData = &keyBuffer[0];
-                    i2d_PublicKey (key.get (), &keyData);
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            serializer << isPrivate << type << keyLength;
-            serializer.Write (&keyBuffer[0], keyLength);
+            SerializeKey (isPrivate, *key, keyBuffer);
+            serializer <<
+                isPrivate <<
+                (util::i32)EVP_PKEY_base_id (key.get ()) <<
+                (util::i32)keyBuffer.size ();
+            serializer.Write (&keyBuffer[0], (util::ui32)keyBuffer.size ());
         }
 
     #if defined (THEKOGANS_CRYPTO_TESTING)
-        const char * const AsymmetricKey::ATTR_KEY_TYPE = "KeyType";
         const char * const AsymmetricKey::ATTR_PRIVATE = "Private";
+        const char * const AsymmetricKey::ATTR_KEY_TYPE = "KeyType";
 
         namespace {
             std::string typeTostring (util::i32 type) {
@@ -244,38 +239,16 @@ namespace thekogans {
         std::string AsymmetricKey::ToString (
                 util::ui32 indentationLevel,
                 const char *tagName) const {
-            util::i32 keyLength = 0;
             util::SecureVector<util::ui8> keyBuffer;
-            if (isPrivate) {
-                keyLength = i2d_PrivateKey (key.get (), 0);
-                if (keyLength > 0) {
-                    keyBuffer.resize (keyLength);
-                    util::ui8 *keyData = &keyBuffer[0];
-                    i2d_PrivateKey (key.get (), &keyData);
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                keyLength = i2d_PublicKey (key.get (), 0);
-                if (keyLength > 0) {
-                    keyBuffer.resize (keyLength);
-                    util::ui8 *keyData = &keyBuffer[0];
-                    i2d_PublicKey (key.get (), &keyData);
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
+            Serialize (isPrivate, *key, keyBuffer);
             std::stringstream stream;
             util::Attributes attributes;
             attributes.push_back (util::Attribute (ATTR_TYPE, Type ()));
             attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
             attributes.push_back (util::Attribute (ATTR_NAME, name));
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_KEY_TYPE, typeTostring (EVP_PKEY_base_id (key.get ()))));
             attributes.push_back (util::Attribute (ATTR_PRIVATE, util::boolTostring (isPrivate)));
+            attributes.push_back (util::Attribute (ATTR_KEY_TYPE, typeTostring (EVP_PKEY_base_id (key.get ()))));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
                 std::string (keyBuffer.begin (), keyBuffer.end ()) << std::endl <<

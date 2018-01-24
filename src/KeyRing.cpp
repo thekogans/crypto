@@ -35,21 +35,32 @@ namespace thekogans {
             #define THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE 16
         #endif // !defined (THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
-        THEKOGANS_UTIL_IMPLEMENT_HEAP_WITH_LOCK_EX (
+        THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             KeyRing,
-            util::SpinLock,
             THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
-        KeyRing::KeyRing (util::Serializer &serializer) {
-            serializer >> id >> name >> description;
+        KeyRing::KeyRing (util::Serializer &serializer) :
+                Serializable (serializer) {
             bool haveMasterKey;
             serializer >> haveMasterKey;
-            masterKey = haveMasterKey ? Key::Get (serializer) : Key::Ptr ();
+            masterKey = haveMasterKey ? Serializable::Get (serializer) : Serializable::Ptr ();
+            util::ui32 paramsCount;
+            serializer >> paramsCount;
+            paramsMap.clear ();
+            while (paramsCount-- > 0) {
+                Params::Ptr params (new Params (serializer));
+                std::pair<ParamsMap::iterator, bool> result =
+                    paramsMap.insert (ParamsMap::value_type (params->GetId (), params));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert params: %s", params->GetName ().c_str ());
+                }
+            }
             util::ui32 activeKeyCount;
             serializer >> activeKeyCount;
             activeKeyMap.clear ();
             while (activeKeyCount-- > 0) {
-                Key::Ptr key = Key::Get (serializer);
+                Serializable::Ptr key = Serializable::Get (serializer);
                 std::pair<KeyMap::iterator, bool> result =
                     activeKeyMap.insert (KeyMap::value_type (key->GetId (), key));
                 if (!result.second) {
@@ -61,7 +72,7 @@ namespace thekogans {
             serializer >> retiredKeyCount;
             retiredKeyMap.clear ();
             while (retiredKeyCount-- > 0) {
-                Key::Ptr key = Key::Get (serializer);
+                Serializable::Ptr key = Serializable::Get (serializer);
                 std::pair<KeyMap::iterator, bool> result =
                     retiredKeyMap.insert (KeyMap::value_type (key->GetId (), key));
                 if (!result.second) {
@@ -71,11 +82,11 @@ namespace thekogans {
             }
             util::ui32 subringCount;
             serializer >> subringCount;
-            subrings.clear ();
+            subringsMap.clear ();
             while (subringCount-- > 0) {
                 Ptr subring (new KeyRing (serializer));
                 std::pair<KeyRingMap::iterator, bool> result =
-                    subrings.insert (KeyRingMap::value_type (subring->GetId (), subring));
+                    subringsMap.insert (KeyRingMap::value_type (subring->GetId (), subring));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Unable to instert subring: %s", subring->GetName ().c_str ());
@@ -110,7 +121,7 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             util::Buffer::UniquePtr buffer (
-                new util::SecureBuffer (util::NetworkEndian, (util::ui32)Size ()));
+                new util::SecureBuffer (util::NetworkEndian, (util::ui32)Size (false)));
             Serialize (*buffer);
             if (cipher.Get () != 0) {
                 buffer = cipher->Encrypt (
@@ -130,7 +141,70 @@ namespace thekogans {
                 buffer->GetDataAvailableForReading ());
         }
 
-        Key::Ptr KeyRing::GetKey (
+        Params::Ptr KeyRing::GetParams (
+                const ID &paramsId,
+                bool recursive) const {
+            ParamsMap::const_iterator it = paramsMap.find (paramsId);
+            if (it != paramsMap.end ()) {
+                return it->second;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Params::Ptr params = it->second->GetParams (paramsId, recursive);
+                    if (params.Get () != 0) {
+                        return params;
+                    }
+                }
+            }
+            return Params::Ptr ();
+        }
+
+        bool KeyRing::AddParams (Params::Ptr params) {
+            if (params.Get () != 0) {
+                std::pair<ParamsMap::iterator, bool> result = paramsMap.insert (
+                    ParamsMap::value_type (params->GetId (), params));
+                return result.second;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        bool KeyRing::DropParams (
+                const ID &paramsId,
+                bool recursive) {
+            ParamsMap::iterator it = paramsMap.find (paramsId);
+            if (it != paramsMap.end ()) {
+                paramsMap.erase (it);
+                return true;
+            }
+            else if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    if (it->second->DropParams (paramsId, recursive)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        void KeyRing::DropAllParams (bool recursive) {
+            paramsMap.clear ();
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    it->second->DropAllParams (recursive);
+                }
+            }
+        }
+
+        Serializable::Ptr KeyRing::GetKey (
                 const ID &keyId,
                 bool recursive) const {
             if (masterKey.Get () != 0 && masterKey->GetId () == keyId) {
@@ -146,18 +220,18 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
-                    Key::Ptr key = it->second->GetKey (keyId, recursive);
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Serializable::Ptr key = it->second->GetKey (keyId, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
                 }
             }
-            return Key::Ptr ();
+            return Serializable::Ptr ();
         }
 
-        bool KeyRing::AddActiveKey (Key::Ptr key) {
+        bool KeyRing::AddActiveKey (Serializable::Ptr key) {
             if (key.Get () != 0) {
                 std::pair<KeyMap::iterator, bool> result = activeKeyMap.insert (
                     KeyMap::value_type (key->GetId (), key));
@@ -188,8 +262,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     if (it->second->RetireActiveKey (keyId, recursive)) {
                         return true;
                     }
@@ -208,8 +282,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     if (it->second->DropActiveKey (keyId, recursive)) {
                         return true;
                     }
@@ -222,8 +296,8 @@ namespace thekogans {
             activeKeyMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     it->second->DropActiveKeys (recursive);
                 }
             }
@@ -239,8 +313,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     if (it->second->DropRetiredKey (keyId, recursive)) {
                         return true;
                     }
@@ -253,8 +327,8 @@ namespace thekogans {
             retiredKeyMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     it->second->DropRetiredKeys (recursive);
                 }
             }
@@ -265,8 +339,8 @@ namespace thekogans {
             retiredKeyMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     it->second->DropAllKeys (recursive);
                 }
             }
@@ -275,14 +349,14 @@ namespace thekogans {
         KeyRing::Ptr KeyRing::GetSubring (
                 const ID &subringId,
                 bool recursive) const {
-            KeyRingMap::const_iterator it = subrings.find (subringId);
-            if (it != subrings.end ()) {
+            KeyRingMap::const_iterator it = subringsMap.find (subringId);
+            if (it != subringsMap.end ()) {
                 return it->second;
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     Ptr subring = it->second->GetSubring (subringId, recursive);
                     if (subring.Get () != 0) {
                         return subring;
@@ -294,7 +368,7 @@ namespace thekogans {
 
         bool KeyRing::AddSubring (Ptr subring) {
             if (subring.Get () != 0) {
-                std::pair<KeyRingMap::iterator, bool> result = subrings.insert (
+                std::pair<KeyRingMap::iterator, bool> result = subringsMap.insert (
                     KeyRingMap::value_type (subring->GetId (), subring));
                 return result.second;
             }
@@ -307,15 +381,15 @@ namespace thekogans {
         bool KeyRing::DropSubring (
                 const ID &subringId,
                 bool recursive) {
-            KeyRingMap::iterator it = subrings.find (subringId);
-            if (it != subrings.end ()) {
-                subrings.erase (it);
+            KeyRingMap::iterator it = subringsMap.find (subringId);
+            if (it != subringsMap.end ()) {
+                subringsMap.erase (it);
                 return true;
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subrings.begin (),
-                        end = subrings.end (); it != end; ++it) {
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
                     if (it->second->DropSubring (subringId, recursive)) {
                         return true;
                     }
@@ -325,25 +399,30 @@ namespace thekogans {
         }
 
         void KeyRing::DropAllSubrings () {
-            subrings.clear ();
+            subringsMap.clear ();
         }
 
         void KeyRing::Clear () {
+            paramsMap.clear ();
             activeKeyMap.clear ();
             retiredKeyMap.clear ();
-            subrings.clear ();
+            subringsMap.clear ();
         }
 
-        std::size_t KeyRing::Size () const {
+        std::size_t KeyRing::Size (bool includeType) const {
             std::size_t size =
-                id.Size () +
-                util::Serializer::Size (name) +
-                util::Serializer::Size (description);
-            bool haveMasterKey = masterKey.Get () != 0;
-            size +=
-                util::Serializer::Size (haveMasterKey) +
-                (haveMasterKey ? masterKey->Size () : 0) +
-                util::UI32_SIZE;
+                Serializable::Size (includeType) +
+                util::BOOL_SIZE;
+            if (masterKey.Get () != 0) {
+                size += masterKey->Size ();
+            }
+            size += util::UI32_SIZE;
+            for (ParamsMap::const_iterator
+                    it = paramsMap.begin (),
+                    end = paramsMap.end (); it != end; ++it) {
+                size += it->second->Size ();
+            }
+            size += util::UI32_SIZE;
             for (KeyMap::const_iterator
                     it = activeKeyMap.begin (),
                     end = activeKeyMap.end (); it != end; ++it) {
@@ -357,19 +436,27 @@ namespace thekogans {
             }
             size += util::UI32_SIZE;
             for (KeyRingMap::const_iterator
-                    it = subrings.begin (),
-                    end = subrings.end (); it != end; ++it) {
+                    it = subringsMap.begin (),
+                    end = subringsMap.end (); it != end; ++it) {
                 size += it->second->Size ();
             }
             return size;
         }
 
-        void KeyRing::Serialize (util::Serializer &serializer) const {
-            serializer << id << name << description;
+        void KeyRing::Serialize (
+                util::Serializer &serializer,
+                bool includeType) const {
+            Serializable::Serialize (serializer, includeType);
             bool haveMasterKey = masterKey.Get () != 0;
             serializer << haveMasterKey;
             if (haveMasterKey) {
                 masterKey->Serialize (serializer);
+            }
+            serializer << (util::ui32)paramsMap.size ();
+            for (ParamsMap::const_iterator
+                    it = paramsMap.begin (),
+                    end = paramsMap.end (); it != end; ++it) {
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)activeKeyMap.size ();
             for (KeyMap::const_iterator
@@ -383,10 +470,10 @@ namespace thekogans {
                     end = retiredKeyMap.end (); it != end; ++it) {
                 it->second->Serialize (serializer);
             }
-            serializer << (util::ui32)subrings.size ();
+            serializer << (util::ui32)subringsMap.size ();
             for (KeyRingMap::const_iterator
-                    it = subrings.begin (),
-                    end = subrings.end (); it != end; ++it) {
+                    it = subringsMap.begin (),
+                    end = subringsMap.end (); it != end; ++it) {
                 it->second->Serialize (serializer);
             }
         }
@@ -437,8 +524,8 @@ namespace thekogans {
                 util::CloseTag (indentationLevel + 1, TAG_RETIRED_KEYS) <<
                 util::OpenTag (indentationLevel + 1, TAG_SUB_RINGS, util::Attributes (), false, true);
             for (KeyRingMap::const_iterator
-                    it = subrings.begin (),
-                    end = subrings.end (); it != end; ++it) {
+                    it = subringsMap.begin (),
+                    end = subringsMap.end (); it != end; ++it) {
                 stream << it->second->ToString (indentationLevel + 2, TAG_SUB_RING);
             }
             stream <<

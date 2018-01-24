@@ -40,7 +40,11 @@ namespace {
             util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
             util::Buffer::UniquePtr signature = signer.SignBuffer (buffer, 1024);
             crypto::Authenticator verifier (crypto::Authenticator::Verify, privateKey->GetPublicKey ());
-            bool result = verifier.VerifyBufferSignature (buffer, 1024, signature->GetReadPtr (), signature->GetDataAvailableForReading ());
+            bool result = verifier.VerifyBufferSignature (
+                buffer,
+                1024,
+                signature->GetReadPtr (),
+                signature->GetDataAvailableForReading ());
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }
@@ -64,8 +68,8 @@ TEST (thekogans, DSA) {
     crypto::OpenSSLInit openSSLInit;
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (*crypto::DSA::ParamsFromKeyLength (512))",
-            crypto::AsymmetricKey::FromParams (*crypto::DSA::ParamsFromKeyLength (512))),
+            "crypto::DSA::ParamsFromKeyLength (512)->CreateAsymmetricKey ()",
+            crypto::DSA::ParamsFromKeyLength (512)->CreateKey ()),
         true);
 }
 
@@ -74,105 +78,105 @@ TEST (thekogans, EC) {
     // Named curves
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1))),
+            "crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1)->CreateKey ()",
+            crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1)->CreateKey ()),
         true);
     // RFC5114Curve
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192))),
+            "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192)->CreateKey ()",
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224))),
+            "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224)->CreateKey ()",
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256))),
+            "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256)->CreateKey ()",
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384))),
+            "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384)->CreateKey ()",
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521))),
+            "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521)->CreateKey ()),
         true);
     // RFC5639Curve
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512)->CreateKey ()),
         true);
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::AsymmetricKey::FromParams (crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T))",
-            crypto::AsymmetricKey::FromParams (*crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T))),
+            "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)->CreateKey ())",
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)->CreateKey ()),
         true);
 }
 

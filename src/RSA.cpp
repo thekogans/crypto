@@ -38,10 +38,11 @@ namespace thekogans {
                 if (ctx.get () != 0 &&
                         EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_keygen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
-                        EVP_PKEY_CTX_set_rsa_keygen_pubexp (ctx.get (), publicExponent.release ()) == 1 &&
+                        EVP_PKEY_CTX_set_rsa_keygen_pubexp (ctx.get (), publicExponent.get ()) == 1 &&
                         EVP_PKEY_keygen (ctx.get (), &key) == 1) {
+                    publicExponent.release ();
                     return AsymmetricKey::Ptr (
-                        new AsymmetricKey (key, true, name, description));
+                        new AsymmetricKey (EVP_PKEYPtr (key), true, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

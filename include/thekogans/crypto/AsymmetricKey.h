@@ -23,7 +23,7 @@
 #include <openssl/pem.h>
 #include "thekogans/util/Exception.h"
 #include "thekogans/crypto/Config.h"
-#include "thekogans/crypto/Key.h"
+#include "thekogans/crypto/Serializable.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
@@ -32,14 +32,14 @@ namespace thekogans {
         /// \struct AsymmetricKey AsymmetricKey.h thekogans/crypto/AsymmetricKey.h
         ///
         /// \brief
-        /// AsymmetricKey wraps a EVP_PKEY and provides the functionality exposed by \see{Key}.
+        /// AsymmetricKey wraps a EVP_PKEY and provides the functionality exposed by \see{Serializable}.
         /// AsymmetricKey makes it very convenient to serialize asymmetric keys for saving to
         /// files or transferring across the network.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Key {
+        struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
             /// \brief
-            /// AsymmetricKey is a \see{Key}.
-            THEKOGANS_CRYPTO_DECLARE_KEY (AsymmetricKey)
+            /// AsymmetricKey is a \see{Serializable}.
+            THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (AsymmetricKey)
 
         private:
             /// \brief
@@ -57,19 +57,19 @@ namespace thekogans {
             /// NOTE: AsymmetricKey takes ownership of the key and will delete
             /// it in it's dtor. If that's not what you need, make sure to call
             /// CRYPTO_add (&key_->references, 1, CRYPTO_LOCK_EVP_PKEY); before
-            /// passing the EVP_PKEY * in to the ctor.
+            /// passing the EVP_PKEYPtr in to the ctor.
             /// \param[in] isPrivate_ true = contains both private and public keys.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             AsymmetricKey (
-                    EVP_PKEY *key_,
+                    EVP_PKEYPtr key_,
                     bool isPrivate_,
                     const std::string &name = std::string (),
                     const std::string &description = std::string ()) :
-                    Key (name, description),
-                    key (key_),
+                    Serializable (name, description),
+                    key (std::move (key_)),
                     isPrivate (isPrivate_) {
-                if (key_ == 0) {
+                if (key.get () == 0) {
                     THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                         THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                 }
@@ -86,16 +86,6 @@ namespace thekogans {
                 return isPrivate;
             }
 
-            /// \brief
-            /// Create an \see{AsymmetricKey} (private/public) from the given parameters.
-            /// \param[in] params EVP_PKEY parameters created by the DH, DSA or EC methods.
-            /// \param[in] name Optional key name.
-            /// \param[in] description Optional key description.
-            /// \return A new AsymmetricKey key.
-            static Ptr FromParams (
-                EVP_PKEY &params,
-                const std::string &name = std::string (),
-                const std::string &description = std::string ());
             /// \brief
             /// Load a PEM encoded private key from a file.
             /// \param[in] path File containing a private key.
@@ -172,11 +162,11 @@ namespace thekogans {
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
-            /// "KeyType"
-            static const char * const ATTR_KEY_TYPE;
-            /// \brief
             /// "Private"
             static const char * const ATTR_PRIVATE;
+            /// \brief
+            /// "KeyType"
+            static const char * const ATTR_KEY_TYPE;
 
             /// \brief
             /// Return the XML representation of a key.

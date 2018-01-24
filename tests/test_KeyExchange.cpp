@@ -34,13 +34,13 @@ namespace {
 
     bool TestParams (
             const char *paramsName,
-            EVP_PKEY &params,
+            crypto::Params &params,
             std::size_t keyLength) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
-            crypto::AsymmetricKey::Ptr privateKey1 = crypto::AsymmetricKey::FromParams (params);
+            crypto::AsymmetricKey::Ptr privateKey1 = params.CreateKey ();
             crypto::AsymmetricKey::Ptr publicKey1 = privateKey1->GetPublicKey ();
-            crypto::AsymmetricKey::Ptr privateKey2 = crypto::AsymmetricKey::FromParams (params);
+            crypto::AsymmetricKey::Ptr privateKey2 = params.CreateKey ();
             crypto::AsymmetricKey::Ptr publicKey2 = privateKey2->GetPublicKey ();
             crypto::KeyExchange keyExchange1 (privateKey1);
             crypto::SymmetricKey::Ptr key1 = keyExchange1.DeriveSharedSymmetricKey (publicKey2, keyLength);

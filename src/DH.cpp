@@ -22,9 +22,11 @@
 namespace thekogans {
     namespace crypto {
 
-        EVP_PKEYPtr DH::ParamsFromPrimeLengthAndGenerator (
+        Params::Ptr DH::ParamsFromPrimeLengthAndGenerator (
                 std::size_t primeLength,
-                std::size_t generator) {
+                std::size_t generator,
+                const std::string &name,
+                const std::string &description) {
             EVP_PKEY *params = 0;
             EVP_PKEY_CTXPtr ctx (
                 EVP_PKEY_CTX_new_id (EVP_PKEY_DH, OpenSSLInit::engine));
@@ -33,7 +35,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_set_dh_paramgen_prime_len (ctx.get (), (util::i32)primeLength) == 1 &&
                     EVP_PKEY_CTX_set_dh_paramgen_generator (ctx.get (), (util::i32)generator) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return EVP_PKEYPtr (params);
+                return Params::Ptr (new Params (EVP_PKEYPtr (params), name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -61,16 +63,19 @@ namespace thekogans {
         }
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
-        EVP_PKEYPtr DH::ParamsFromPrimeAndGenerator (
+        Params::Ptr DH::ParamsFromPrimeAndGenerator (
                 BIGNUM &prime,
-                BIGNUM &generator) {
-            DHPtr dh (DH_new ());
-            if (dh.get () != 0) {
-                if (DH_set0_pqg (dh.get (), BN_dup (&prime), 0, BN_dup (&generator)) == 1) {
+                BIGNUM &generator,
+                const std::string &name,
+                const std::string &description) {
+            DHPtr dhParams (DH_new ());
+            if (dhParams.get () != 0) {
+                if (DH_set0_pqg (dhParams.get (), BN_dup (&prime), 0, BN_dup (&generator)) == 1) {
                     EVP_PKEYPtr params (EVP_PKEY_new ());
-                    if (params.get () != 0) {
-                        EVP_PKEY_assign_DH (params.get (), dh.release ());
-                        return params;
+                    if (params.get () != 0 &&
+                            EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
+                        dhParams.release ();
+                        return Params::Ptr (new Params (std::move (params), name, description));
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -93,13 +98,16 @@ namespace thekogans {
                 util::i32 generatorLength;
             };
 
-            EVP_PKEYPtr ParamsFromDHParams (const DHParams &params) {
+            Params::Ptr ParamsFromDHParams (
+                    const DHParams &params,
+                    const std::string &name,
+                    const std::string &description) {
                 BIGNUMPtr prime (BN_new ());
                 BIGNUMPtr generator (BN_new ());
                 if (prime.get () != 0 && generator.get () != 0) {
                     BN_bin2bn (params.prime, params.primeLength, prime.get ());
                     BN_bin2bn (params.generator, params.generatorLength, generator.get ());
-                    return DH::ParamsFromPrimeAndGenerator (*prime, *generator);
+                    return DH::ParamsFromPrimeAndGenerator (*prime, *generator, name, description);
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -332,8 +340,11 @@ namespace thekogans {
             };
         }
 
-        EVP_PKEYPtr DH::ParamsFromRFC3526Prime (RFC3526Prime prime) {
-            return ParamsFromDHParams (rfc3526params[prime]);
+        Params::Ptr DH::ParamsFromRFC3526Prime (
+                RFC3526Prime prime,
+                const std::string &name,
+                const std::string &description) {
+            return ParamsFromDHParams (rfc3526params[prime], name, description);
         }
 
         namespace {
@@ -442,71 +453,11 @@ namespace thekogans {
             };
         }
 
-        EVP_PKEYPtr DH::ParamsFromRFC5114Prime (RFC5114Prime prime) {
-            return ParamsFromDHParams (rfc5114params[prime]);
-        }
-
-        util::Buffer::UniquePtr DH::SaveParams (EVP_PKEY &params) {
-            if (EVP_PKEY_base_id (&params) == EVP_PKEY_DH) {
-                DHPtr dhParams (EVP_PKEY_get1_DH (&params));
-                if (dhParams.get () != 0) {
-                    util::i32 parmsLength = i2d_DHparams (dhParams.get (), 0);
-                    if (parmsLength > 0) {
-                        util::Buffer::UniquePtr buffer (
-                            new util::Buffer (
-                                util::NetworkEndian,
-                                util::UI32_SIZE + // MAGIC32
-                                util::I32_SIZE + // parmsLength
-                                parmsLength)); // params
-                        *buffer << util::MAGIC32 << parmsLength;
-                        util::ui8 *paramsData = buffer->GetWritePtr ();
-                        buffer->AdvanceWriteOffset (
-                            (util::ui32)i2d_DHparams (dhParams.get (), &paramsData));
-                        return buffer;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid parameters type %d.",
-                    EVP_PKEY_base_id (&params));
-            }
-        }
-
-        EVP_PKEYPtr DH::LoadParams (util::Serializer &serializer) {
-            util::ui32 magic;
-            serializer >> magic;
-            if (magic == util::MAGIC32) {
-                util::i32 paramsLength;
-                serializer >> paramsLength;
-                std::vector<util::ui8> params (paramsLength);
-                serializer.Read (&params[0], paramsLength);
-                const util::ui8 *paramsData = &params[0];
-                DHPtr dhParams (d2i_DHparams (0, &paramsData, paramsLength));
-                if (dhParams.get () != 0) {
-                    EVP_PKEYPtr evpParams (EVP_PKEY_new ());
-                    if (EVP_PKEY_assign_DH (evpParams.get (), dhParams.release ()) == 1) {
-                        return evpParams;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid parameters buffer signature %u.",
-                    magic);
-            }
+        Params::Ptr DH::ParamsFromRFC5114Prime (
+                RFC5114Prime prime,
+                const std::string &name,
+                const std::string &description) {
+            return ParamsFromDHParams (rfc5114params[prime], name, description);
         }
 
     } // namespace crypto

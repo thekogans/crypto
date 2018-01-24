@@ -25,14 +25,16 @@ namespace thekogans {
         #define OPENSSL_EC_EXPLICIT_CURVE 0x000
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
-        EVP_PKEYPtr EC::ParamsFromGFpCurve (
+        Params::Ptr EC::ParamsFromGFpCurve (
                 const BIGNUM &p,
                 const BIGNUM &a,
                 const BIGNUM &b,
                 const BIGNUM &gx,
                 const BIGNUM &gy,
                 const BIGNUM &n,
-                const BIGNUM &c) {
+                const BIGNUM &c,
+                const std::string &name,
+                const std::string &description) {
             BN_CTXPtr ctx (BN_CTX_new ());
             if (ctx.get () != 0) {
                 EC_GROUPPtr curve (EC_GROUP_new_curve_GFp (&p, &a, &b, ctx.get ()));
@@ -43,13 +45,14 @@ namespace thekogans {
                             EC_POINT_set_affine_coordinates_GFp (curve.get (),
                                 generator.get (), &gx, &gy, ctx.get ()) == 1 &&
                             EC_GROUP_set_generator (curve.get (), generator.get (), &n, &c) == 1) {
-                        EC_KEYPtr ec (EC_KEY_new ());
-                        if (ec.get () != 0) {
-                            EC_KEY_set_group (ec.get (), curve.get ());
+                        EC_KEYPtr ecParams (EC_KEY_new ());
+                        if (ecParams.get () != 0) {
+                            EC_KEY_set_group (ecParams.get (), curve.get ());
                             EVP_PKEYPtr params (EVP_PKEY_new ());
-                            if (params.get () != 0) {
-                                EVP_PKEY_assign_EC_KEY (params.get (), ec.release ());
-                                return params;
+                            if (params.get () != 0 &&
+                                    EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
+                                ecParams.release ();
+                                return Params::Ptr (new Params (std::move (params), name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -72,7 +75,10 @@ namespace thekogans {
             }
         }
 
-        EVP_PKEYPtr EC::ParamsFromNamedCurve (util::i32 nid) {
+        Params::Ptr EC::ParamsFromNamedCurve (
+                util::i32 nid,
+                const std::string &name,
+                const std::string &description) {
             EVP_PKEY *params = 0;
             EVP_PKEY_CTXPtr ctx (
                 EVP_PKEY_CTX_new_id (EVP_PKEY_EC, OpenSSLInit::engine));
@@ -81,7 +87,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_set_ec_paramgen_curve_nid (ctx.get (), nid) == 1 &&
                     EVP_PKEY_CTX_set_ec_param_enc (ctx.get (), OPENSSL_EC_NAMED_CURVE) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return EVP_PKEYPtr (params);
+                return Params::Ptr (new Params (EVP_PKEYPtr (params), name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -106,7 +112,10 @@ namespace thekogans {
                 util::i32 cLength;
             };
 
-            EVP_PKEYPtr ParamsFromEllipticCurve (const EllipticCurve &curve) {
+            Params::Ptr ParamsFromEllipticCurve (
+                    const EllipticCurve &curve,
+                    const std::string &name,
+                    const std::string &description) {
                 BIGNUMPtr p (BN_new ());
                 BIGNUMPtr a (BN_new ());
                 BIGNUMPtr b (BN_new ());
@@ -126,7 +135,7 @@ namespace thekogans {
                     BN_bin2bn (curve.gy, curve.gyLength, gy.get ());
                     BN_bin2bn (curve.n, curve.nLength, n.get ());
                     BN_bin2bn (curve.c, curve.cLength, c.get ());
-                    return EC::ParamsFromGFpCurve (*p, *a, *b, *gx, *gy, *n, *c);
+                    return EC::ParamsFromGFpCurve (*p, *a, *b, *gx, *gy, *n, *c, name, description);
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -413,8 +422,11 @@ namespace thekogans {
             };
         }
 
-        EVP_PKEYPtr EC::ParamsFromRFC5114Curve (RFC5114Curve curve) {
-            return ParamsFromEllipticCurve (rfc5114curves[curve]);
+        Params::Ptr EC::ParamsFromRFC5114Curve (
+                RFC5114Curve curve,
+                const std::string &name,
+                const std::string &description) {
+            return ParamsFromEllipticCurve (rfc5114curves[curve], name, description);
         }
 
         namespace {
@@ -1226,71 +1238,11 @@ namespace thekogans {
             };
         }
 
-        EVP_PKEYPtr EC::ParamsFromRFC5639Curve (RFC5639Curve curve) {
-            return ParamsFromEllipticCurve (rfc5639curves[curve]);
-        }
-
-        util::Buffer::UniquePtr EC::SaveParams (EVP_PKEY &params) {
-            if (EVP_PKEY_base_id (&params) == EVP_PKEY_EC) {
-                EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (&params));
-                if (ecParams.get () != 0) {
-                    util::i32 parmsLength = i2d_ECParameters (ecParams.get (), 0);
-                    if (parmsLength > 0) {
-                        util::Buffer::UniquePtr buffer (
-                            new util::Buffer (
-                                util::NetworkEndian,
-                                util::UI32_SIZE + // MAGIC32
-                                util::I32_SIZE + // parmsLength
-                                parmsLength)); // params
-                        *buffer << util::MAGIC32 << parmsLength;
-                        util::ui8 *paramsData = buffer->GetWritePtr ();
-                        buffer->AdvanceWriteOffset (
-                            (util::ui32)i2d_ECParameters (ecParams.get (), &paramsData));
-                        return buffer;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid parameters type %d.",
-                    EVP_PKEY_base_id (&params));
-            }
-        }
-
-        EVP_PKEYPtr EC::LoadParams (util::Serializer &serializer) {
-            util::ui32 magic;
-            serializer >> magic;
-            if (magic == util::MAGIC32) {
-                util::i32 paramsLength;
-                serializer >> paramsLength;
-                std::vector<util::ui8> params (paramsLength);
-                serializer.Read (&params[0], paramsLength);
-                const util::ui8 *paramsData = &params[0];
-                EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, paramsLength));
-                if (ecParams.get () != 0) {
-                    EVP_PKEYPtr evpParams (EVP_PKEY_new ());
-                    if (EVP_PKEY_assign_EC_KEY (evpParams.get (), ecParams.release ()) == 1) {
-                        return evpParams;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid parameters buffer signature %u.",
-                    magic);
-            }
+        Params::Ptr EC::ParamsFromRFC5639Curve (
+                RFC5639Curve curve,
+                const std::string &name,
+                const std::string &description) {
+            return ParamsFromEllipticCurve (rfc5639curves[curve], name, description);
         }
 
     } // namespace crypto

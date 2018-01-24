@@ -33,7 +33,7 @@ namespace thekogans {
         /// \struct ID ID.h thekogans/crypto/ID.h
         ///
         /// \brief
-        /// Ids are randomly generated 32 byte values. They're used by \see{Key} and \see{KeyRing}.
+        /// Ids are randomly generated 32 byte values. They're used by \see{Serializable}.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL ID {
             /// \enum

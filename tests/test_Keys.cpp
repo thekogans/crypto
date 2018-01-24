@@ -79,9 +79,10 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size ());
         key1->Serialize (serializer);
-        crypto::Key::Ptr key2 = crypto::Key::Get (serializer);
-        bool result = dynamic_cast<crypto::SymmetricKey *> (key2.Get ()) != 0 &&
-            *key1 == *dynamic_cast<crypto::SymmetricKey *> (key2.Get ());
+        crypto::SymmetricKey::Ptr key2 =
+            util::dynamic_refcounted_pointer_cast<crypto::SymmetricKey> (
+                crypto::Serializable::Get (serializer));
+        bool result = key2.Get () != 0 && *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);
     }
@@ -100,8 +101,8 @@ namespace {
 
 TEST (thekogans, AsymmetricKey) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey = crypto::AsymmetricKey::FromParams (
-        *crypto::DSA::ParamsFromKeyLength (512));
+    crypto::AsymmetricKey::Ptr privateKey =
+        crypto::DSA::ParamsFromKeyLength (512)->CreateKey ();
     {
         std::cout << "AsymmetricKey private key...";
         util::Buffer serializer (util::NetworkEndian, (util::ui32)privateKey->Size (false));

@@ -22,13 +22,10 @@
 #include <list>
 #include <map>
 #include "thekogans/util/Types.h"
-#include "thekogans/util/Heap.h"
-#include "thekogans/util/RefCounted.h"
-#include "thekogans/util/SpinLock.h"
-#include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/ID.h"
-#include "thekogans/crypto/Key.h"
+#include "thekogans/crypto/Serializable.h"
+#include "thekogans/crypto/Params.h"
 #include "thekogans/crypto/Cipher.h"
 
 namespace thekogans {
@@ -46,31 +43,24 @@ namespace thekogans {
         /// keys, then call KeyRing::Save. Later call KeyRing::Load and use it to decrypt
         /// the data at rest.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL KeyRing : public util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL KeyRing : public Serializable {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<KeyRing>.
-            typedef util::ThreadSafeRefCounted::Ptr<KeyRing> Ptr;
-
-            /// \brief
-            /// KeyRing has it's own secure heap.
-            THEKOGANS_UTIL_DECLARE_HEAP_WITH_LOCK (KeyRing, util::SpinLock)
+            /// KeyRing is a \see{Serializable}.
+            THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (KeyRing)
 
         private:
             /// \brief
-            /// key id.
-            ID id;
+            /// Convenient typedef for std::map<ID, Params::Ptr>.
+            typedef std::map<ID, Params::Ptr> ParamsMap;
             /// \brief
-            /// Optional keyring name.
-            std::string name;
-            /// \brief
-            /// Optional keyring description.
-            std::string description;
+            /// Params map.
+            ParamsMap paramsMap;
             /// \brief
             /// Master key.
-            Key::Ptr masterKey;
+            Serializable::Ptr masterKey;
             /// \brief
-            /// Convenient typedef for std::map<ID, Key::Ptr>.
-            typedef std::map<ID, Key::Ptr> KeyMap;
+            /// Convenient typedef for std::map<ID, Serializable::Ptr>.
+            typedef std::map<ID, Serializable::Ptr> KeyMap;
             /// \brief
             /// Active key map.
             KeyMap activeKeyMap;
@@ -82,20 +72,19 @@ namespace thekogans {
             typedef std::map<ID, Ptr> KeyRingMap;
             /// \brief
             /// Subrings hanging off this keyring.
-            KeyRingMap subrings;
+            KeyRingMap subringsMap;
 
         public:
             /// \brief
             /// ctor.
-            /// \param[in] name_ Optional keyring name.
-            /// \param[in] description_ Optional keyring description.
-            /// \param[in] masterKey_ Master \see{Key}.
+            /// \param[in] name Optional keyring name.
+            /// \param[in] description Optional keyring description.
+            /// \param[in] masterKey_ Master key.
             KeyRing (
-                const std::string &name_ = std::string (),
-                const std::string &description_ = std::string (),
-                Key::Ptr masterKey_ = Key::Ptr ()) :
-                name (name_),
-                description (description_),
+                const std::string &name = std::string (),
+                const std::string &description = std::string (),
+                Serializable::Ptr masterKey_ = Serializable::Ptr ()) :
+                Serializable (name, description),
                 masterKey (masterKey_) {}
             /// \brief
             /// ctor.
@@ -144,48 +133,75 @@ namespace thekogans {
             }
 
             /// \brief
-            /// Return the master \see{Key}.
-            /// \return The master \see{Key}.
-            inline Key::Ptr GetMasterKey () const {
+            /// Return the master key.
+            /// \return The master key.
+            inline Serializable::Ptr GetMasterKey () const {
                 return masterKey;
             }
             /// \brief
             /// Set the master key to the given key.
             /// \param[in] masterKey_ New master key to set.
-            inline void SetMasterKey (Key::Ptr masterKey_) {
+            inline void SetMasterKey (Serializable::Ptr masterKey_) {
                 masterKey = masterKey_;
             }
 
             /// \brief
-            /// Retrieve the \see{Key} (master, active or retired) corresponding
-            /// to the given id.
-            /// \param[in] keyId Id of \see{Key} to retrieve.
+            /// Return the params with the given id.
+            /// \param[in] paramsId Id of params to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return Master, active or retired \see{Key} corresponding to the
+            /// \return Paramsg corresponding to the given paramsId (Params::Ptr () if not found).
+            Params::Ptr GetParams (
+                const ID &paramsId,
+                bool recursive = true) const;
+            /// \brief
+            /// Add a params to this ring.
+            /// \param[in] params Params to add.
+            /// \return true = paras added. false = A params with
+            /// this id already exists in the ring.
+            bool AddParams (Params::Ptr params);
+            /// \brief
+            /// Drop a params with the given id.
+            /// \param[in] paramsId Id of params to delete.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return true = dropped, false = not found.
+            bool DropParams (
+                const ID &paramsId,
+                bool recursive = true);
+            /// \brief
+            /// Drop all params.
+            /// \param[in] recursive true = descend down to sub rings.
+            void DropAllParams (bool recursive = true);
+
+            /// \brief
+            /// Retrieve the key (master, active or retired) corresponding
+            /// to the given id.
+            /// \param[in] keyId Id of key to retrieve.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return Master, active or retired key corresponding to the
             /// given id. \see{Key::Ptr} () if not found.
-            Key::Ptr GetKey (
+            Serializable::Ptr GetKey (
                 const ID &keyId,
                 bool recursive = true) const;
 
             /// \brief
-            /// Add a \see{Key} to the ring.
-            /// \param[in] key \see{Key} to add.
-            /// \return true = \see{Key} added. false = A \see{Key} with
+            /// Add a key to the ring.
+            /// \param[in] key key to add.
+            /// \return true = key added. false = A key with
             /// this id already exists in the ring.
-            bool AddActiveKey (Key::Ptr key);
+            bool AddActiveKey (Serializable::Ptr key);
             /// \brief
-            /// Given an active \see{Key} id, move the corresponding \see{Key}
+            /// Given an active key id, move the corresponding key
             /// to the retired key map.
-            /// \param[in] keyId Active \see{Key} id to retire.
+            /// \param[in] keyId Active key id to retire.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = retired, false = not found.
             bool RetireActiveKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
-            /// Given an active \see{Key} id, drop the corresponding \see{Key}
+            /// Given an active key id, drop the corresponding key
             /// from the key ring.
-            /// \param[in] keyId Active \see{Key} id to drop from the key ring.
+            /// \param[in] keyId Active key id to drop from the key ring.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
             bool DropActiveKey (
@@ -196,9 +212,9 @@ namespace thekogans {
             /// \param[in] recursive true = descend down to sub rings.
             void DropActiveKeys (bool recursive = true);
             /// \brief
-            /// Given a retired \see{Key} id, drop the corresponding \see{Key}
+            /// Given a retired key id, drop the corresponding key
             /// from the key ring.
-            /// \param[in] keyId Retired \see{Key} id to drop from the key ring.
+            /// \param[in] keyId Retired key id to drop from the key ring.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
             bool DropRetiredKey (
@@ -240,18 +256,23 @@ namespace thekogans {
             void DropAllSubrings ();
 
             /// \brief
-            /// Drop all keys and sub rings.
+            /// Drop all params, keys and sub rings.
             void Clear ();
 
             /// \brief
             /// Return the serialized keyring size.
+            /// \param[in] includeType true = include key's type in size calculation.
             /// \return Serialized keyring size.
-            std::size_t Size () const;
+            virtual std::size_t Size (bool includeType = true) const;
 
             /// \brief
             /// Save the key ring to a serializer.
             /// \param[in] serializer Serializer to write the keyring to.
-            void Serialize (util::Serializer &serializer) const;
+            /// \param[in] includeType true = Serialize keyrings's type
+            /// to be used by \see{Serializable::Get}.
+            virtual void Serialize (
+                util::Serializer &serializer,
+                bool includeType = true) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief

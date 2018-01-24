@@ -40,7 +40,7 @@ namespace thekogans {
         /// \struct Cipher Cipher.h thekogans/crypto/Cipher.h
         ///
         /// \brief
-        /// Cipher implements symmetric encryption/decryption using AES (CBC or GCM mode).
+        /// Cipher implements symmetric encryption/decryption using AES (CBC or GCM mode)
         /// Every encryption operation uses a random iv to thwart BEAST. MACs (CBC mode)
         /// are calculated over ciphertext to avoid the cryptographic doom principle:
         /// https://moxie.org/blog/the-cryptographic-doom-principle/. See the description

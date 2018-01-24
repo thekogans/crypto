@@ -23,7 +23,7 @@
 #include "thekogans/util/FixedBuffer.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
-#include "thekogans/crypto/Key.h"
+#include "thekogans/crypto/Serializable.h"
 
 namespace thekogans {
     namespace crypto {
@@ -34,11 +34,11 @@ namespace thekogans {
         /// SymmetricKey is used by \see{Cipher} for bulk encryption.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL SymmetricKey :
-                public Key,
+                public Serializable,
                 public util::FixedBuffer<EVP_MAX_KEY_LENGTH> {
             /// \brief
-            /// SymmetricKey is a \see{Key}
-            THEKOGANS_CRYPTO_DECLARE_KEY (SymmetricKey)
+            /// SymmetricKey is a \see{Serializable}
+            THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (SymmetricKey)
 
             /// \brief
             /// ctor.
@@ -47,7 +47,7 @@ namespace thekogans {
             SymmetricKey (
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
-                Key (name, description) {}
+                Serializable (name, description) {}
             /// \brief
             /// ctor.
             /// \param[in] serializer Serializer containing the key.

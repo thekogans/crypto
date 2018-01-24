@@ -37,10 +37,12 @@ namespace thekogans {
             #define THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE 16
         #endif // !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 
-        THEKOGANS_CRYPTO_IMPLEMENT_KEY (SymmetricKey, THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
+        THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
+            SymmetricKey,
+            THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 
         SymmetricKey::SymmetricKey (util::Serializer &serializer) :
-                Key (serializer) {
+                Serializable (serializer) {
             serializer >> writeOffset;
             serializer.Read (data, GetDataAvailableForReading ());
             memset (GetWritePtr (), 0, GetDataAvailableForWriting ());
@@ -132,14 +134,14 @@ namespace thekogans {
 
         std::size_t SymmetricKey::Size (bool includeType) const {
             return
-                Key::Size (includeType) +
+                Serializable::Size (includeType) +
                 util::UI32_SIZE + GetDataAvailableForReading ();
         }
 
         void SymmetricKey::Serialize (
                 util::Serializer &serializer,
                 bool includeType) const {
-            Key::Serialize (serializer, includeType);
+            Serializable::Serialize (serializer, includeType);
             serializer << GetDataAvailableForReading ();
             serializer.Write (GetReadPtr (), GetDataAvailableForReading ());
         }

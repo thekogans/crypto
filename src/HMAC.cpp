@@ -54,7 +54,7 @@ namespace thekogans {
                             (void *)symmetricKey->GetReadPtr ()) == 1 &&
                         EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                     return AsymmetricKey::Ptr (
-                        new AsymmetricKey (key, true, name, description));
+                        new AsymmetricKey (EVP_PKEYPtr (key), true, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

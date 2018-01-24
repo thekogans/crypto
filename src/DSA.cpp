@@ -23,7 +23,10 @@
 namespace thekogans {
     namespace crypto {
 
-        EVP_PKEYPtr DSA::ParamsFromKeyLength (std::size_t keyLength) {
+        Params::Ptr DSA::ParamsFromKeyLength (
+                std::size_t keyLength,
+                const std::string &name,
+                const std::string &description) {
             if (keyLength > 0) {
                 EVP_PKEY *params = 0;
                 EVP_PKEY_CTXPtr ctx (
@@ -32,7 +35,7 @@ namespace thekogans {
                         EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_dsa_paramgen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
                         EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                    return EVP_PKEYPtr (params);
+                    return Params::Ptr (new Params (EVP_PKEYPtr (params), name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -41,69 +44,6 @@ namespace thekogans {
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        util::Buffer::UniquePtr DSA::SaveParams (EVP_PKEY &params) {
-            if (EVP_PKEY_base_id (&params) == EVP_PKEY_DSA) {
-                DSAPtr dsaParams (EVP_PKEY_get1_DSA (&params));
-                if (dsaParams.get () != 0) {
-                    util::i32 parmsLength = i2d_DSAparams (dsaParams.get (), 0);
-                    if (parmsLength > 0) {
-                        util::Buffer::UniquePtr buffer (
-                            new util::Buffer (
-                                util::NetworkEndian,
-                                util::UI32_SIZE + // MAGIC32
-                                util::I32_SIZE + // parmsLength
-                                parmsLength)); // params
-                        *buffer << util::MAGIC32 << parmsLength;
-                        util::ui8 *paramsData = buffer->GetWritePtr ();
-                        buffer->AdvanceWriteOffset (
-                            (util::ui32)i2d_DSAparams (dsaParams.get (), &paramsData));
-                        return buffer;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid parameters type %d.",
-                    EVP_PKEY_base_id (&params));
-            }
-        }
-
-        EVP_PKEYPtr DSA::LoadParams (util::Serializer &serializer) {
-            util::ui32 magic;
-            serializer >> magic;
-            if (magic == util::MAGIC32) {
-                util::i32 paramsLength;
-                serializer >> paramsLength;
-                std::vector<util::ui8> params (paramsLength);
-                serializer.Read (&params[0], paramsLength);
-                const util::ui8 *paramsData = &params[0];
-                DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, paramsLength));
-                if (dsaParams.get () != 0) {
-                    EVP_PKEYPtr evpParams (EVP_PKEY_new ());
-                    if (EVP_PKEY_assign_DSA (evpParams.get (), dsaParams.release ()) == 1) {
-                        return evpParams;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid parameters buffer signature %u.",
-                    magic);
             }
         }
 
