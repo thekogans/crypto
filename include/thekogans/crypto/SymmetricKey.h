@@ -140,7 +140,7 @@ namespace thekogans {
             /// \return XML representation of a key.
             virtual std::string ToString (
                 util::ui32 indentationLevel = 0,
-                const char *tagName = TAG_KEY) const;
+                const char *tagName = TAG_SERIALIZABLE) const;
         #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
             /// \brief
