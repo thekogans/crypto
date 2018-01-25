@@ -99,7 +99,7 @@ namespace thekogans {
             /// \param[in] associatedDataLength Length of optional associated data.
             static Ptr Load (
                 const std::string &path,
-                Cipher::Ptr cipher,
+                Cipher *cipher = 0,
                 const void *associatedData = 0,
                 std::size_t associatedDataLength = 0);
             /// \brief
@@ -110,7 +110,7 @@ namespace thekogans {
             /// \param[in] associatedDataLength Length of optional associated data.
             void Save (
                 const std::string &path,
-                Cipher::Ptr cipher,
+                Cipher *cipher = 0,
                 const void *associatedData = 0,
                 std::size_t associatedDataLength = 0);
 

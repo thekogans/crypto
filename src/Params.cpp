@@ -387,7 +387,7 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
             attributes.push_back (util::Attribute (ATTR_NAME, name));
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_PARAMS_TYPE, typeTostring (EVP_PKEY_base_id (key.get ()))));
+            attributes.push_back (util::Attribute (ATTR_PARAMS_TYPE, typeTostring (EVP_PKEY_base_id (params.get ()))));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
                 std::string (paramsBuffer.begin (), paramsBuffer.end ()) << std::endl <<

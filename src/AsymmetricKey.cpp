@@ -240,7 +240,7 @@ namespace thekogans {
                 util::ui32 indentationLevel,
                 const char *tagName) const {
             util::SecureVector<util::ui8> keyBuffer;
-            Serialize (isPrivate, *key, keyBuffer);
+            SerializeKey (isPrivate, *key, keyBuffer);
             std::stringstream stream;
             util::Attributes attributes;
             attributes.push_back (util::Attribute (ATTR_TYPE, Type ()));

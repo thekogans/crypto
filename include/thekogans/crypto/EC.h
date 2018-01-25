@@ -19,7 +19,6 @@
 #define __thekogans_crypto_EC_h
 
 #include <openssl/bn.h>
-#include <openssl/evp.h>
 #include "thekogans/util/Serializer.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"

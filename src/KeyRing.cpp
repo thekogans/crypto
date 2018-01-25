@@ -96,7 +96,7 @@ namespace thekogans {
 
         KeyRing::Ptr KeyRing::Load (
                 const std::string &path,
-                Cipher::Ptr cipher,
+                Cipher *cipher,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             util::ReadOnlyFile file (util::NetworkEndian, path);
@@ -104,7 +104,7 @@ namespace thekogans {
                 new util::Buffer (util::NetworkEndian, (util::ui32)file.GetSize ()));
             buffer->AdvanceWriteOffset (
                 file.Read (buffer->GetWritePtr (), buffer->GetDataAvailableForWriting ()));
-            if (cipher.Get () != 0) {
+            if (cipher != 0) {
                 buffer = cipher->Decrypt (
                     buffer->GetReadPtr (),
                     buffer->GetDataAvailableForReading (),
@@ -117,13 +117,13 @@ namespace thekogans {
 
         void KeyRing::Save (
                 const std::string &path,
-                Cipher::Ptr cipher,
+                Cipher *cipher,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             util::Buffer::UniquePtr buffer (
                 new util::SecureBuffer (util::NetworkEndian, (util::ui32)Size (false)));
-            Serialize (*buffer);
-            if (cipher.Get () != 0) {
+            Serialize (*buffer, false);
+            if (cipher != 0) {
                 buffer = cipher->Encrypt (
                     buffer->GetReadPtr (),
                     buffer->GetDataAvailableForReading (),
