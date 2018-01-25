@@ -22,23 +22,41 @@
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/FixedBuffer.h"
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/Cipher.h"
 #include "thekogans/crypto/KeyRing.h"
 
 using namespace thekogans;
+
+namespace {
+    std::string GetCipherSuites () {
+        std::string cipherSuites_;
+        const std::vector<crypto::CipherSuite> &cipherSuites =
+            crypto::CipherSuite::GetCipherSuites ();
+        if (!cipherSuites.empty ()) {
+            cipherSuites_ = cipherSuites[0].ToString ();
+            for (std::size_t i = 1, count = cipherSuites.size (); i < count; ++i) {
+                cipherSuites_ += " | " + cipherSuites[i].ToString ();
+            }
+        }
+        return cipherSuites_;
+    }
+}
 
 int main (
         int argc,
         const char *argv[]) {
     struct Options : public util::CommandLineOptions {
         bool help;
+        crypto::CipherSuite cipherSuite;
         std::string name;
         std::string description;
         std::string password;
         std::string path;
 
         Options () :
-            help (false) {}
+            help (false),
+            cipherSuite ("ECDHE_ECDSA_AES-256-GCM_SHA2-512") {}
 
         virtual void DoOption (
                 char option,
@@ -46,6 +64,10 @@ int main (
             switch (option) {
                 case 'h': {
                     help = true;
+                    break;
+                }
+                case 'c': {
+                    cipherSuite = crypto::CipherSuite (value);
                     break;
                 }
                 case 'n': {
@@ -67,9 +89,12 @@ int main (
         }
     } options;
     options.Parse (argc, argv, "hcndp");
-    if (options.help || options.password.empty () || options.path.empty ()) {
-        std::cout << "usage: " << argv[0] << " [-h] [-n:'optional key ring name'] "
-            "[-d:'optional key ring description'] -p:password path" << std::endl;
+    if (options.help ||
+            options.password.empty () ||
+            options.path.empty ()) {
+        std::cout << "usage: " << argv[0] << " [-h] [-c:'" << GetCipherSuites () << "'] "
+            "[-n:'optional key ring name'] [-d:'optional key ring description'] "
+            "-p:password path" << std::endl;
         return 1;
     }
     THEKOGANS_UTIL_LOG_INIT (
@@ -82,11 +107,9 @@ int main (
         {
             std::cout << "Generating key ring...";
             crypto::KeyRing keyRing (
+                options.cipherSuite,
                 options.name,
-                options.description,
-                util::static_refcounted_pointer_cast<crypto::Serializable> (
-                    crypto::SymmetricKey::FromRandom (
-                        crypto::Cipher::GetKeyLength ())));
+                options.description);
             crypto::Cipher cipher (
                 crypto::SymmetricKey::FromSecretAndSalt (
                     crypto::Cipher::GetKeyLength (),
@@ -110,9 +133,7 @@ int main (
                     util::GlobalRandomSource::Instance ().GetBytes (
                         originalPlaintext.GetWritePtr (),
                         originalPlaintext.GetDataAvailableForWriting ()));
-                crypto::Cipher cipher (
-                    util::dynamic_refcounted_pointer_cast<crypto::SymmetricKey> (
-                        keyRing->GetMasterKey ()));
+                crypto::Cipher cipher (keyRing->GetMasterKey ());
                 util::Buffer::UniquePtr ciphertext = cipher.Encrypt (
                     originalPlaintext.GetReadPtr (),
                     originalPlaintext.GetDataAvailableForReading ());

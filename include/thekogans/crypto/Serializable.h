@@ -187,13 +187,15 @@ namespace thekogans {
             static thekogans::crypto::Serializable::Ptr Create (thekogans::util::Serializer &serializer) {\
                 return thekogans::crypto::Serializable::Ptr (new type (serializer));\
             }\
+            static const char *TYPE;\
             virtual std::string Type () const {\
-                return #type;\
+                return TYPE;\
             }
 
         /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE_COMMON(type)
         /// Common code used by Static and Shared versions THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE.
         #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE_COMMON(type, minSerializablesInPage)\
+            const char *type::TYPE = #type;\
             THEKOGANS_UTIL_IMPLEMENT_HEAP_WITH_LOCK_EX_AND_ALLOCATOR (\
                 type,\
                 thekogans::util::SpinLock,\

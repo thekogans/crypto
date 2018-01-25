@@ -53,6 +53,10 @@ namespace thekogans {
                 authenticatorSeparator,
                 cipherSeparator++ - authenticatorSeparator);
             messageDigest = cipherSuite.substr (cipherSeparator);
+            if (!IsValid ()) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid cipher suite: %s", cipherSuite.c_str ());
+            }
         }
 
         namespace {

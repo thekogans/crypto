@@ -39,11 +39,26 @@ namespace thekogans {
             KeyRing,
             THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
+        KeyRing::KeyRing (
+            const CipherSuite &cipherSuite_,
+            const std::string &name,
+            const std::string &description) :
+            Serializable (name, description),
+            cipherSuite (cipherSuite_),
+            masterKey (
+                SymmetricKey::FromRandom (
+                    Cipher::GetKeyLength (
+                        CipherSuite::GetOpenSSLCipher (cipherSuite.cipher)))) {}
+
         KeyRing::KeyRing (util::Serializer &serializer) :
                 Serializable (serializer) {
+            serializer >> cipherSuite;
             bool haveMasterKey;
             serializer >> haveMasterKey;
-            masterKey = haveMasterKey ? Serializable::Get (serializer) : Serializable::Ptr ();
+            masterKey = haveMasterKey ?
+                util::dynamic_refcounted_pointer_cast<SymmetricKey> (
+                    Serializable::Get (serializer)) :
+                SymmetricKey::Ptr ();
             util::ui32 paramsCount;
             serializer >> paramsCount;
             paramsMap.clear ();
@@ -208,7 +223,7 @@ namespace thekogans {
                 const ID &keyId,
                 bool recursive) const {
             if (masterKey.Get () != 0 && masterKey->GetId () == keyId) {
-                return masterKey;
+                return util::static_refcounted_pointer_cast<Serializable> (masterKey);
             }
             KeyMap::const_iterator it = activeKeyMap.find (keyId);
             if (it != activeKeyMap.end ()) {
@@ -412,6 +427,7 @@ namespace thekogans {
         std::size_t KeyRing::Size (bool includeType) const {
             std::size_t size =
                 Serializable::Size (includeType) +
+                cipherSuite.Size () +
                 util::BOOL_SIZE;
             if (masterKey.Get () != 0) {
                 size += masterKey->Size ();
@@ -447,6 +463,7 @@ namespace thekogans {
                 util::Serializer &serializer,
                 bool includeType) const {
             Serializable::Serialize (serializer, includeType);
+            serializer << cipherSuite;
             bool haveMasterKey = masterKey.Get () != 0;
             serializer << haveMasterKey;
             if (haveMasterKey) {
@@ -487,7 +504,10 @@ namespace thekogans {
         const char * const KeyRing::ATTR_ID = "Id";
         const char * const KeyRing::ATTR_NAME = "Name";
         const char * const KeyRing::ATTR_DESCRIPTION = "Description";
+        const char * const KeyRing::ATTR_CIPHER_SUITE = "CipherSuite";
         const char * const KeyRing::TAG_MASTER_KEY = "MasterKey";
+        const char * const KeyRing::TAG_PARAMS = "Params";
+        const char * const KeyRing::TAG_PARAM = "Param";
         const char * const KeyRing::TAG_ACTIVE_KEYS = "ActiveKeys";
         const char * const KeyRing::TAG_ACTIVE_KEY = "ActiveKey";
         const char * const KeyRing::TAG_RETIRED_KEYS = "RetiredKeys";
@@ -503,9 +523,18 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
             attributes.push_back (util::Attribute (ATTR_NAME, name));
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
+            attributes.push_back (util::Attribute (ATTR_CIPHER_SUITE, cipherSuite.ToString ()));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
                 (masterKey.Get () != 0 ? masterKey->ToString (indentationLevel + 1, TAG_MASTER_KEY) : std::string ()) <<
+                util::OpenTag (indentationLevel + 1, TAG_PARAMS, util::Attributes (), false, true);
+            for (ParamsMap::const_iterator
+                    it = paramsMap.begin (),
+                    end = paramsMap.end (); it != end; ++it) {
+                stream << it->second->ToString (indentationLevel + 2, TAG_PARAM);
+            }
+            stream <<
+                util::CloseTag (indentationLevel + 1, TAG_PARAMS) <<
                 util::OpenTag (indentationLevel + 1, TAG_ACTIVE_KEYS, util::Attributes (), false, true);
             for (KeyMap::const_iterator
                     it = activeKeyMap.begin (),

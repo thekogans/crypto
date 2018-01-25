@@ -25,6 +25,8 @@
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/ID.h"
 #include "thekogans/crypto/Serializable.h"
+#include "thekogans/crypto/CipherSuite.h"
+#include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/Params.h"
 #include "thekogans/crypto/Cipher.h"
 
@@ -50,14 +52,17 @@ namespace thekogans {
 
         private:
             /// \brief
+            /// \see{CipherSuite} associated with this key ring.
+            CipherSuite cipherSuite;
+            /// \brief
+            /// Master key.
+            SymmetricKey::Ptr masterKey;
+            /// \brief
             /// Convenient typedef for std::map<ID, Params::Ptr>.
             typedef std::map<ID, Params::Ptr> ParamsMap;
             /// \brief
             /// Params map.
             ParamsMap paramsMap;
-            /// \brief
-            /// Master key.
-            Serializable::Ptr masterKey;
             /// \brief
             /// Convenient typedef for std::map<ID, Serializable::Ptr>.
             typedef std::map<ID, Serializable::Ptr> KeyMap;
@@ -77,15 +82,13 @@ namespace thekogans {
         public:
             /// \brief
             /// ctor.
+            /// \param[in] cipherSuite_ \see{CipherSuite} associated with this key ring.
             /// \param[in] name Optional keyring name.
             /// \param[in] description Optional keyring description.
-            /// \param[in] masterKey_ Master key.
             KeyRing (
+                const CipherSuite &cipherSuite_,
                 const std::string &name = std::string (),
-                const std::string &description = std::string (),
-                Serializable::Ptr masterKey_ = Serializable::Ptr ()) :
-                Serializable (name, description),
-                masterKey (masterKey_) {}
+                const std::string &description = std::string ());
             /// \brief
             /// ctor.
             /// \param[in] buffer Buffer containing the serialized key ring.
@@ -114,34 +117,23 @@ namespace thekogans {
                 const void *associatedData = 0,
                 std::size_t associatedDataLength = 0);
 
-            /// Return the key ring id.
-            /// \return key ring id.
-            inline const ID &GetId () const {
-                return id;
-            }
-
-            /// Return the key ring name.
-            /// \return key ring name.
-            inline const std::string &GetName () const {
-                return name;
-            }
-
-            /// Return the key ring description.
-            /// \return key ring description.
-            inline const std::string &GetDescription () const {
-                return description;
+            /// \brief
+            /// Return the \see{CipherSuite} associated with this key ring.
+            /// \return \see{CipherSuite} associated with this key ring.
+            inline const CipherSuite &GetCipherSuite () const {
+                return cipherSuite;
             }
 
             /// \brief
             /// Return the master key.
             /// \return The master key.
-            inline Serializable::Ptr GetMasterKey () const {
+            inline SymmetricKey::Ptr GetMasterKey () const {
                 return masterKey;
             }
             /// \brief
             /// Set the master key to the given key.
             /// \param[in] masterKey_ New master key to set.
-            inline void SetMasterKey (Serializable::Ptr masterKey_) {
+            inline void SetMasterKey (SymmetricKey::Ptr masterKey_) {
                 masterKey = masterKey_;
             }
 
@@ -298,8 +290,17 @@ namespace thekogans {
             /// "Description"
             static const char * const ATTR_DESCRIPTION;
             /// \brief
+            /// "CipherSuite"
+            static const char * const ATTR_CIPHER_SUITE;
+            /// \brief
             /// "MasterKey"
             static const char * const TAG_MASTER_KEY;
+            /// \brief
+            /// "Params"
+            static const char * const TAG_PARAMS;
+            /// \brief
+            /// "Param"
+            static const char * const TAG_PARAM;
             /// \brief
             /// "ActiveKeys"
             static const char * const TAG_ACTIVE_KEYS;
