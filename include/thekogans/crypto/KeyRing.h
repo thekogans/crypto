@@ -26,8 +26,9 @@
 #include "thekogans/crypto/ID.h"
 #include "thekogans/crypto/Serializable.h"
 #include "thekogans/crypto/CipherSuite.h"
-#include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/Params.h"
+#include "thekogans/crypto/SymmetricKey.h"
+#include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/Cipher.h"
 
 namespace thekogans {
@@ -36,14 +37,15 @@ namespace thekogans {
         /// \struct KeyRing KeyRing.h thekogans/crypto/KeyRing.h
         ///
         /// \brief
-        /// KeyRings design makes it perfectly suitable for both duties of securing data
-        /// on the wire as well as data at rest. In the former case, create a KeyRing, call
-        /// KeyRing::Save and distribute it to the communicating peers. Have both peers call
-        /// KeyRing::Load and use the master key to generate temporary session (active) keys.
-        /// Once the session is over, destroy the KeyRing without calling KeyRing::Save.
-        /// In the later case, create a KeyRing, use it to generate permanent encryption (active)
-        /// keys, then call KeyRing::Save. Later call KeyRing::Load and use it to decrypt
-        /// the data at rest.
+        /// KeyRing is a collection of \see{Params}, \see{SymmetricKey} and \see{AsymmetricKey}
+        /// suitable for use with a particular \see{CipherSuite}. KeyRings design makes it perfectly
+        /// suitable for both duties of securing data on the wire as well as data at rest. In the
+        /// former case, create a KeyRing, call KeyRing::Save and distribute it to the communicating
+        /// peers. Have both peers call KeyRing::Load and use the master key to generate temporary
+        /// session (active) keys. Once the session is over, destroy the KeyRing without calling
+        /// KeyRing::Save. In the later case, create a KeyRing, use it to generate permanent
+        /// encryption (active) keys, then call KeyRing::Save. Later call KeyRing::Load and use
+        /// it to decrypt the data at rest.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyRing : public Serializable {
             /// \brief
@@ -55,23 +57,38 @@ namespace thekogans {
             /// \see{CipherSuite} associated with this key ring.
             CipherSuite cipherSuite;
             /// \brief
-            /// Master key.
-            SymmetricKey::Ptr masterKey;
-            /// \brief
             /// Convenient typedef for std::map<ID, Params::Ptr>.
             typedef std::map<ID, Params::Ptr> ParamsMap;
             /// \brief
-            /// Params map.
-            ParamsMap paramsMap;
+            /// \see{KeyExchange} \see{Params} map.
+            ParamsMap keyExchangeParamsMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Serializable::Ptr>.
-            typedef std::map<ID, Serializable::Ptr> KeyMap;
+            /// Convenient typedef for std::map<ID, AsymmetricKeyMap::Ptr>.
+            typedef std::map<ID, AsymmetricKey::Ptr> AsymmetricKeyMap;
             /// \brief
-            /// Active key map.
-            KeyMap activeKeyMap;
+            /// \see{KeyExchange} \see{AsymmetricKey} map.
+            AsymmetricKeyMap keyExchangeKeyMap;
             /// \brief
-            /// Where keys go to die.
-            KeyMap retiredKeyMap;
+            /// \see{Authenticator} \see{Params} map.
+            ParamsMap authenticatorParamsMap;
+            /// \brief
+            /// \see{Authenticator} \see{AsymmetricKey} map.
+            AsymmetricKeyMap authenticatorKeyMap;
+            /// \brief
+            /// \see{Cipher} master key.
+            SymmetricKey::Ptr cipherMasterKey;
+            /// \brief
+            /// Convenient typedef for std::map<ID, SymmetricKey::Ptr>.
+            typedef std::map<ID, SymmetricKey::Ptr> SymmetricKeyMap;
+            /// \brief
+            /// \see{Cipher} active \see{SymmetricKey} map.
+            SymmetricKeyMap cipherActiveKeyMap;
+            /// \brief
+            /// Where active keys go to die.
+            SymmetricKeyMap cipherRetiredKeyMap;
+            /// \brief
+            /// \see{MAC} \see{AsymmetricKey} map.
+            AsymmetricKeyMap macKeyMap;
             /// \brief
             /// Convenient typedef for std::map<ID, Ptr>.
             typedef std::map<ID, Ptr> KeyRingMap;
@@ -125,101 +142,212 @@ namespace thekogans {
             }
 
             /// \brief
-            /// Return the master key.
-            /// \return The master key.
-            inline SymmetricKey::Ptr GetMasterKey () const {
-                return masterKey;
-            }
-            /// \brief
-            /// Set the master key to the given key.
-            /// \param[in] masterKey_ New master key to set.
-            inline void SetMasterKey (SymmetricKey::Ptr masterKey_) {
-                masterKey = masterKey_;
-            }
-
-            /// \brief
-            /// Return the params with the given id.
-            /// \param[in] paramsId Id of params to retrieve.
+            /// Return the \see{KeyExchange} \see{Params} with the given \see{ID}.
+            /// \param[in] paramsId \see{ID} of \see{KeyExchange} \see{Params} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return Paramsg corresponding to the given paramsId (Params::Ptr () if not found).
-            Params::Ptr GetParams (
+            /// \return \see{KeyExchange} \see{Params} corresponding to the given paramsId
+            /// (Params::Ptr () if not found).
+            Params::Ptr GetKeyExchangeParams (
                 const ID &paramsId,
                 bool recursive = true) const;
             /// \brief
-            /// Add a params to this ring.
-            /// \param[in] params Params to add.
-            /// \return true = paras added. false = A params with
-            /// this id already exists in the ring.
-            bool AddParams (Params::Ptr params);
+            /// Add a \see{KeyExchange} \see{Params} to this ring.
+            /// \param[in] params \see{KeyExchange} \see{Params} to add.
+            /// \return true = params added. false = A \see{Params} with
+            /// this \see{ID} already exists in the ring.
+            bool AddKeyExchangeParams (Params::Ptr params);
             /// \brief
-            /// Drop a params with the given id.
-            /// \param[in] paramsId Id of params to delete.
+            /// Drop a \see{KeyExchange} \see{Params} with the given \see{ID}.
+            /// \param[in] paramsId \see{ID} of \see{KeyExchange} \see{Params} to delete.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
-            bool DropParams (
+            bool DropKeyExchangeParams (
                 const ID &paramsId,
                 bool recursive = true);
             /// \brief
-            /// Drop all params.
+            /// Drop all \see{KeyExchange} \see{Params}.
             /// \param[in] recursive true = descend down to sub rings.
-            void DropAllParams (bool recursive = true);
+            void DropAllKeyExchangeParams (bool recursive = true);
 
             /// \brief
-            /// Retrieve the key (master, active or retired) corresponding
-            /// to the given id.
-            /// \param[in] keyId Id of key to retrieve.
+            /// Return the \see{KeyExchange} \see{AsymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return Master, active or retired key corresponding to the
-            /// given id. \see{Key::Ptr} () if not found.
-            Serializable::Ptr GetKey (
+            /// \return \see{KeyExchange} \see{AsymmetricKey} corresponding to the given keyId
+            /// (AsymmetricKey::Ptr () if not found).
+            AsymmetricKey::Ptr GetKeyExchangeKey (
+                const ID &keyId,
+                bool recursive = true) const;
+            /// \brief
+            /// Add a \see{KeyExchange} \see{AsymmetricKey} to this ring.
+            /// \param[in] key \see{KeyExchange} \see{AsymmetricKey} to add.
+            /// \return true = key added. false = A key with this \see{ID}
+            /// already exists in the ring.
+            bool AddKeyExchangeKey (AsymmetricKey::Ptr key);
+            /// \brief
+            /// Drop a \see{KeyExchange} \see{AsymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey} to delete.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return true = dropped, false = not found.
+            bool DropKeyExchangeKey (
+                const ID &keyId,
+                bool recursive = true);
+            /// \brief
+            /// Drop all \see{KeyExchange} \see{AsymmetricKey}.
+            /// \param[in] recursive true = descend down to sub rings.
+            void DropAllKeyExchangeKeys (bool recursive = true);
+
+            /// \brief
+            /// Return the \see{Authenticator} \see{Params} with the given \see{ID}.
+            /// \param[in] paramsId \see{ID} of \see{Authenticator} \see{Params} to retrieve.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{Authenticator} \see{Params} corresponding to the given paramsId
+            /// (Params::Ptr () if not found).
+            Params::Ptr GetAuthenticatorParams (
+                const ID &paramsId,
+                bool recursive = true) const;
+            /// \brief
+            /// Add a \see{Authenticator} \see{Params} to this ring.
+            /// \param[in] params \see{Authenticator} \see{Params} to add.
+            /// \return true = params added. false = A \see{Params} with
+            /// this \see{ID} already exists in the ring.
+            bool AddAuthenticatorParams (Params::Ptr params);
+            /// \brief
+            /// Drop a \see{Authenticator} \see{Params} with the given \see{ID}.
+            /// \param[in] paramsId \see{ID} of \see{Authenticator} \see{Params} to delete.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return true = dropped, false = not found.
+            bool DropAuthenticatorParams (
+                const ID &paramsId,
+                bool recursive = true);
+            /// \brief
+            /// Drop all \see{Authenticator} \see{Params}.
+            /// \param[in] recursive true = descend down to sub rings.
+            void DropAllAuthenticatorParams (bool recursive = true);
+
+            /// \brief
+            /// Return the \see{Authenticator} \see{AsymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey} to retrieve.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{Authenticator} \see{AsymmetricKey} corresponding to the given keyId
+            /// (AsymmetricKey::Ptr () if not found).
+            AsymmetricKey::Ptr GetAuthenticatorKey (
+                const ID &keyId,
+                bool recursive = true) const;
+            /// \brief
+            /// Add a \see{Authenticator} \see{AsymmetricKey} to this ring.
+            /// \param[in] key \see{Authenticator} \see{AsymmetricKey} to add.
+            /// \return true = key added. false = A key with this \see{ID}
+            /// already exists in the ring.
+            bool AddAuthenticatorKey (AsymmetricKey::Ptr key);
+            /// \brief
+            /// Drop a \see{Authenticator} \see{AsymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey} to delete.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return true = dropped, false = not found.
+            bool DropAuthenticatorKey (
+                const ID &keyId,
+                bool recursive = true);
+            /// \brief
+            /// Drop all \see{Authenticator} \see{AsymmetricKey}.
+            /// \param[in] recursive true = descend down to sub rings.
+            void DropAllAuthenticatorKeys (bool recursive = true);
+
+            /// \brief
+            /// Return the \see{Cipher} master key.
+            /// \return \see{Cipher} master key.
+            inline SymmetricKey::Ptr GetCipherMasterKey () const {
+                return cipherMasterKey;
+            }
+            /// \brief
+            /// Set the \see{Cipher} master key to the given key.
+            /// \param[in] masterKey_ New \see{Cipher} master key to set.
+            void SetCipherMasterKey (SymmetricKey::Ptr masterKey_);
+
+            /// \brief
+            /// Retrieve the \see{Cipher} \see{SymmetricKey} (master, active or retired)
+            /// corresponding to the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{Cipher} \see{SymmetricKey} to retrieve.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return Master, active or retired \see{SymmetricKey} corresponding to the
+            /// given \see{ID}. \see{Key::Ptr} () if not found.
+            SymmetricKey::Ptr GetCipherKey (
                 const ID &keyId,
                 bool recursive = true) const;
 
             /// \brief
-            /// Add a key to the ring.
-            /// \param[in] key key to add.
+            /// Add a \see{Cipher} \see{SymmetricKey} to the ring.
+            /// \param[in] key \see{Cipher} \see{SymmetricKey} to add.
             /// \return true = key added. false = A key with
             /// this id already exists in the ring.
-            bool AddActiveKey (Serializable::Ptr key);
+            bool AddCipherActiveKey (SymmetricKey::Ptr key);
             /// \brief
-            /// Given an active key id, move the corresponding key
-            /// to the retired key map.
-            /// \param[in] keyId Active key id to retire.
+            /// Given an active \see{Cipher} \see{SymmetricKey} \see{ID}, move the corresponding
+            /// key to the retired key map.
+            /// \param[in] keyId Active \see{Cipher} \see{SymmetricKey} \see{ID} to retire.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = retired, false = not found.
-            bool RetireActiveKey (
+            bool RetireCipherActiveKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
-            /// Given an active key id, drop the corresponding key
+            /// Given an active \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding key
             /// from the key ring.
-            /// \param[in] keyId Active key id to drop from the key ring.
+            /// \param[in] keyId Active \see{Cipher} \see{SymmetricKey} \see{ID} to drop from the key ring.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
-            bool DropActiveKey (
+            bool DropCipherActiveKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
-            /// Drop all active keys.
+            /// Drop all active \see{Cipher} \see{SymmetricKey}s.
             /// \param[in] recursive true = descend down to sub rings.
-            void DropActiveKeys (bool recursive = true);
+            void DropCipherActiveKeys (bool recursive = true);
             /// \brief
-            /// Given a retired key id, drop the corresponding key
-            /// from the key ring.
-            /// \param[in] keyId Retired key id to drop from the key ring.
+            /// Given a retired \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding
+            /// key from the key ring.
+            /// \param[in] keyId Retired \see{Cipher} \see{SymmetricKey} \see{ID} to drop from the key ring.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
-            bool DropRetiredKey (
+            bool DropCipherRetiredKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
-            /// Drop all retired keys.
+            /// Drop all \see{Cipher} retired \see{SymmetricKey}s.
             /// \param[in] recursive descend down to sub rings.
-            void DropRetiredKeys (bool recursive = true);
+            void DropCipherRetiredKeys (bool recursive = true);
             /// \brief
-            /// Drop all keys. Master key is not affected.
+            /// Drop all \see{Cipher} keys. Master key is not affected.
             /// \param[in] recursive descend down to sub rings.
-            void DropAllKeys (bool recursive = true);
+            void DropAllCipherKeys (bool recursive = true);
+
+            /// \brief
+            /// Return the \see{MAC} \see{AsymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{MAC} \see{AsymmetricKey} to retrieve.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{MAC} \see{AsymmetricKey} corresponding to the given keyId
+            /// (AsymmetricKey::Ptr () if not found).
+            AsymmetricKey::Ptr GetMACKey (
+                const ID &keyId,
+                bool recursive = true) const;
+            /// \brief
+            /// Add a \see{MAC} \see{AsymmetricKey} to this ring.
+            /// \param[in] key \see{MAC} \see{AsymmetricKey} to add.
+            /// \return true = key added. false = A key with this \see{ID}
+            /// already exists in the ring.
+            bool AddMACKey (AsymmetricKey::Ptr key);
+            /// \brief
+            /// Drop a \see{MAC} \see{AsymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{MAC} \see{AsymmetricKey} to delete.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return true = dropped, false = not found.
+            bool DropMACKey (
+                const ID &keyId,
+                bool recursive = true);
+            /// \brief
+            /// Drop all \see{MAC} \see{AsymmetricKey}.
+            /// \param[in] recursive true = descend down to sub rings.
+            void DropAllMACKeys (bool recursive = true);
 
             /// \brief
             /// Return the sub ring with the given id.
@@ -293,26 +421,50 @@ namespace thekogans {
             /// "CipherSuite"
             static const char * const ATTR_CIPHER_SUITE;
             /// \brief
-            /// "MasterKey"
-            static const char * const TAG_MASTER_KEY;
+            /// "KeyExchangeParams"
+            static const char * const TAG_KEY_EXCHANGE_PARAMS;
             /// \brief
-            /// "Params"
-            static const char * const TAG_PARAMS;
+            /// "KeyExchangeParam"
+            static const char * const TAG_KEY_EXCHANGE_PARAM;
             /// \brief
-            /// "Param"
-            static const char * const TAG_PARAM;
+            /// "KeyExchangeKeys"
+            static const char * const TAG_KEY_EXCHANGE_KEYS;
             /// \brief
-            /// "ActiveKeys"
-            static const char * const TAG_ACTIVE_KEYS;
+            /// "KeyExchangeKey"
+            static const char * const TAG_KEY_EXCHANGE_KEY;
             /// \brief
-            /// "ActiveKey"
-            static const char * const TAG_ACTIVE_KEY;
+            /// "AuthenticatorParams"
+            static const char * const TAG_AUTHENTICATOR_PARAMS;
             /// \brief
-            /// "RetiredKeys"
-            static const char * const TAG_RETIRED_KEYS;
+            /// "AuthenticatorParam"
+            static const char * const TAG_AUTHENTICATOR_PARAM;
             /// \brief
-            /// "RetiredKey"
-            static const char * const TAG_RETIRED_KEY;
+            /// "AuthenticatorKeys"
+            static const char * const TAG_AUTHENTICATOR_KEYS;
+            /// \brief
+            /// "AuthenticatorKey"
+            static const char * const TAG_AUTHENTICATOR_KEY;
+            /// \brief
+            /// "CipherMasterKey"
+            static const char * const TAG_CIPHER_MASTER_KEY;
+            /// \brief
+            /// "CipherActiveKeys"
+            static const char * const TAG_CIPHER_ACTIVE_KEYS;
+            /// \brief
+            /// "CipherActiveKey"
+            static const char * const TAG_CIPHER_ACTIVE_KEY;
+            /// \brief
+            /// "CipherRetiredKeys"
+            static const char * const TAG_CIPHER_RETIRED_KEYS;
+            /// \brief
+            /// "CipherRetiredKey"
+            static const char * const TAG_CIPHER_RETIRED_KEY;
+            /// \brief
+            /// "MACKeys"
+            static const char * const TAG_MAC_KEYS;
+            /// \brief
+            /// "MACKey"
+            static const char * const TAG_MAC_KEY;
             /// \brief
             /// "SubRings"
             static const char * const TAG_SUB_RINGS;

@@ -131,18 +131,6 @@ namespace thekogans {
                 }
                 return messageDigests_;
             }
-
-            bool MatchAsymmetricKey (
-                    const std::string &algorithm,
-                    AsymmetricKey::Ptr key) {
-                return
-                    (algorithm == CipherSuite::KEY_EXCHANGE_ECDHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
-                    (algorithm == CipherSuite::KEY_EXCHANGE_DHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DH) ||
-                    (algorithm == CipherSuite::KEY_EXCHANGE_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA) ||
-                    (algorithm == CipherSuite::AUTHENTICATOR_ECDSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
-                    (algorithm == CipherSuite::AUTHENTICATOR_DSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DSA) ||
-                    (algorithm == CipherSuite::AUTHENTICATOR_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA);
-            }
         }
 
         const std::vector<CipherSuite> &CipherSuite::GetCipherSuites () {
@@ -222,6 +210,20 @@ namespace thekogans {
                 IsValidAuthenticator (authenticator) &&
                 IsValidCipher (cipher) &&
                 IsValidMessageDigest (messageDigest);
+        }
+
+        namespace {
+            bool MatchAsymmetricKey (
+                    const std::string &algorithm,
+                    AsymmetricKey::Ptr key) {
+                return
+                    (algorithm == CipherSuite::KEY_EXCHANGE_ECDHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
+                    (algorithm == CipherSuite::KEY_EXCHANGE_DHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DH) ||
+                    (algorithm == CipherSuite::KEY_EXCHANGE_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA) ||
+                    (algorithm == CipherSuite::AUTHENTICATOR_ECDSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
+                    (algorithm == CipherSuite::AUTHENTICATOR_DSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DSA) ||
+                    (algorithm == CipherSuite::AUTHENTICATOR_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA);
+            }
         }
 
         KeyExchange::Ptr CipherSuite::GetKeyExchange (AsymmetricKey::Ptr privateKey) const {

@@ -56,7 +56,11 @@ int main (
 
         Options () :
             help (false),
-            cipherSuite ("ECDHE_ECDSA_AES-256-GCM_SHA2-512") {}
+            cipherSuite (
+                crypto::CipherSuite::KEY_EXCHANGE_ECDHE,
+                crypto::CipherSuite::AUTHENTICATOR_ECDSA,
+                crypto::CipherSuite::CIPHER_AES_256_GCM,
+                crypto::CipherSuite::MESSAGE_DIGEST_SHA2_512) {}
 
         virtual void DoOption (
                 char option,
@@ -117,7 +121,7 @@ int main (
                     options.password.size ()));
             keyRing.Save (options.path, &cipher);
             std::cout << "Done" << std::endl << "Master Key ID: " <<
-                keyRing.GetMasterKey ()->GetId ().ToString () << std::endl;
+                keyRing.GetCipherMasterKey ()->GetId ().ToString () << std::endl;
         }
         {
             std::cout << "Verifying key ring...";
@@ -133,7 +137,7 @@ int main (
                     util::GlobalRandomSource::Instance ().GetBytes (
                         originalPlaintext.GetWritePtr (),
                         originalPlaintext.GetDataAvailableForWriting ()));
-                crypto::Cipher cipher (keyRing->GetMasterKey ());
+                crypto::Cipher cipher (keyRing->GetCipherMasterKey ());
                 util::Buffer::UniquePtr ciphertext = cipher.Encrypt (
                     originalPlaintext.GetReadPtr (),
                     originalPlaintext.GetDataAvailableForReading ());

@@ -90,24 +90,6 @@ namespace thekogans {
                 return params.get ();
             }
 
-            /// Return the params id.
-            /// \return Params id.
-            inline const ID &GetId () const {
-                return id;
-            }
-
-            /// Return the params name.
-            /// \return Params  name.
-            inline const std::string &GetName () const {
-                return name;
-            }
-
-            /// Return the params description.
-            /// \return Params description.
-            inline const std::string &GetDescription () const {
-                return description;
-            }
-
             /// \brief
             /// Create an \see{AsymmetricKey} based on parameters.
             /// \param[in] name Optional key name.
