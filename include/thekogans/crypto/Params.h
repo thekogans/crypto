@@ -91,6 +91,15 @@ namespace thekogans {
             }
 
             /// \brief
+            /// Return the EVP_PKEY type.
+            /// NOTE: While type can be any of the OpenSSL supported EVP_PKEY types,
+            /// thekogans_crypto only supports (EVP_PKEY_DH, EVP_PKEY_DSA, EVP_PKEY_EC).
+            /// \return EVP_PKEY type.
+            inline util::i32 GetType () const {
+                return EVP_PKEY_base_id (params.get ());
+            }
+
+            /// \brief
             /// Create an \see{AsymmetricKey} based on parameters.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.

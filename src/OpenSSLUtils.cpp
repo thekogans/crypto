@@ -137,6 +137,25 @@ namespace thekogans {
             }
         }
 
+        _LIB_THEKOGANS_CRYPTO_DECL std::string _LIB_THEKOGANS_CRYPTO_API
+        EVP_PKEYtypeTostring (util::i32 type) {
+            switch (type) {
+                case EVP_PKEY_RSA:
+                    return "RSA";
+                case EVP_PKEY_DSA:
+                    return "DSA";
+                case EVP_PKEY_DH:
+                    return "DH";
+                case EVP_PKEY_EC:
+                    return "EC";
+                case EVP_PKEY_HMAC:
+                    return "HMAC";
+                case EVP_PKEY_CMAC:
+                    return "CMAC";
+            }
+            return "unknown";
+        }
+
         _LIB_THEKOGANS_CRYPTO_DECL BIGNUMPtr _LIB_THEKOGANS_CRYPTO_API
         BIGNUMFromui32 (util::ui32 value) {
             BIGNUMPtr bn (BN_new ());

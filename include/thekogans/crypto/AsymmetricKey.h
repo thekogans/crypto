@@ -62,18 +62,10 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             AsymmetricKey (
-                    EVP_PKEYPtr key_,
-                    bool isPrivate_,
-                    const std::string &name = std::string (),
-                    const std::string &description = std::string ()) :
-                    Serializable (name, description),
-                    key (std::move (key_)),
-                    isPrivate (isPrivate_) {
-                if (key.get () == 0) {
-                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                }
-            }
+                EVP_PKEYPtr key_,
+                bool isPrivate_,
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
             /// \brief
             /// ctor.
             /// \param[in] serializer Serializer containing the key.
@@ -134,6 +126,16 @@ namespace thekogans {
             /// \return EVP_PKEY *.
             inline EVP_PKEY *Get () const {
                 return key.get ();
+            }
+
+            /// \brief
+            /// Return the EVP_PKEY type.
+            /// NOTE: While type can be any of the OpenSSL supported EVP_PKEY types,
+            /// thekogans_crypto only supports (EVP_PKEY_DH, EVP_PKEY_DSA, EVP_PKEY_EC,
+            /// EVP_PKEY_RSA, EVP_PKEY_HMAC and EVP_PKEY_CMAC).
+            /// \return EVP_PKEY type.
+            inline util::i32 GetType () const {
+                return EVP_PKEY_base_id (key.get ());
             }
 
             /// \brief

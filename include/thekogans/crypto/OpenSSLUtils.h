@@ -390,6 +390,15 @@ namespace thekogans {
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
         /// \brief
+        /// Convert OpenSSL EVP_PKEY key type to string.
+        /// \param[in] type One of EVP_PKEY_RSA, EVP_PKEY_DSA, EVP_PKEY_DH,
+        /// EVP_PKEY_EC, EVP_PKEY_HMAC or EVP_PKEY_CMAC to "RSA", "DSA", "DH",
+        /// "EC", "HMAC" or "CMAC".
+        /// \return "RSA", "DSA", "DH", "EC", "HMAC" or "CMAC".
+        _LIB_THEKOGANS_CRYPTO_DECL std::string _LIB_THEKOGANS_CRYPTO_API
+            EVP_PKEYtypeTostring (util::i32 type);
+
+        /// \brief
         /// Create a BIGNUMPtr and initialize it to a given value.
         /// \param[in] value Value to initialize the BIGNUM to.
         /// \return BIGNUMPtr initialized to a given value.

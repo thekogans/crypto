@@ -48,7 +48,7 @@ namespace thekogans {
                 Serializable (name, description),
                 params (std::move (params_)) {
             if (params.get () != 0) {
-                util::i32 type = EVP_PKEY_base_id (params.get ());
+                util::i32 type = GetType ();
                 if (type != EVP_PKEY_DH && type != EVP_PKEY_DSA && type != EVP_PKEY_EC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Invalid parameters type %d.", type);
@@ -244,7 +244,7 @@ namespace thekogans {
         }
 
         std::size_t Params::Size (bool includeType) const {
-            util::i32 type = EVP_PKEY_base_id (params.get ());
+            util::i32 type = GetType ();
             util::i32 paramsLength = 0;
             if (type == EVP_PKEY_DH) {
                 DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
@@ -355,27 +355,13 @@ namespace thekogans {
             util::SecureVector<util::ui8> paramsBuffer;
             SerializeParams (*params, paramsBuffer);
             serializer <<
-                (util::i32)EVP_PKEY_base_id (params.get ()) <<
+                GetType () <<
                 (util::i32)paramsBuffer.size ();
             serializer.Write (&paramsBuffer[0], (util::i32)paramsBuffer.size ());
         }
 
     #if defined (THEKOGANS_CRYPTO_TESTING)
         const char * const Params::ATTR_PARAMS_TYPE = "ParamsType";
-
-        namespace {
-            std::string typeTostring (util::i32 type) {
-                switch (type) {
-                    case EVP_PKEY_DH:
-                        return "DH";
-                    case EVP_PKEY_DSA:
-                        return "DSA";
-                    case EVP_PKEY_EC:
-                        return "EC";
-                }
-                return "unknown";
-            }
-        }
 
         std::string Params::ToString (
                 util::ui32 indentationLevel,
@@ -387,7 +373,7 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
             attributes.push_back (util::Attribute (ATTR_NAME, name));
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_PARAMS_TYPE, typeTostring (EVP_PKEY_base_id (params.get ()))));
+            attributes.push_back (util::Attribute (ATTR_PARAMS_TYPE, EVP_PKEYtypeTostring (GetType ())));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
                 std::string (paramsBuffer.begin (), paramsBuffer.end ()) << std::endl <<

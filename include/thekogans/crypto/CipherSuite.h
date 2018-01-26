@@ -24,6 +24,9 @@
 #include <openssl/evp.h>
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
+#include "thekogans/crypto/Params.h"
+#include "thekogans/crypto/SymmetricKey.h"
+#include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/KeyExchange.h"
 #include "thekogans/crypto/Authenticator.h"
 #include "thekogans/crypto/Cipher.h"
@@ -218,6 +221,37 @@ namespace thekogans {
             /// Check if we support the algorithms specified in this cipher suite.
             /// \return true = we support the algorithms specified in this cipher suite.
             bool IsValid () const;
+
+            /// \brief
+            /// Verify that the given params are appropriate for this cipher suite \see{KeyExchange}.
+            /// \param[in] params \see{Params} to verify.
+            /// \return true = given params are appropriate.
+            bool VerifyKeyExchangeParams (const Params &params) const;
+            /// \brief
+            /// Verify that the given key is appropriate for this cipher suite \see{KeyExchange}.
+            /// \param[in] key \see{AsymmetricKey} to verify.
+            /// \return true = given key is appropriate.
+            bool VerifyKeyExchangeKey (const AsymmetricKey &key) const;
+            /// \brief
+            /// Verify that the given params are appropriate for this cipher suite \see{Authenticator}.
+            /// \param[in] params \see{Params} to verify.
+            /// \return true = given params are appropriate.
+            bool VerifyAuthenticatorParams (const Params &params) const;
+            /// \brief
+            /// Verify that the given key is appropriate for this cipher suite \see{Authenticator}.
+            /// \param[in] key \see{AsymmetricKey} to verify.
+            /// \return true = given key is appropriate.
+            bool VerifyAuthenticatorKey (const AsymmetricKey &key) const;
+            /// \brief
+            /// Verify that the given key is appropriate for this cipher suite \see{Cipher}.
+            /// \param[in] key \see{SymmetricKey} to verify.
+            /// \return true = given key is appropriate.
+            bool VerifyCipherKey (const SymmetricKey &key) const;
+            /// \brief
+            /// Verify that the given key is appropriate for \see{MAC} (EVP_PKEY_HMAC or EVP_PKEY_CMAC).
+            /// \param[in] key \see{AsymmetricKey} to verify.
+            /// \return true = given key is appropriate.
+            bool VerifyMACKey (const AsymmetricKey &key) const;
 
             /// \brief
             /// Return the \see{KeyExchange} instance represented by keyExchange.

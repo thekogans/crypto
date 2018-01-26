@@ -212,22 +212,47 @@ namespace thekogans {
                 IsValidMessageDigest (messageDigest);
         }
 
-        namespace {
-            bool MatchAsymmetricKey (
-                    const std::string &algorithm,
-                    AsymmetricKey::Ptr key) {
-                return
-                    (algorithm == CipherSuite::KEY_EXCHANGE_ECDHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
-                    (algorithm == CipherSuite::KEY_EXCHANGE_DHE && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DH) ||
-                    (algorithm == CipherSuite::KEY_EXCHANGE_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA) ||
-                    (algorithm == CipherSuite::AUTHENTICATOR_ECDSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_EC) ||
-                    (algorithm == CipherSuite::AUTHENTICATOR_DSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_DSA) ||
-                    (algorithm == CipherSuite::AUTHENTICATOR_RSA && EVP_PKEY_base_id (key->Get ()) == EVP_PKEY_RSA);
-            }
+        bool CipherSuite::VerifyKeyExchangeParams (const Params &params) const {
+            util::i32 type = params.GetType ();
+            return
+                (keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE && type == EVP_PKEY_EC) ||
+                (keyExchange == CipherSuite::KEY_EXCHANGE_DHE && type == EVP_PKEY_DH);
+        }
+
+        bool CipherSuite::VerifyKeyExchangeKey (const AsymmetricKey &key) const {
+            util::i32 type = key.GetType ();
+            return
+                (keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE && type == EVP_PKEY_EC) ||
+                (keyExchange == CipherSuite::KEY_EXCHANGE_DHE && type == EVP_PKEY_DH) ||
+                (keyExchange == CipherSuite::KEY_EXCHANGE_RSA && type == EVP_PKEY_RSA);
+        }
+
+        bool CipherSuite::VerifyAuthenticatorParams (const Params &params) const {
+            util::i32 type = params.GetType ();
+            return
+                (authenticator == CipherSuite::AUTHENTICATOR_ECDSA && type == EVP_PKEY_EC) ||
+                (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == EVP_PKEY_DSA);
+        }
+
+        bool CipherSuite::VerifyAuthenticatorKey (const AsymmetricKey &key) const {
+            util::i32 type = key.GetType ();
+            return
+                (authenticator == CipherSuite::AUTHENTICATOR_ECDSA && type == EVP_PKEY_EC) ||
+                (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == EVP_PKEY_DSA) ||
+                (authenticator == CipherSuite::AUTHENTICATOR_RSA && type == EVP_PKEY_RSA);
+        }
+
+        bool CipherSuite::VerifyCipherKey (const SymmetricKey &key) const {
+            return Cipher::GetKeyLength (GetOpenSSLCipher (cipher)) == key.Length ();
+        }
+
+        bool CipherSuite::VerifyMACKey (const AsymmetricKey &key) const {
+            util::i32 type = key.GetType ();
+            return type == EVP_PKEY_HMAC || type == EVP_PKEY_CMAC;
         }
 
         KeyExchange::Ptr CipherSuite::GetKeyExchange (AsymmetricKey::Ptr privateKey) const {
-            if (privateKey.Get () != 0 && MatchAsymmetricKey (keyExchange, privateKey)) {
+            if (privateKey.Get () != 0 && VerifyKeyExchangeKey (*privateKey)) {
                 return KeyExchange::Ptr (new KeyExchange (privateKey));
             }
             else {
@@ -242,7 +267,7 @@ namespace thekogans {
             if (key.Get () != 0 &&
                     ((op == Authenticator::Sign && key->IsPrivate ()) ||
                         (op == Authenticator::Verify && !key->IsPrivate ())) &&
-                    MatchAsymmetricKey (authenticator, key)) {
+                    VerifyAuthenticatorKey (*key)) {
                 return Authenticator::Ptr (
                     new Authenticator (
                         op,
@@ -256,8 +281,7 @@ namespace thekogans {
         }
 
         Cipher::Ptr CipherSuite::GetCipher (SymmetricKey::Ptr key) const {
-            if (key.Get () != 0 &&
-                    Cipher::GetKeyLength (GetOpenSSLCipher (cipher)) == key->Length ()) {
+            if (key.Get () != 0 && VerifyCipherKey (*key)) {
                 return Cipher::Ptr (
                     new Cipher (
                         key,

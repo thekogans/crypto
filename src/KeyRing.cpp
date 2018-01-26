@@ -234,7 +234,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddKeyExchangeParams (Params::Ptr params) {
-            if (params.Get () != 0) {
+            if (params.Get () != 0 && cipherSuite.VerifyKeyExchangeParams (*params)) {
                 std::pair<ParamsMap::iterator, bool> result = keyExchangeParamsMap.insert (
                     ParamsMap::value_type (params->GetId (), params));
                 return result.second;
@@ -297,7 +297,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddKeyExchangeKey (AsymmetricKey::Ptr key) {
-            if (key.Get () != 0) {
+            if (key.Get () != 0 && cipherSuite.VerifyKeyExchangeKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result = keyExchangeKeyMap.insert (
                     AsymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
@@ -360,7 +360,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddAuthenticatorParams (Params::Ptr params) {
-            if (params.Get () != 0) {
+            if (params.Get () != 0 && cipherSuite.VerifyAuthenticatorParams (*params)) {
                 std::pair<ParamsMap::iterator, bool> result = authenticatorParamsMap.insert (
                     ParamsMap::value_type (params->GetId (), params));
                 return result.second;
@@ -423,7 +423,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddAuthenticatorKey (AsymmetricKey::Ptr key) {
-            if (key.Get () != 0) {
+            if (key.Get () != 0 && cipherSuite.VerifyAuthenticatorKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result = authenticatorKeyMap.insert (
                     AsymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
@@ -466,7 +466,7 @@ namespace thekogans {
         }
 
         void KeyRing::SetCipherMasterKey (SymmetricKey::Ptr cipherMasterKey_) {
-            if (cipherMasterKey_.Get () != 0) {
+            if (cipherMasterKey_.Get () != 0 && cipherSuite.VerifyCipherKey (*cipherMasterKey_)) {
                 cipherMasterKey = cipherMasterKey_;
             }
             else {
@@ -503,7 +503,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddCipherActiveKey (SymmetricKey::Ptr key) {
-            if (key.Get () != 0) {
+            if (key.Get () != 0 && cipherSuite.VerifyCipherKey (*key)) {
                 std::pair<SymmetricKeyMap::iterator, bool> result = cipherActiveKeyMap.insert (
                     SymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
@@ -638,7 +638,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddMACKey (AsymmetricKey::Ptr key) {
-            if (key.Get () != 0) {
+            if (key.Get () != 0 && cipherSuite.VerifyMACKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result = macKeyMap.insert (
                     AsymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
@@ -701,9 +701,15 @@ namespace thekogans {
         }
 
         bool KeyRing::AddSubring (Ptr subring) {
-            std::pair<KeyRingMap::iterator, bool> result = subringsMap.insert (
-                KeyRingMap::value_type (subring->GetId (), subring));
-            return result.second;
+            if (subring.Get () != 0) {
+                std::pair<KeyRingMap::iterator, bool> result = subringsMap.insert (
+                    KeyRingMap::value_type (subring->GetId (), subring));
+                return result.second;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
         bool KeyRing::DropSubring (

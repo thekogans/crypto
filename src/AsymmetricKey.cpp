@@ -40,6 +40,28 @@ namespace thekogans {
             AsymmetricKey,
             THEKOGANS_CRYPTO_MIN_ASYMMETRIC_KEYS_IN_PAGE)
 
+        AsymmetricKey::AsymmetricKey (
+                EVP_PKEYPtr key_,
+                bool isPrivate_,
+                const std::string &name,
+                const std::string &description) :
+                Serializable (name, description),
+                key (std::move (key_)),
+                isPrivate (isPrivate_) {
+            if (key.get () != 0) {
+                util::i32 type = GetType ();
+                if (type != EVP_PKEY_DH && type != EVP_PKEY_DSA && type != EVP_PKEY_EC &&
+                        type != EVP_PKEY_RSA && type != EVP_PKEY_HMAC && type != EVP_PKEY_CMAC) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Invalid parameters type %d.", type);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
         AsymmetricKey::AsymmetricKey (util::Serializer &serializer) :
                 Serializable (serializer) {
             util::i32 type;
@@ -195,7 +217,7 @@ namespace thekogans {
             SerializeKey (isPrivate, *key, keyBuffer);
             serializer <<
                 isPrivate <<
-                (util::i32)EVP_PKEY_base_id (key.get ()) <<
+                GetType () <<
                 (util::i32)keyBuffer.size ();
             serializer.Write (&keyBuffer[0], (util::ui32)keyBuffer.size ());
         }
@@ -203,38 +225,6 @@ namespace thekogans {
     #if defined (THEKOGANS_CRYPTO_TESTING)
         const char * const AsymmetricKey::ATTR_PRIVATE = "Private";
         const char * const AsymmetricKey::ATTR_KEY_TYPE = "KeyType";
-
-        namespace {
-            std::string typeTostring (util::i32 type) {
-                switch (type) {
-                    case EVP_PKEY_RSA:
-                        return "RSA";
-                    case EVP_PKEY_RSA2:
-                        return "RSA2";
-                    case EVP_PKEY_DSA:
-                        return "DSA";
-                    case EVP_PKEY_DSA1:
-                        return "DSA1";
-                    case EVP_PKEY_DSA2:
-                        return "DSA2";
-                    case EVP_PKEY_DSA3:
-                        return "DSA3";
-                    case EVP_PKEY_DSA4:
-                        return "DSA4";
-                    case EVP_PKEY_DH:
-                        return "DH";
-                    case EVP_PKEY_DHX:
-                        return "DHX";
-                    case EVP_PKEY_EC:
-                        return "EC";
-                    case EVP_PKEY_HMAC:
-                        return "HMAC";
-                    case EVP_PKEY_CMAC:
-                        return "CMAC";
-                }
-                return "unknown";
-            }
-        }
 
         std::string AsymmetricKey::ToString (
                 util::ui32 indentationLevel,
@@ -248,7 +238,7 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_NAME, name));
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
             attributes.push_back (util::Attribute (ATTR_PRIVATE, util::boolTostring (isPrivate)));
-            attributes.push_back (util::Attribute (ATTR_KEY_TYPE, typeTostring (EVP_PKEY_base_id (key.get ()))));
+            attributes.push_back (util::Attribute (ATTR_KEY_TYPE, EVP_PKEYtypeTostring (GetType ())));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
                 std::string (keyBuffer.begin (), keyBuffer.end ()) << std::endl <<

@@ -60,7 +60,7 @@ namespace thekogans {
                 AsymmetricKey::Ptr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && EVP_PKEY_base_id (publicKey->Get ()) == EVP_PKEY_RSA) {
+                    publicKey.Get () != 0 && publicKey->GetType () == EVP_PKEY_RSA) {
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new (publicKey->Get (), OpenSSLInit::engine));
                 if (ctx.get () != 0 &&
@@ -102,7 +102,7 @@ namespace thekogans {
                 util::i32 padding,
                 util::Endianness endianness) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    privateKey.Get () != 0 && EVP_PKEY_base_id (privateKey->Get ()) == EVP_PKEY_RSA) {
+                    privateKey.Get () != 0 && privateKey->GetType () == EVP_PKEY_RSA) {
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new (privateKey->Get (), OpenSSLInit::engine));
                 if (ctx.get () != 0 &&
