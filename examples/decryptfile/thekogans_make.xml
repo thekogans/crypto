@@ -1,5 +1,5 @@
 <thekogans_make organization = "thekogans"
-                project = "decryptfile"
+                project = "crypto_decryptfile"
                 project_type = "program"
                 major_version = "0"
                 minor_version = "1"

@@ -1,10 +1,10 @@
 <thekogans_make organization = "thekogans"
-                project = "crypto_encryptfile"
+                project = "crypto_signfile"
                 project_type = "program"
                 major_version = "0"
                 minor_version = "1"
                 patch_version = "0"
-                guid = "2EB0EF8D80835E67E3F17274A0C041BF"
+                guid = "29ed9e9cca7dd3e1d3bd889e8ae93115"
                 schema_version = "2">
   <dependencies>
     <project organization = "thekogans"

@@ -23,11 +23,10 @@
 #include "thekogans/util/ConsoleLogger.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/File.h"
-#include "thekogans/util/Array.h"
-#include "thekogans/util/StringUtils.h"
+#include "thekogans/util/Base64.h"
 #include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/SymmetricKey.h"
-#include "thekogans/crypto/Cipher.h"
+#include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/Authenticator.h"
 
 using namespace thekogans;
 
@@ -36,13 +35,11 @@ int main (
         const char *argv[]) {
     struct Options : public util::CommandLineOptions {
         bool help;
-        util::ui32 blockSize;
-        std::string password;
+        std::string privateKey;
         std::string path;
 
         Options () :
-            help (false),
-            blockSize (2) {}
+            help (false) {}
 
         virtual void DoOption (
                 char option,
@@ -52,12 +49,8 @@ int main (
                     help = true;
                     break;
                 }
-                case 'b': {
-                    blockSize = util::stringToui32 (value.c_str ());
-                    break;
-                }
                 case 'p': {
-                    password = value;
+                    privateKey = value;
                     break;
                 }
             }
@@ -66,10 +59,9 @@ int main (
             path = value;
         }
     } options;
-    options.Parse (argc, argv, "hbp");
-    if (options.help || options.password.empty () || options.path.empty ()) {
-        std::cout << "usage: " << argv[0] <<
-            " [-h] [-b:'block size (in MB)'] -p:password path" << std::endl;
+    options.Parse (argc, argv, "hp");
+    if (options.help || options.privateKey.empty () || options.path.empty ()) {
+        std::cout << "usage: " << argv[0] << " [-h] -p:'private key path' path" << std::endl;
         return 1;
     }
     THEKOGANS_UTIL_LOG_INIT (
@@ -78,40 +70,25 @@ int main (
     THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
-        std::cout << "Encrypting '" << options.path << "'";
-        util::ReadOnlyFile fromFile (util::NetworkEndian, options.path);
-        util::SimpleFile toFile (
+        std::cout << "Signing '" << options.path << "'...";
+        crypto::Authenticator authenticator (
+            crypto::Authenticator::Sign,
+            crypto::AsymmetricKey::LoadPrivateKeyFromFile (options.privateKey));
+        util::Buffer::UniquePtr signature = authenticator.SignFile (options.path);
+        util::Buffer::UniquePtr encodedSignature =
+            util::Base64::Encode (
+                signature->GetReadPtr (),
+                signature->GetDataAvailableForReading (),
+                64);
+        util::SimpleFile signatureFile (
             util::NetworkEndian,
-            options.path + ".enc",
+            options.path + ".sig",
             util::SimpleFile::ReadWrite |
             util::SimpleFile::Create |
             util::SimpleFile::Truncate);
-        crypto::Cipher cipher (
-            crypto::SymmetricKey::FromSecretAndSalt (
-                crypto::Cipher::GetKeyLength (),
-                options.password.c_str (),
-                options.password.size ()));
-        util::ui32 blockSize = 1024 * 1024 * options.blockSize;
-        toFile << blockSize;
-        util::Array<util::ui8> plaintext (blockSize);
-        util::Array<util::ui8> ciphertext (crypto::Cipher::GetMaxBufferLength (blockSize));
-        for (util::ui32 plaintextLength = fromFile.Read (plaintext.array, blockSize);
-                plaintextLength != 0;
-                plaintextLength = fromFile.Read (plaintext.array, blockSize)) {
-            util::ui32 ciphertextLength =
-                (util::ui32)cipher.Encrypt (plaintext.array, plaintextLength, 0, 0, ciphertext.array);
-            toFile << ciphertextLength;
-            if (toFile.Write (ciphertext.array, ciphertextLength) == ciphertextLength) {
-                std::cout << ".";
-                std::cout.flush ();
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to write %u bytes to %s",
-                    ciphertextLength,
-                    toFile.GetPath ().c_str ());
-            }
-        }
+        signatureFile.Write (
+            encodedSignature->GetReadPtr (),
+            encodedSignature->GetDataAvailableForReading ());
         std::cout << "Done" << std::endl;
     }
     THEKOGANS_UTIL_CATCH_AND_LOG

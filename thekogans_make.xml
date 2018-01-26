@@ -16,8 +16,6 @@
                name = "openssl_ssl"/>
     <toolchain organization = "thekogans"
                name = "openssl_crypto"/>
-    <toolchain organization = "thekogans"
-               name = "pugixml"/>
     <choose>
       <when condition = "$(TOOLCHAIN_OS) == 'Windows'">
         <library>Crypt32.lib</library>
