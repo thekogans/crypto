@@ -1,0 +1,10 @@
+thekogans_crypto takes a task oriented approach to OpenSSL. if you're
+familiar with the OpenSSL API, you're undoubtedly familiar with it's
+complexity. this complexity comes as a result of it's granular design.
+more often then not, we need to perform a particular cryptographic
+task (encrypt a file, sign and verify a file, generate symmetric and
+asymmetrc key...). OpenSSL's API makes it difficult to see the forest
+for the trees.
+
+thekogans_crypto exposes a collection of objects that perform high
+level cryptographic tasks like the ones mentioned above.
