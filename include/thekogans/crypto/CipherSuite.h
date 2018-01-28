@@ -39,7 +39,7 @@ namespace thekogans {
         ///
         /// \brief
         /// CipherSuite collects the various algorithms necessary for key exchange, authentication,
-        /// symmetric encryption and message digest.
+        /// symmetric encryption/decryption and message digest.
         ///
         /// OpenSSL canonical cipher suite names have the following format: Kx-Auth-Enc-Mode-MD.
         ///
@@ -145,11 +145,7 @@ namespace thekogans {
                 const std::string &keyExchange_,
                 const std::string &authenticator_,
                 const std::string &cipher_,
-                const std::string &messageDigest_) :
-                keyExchange (keyExchange_),
-                authenticator (authenticator_),
-                cipher (cipher_),
-                messageDigest (messageDigest_) {}
+                const std::string &messageDigest_);
             /// \brief
             /// ctor.
             /// \param[in] cipherSuite String encoded cipher suite: Kx_Auth_Enc_MD.
@@ -157,31 +153,21 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] serializer Serializer containing the cipher suite.
-            explicit CipherSuite (util::Serializer &serializer) {
-                serializer >> keyExchange >> authenticator >> cipher >> messageDigest;
-            }
+            explicit CipherSuite (util::Serializer &serializer);
             /// \brief
             /// copy ctor.
             /// \param[in] cipherSuite Cipher suite to copy.
-            CipherSuite (const CipherSuite &cipherSuite) :
-                keyExchange (cipherSuite.keyExchange),
-                authenticator (cipherSuite.authenticator),
-                cipher (cipherSuite.cipher),
-                messageDigest (cipherSuite.messageDigest) {}
+            CipherSuite (const CipherSuite &cipherSuite);
+
+            /// \brief
+            /// Empty cipher suite.
+            static const CipherSuite Empty;
 
             /// \brief
             /// Assignment operator.
             /// \param[in] cipherSuite Cipher suite to copy.
             /// \return *this.
-            CipherSuite &operator = (const CipherSuite &cipherSuite) {
-                if (&cipherSuite != this) {
-                    keyExchange = cipherSuite.keyExchange;
-                    authenticator = cipherSuite.authenticator;
-                    cipher = cipherSuite.cipher;
-                    messageDigest = cipherSuite.messageDigest;
-                }
-                return *this;
-            }
+            CipherSuite &operator = (const CipherSuite &cipherSuite);
 
             /// \brief
             /// Return the list of all available cipher suites.
@@ -199,10 +185,12 @@ namespace thekogans {
 
             /// \brief
             /// Return the OpenSSL EVP_CIPHER represented by the given cipher.
+            /// \param[in] cipher Cipher name to convert to OpenSSL EVP_CIPHER.
             /// \return OpenSSL EVP_CIPHER represented by the given cipher.
             static const EVP_CIPHER *GetOpenSSLCipher (const std::string &cipher);
             /// \brief
             /// Return the OpenSSL EVP_MD represented by the given messageDigest.
+            /// \param[in] messageDigest Message digest name to convert to OpenSSL EVP_MD.
             /// \return OpenSSL EVP_MD represented by the given messageDigest.
             static const EVP_MD *GetOpenSSLMessageDigest (const std::string &messageDigest);
 
@@ -275,6 +263,19 @@ namespace thekogans {
             /// Return the message digest instance represented by messageDigest.
             /// \return Message digest instance represented by messageDigest.
             MessageDigest::Ptr GetMessageDigest () const;
+
+            /// \brief
+            /// Return the OpenSSL EVP_CIPHER represented by the given cipher.
+            /// \return OpenSSL EVP_CIPHER represented by the given cipher.
+            inline const EVP_CIPHER *GetOpenSSLCipher () const {
+                return GetOpenSSLCipher (cipher);
+            }
+            /// \brief
+            /// Return the OpenSSL EVP_MD represented by the given messageDigest.
+            /// \return OpenSSL EVP_MD represented by the given messageDigest.
+            inline const EVP_MD *GetOpenSSLMessageDigest () const {
+                return GetOpenSSLMessageDigest (messageDigest);
+            }
 
             /// \brief
             /// Return the canonical (Kx_Auth_Enc_MD) representation of a cipher suite.

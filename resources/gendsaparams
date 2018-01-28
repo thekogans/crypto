@@ -1,0 +1,23 @@
+#!/bin/bash
+
+BITS=
+
+# Parse command line options.
+for i in "$@"; do
+    case $i in
+        -b:*|--bits:*)
+            BITS="${i#*:}"
+            ;;
+    esac
+done
+
+if [ "$BITS" == "" ]; then
+    echo "usage: $0 -b:'bits'"
+    exit 1
+fi
+
+echo "Generating DSA parameters."
+DSA_PARAMETERS=dsa_parameters_"$BITS".pem
+openssl genpkey -genparam -algorithm DSA -out "$DSA_PARAMETERS" -pkeyopt dsa_paramgen_bits:"$BITS"
+
+exit 0

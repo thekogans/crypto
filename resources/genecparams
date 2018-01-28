@@ -1,0 +1,23 @@
+#!/bin/bash
+
+CURVE=secp256k1
+
+# Parse command line options.
+for i in "$@"; do
+    case $i in
+        -c:*|--curve:*)
+            CURVE="${i#*:}"
+            ;;
+    esac
+done
+
+if [ "$CURVE" == "" ]; then
+    echo "usage: $0 -c:'curve name'"
+    exit 1
+fi
+
+echo "Generating EC parameters."
+EC_PARAMETERS=ec_parameters_"$CURVE".pem
+openssl genpkey -genparam -algorithm EC -out "$EC_PARAMETERS" -pkeyopt ec_paramgen_curve:"$CURVE"
+
+exit 0

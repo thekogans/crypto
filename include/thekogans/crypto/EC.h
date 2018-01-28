@@ -71,6 +71,8 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
+            /// \enum
+            /// Curves found in RFC 5114.
             enum RFC5114Curve {
                 /// \brief
                 /// 192 bit curve.
@@ -88,6 +90,7 @@ namespace thekogans {
                 /// 521 bit curve.
                 RFC5114_CURVE_521
             };
+            /// \brief
             /// Generate GFp elliptic curve parameters from the values found in RFC5114.
             /// \param[in] curve One of the RFC5114_CURVE_* values from above.
             /// \param[in] name Optional parameters name.
@@ -98,6 +101,8 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
+            /// \enum
+            /// Curves found in RFC 5639.
             enum RFC5639Curve {
                 /// \brief
                 /// 2D 160 bit curve.
@@ -142,6 +147,7 @@ namespace thekogans {
                 /// 3D 512 bit curve.
                 RFC5639_CURVE_512_T
             };
+            /// \brief
             /// Generate GFp elliptic curve parameters from the values found in RFC5639.
             /// \param[in] curve One of the RFC5639_CURVE_* values from above.
             /// \param[in] name Optional parameters name.

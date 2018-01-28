@@ -35,11 +35,13 @@ int main (
         const char *argv[]) {
     struct Options : public util::CommandLineOptions {
         bool help;
-        std::string privateKey;
+        std::string prefix;
+        bool verify;
         std::string path;
 
         Options () :
-            help (false) {}
+            help (false),
+            verify (false) {}
 
         virtual void DoOption (
                 char option,
@@ -50,7 +52,11 @@ int main (
                     break;
                 }
                 case 'p': {
-                    privateKey = value;
+                    prefix = value;
+                    break;
+                }
+                case 'v': {
+                    verify = true;
                     break;
                 }
             }
@@ -59,9 +65,9 @@ int main (
             path = value;
         }
     } options;
-    options.Parse (argc, argv, "hp");
-    if (options.help || options.privateKey.empty () || options.path.empty ()) {
-        std::cout << "usage: " << argv[0] << " [-h] -p:'private key path' path" << std::endl;
+    options.Parse (argc, argv, "hpv");
+    if (options.help || options.path.empty ()) {
+        std::cout << "usage: " << argv[0] << " [-h] -p:'private/public key file prefix' path" << std::endl;
         return 1;
     }
     THEKOGANS_UTIL_LOG_INIT (
@@ -70,26 +76,49 @@ int main (
     THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
-        std::cout << "Signing '" << options.path << "'...";
-        crypto::Authenticator authenticator (
-            crypto::Authenticator::Sign,
-            crypto::AsymmetricKey::LoadPrivateKeyFromFile (options.privateKey));
-        util::Buffer::UniquePtr signature = authenticator.SignFile (options.path);
-        util::Buffer::UniquePtr encodedSignature =
-            util::Base64::Encode (
+        {
+            std::cout << "Signing '" << options.path << "'...";
+            crypto::Authenticator signer (
+                crypto::Authenticator::Sign,
+                crypto::AsymmetricKey::LoadPrivateKeyFromFile (options.prefix + "private_key.pem"));
+            util::Buffer::UniquePtr signature = signer.SignFile (options.path);
+            util::Buffer::UniquePtr encodedSignature =
+                util::Base64::Encode (
+                    signature->GetReadPtr (),
+                    signature->GetDataAvailableForReading (),
+                    64);
+            util::SimpleFile signatureFile (
+                util::NetworkEndian,
+                options.path + ".sig",
+                util::SimpleFile::ReadWrite |
+                util::SimpleFile::Create |
+                util::SimpleFile::Truncate);
+            signatureFile.Write (
+                encodedSignature->GetReadPtr (),
+                encodedSignature->GetDataAvailableForReading ());
+            std::cout << "Done" << std::endl;
+        }
+        if (options.verify) {
+            std::cout << "Verifying '" << options.path << "'...";
+            crypto::Authenticator verifier (
+                crypto::Authenticator::Verify,
+                crypto::AsymmetricKey::LoadPublicKeyFromFile (options.prefix + "public_key.pem"));
+            util::ReadOnlyFile signatureFile (util::NetworkEndian, options.path + ".sig");
+            util::Buffer encodedSignature (util::NetworkEndian, signatureFile.GetSize ());
+            encodedSignature.AdvanceWriteOffset (
+                signatureFile.Read (
+                    encodedSignature.GetWritePtr (),
+                    encodedSignature.GetDataAvailableForWriting ()));
+            util::Buffer::UniquePtr signature =
+                util::Base64::Decode (
+                    encodedSignature.GetReadPtr (),
+                    encodedSignature.GetDataAvailableForReading ());
+            bool result = verifier.VerifyFileSignature (
+                options.path,
                 signature->GetReadPtr (),
-                signature->GetDataAvailableForReading (),
-                64);
-        util::SimpleFile signatureFile (
-            util::NetworkEndian,
-            options.path + ".sig",
-            util::SimpleFile::ReadWrite |
-            util::SimpleFile::Create |
-            util::SimpleFile::Truncate);
-        signatureFile.Write (
-            encodedSignature->GetReadPtr (),
-            encodedSignature->GetDataAvailableForReading ());
-        std::cout << "Done" << std::endl;
+                signature->GetDataAvailableForReading ());
+            std::cout << (result ? "Passed" : "Failed") << std::endl;
+        }
     }
     THEKOGANS_UTIL_CATCH_AND_LOG
     THEKOGANS_UTIL_LOG_FLUSH

@@ -108,22 +108,37 @@ namespace thekogans {
             /// dtor.
             virtual ~Serializable () {}
 
+            /// \brief
             /// Return the serializable id.
             /// \return Serializable id.
             inline const ID &GetId () const {
                 return id;
             }
 
+            /// \brief
             /// Return the serializable name.
             /// \return Serializable name.
             inline const std::string &GetName () const {
                 return name;
             }
+            /// \brief
+            /// Set the serializable name.
+            /// \param[in] name_ New name to set.
+            inline void SetName (const std::string &name_) {
+                name = name_;
+            }
 
+            /// \brief
             /// Return the serializable description.
             /// \return Serializable description.
             inline const std::string &GetDescription () const {
                 return description;
+            }
+            /// \brief
+            /// Set the serializable description.
+            /// \param[in] description_ New description to set.
+            inline void SetDescription (const std::string &description_) {
+                description = description_;
             }
 
             /// \brief

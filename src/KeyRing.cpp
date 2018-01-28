@@ -738,8 +738,8 @@ namespace thekogans {
 
         void KeyRing::Clear () {
             keyExchangeParamsMap.clear ();
-            keyExchangeParamsMap.clear ();
-            authenticatorKeyMap.clear ();
+            keyExchangeKeyMap.clear ();
+            authenticatorParamsMap.clear ();
             authenticatorKeyMap.clear ();
             cipherActiveKeyMap.clear ();
             cipherRetiredKeyMap.clear ();

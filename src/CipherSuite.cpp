@@ -39,6 +39,22 @@ namespace thekogans {
         const char * const CipherSuite::MESSAGE_DIGEST_SHA2_384 = "SHA2-384";
         const char * const CipherSuite::MESSAGE_DIGEST_SHA2_256 = "SHA2-256";
 
+        CipherSuite::CipherSuite (
+                const std::string &keyExchange_,
+                const std::string &authenticator_,
+                const std::string &cipher_,
+                const std::string &messageDigest_) :
+                keyExchange (keyExchange_),
+                authenticator (authenticator_),
+                cipher (cipher_),
+                messageDigest (messageDigest_) {
+            if (!IsValid ()) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid cipher suite: %s",
+                    ToString ().c_str ());
+            }
+        }
+
         CipherSuite::CipherSuite (const std::string &cipherSuite) {
             std::string::size_type keyExchangeSeparator = cipherSuite.find_first_of ('_');
             keyExchange = cipherSuite.substr (0, keyExchangeSeparator++);
@@ -55,9 +71,48 @@ namespace thekogans {
             messageDigest = cipherSuite.substr (cipherSeparator);
             if (!IsValid ()) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid cipher suite: %s", cipherSuite.c_str ());
+                    "Invalid cipher suite: %s",
+                    cipherSuite.c_str ());
             }
         }
+
+        CipherSuite::CipherSuite (util::Serializer &serializer) {
+            serializer >> keyExchange >> authenticator >> cipher >> messageDigest;
+            if (!IsValid ()) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid cipher suite: %s",
+                    ToString ().c_str ());
+            }
+        }
+
+        CipherSuite::CipherSuite (const CipherSuite &cipherSuite) :
+                keyExchange (cipherSuite.keyExchange),
+                authenticator (cipherSuite.authenticator),
+                cipher (cipherSuite.cipher),
+                messageDigest (cipherSuite.messageDigest) {
+            if (!IsValid ()) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid cipher suite: %s",
+                    ToString ().c_str ());
+            }
+        }
+
+        CipherSuite &CipherSuite::operator = (const CipherSuite &cipherSuite) {
+            if (&cipherSuite != this) {
+                keyExchange = cipherSuite.keyExchange;
+                authenticator = cipherSuite.authenticator;
+                cipher = cipherSuite.cipher;
+                messageDigest = cipherSuite.messageDigest;
+                if (!IsValid ()) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Invalid cipher suite: %s",
+                        ToString ().c_str ());
+                }
+            }
+            return *this;
+        }
+
+        const CipherSuite CipherSuite::Empty;
 
         namespace {
             const char *keyExchanges[] = {
@@ -206,10 +261,14 @@ namespace thekogans {
 
         bool CipherSuite::IsValid () const {
             return
-                IsValidKeyExchange (keyExchange) &&
+                (keyExchange.empty () &&
+                authenticator.empty () &&
+                cipher.empty () &&
+                messageDigest.empty ()) ||
+                (IsValidKeyExchange (keyExchange) &&
                 IsValidAuthenticator (authenticator) &&
                 IsValidCipher (cipher) &&
-                IsValidMessageDigest (messageDigest);
+                IsValidMessageDigest (messageDigest));
         }
 
         bool CipherSuite::VerifyKeyExchangeParams (const Params &params) const {

@@ -373,7 +373,7 @@ namespace thekogans {
                     ciphertext,
                     FrameHeader::SIZE);
                 buffer << FrameHeader (key->GetId (), (util::ui32)ciphertextLength);
-                return CiphertextHeader::SIZE + ciphertextLength;
+                return FrameHeader::SIZE + ciphertextLength;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

@@ -22,6 +22,20 @@
 namespace thekogans {
     namespace crypto {
 
+        KeyExchange::KeyExchange (AsymmetricKey::Ptr privateKey_) :
+                privateKey (privateKey_) {
+            if (privateKey.Get () != 0) {
+                ctx.reset (EVP_PKEY_CTX_new (privateKey->Get (), OpenSSLInit::engine));
+                if (ctx.get () == 0) {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
         SymmetricKey::Ptr KeyExchange::DeriveSharedSymmetricKey (
                 AsymmetricKey::Ptr publicKey,
                 std::size_t keyLength,
@@ -33,10 +47,7 @@ namespace thekogans {
                 const std::string &description) {
             if (publicKey.Get () != 0 && keyLength > 0 && md != 0) {
                 std::size_t secretLength = 0;
-                EVP_PKEY_CTXPtr ctx (
-                    EVP_PKEY_CTX_new (privateKey->Get (), OpenSSLInit::engine));
-                if (ctx.get () != 0 &&
-                        EVP_PKEY_derive_init (ctx.get ()) == 1 &&
+                if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
                         EVP_PKEY_derive_set_peer (ctx.get (), publicKey->Get ()) == 1 &&
                         EVP_PKEY_derive (ctx.get (), 0, &secretLength) == 1) {
                     util::SecureVector<util::ui8> secret (secretLength);

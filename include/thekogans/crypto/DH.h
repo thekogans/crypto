@@ -51,11 +51,11 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
-            /// Generate DH parameters from a given prime.
+            /// Generate DH parameters from a given prime and generator.
             /// WARNING: Not every prime is a DH prime. They are fairly difficult to
             /// generate and take a long time. You are strongly encouraged to use
-            /// RFC3526Prime or RFC5114Prime as these primes have been vetted by the
-            /// community and are considered safe.
+            /// RFC3526Prime or RFC5114Prime (below) as these primes have been vetted
+            /// by the community and are considered safe.
             /// \param[in] prime DH prime.
             /// \param[in] generator DH generator.
             /// \param[in] name Optional parameters name.
@@ -106,7 +106,7 @@ namespace thekogans {
             /// Primes found in RFC 5114.
             enum RFC5114Prime {
                 /// \brief
-                /// 1536 bit prime with 160-bit Prime Order Subgroup.
+                /// 1024 bit prime with 160-bit Prime Order Subgroup.
                 RFC5114_PRIME_1024,
                 /// \brief
                 /// 2048 bit prime with 224-bit Prime Order Subgroup.

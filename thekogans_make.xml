@@ -87,15 +87,16 @@
   </cpp_sources>
   <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_TESTS)">
     <cpp_tests prefix = "tests">
+      <cpp_test>test_AsymmetricKey.cpp</cpp_test>
       <cpp_test>test_Authenticator.cpp</cpp_test>
       <cpp_test>test_Cipher.cpp</cpp_test>
       <cpp_test>test_CipherSuite.cpp</cpp_test>
       <cpp_test>test_KeyRing.cpp</cpp_test>
       <cpp_test>test_KeyExchange.cpp</cpp_test>
-      <cpp_test>test_Keys.cpp</cpp_test>
       <cpp_test>test_MAC.cpp</cpp_test>
       <cpp_test>test_MessageDigest.cpp</cpp_test>
       <cpp_test>test_Params.cpp</cpp_test>
+      <cpp_test>test_SymmetricKey.cpp</cpp_test>
       <cpp_test>test_SystemCACertificates.cpp</cpp_test>
     </cpp_tests>
   </if>

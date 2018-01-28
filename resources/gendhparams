@@ -1,0 +1,32 @@
+#!/bin/bash
+
+PRIME_LEN=
+RFC5114=
+
+# Parse command line options.
+for i in "$@"; do
+    case $i in
+        -p:*|--prime-len:*)
+            PRIME_LEN="${i#*:}"
+            ;;
+        -r:*|--rfc5114:*)
+            RFC5114="${i#*:}"
+            ;;
+    esac
+done
+
+if [ "$PRIME_LEN" == "" ] && [ "$RFC5114" == "" ]; then
+    echo "usage: $0 -p:'prime length' or -r:[1 | 2 | 3]"
+    exit 1
+fi
+
+echo "Generating DH parameters."
+if [ "$PRIME_LEN" != "" ]; then
+    DH_PARAMETERS=dh_parameters_"$PRIME_LEN".pem
+    openssl genpkey -genparam -algorithm DH -out "$DH_PARAMETERS" -pkeyopt dh_paramgen_prime_len:"$PRIME_LEN"
+else
+    DH_PARAMETERS=dh_parameters_rfc5114_"$RFC5114".pem
+    openssl genpkey -genparam -algorithm DH -out "$DH_PARAMETERS" -pkeyopt dh_rfc5114:"$RFC5114"
+fi
+
+exit 0

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+PARAMETERS_FILE=
+PASSWORD=no
+
+# Parse command line options.
+for i in "$@"; do
+    case $i in
+        -f:*|--parameters-file:*)
+            PARAMETERS_FILE="${i#*:}"
+            ;;
+        -p:*|--password:*)
+            PASSWORD="${i#*:}"
+            ;;
+    esac
+done
+
+if [ "$PARAMETERS_FILE" == "" ]; then
+    echo "usage: $0 -f:'parameters file' [-p:[yes | no]]"
+    exit 1
+fi
+
+PRIVATE_KEY=dsa_private_key.pem
+PUBLIC_KEY=dsa_public_key.pem
+
+if [ -e "$PRIVATE_KEY" ]; then
+    echo "Deleting old private key."
+    rm "$PRIVATE_KEY"
+fi
+echo "Generating new private key."
+if [ "$PASSWORD" == "yes" ]; then
+    openssl gendsa -aes256 -out "$PRIVATE_KEY" "$PARAMETERS_FILE"
+else
+    openssl gendsa -out "$PRIVATE_KEY" "$PARAMETERS_FILE"
+fi
+
+if [ -e "$PUBLIC_KEY" ]; then
+    echo "Deleting old public key."
+    rm "$PUBLIC_KEY"
+fi
+echo "Extracting new public key."
+openssl dsa -pubout -in "$PRIVATE_KEY" -out "$PUBLIC_KEY"
+
+exit 0

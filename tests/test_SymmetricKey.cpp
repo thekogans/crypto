@@ -88,40 +88,4 @@ TEST (thekogans, SymmetricKey) {
     }
 }
 
-namespace {
-    bool operator == (
-            const crypto::AsymmetricKey &key1,
-            const crypto::AsymmetricKey &key2) {
-        return
-            key1.GetId () == key2.GetId () &&
-            key1.GetName () == key2.GetName () &&
-            key1.GetDescription () == key2.GetDescription ();
-    }
-}
-
-TEST (thekogans, AsymmetricKey) {
-    crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey =
-        crypto::DSA::ParamsFromKeyLength (512)->CreateKey ();
-    {
-        std::cout << "AsymmetricKey private key...";
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)privateKey->Size (false));
-        privateKey->Serialize (serializer, false);
-        crypto::AsymmetricKey::Ptr privateKey2 (new crypto::AsymmetricKey (serializer));
-        bool result = *privateKey == *privateKey2;
-        std::cout << (result ? "pass" : "fail") << std::endl;
-        CHECK_EQUAL (result, true);
-    }
-    {
-        std::cout << "AsymmetricKey public key...";
-        crypto::AsymmetricKey::Ptr publicKey = privateKey->GetPublicKey ();
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)publicKey->Size (false));
-        publicKey->Serialize (serializer, false);
-        crypto::AsymmetricKey::Ptr publicKey2 (new crypto::AsymmetricKey (serializer));
-        bool result = *publicKey == *publicKey2;
-        std::cout << (result ? "pass" : "fail") << std::endl;
-        CHECK_EQUAL (result, true);
-    }
-}
-
 TESTMAIN

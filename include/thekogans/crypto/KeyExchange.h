@@ -20,6 +20,7 @@
 
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/crypto/Config.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 
@@ -40,13 +41,15 @@ namespace thekogans {
             /// \brief
             /// Private key used for \see{SymmetricKey} derivation.
             AsymmetricKey::Ptr privateKey;
+            /// \brief
+            /// OpenSSL key derivation context.
+            EVP_PKEY_CTXPtr ctx;
 
         public:
             /// \brief
             /// ctor.
             /// \param[in] privateKey Private key used for \see{SymmetricKey} derivation.
-            explicit KeyExchange (AsymmetricKey::Ptr privateKey_) :
-                privateKey (privateKey_) {}
+            explicit KeyExchange (AsymmetricKey::Ptr privateKey_);
 
             /// \brief
             /// Call this method to get the public key (your half of the shared secret).

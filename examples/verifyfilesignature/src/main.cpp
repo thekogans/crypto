@@ -74,7 +74,7 @@ int main (
         crypto::Authenticator authenticator (
             crypto::Authenticator::Verify,
             crypto::AsymmetricKey::LoadPublicKeyFromFile (options.publicKey));
-        util::ReadOnlyFile signatureFile (util::HostEndian, options.path + ".sig");
+        util::ReadOnlyFile signatureFile (util::NetworkEndian, options.path + ".sig");
         util::Buffer encodedSignature (util::NetworkEndian, signatureFile.GetSize ());
         encodedSignature.AdvanceWriteOffset (
             signatureFile.Read (
