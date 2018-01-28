@@ -144,8 +144,8 @@ namespace thekogans {
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;
                     for (util::ui32 count = file.Read (buffer.array, 4096);
-                         count != 0;
-                         count = file.Read (buffer.array, 4096)) {
+                            count != 0;
+                            count = file.Read (buffer.array, 4096)) {
                         if (EVP_DigestVerifyUpdate (&ctx, buffer.array, count) != 1) {
                             THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                         }
