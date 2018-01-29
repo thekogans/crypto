@@ -391,7 +391,7 @@ namespace thekogans {
                 util::Buffer::UniquePtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
-                        (util::ui32)(FrameHeader::SIZE + GetMaxBufferLength (plaintextLength))));
+                        (util::ui32)(GetMaxBufferLength (plaintextLength))));
                 ciphertext->AdvanceWriteOffset (
                     (util::ui32)EncryptAndFrame (
                         plaintext,

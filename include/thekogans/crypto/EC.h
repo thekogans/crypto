@@ -105,46 +105,46 @@ namespace thekogans {
             /// Curves found in RFC 5639.
             enum RFC5639Curve {
                 /// \brief
-                /// 2D 160 bit curve.
+                /// 160 bit curve.
                 RFC5639_CURVE_160,
                 /// \brief
-                /// 3D 160 bit curve.
+                /// Twisted 160 bit curve.
                 RFC5639_CURVE_160_T,
                 /// \brief
-                /// 2D 192 bit curve.
+                /// 192 bit curve.
                 RFC5639_CURVE_192,
                 /// \brief
-                /// 3D 192 bit curve.
+                /// Twisted 192 bit curve.
                 RFC5639_CURVE_192_T,
                 /// \brief
-                /// 2D 224 bit curve.
+                /// 224 bit curve.
                 RFC5639_CURVE_224,
                 /// \brief
-                /// 3D 224 bit curve.
+                /// Twisted 224 bit curve.
                 RFC5639_CURVE_224_T,
                 /// \brief
-                /// 2D 256 bit curve.
+                /// 256 bit curve.
                 RFC5639_CURVE_256,
                 /// \brief
-                /// 3D 256 bit curve.
+                /// Twisted 256 bit curve.
                 RFC5639_CURVE_256_T,
                 /// \brief
-                /// 2D 320 bit curve.
+                /// 320 bit curve.
                 RFC5639_CURVE_320,
                 /// \brief
-                /// 3D 320 bit curve.
+                /// Twisted 320 bit curve.
                 RFC5639_CURVE_320_T,
                 /// \brief
-                /// 2D 384 bit curve.
+                /// 384 bit curve.
                 RFC5639_CURVE_384,
                 /// \brief
-                /// 3D 384 bit curve.
+                /// Twisted 384 bit curve.
                 RFC5639_CURVE_384_T,
                 /// \brief
-                /// 2D 512 bit curve.
+                /// 512 bit curve.
                 RFC5639_CURVE_512,
                 /// \brief
-                /// 3D 512 bit curve.
+                /// Twisted 512 bit curve.
                 RFC5639_CURVE_512_T
             };
             /// \brief
