@@ -32,8 +32,8 @@ namespace thekogans {
         ///
         /// \brief
         /// Generate Diffie-Hellman (DH) parameters (prime and generator) using various
-        /// given techniques. Call \see{Params::CreateKey} to derive the key.
-        /// Use the derived key to perform \see{KeyExchange}.
+        /// given techniques. Call \see{Params::CreateKey} to derive the key. Use the
+        /// derived key to perform \see{KeyExchange}.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL DH {
             /// \brief
@@ -127,6 +127,27 @@ namespace thekogans {
                 RFC5114Prime prime,
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+
+            /// \enum
+            /// Primes found in https://www.cryptologie.net/article/377/what-diffie-hellman-parameters-to-use/.
+            enum DavidPrime {
+                /// \brief
+                /// 2048 bit prime.
+                DAVID_PRIME_2048,
+                /// \brief
+                /// 4096 bit prime.
+                DAVID_PRIME_4096
+            };
+            /// \brief
+            /// Generate DH parameters from primes found in David's blog.
+            /// \param[in] prime One of DAVID_PRIME_* values above.
+            /// \param[in] name Optional parameters name.
+            /// \param[in] description Optional parameters description.
+            /// \return DH parameters suitable for key and shared secret generation.
+            static Params::Ptr ParamsDavidPrime (
+                DavidPrime prime,
+                const std::string &name,
+                const std::string &description);
         };
 
     } // namespace crypto

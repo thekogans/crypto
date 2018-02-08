@@ -11,3 +11,13 @@ level cryptographic tasks like the ones mentioned above.
 
 thekogans_crypto has been tested and verified with OpenSSL versions
 1.0.2n and 1.1.0g.
+
+libthekogans_crypto has the following required dependencies:
+
+libthekogans_util
+openssl_ssl
+openssl_crypto
+
+Windows: Crypt32.lib.
+
+OS X: frameworks: CoreFoundation, Security.

@@ -285,6 +285,20 @@ namespace thekogans {
             static std::size_t GetMaxBufferLength (std::size_t plaintextLength);
 
             /// \brief
+            /// Return the encryptor stats.
+            /// \return Encryptor stats.
+            inline const Stats &GetEncryptorStats () const {
+                return encryptor.stats;
+            }
+
+            /// \brief
+            /// Return the decryptor stats.
+            /// \return Decryptor stats.
+            inline const Stats &GetDecryptorStats () const {
+                return decryptor.stats;
+            }
+
+            /// \brief
             /// Encrypt and mac plaintext. This is the workhorse encryption function
             /// used by others below. It writes the following structure in to ciphertext:
             ///

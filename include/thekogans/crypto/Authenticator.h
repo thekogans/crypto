@@ -56,7 +56,7 @@ namespace thekogans {
             /// Operation (Sign/Verify) to perform.
             Op op;
             /// \brief
-            /// Private (Sign)/Public (Verify) key.
+            /// Private (Sign)/Public (Verify) \see{AsymmetricKey}.
             AsymmetricKey::Ptr key;
             /// \brief
             /// OpenSSL message digest object.

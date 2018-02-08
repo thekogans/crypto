@@ -68,7 +68,7 @@ namespace thekogans {
                 const std::string &description = std::string ());
             /// \brief
             /// ctor.
-            /// \param[in] serializer Serializer containing the key.
+            /// \param[in] serializer \see{util::Serializer} containing the key.
             explicit AsymmetricKey (util::Serializer &serializer);
 
             /// \brief
@@ -156,7 +156,7 @@ namespace thekogans {
 
             /// \brief
             /// Serialize the key to the given serializer.
-            /// \param[out] serializer Serializer to serialize the key to.
+            /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             /// \param[in] includeType true = Serialize key's type to be used by Get above.
             virtual void Serialize (
                 util::Serializer &serializer,
