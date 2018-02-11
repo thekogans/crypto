@@ -243,6 +243,38 @@ namespace thekogans {
             }
         }
 
+        void Params::Save (const std::string &path) const {
+            crypto::BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
+            if (bio.get () != 0) {
+                util::i32 type = GetType ();
+                if (type == EVP_PKEY_DH) {
+                    DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
+                    if (dhParams.get () == 0 ||
+                            PEM_write_bio_DHparams (bio.get (), dhParams.get ()) == 0) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (type == EVP_PKEY_DSA) {
+                    DSAPtr dsaParams (EVP_PKEY_get1_DSA (params.get ()));
+                    if (dsaParams.get () == 0 ||
+                            PEM_write_bio_DSAparams (bio.get (), dsaParams.get ()) == 0) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (type == EVP_PKEY_EC) {
+                    EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (params.get ()));
+                    if (ecParams.get () == 0 ||
+                            PEM_write_bio_ECPKParameters (bio.get (),
+                                EC_KEY_get0_group (ecParams.get ())) == 0) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+            }
+            else {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
+        }
+
         std::size_t Params::Size (bool includeType) const {
             util::i32 type = GetType ();
             util::i32 paramsLength = 0;

@@ -428,6 +428,8 @@ namespace thekogans {
         /// \param[in] format Format of the CRL file (DER/PEM).
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
+        /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+        /// will interpret the userData as a NULL terminated password.
         /// \return X509_CRLPtr containing the parsed CRL.
         _LIB_THEKOGANS_CRYPTO_DECL X509_CRLPtr _LIB_THEKOGANS_CRYPTO_API
             LoadCRL (
@@ -435,6 +437,16 @@ namespace thekogans {
                 util::ui32 format,
                 pem_password_cb *passwordCallback,
                 void *userData);
+        /// \brief
+        /// Save the given CRL to a from.
+        /// \param[in] path Path to CRL file.
+        /// \param[in] crl CRL to save.
+        /// \param[in] format Format of the CRL file (DER/PEM).
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API
+            SaveCRL (
+                const std::string &path,
+                X509_CRL *crl,
+                util::ui32 format = FORMAT_PEM);
         /// \brief
         /// Check a given certificate (X509) against the given CRL.
         /// \param[in] crl CRL to check against.

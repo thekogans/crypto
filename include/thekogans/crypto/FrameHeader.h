@@ -39,7 +39,7 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL FrameHeader {
             /// \brief
-            /// \see{Key} id used to encrypt this frame.
+            /// \see{SymmetricKey} id used to encrypt this frame.
             ID keyId;
             /// \brief
             /// Length of following ciphertext.
@@ -59,7 +59,7 @@ namespace thekogans {
 
             /// \brief
             /// ctor.
-            /// \param[in] keyId_ \see{Key} id used to encrypt this frame.
+            /// \param[in] keyId_ \see{SymmetricKey} id used to encrypt this frame.
             /// \param[in] ciphertextLength_ Length of following ciphertext.
             FrameHeader (
                 const ID &keyId_,

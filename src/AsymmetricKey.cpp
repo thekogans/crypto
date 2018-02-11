@@ -141,6 +141,28 @@ namespace thekogans {
             }
         }
 
+        void AsymmetricKey::Save (
+                const std::string &path,
+                const EVP_CIPHER *cipher,
+                const void *symmetricKey,
+                std::size_t symmetricKeyLength,
+                pem_password_cb *passwordCallback,
+                void *userData) {
+            BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
+            if (bio.get () != 0 || (isPrivate ?
+                    PEM_write_bio_PrivateKey (
+                        bio.get (),
+                        key.get (),
+                        cipher,
+                        (unsigned char *)symmetricKey,
+                        symmetricKeyLength,
+                        passwordCallback,
+                        userData) :
+                    PEM_write_bio_PUBKEY (bio.get (), key.get ())) == 0) {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
+        }
+
         AsymmetricKey::Ptr AsymmetricKey::GetPublicKey (
                 const std::string &name,
                 const std::string &description) const {
@@ -184,27 +206,21 @@ namespace thekogans {
                     bool isPrivate,
                     EVP_PKEY &key,
                     util::SecureVector<util::ui8> &keyBuffer) {
-                if (isPrivate) {
-                    util::i32 keyLength = i2d_PrivateKey (&key, 0);
-                    if (keyLength > 0) {
-                        keyBuffer.resize (keyLength);
-                        util::ui8 *keyData = &keyBuffer[0];
+                util::i32 keyLength = isPrivate ?
+                    i2d_PrivateKey (&key, 0) :
+                    i2d_PublicKey (&key, 0);
+                if (keyLength > 0) {
+                    keyBuffer.resize (keyLength);
+                    util::ui8 *keyData = &keyBuffer[0];
+                    if (isPrivate) {
                         i2d_PrivateKey (&key, &keyData);
                     }
                     else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        i2d_PublicKey (&key, &keyData);
                     }
                 }
                 else {
-                    util::i32 keyLength = i2d_PublicKey (&key, 0);
-                    if (keyLength > 0) {
-                        keyBuffer.resize (keyLength);
-                        util::ui8 *keyData = &keyBuffer[0];
-                        i2d_PublicKey (&key, &keyData);
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
         }

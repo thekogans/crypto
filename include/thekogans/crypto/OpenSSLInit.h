@@ -47,7 +47,7 @@ namespace thekogans {
                 DEFAULT_ENTROPY_NEEDED = 1024,
                 /// \brief
                 /// Default \see{util::SecureAllocator} working set size. thekogans_crypto
-                /// uses a lot of secure memory. All \see{Key}s, IVs, shared secrets...
+                /// uses a lot of secure memory. All \see{SymmetricKey}s, IVs, shared secrets...
                 /// are allocated from \see{util::SecureAllocator}. Some OSs (specifically
                 /// Windows) severely limit the number of pages that get wired in for any
                 /// process. It's important that you pick a working set size appropriate to

@@ -72,6 +72,8 @@ namespace thekogans {
             /// \param[in] type EVP_PKEY_DH, EVP_PKEY_DSA or EVP_PKEY_EC
             /// \param[in] passwordCallback Provide a password if file is encrypted.
             /// \param[in] userData User data for passwordCallback.
+            /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+            /// will interpret the userData as a NULL terminated password.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return Private key parameters.
@@ -82,6 +84,10 @@ namespace thekogans {
                 void *userData = 0,
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+            /// \brief
+            /// Save the PEM encoded key parameters.
+            /// \param[in] path File path to save to.
+            void Save (const std::string &path) const;
 
             /// \brief
             /// Return the EVP_PKEY *.

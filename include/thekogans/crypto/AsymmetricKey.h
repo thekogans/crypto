@@ -83,6 +83,8 @@ namespace thekogans {
             /// \param[in] path File containing a private key.
             /// \param[in] passwordCallback Provide a password if file is encrypted.
             /// \param[in] userData User data for passwordCallback.
+            /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+            /// will interpret the userData as a NULL terminated password.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Private key.
@@ -97,6 +99,8 @@ namespace thekogans {
             /// \param[in] path File containing a public key.
             /// \param[in] passwordCallback Provide a password if file is encrypted.
             /// \param[in] userData User data for passwordCallback.
+            /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+            /// will interpret the userData as a NULL terminated password.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public key.
@@ -111,6 +115,8 @@ namespace thekogans {
             /// \param[in] path File containing a certificate.
             /// \param[in] passwordCallback Provide a password if file is encrypted.
             /// \param[in] userData User data for passwordCallback.
+            /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+            /// will interpret the userData as a NULL terminated password.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public key.
@@ -120,6 +126,23 @@ namespace thekogans {
                 void *userData = 0,
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+            /// \brief
+            /// Save the key to a file.
+            /// \param[in] path File name to save the key to.
+            /// \param[in] cipher Optional cipher to use to encrypt the private key.
+            /// \param[in] symmetricKey Optional symmetric key to use with the cipher.
+            /// \param[in] symmetricKeyLength Optional symmetric key length.
+            /// \param[in] passwordCallback Provide a password if file is encrypted.
+            /// \param[in] userData User data for passwordCallback.
+            /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+            /// will interpret the userData as a NULL terminated password.
+            void Save (
+                const std::string &path,
+                const EVP_CIPHER *cipher = 0,
+                const void *symmetricKey = 0,
+                std::size_t symmetricKeyLength = 0,
+                pem_password_cb *passwordCallback = 0,
+                void *userData = 0);
 
             /// \brief
             /// Return the EVP_PKEY *.

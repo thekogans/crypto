@@ -237,6 +237,26 @@ namespace thekogans {
             }
         }
 
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API
+        SaveCRL (
+                const std::string &path,
+                X509_CRL *crl,
+                util::ui32 format) {
+            if (!path.empty () && crl != 0 && (format == FORMAT_DER || format == FORMAT_PEM)) {
+                crypto::BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
+                if (bio.get () != 0 ||
+                        (format == FORMAT_PEM ?
+                            PEM_write_bio_X509_CRL (bio.get (), crl) :
+                            i2d_X509_CRL_bio (bio.get (), crl)) != 1) {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
         _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API
         CheckCRL (
                 X509_CRL *crl,
