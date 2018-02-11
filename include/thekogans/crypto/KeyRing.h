@@ -75,17 +75,17 @@ namespace thekogans {
             /// \see{Authenticator} \see{AsymmetricKey} map.
             AsymmetricKeyMap authenticatorKeyMap;
             /// \brief
-            /// \see{Cipher} master key.
-            SymmetricKey::Ptr cipherMasterKey;
+            /// Master \see{Cipher} key.
+            SymmetricKey::Ptr masterCipherKey;
             /// \brief
             /// Convenient typedef for std::map<ID, SymmetricKey::Ptr>.
             typedef std::map<ID, SymmetricKey::Ptr> SymmetricKeyMap;
             /// \brief
-            /// \see{Cipher} active \see{SymmetricKey} map.
-            SymmetricKeyMap cipherActiveKeyMap;
+            /// Active \see{Cipher} \see{SymmetricKey} map.
+            SymmetricKeyMap activeCipherKeyMap;
             /// \brief
             /// Where active keys go to die.
-            SymmetricKeyMap cipherRetiredKeyMap;
+            SymmetricKeyMap retiredCipherKeyMap;
             /// \brief
             /// \see{MAC} \see{AsymmetricKey} map.
             AsymmetricKeyMap macKeyMap;
@@ -254,15 +254,15 @@ namespace thekogans {
             void DropAllAuthenticatorKeys (bool recursive = true);
 
             /// \brief
-            /// Return the \see{Cipher} master key.
-            /// \return \see{Cipher} master key.
-            inline SymmetricKey::Ptr GetCipherMasterKey () const {
-                return cipherMasterKey;
+            /// Return the master \see{Cipher} key.
+            /// \return Master \see{Cipher} key.
+            inline SymmetricKey::Ptr GetMasterCipherKey () const {
+                return masterCipherKey;
             }
             /// \brief
-            /// Set the \see{Cipher} master key to the given key.
-            /// \param[in] masterKey_ New \see{Cipher} master key to set.
-            void SetCipherMasterKey (SymmetricKey::Ptr masterKey_);
+            /// Set the master \see{Cipher} key to the given key.
+            /// \param[in] masterKey_ New master \see{Cipher} key to set.
+            void SetMasterCipherKey (SymmetricKey::Ptr masterKey_);
 
             /// \brief
             /// Retrieve the \see{Cipher} \see{SymmetricKey} (master, active or retired)
@@ -287,7 +287,7 @@ namespace thekogans {
             /// \param[in] keyId Active \see{Cipher} \see{SymmetricKey} \see{ID} to retire.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = retired, false = not found.
-            bool RetireCipherActiveKey (
+            bool RetireActiveCipherKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
@@ -296,26 +296,26 @@ namespace thekogans {
             /// \param[in] keyId Active \see{Cipher} \see{SymmetricKey} \see{ID} to drop from the key ring.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
-            bool DropCipherActiveKey (
+            bool DropActiveCipherKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
             /// Drop all active \see{Cipher} \see{SymmetricKey}s.
             /// \param[in] recursive true = descend down to sub rings.
-            void DropCipherActiveKeys (bool recursive = true);
+            void DropActiveCipherKeys (bool recursive = true);
             /// \brief
             /// Given a retired \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding
             /// key from the key ring.
             /// \param[in] keyId Retired \see{Cipher} \see{SymmetricKey} \see{ID} to drop from the key ring.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
-            bool DropCipherRetiredKey (
+            bool DropRetiredCipherKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
             /// Drop all \see{Cipher} retired \see{SymmetricKey}s.
             /// \param[in] recursive descend down to sub rings.
-            void DropCipherRetiredKeys (bool recursive = true);
+            void DropRetiredCipherKeys (bool recursive = true);
             /// \brief
             /// Drop all \see{Cipher} keys. Master key is not affected.
             /// \param[in] recursive descend down to sub rings.
