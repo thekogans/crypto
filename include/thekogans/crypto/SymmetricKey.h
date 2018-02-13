@@ -61,13 +61,13 @@ namespace thekogans {
             }
 
             /// \brief
-            /// ctor.
+            /// Generate a key given secret (password) and length.
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] secret Shared secret from which to derive the key.
             /// \param[in] secretLength Shared secret length.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
-            /// \param[in] md OpenSSL message digest to use for the signing operation.
+            /// \param[in] md OpenSSL message digest to use for hashing.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
             /// \param[in] name Optional key name.
@@ -91,18 +91,18 @@ namespace thekogans {
             };
 
             /// \brief
-            /// Generate a random key. Use this routine to encrypt data at rest.
+            /// Generate a random key.
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] randomLength Length of random buffer from which
             /// keying material is derived.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
-            /// \param[in] md OpenSSL message digest to use for the signing operation.
+            /// \param[in] md OpenSSL message digest to use for hashing.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
-            /// \return A random symmetric key.
+            /// \return A new symmetric key.
             static Ptr FromRandom (
                 std::size_t keyLength,
                 std::size_t randomLength = MIN_RANDOM_LENGTH,

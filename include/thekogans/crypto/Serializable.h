@@ -52,6 +52,7 @@ namespace thekogans {
             typedef std::map<std::string, Factory> Map;
             /// \brief
             /// Controls Map's lifetime.
+            /// \return Serializable map.
             static Map &GetMap ();
             /// \brief
             /// Used for Serializable dynamic discovery and creation.

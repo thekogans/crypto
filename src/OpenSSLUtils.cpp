@@ -176,13 +176,13 @@ namespace thekogans {
                 X509 *cert,
                 std::vector<std::string> &crlDistributionPoints) {
             if (cert != 0) {
-                STACK_OF (DIST_POINT) *distributionPoints =
+                const STACK_OF (DIST_POINT) *distributionPoints =
                     (STACK_OF (DIST_POINT) *)X509_get_ext_d2i (cert, NID_crl_distribution_points, 0, 0);
                 for (int i = 0, count = sk_DIST_POINT_num (distributionPoints); i < count; ++i) {
-                    DIST_POINT_NAME *distributionPoint = sk_DIST_POINT_value (distributionPoints, i)->distpoint;
+                    const DIST_POINT_NAME *distributionPoint = sk_DIST_POINT_value (distributionPoints, i)->distpoint;
                     if (distributionPoint->type == 0) {
                         for (int j = 0, count = sk_GENERAL_NAME_num (distributionPoint->name.fullname); j < count; ++j) {
-                            ASN1_IA5STRING *url =
+                            const ASN1_IA5STRING *url =
                                 sk_GENERAL_NAME_value (distributionPoint->name.fullname, j)->d.uniformResourceIdentifier;
                             crlDistributionPoints.push_back (
                                 std::string (
@@ -191,9 +191,10 @@ namespace thekogans {
                         }
                     }
                     else if (distributionPoint->type == 1) {
-                        STACK_OF (X509_NAME_ENTRY) *relativeNames = distributionPoint->name.relativename;
+                        const STACK_OF (X509_NAME_ENTRY) *relativeNames = distributionPoint->name.relativename;
                         for (int j = 0, count = sk_X509_NAME_ENTRY_num (relativeNames); j < count; ++j) {
-                            ASN1_STRING *url = X509_NAME_ENTRY_get_data (sk_X509_NAME_ENTRY_value (relativeNames, j));
+                            const ASN1_STRING *url =
+                                X509_NAME_ENTRY_get_data (sk_X509_NAME_ENTRY_value (relativeNames, j));
                             crlDistributionPoints.push_back (
                                 std::string(
                                     (const char *)ASN1_STRING_get0_data (url),
@@ -215,7 +216,7 @@ namespace thekogans {
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (!path.empty () && (format == FORMAT_DER || format == FORMAT_PEM)) {
-                crypto::BIOPtr bio (BIO_new_file (path.c_str (), "r"));
+                BIOPtr bio (BIO_new_file (path.c_str (), "r"));
                 if (bio.get () != 0) {
                     X509_CRLPtr crl (format == FORMAT_DER ?
                         d2i_X509_CRL_bio (bio.get (), 0) :
@@ -243,7 +244,7 @@ namespace thekogans {
                 X509_CRL *crl,
                 util::ui32 format) {
             if (!path.empty () && crl != 0 && (format == FORMAT_DER || format == FORMAT_PEM)) {
-                crypto::BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
+                BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
                 if (bio.get () != 0 ||
                         (format == FORMAT_PEM ?
                             PEM_write_bio_X509_CRL (bio.get (), crl) :

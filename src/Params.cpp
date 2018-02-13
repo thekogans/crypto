@@ -244,7 +244,7 @@ namespace thekogans {
         }
 
         void Params::Save (const std::string &path) const {
-            crypto::BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
+            BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
             if (bio.get () != 0) {
                 util::i32 type = GetType ();
                 if (type == EVP_PKEY_DH) {
