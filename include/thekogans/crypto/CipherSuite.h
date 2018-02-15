@@ -162,6 +162,12 @@ namespace thekogans {
             /// \brief
             /// Empty cipher suite.
             static const CipherSuite Empty;
+            /// \brief
+            /// Strongest cipher suite.
+            static const CipherSuite Strongest;
+            /// \brief
+            /// Weakest cipher suite.
+            static const CipherSuite Weakest;
 
             /// \brief
             /// Assignment operator.
@@ -255,10 +261,15 @@ namespace thekogans {
                 Authenticator::Op op,
                 AsymmetricKey::Ptr key) const;
             /// \brief
-            /// Return the cipher instance represented by cipher.
+            /// Return the \see{Cipher} instance represented by cipher.
             /// \param[in] key \see{SymmetricKey} used to encrypt/decrypt.
-            /// \return Cipher instance represented by cipher.
+            /// \return \see{Cipher} instance represented by cipher.
             Cipher::Ptr GetCipher (SymmetricKey::Ptr key) const;
+            /// \brief
+            /// Return the \see{MAC} instance represented by messageDigest.
+            /// \param[in] key \see{AsymmetricKey} used to mac/verify.
+            /// \return \see{MAC} instance represented by messageDigest.
+            MAC::Ptr GetMAC (AsymmetricKey::Ptr key) const;
             /// \brief
             /// Return the message digest instance represented by messageDigest.
             /// \return Message digest instance represented by messageDigest.

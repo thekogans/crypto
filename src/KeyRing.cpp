@@ -158,10 +158,12 @@ namespace thekogans {
             while (subringCount-- > 0) {
                 Ptr subring (new KeyRing (serializer));
                 std::pair<KeyRingMap::iterator, bool> result =
-                    subringsMap.insert (KeyRingMap::value_type (subring->GetId (), subring));
+                    subringsMap.insert (
+                        KeyRingMap::value_type (subring->GetId (), subring));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert subring: %s", subring->GetName ().c_str ());
+                        "Unable to instert subring: %s",
+                        subring->GetName ().c_str ());
                 }
             }
         }
@@ -224,7 +226,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
-                    Params::Ptr params = it->second->GetKeyExchangeParams (paramsId, recursive);
+                    Params::Ptr params =
+                        it->second->GetKeyExchangeParams (paramsId, recursive);
                     if (params.Get () != 0) {
                         return params;
                     }
@@ -234,9 +237,11 @@ namespace thekogans {
         }
 
         bool KeyRing::AddKeyExchangeParams (Params::Ptr params) {
-            if (params.Get () != 0 && cipherSuite.VerifyKeyExchangeParams (*params)) {
-                std::pair<ParamsMap::iterator, bool> result = keyExchangeParamsMap.insert (
-                    ParamsMap::value_type (params->GetId (), params));
+            if (params.Get () != 0 &&
+                    cipherSuite.VerifyKeyExchangeParams (*params)) {
+                std::pair<ParamsMap::iterator, bool> result =
+                    keyExchangeParamsMap.insert (
+                        ParamsMap::value_type (params->GetId (), params));
                 return result.second;
             }
             else {
@@ -287,7 +292,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
-                    AsymmetricKey::Ptr key = it->second->GetKeyExchangeKey (keyId, recursive);
+                    AsymmetricKey::Ptr key =
+                        it->second->GetKeyExchangeKey (keyId, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
@@ -296,10 +302,46 @@ namespace thekogans {
             return AsymmetricKey::Ptr ();
         }
 
+        KeyExchange::Ptr KeyRing::GetKeyExchange (
+                const ID &keyId,
+                bool recursive) {
+            KeyExchangeMap::const_iterator it = keyExchangeMap.find (keyId);
+            if (it != keyExchangeMap.end ()) {
+                return it->second;
+            }
+            AsymmetricKey::Ptr key = GetKeyExchangeKey (keyId, false);
+            if (key.Get () != 0) {
+                KeyExchange::Ptr keyExchange =
+                    cipherSuite.GetKeyExchange (key);
+                std::pair<KeyExchangeMap::iterator, bool> result =
+                    keyExchangeMap.insert (
+                        KeyExchangeMap::value_type (keyId, keyExchange));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to add a KeyExchange: %s.",
+                        keyId.ToString ().c_str ());
+                }
+                return keyExchange;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    KeyExchange::Ptr keyExchange =
+                        it->second->GetKeyExchange (keyId, recursive);
+                    if (keyExchange.Get () != 0) {
+                        return keyExchange;
+                    }
+                }
+            }
+            return KeyExchange::Ptr ();
+        }
+
         bool KeyRing::AddKeyExchangeKey (AsymmetricKey::Ptr key) {
             if (key.Get () != 0 && cipherSuite.VerifyKeyExchangeKey (*key)) {
-                std::pair<AsymmetricKeyMap::iterator, bool> result = keyExchangeKeyMap.insert (
-                    AsymmetricKeyMap::value_type (key->GetId (), key));
+                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                    keyExchangeKeyMap.insert (
+                        AsymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
             }
             else {
@@ -314,6 +356,10 @@ namespace thekogans {
             AsymmetricKeyMap::iterator it = keyExchangeKeyMap.find (keyId);
             if (it != keyExchangeKeyMap.end ()) {
                 keyExchangeKeyMap.erase (it);
+                KeyExchangeMap::iterator it = keyExchangeMap.find (keyId);
+                if (it != keyExchangeMap.end ()) {
+                    keyExchangeMap.erase (it);
+                }
                 return true;
             }
             else if (recursive) {
@@ -330,6 +376,7 @@ namespace thekogans {
 
         void KeyRing::DropAllKeyExchangeKeys (bool recursive) {
             keyExchangeKeyMap.clear ();
+            keyExchangeMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
@@ -350,7 +397,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
-                    Params::Ptr params = it->second->GetAuthenticatorParams (paramsId, recursive);
+                    Params::Ptr params =
+                        it->second->GetAuthenticatorParams (paramsId, recursive);
                     if (params.Get () != 0) {
                         return params;
                     }
@@ -361,8 +409,9 @@ namespace thekogans {
 
         bool KeyRing::AddAuthenticatorParams (Params::Ptr params) {
             if (params.Get () != 0 && cipherSuite.VerifyAuthenticatorParams (*params)) {
-                std::pair<ParamsMap::iterator, bool> result = authenticatorParamsMap.insert (
-                    ParamsMap::value_type (params->GetId (), params));
+                std::pair<ParamsMap::iterator, bool> result =
+                    authenticatorParamsMap.insert (
+                        ParamsMap::value_type (params->GetId (), params));
                 return result.second;
             }
             else {
@@ -413,7 +462,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
-                    AsymmetricKey::Ptr key = it->second->GetAuthenticatorKey (keyId, recursive);
+                    AsymmetricKey::Ptr key =
+                        it->second->GetAuthenticatorKey (keyId, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
@@ -422,10 +472,49 @@ namespace thekogans {
             return AsymmetricKey::Ptr ();
         }
 
+        Authenticator::Ptr KeyRing::GetAuthenticator (
+                Authenticator::Op op,
+                const ID &keyId,
+                bool recursive) {
+            AuthenticatorMap::const_iterator it =
+                authenticatorMap.find (AuthenticatorMapKey (op, keyId));
+            if (it != authenticatorMap.end ()) {
+                return it->second;
+            }
+            AsymmetricKey::Ptr key = GetAuthenticatorKey (keyId, false);
+            if (key.Get () != 0) {
+                Authenticator::Ptr authenticator =
+                    cipherSuite.GetAuthenticator (op, key);
+                std::pair<AuthenticatorMap::iterator, bool> result =
+                    authenticatorMap.insert (
+                        AuthenticatorMap::value_type (
+                            AuthenticatorMapKey (op, keyId), authenticator));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to add an Authenticator: %s.",
+                        keyId.ToString ().c_str ());
+                }
+                return authenticator;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Authenticator::Ptr authenticator =
+                        it->second->GetAuthenticator (op, keyId, recursive);
+                    if (authenticator.Get () != 0) {
+                        return authenticator;
+                    }
+                }
+            }
+            return Authenticator::Ptr ();
+        }
+
         bool KeyRing::AddAuthenticatorKey (AsymmetricKey::Ptr key) {
             if (key.Get () != 0 && cipherSuite.VerifyAuthenticatorKey (*key)) {
-                std::pair<AsymmetricKeyMap::iterator, bool> result = authenticatorKeyMap.insert (
-                    AsymmetricKeyMap::value_type (key->GetId (), key));
+                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                    authenticatorKeyMap.insert (
+                        AsymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
             }
             else {
@@ -440,6 +529,17 @@ namespace thekogans {
             AsymmetricKeyMap::iterator it = authenticatorKeyMap.find (keyId);
             if (it != authenticatorKeyMap.end ()) {
                 authenticatorKeyMap.erase (it);
+                AuthenticatorMap::iterator it =
+                    authenticatorMap.find (
+                        AuthenticatorMapKey (Authenticator::Sign, keyId));
+                if (it != authenticatorMap.end ()) {
+                    authenticatorMap.erase (it);
+                }
+                it = authenticatorMap.find (
+                    AuthenticatorMapKey (Authenticator::Verify, keyId));
+                if (it != authenticatorMap.end ()) {
+                    authenticatorMap.erase (it);
+                }
                 return true;
             }
             else if (recursive) {
@@ -456,6 +556,7 @@ namespace thekogans {
 
         void KeyRing::DropAllAuthenticatorKeys (bool recursive) {
             authenticatorKeyMap.clear ();
+            authenticatorMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
@@ -466,7 +567,14 @@ namespace thekogans {
         }
 
         void KeyRing::SetMasterCipherKey (SymmetricKey::Ptr masterCipherKey_) {
-            if (masterCipherKey_.Get () != 0 && cipherSuite.VerifyCipherKey (*masterCipherKey_)) {
+            if (masterCipherKey_.Get () != 0 &&
+                    cipherSuite.VerifyCipherKey (*masterCipherKey_)) {
+                if (masterCipherKey.Get () != 0) {
+                    CipherMap::iterator it = cipherMap.find (masterCipherKey->GetId ());
+                    if (it != cipherMap.end ()) {
+                        cipherMap.erase (it);
+                    }
+                }
                 masterCipherKey = masterCipherKey_;
             }
             else {
@@ -502,10 +610,46 @@ namespace thekogans {
             return SymmetricKey::Ptr ();
         }
 
+        Cipher::Ptr KeyRing::GetCipher (
+                const ID &keyId,
+                bool recursive) {
+            CipherMap::const_iterator it = cipherMap.find (keyId);
+            if (it != cipherMap.end ()) {
+                return it->second;
+            }
+            SymmetricKey::Ptr key = GetCipherKey (keyId, false);
+            if (key.Get () != 0) {
+                Cipher::Ptr cipher =
+                    cipherSuite.GetCipher (key);
+                std::pair<CipherMap::iterator, bool> result =
+                    cipherMap.insert (
+                        CipherMap::value_type (keyId, cipher));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to add a Cipher: %s.",
+                        keyId.ToString ().c_str ());
+                }
+                return cipher;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Cipher::Ptr cipher =
+                        it->second->GetCipher (keyId, recursive);
+                    if (cipher.Get () != 0) {
+                        return cipher;
+                    }
+                }
+            }
+            return Cipher::Ptr ();
+        }
+
         bool KeyRing::AddCipherActiveKey (SymmetricKey::Ptr key) {
             if (key.Get () != 0 && cipherSuite.VerifyCipherKey (*key)) {
-                std::pair<SymmetricKeyMap::iterator, bool> result = activeCipherKeyMap.insert (
-                    SymmetricKeyMap::value_type (key->GetId (), key));
+                std::pair<SymmetricKeyMap::iterator, bool> result =
+                    activeCipherKeyMap.insert (
+                        SymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
             }
             else {
@@ -519,15 +663,16 @@ namespace thekogans {
                 bool recursive) {
             SymmetricKeyMap::iterator it = activeCipherKeyMap.find (keyId);
             if (it != activeCipherKeyMap.end ()) {
-                std::pair<SymmetricKeyMap::iterator, bool> result = retiredCipherKeyMap.insert (
-                    SymmetricKeyMap::value_type (keyId, it->second));
+                std::pair<SymmetricKeyMap::iterator, bool> result =
+                    retiredCipherKeyMap.insert (
+                        SymmetricKeyMap::value_type (keyId, it->second));
                 if (result.second) {
                     activeCipherKeyMap.erase (it);
                     return true;
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to add Cipher retired key; %s.",
+                        "Unable to add a retired Cipher key: %s.",
                         keyId.ToString ().c_str ());
                 }
             }
@@ -549,6 +694,10 @@ namespace thekogans {
             SymmetricKeyMap::iterator it = activeCipherKeyMap.find (keyId);
             if (it != activeCipherKeyMap.end ()) {
                 activeCipherKeyMap.erase (it);
+                CipherMap::iterator it = cipherMap.find (keyId);
+                if (it != cipherMap.end ()) {
+                    cipherMap.erase (it);
+                }
                 return true;
             }
             else if (recursive) {
@@ -564,6 +713,14 @@ namespace thekogans {
         }
 
         void KeyRing::DropActiveCipherKeys (bool recursive) {
+            for (SymmetricKeyMap::const_iterator
+                    it = activeCipherKeyMap.begin (),
+                    end = activeCipherKeyMap.end (); it != end; ++it) {
+                CipherMap::iterator jt = cipherMap.find (it->second->GetId ());
+                if (jt != cipherMap.end ()) {
+                    cipherMap.erase (jt);
+                }
+            }
             activeCipherKeyMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
@@ -580,6 +737,10 @@ namespace thekogans {
             SymmetricKeyMap::iterator it = retiredCipherKeyMap.find (keyId);
             if (it != retiredCipherKeyMap.end ()) {
                 retiredCipherKeyMap.erase (it);
+                CipherMap::iterator it = cipherMap.find (keyId);
+                if (it != cipherMap.end ()) {
+                    cipherMap.erase (it);
+                }
                 return true;
             }
             else if (recursive) {
@@ -595,6 +756,14 @@ namespace thekogans {
         }
 
         void KeyRing::DropRetiredCipherKeys (bool recursive) {
+            for (SymmetricKeyMap::const_iterator
+                    it = retiredCipherKeyMap.begin (),
+                    end = retiredCipherKeyMap.end (); it != end; ++it) {
+                CipherMap::iterator jt = cipherMap.find (it->second->GetId ());
+                if (jt != cipherMap.end ()) {
+                    cipherMap.erase (jt);
+                }
+            }
             retiredCipherKeyMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
@@ -608,6 +777,7 @@ namespace thekogans {
         void KeyRing::DropAllCipherKeys (bool recursive) {
             activeCipherKeyMap.clear ();
             retiredCipherKeyMap.clear ();
+            cipherMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
@@ -637,10 +807,45 @@ namespace thekogans {
             return AsymmetricKey::Ptr ();
         }
 
+        MAC::Ptr KeyRing::GetMAC (
+                const ID &keyId,
+                bool recursive) {
+            MACMap::const_iterator it = macMap.find (keyId);
+            if (it != macMap.end ()) {
+                return it->second;
+            }
+            AsymmetricKey::Ptr key = GetMACKey (keyId, false);
+            if (key.Get () != 0) {
+                MAC::Ptr mac = cipherSuite.GetMAC (key);
+                std::pair<MACMap::iterator, bool> result =
+                    macMap.insert (
+                        MACMap::value_type (keyId, mac));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to add a MAC: %s.",
+                        keyId.ToString ().c_str ());
+                }
+                return mac;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    MAC::Ptr mac =
+                        it->second->GetMAC (keyId, recursive);
+                    if (mac.Get () != 0) {
+                        return mac;
+                    }
+                }
+            }
+            return MAC::Ptr ();
+        }
+
         bool KeyRing::AddMACKey (AsymmetricKey::Ptr key) {
             if (key.Get () != 0 && cipherSuite.VerifyMACKey (*key)) {
-                std::pair<AsymmetricKeyMap::iterator, bool> result = macKeyMap.insert (
-                    AsymmetricKeyMap::value_type (key->GetId (), key));
+                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                    macKeyMap.insert (
+                        AsymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
             }
             else {
@@ -655,6 +860,10 @@ namespace thekogans {
             AsymmetricKeyMap::iterator it = macKeyMap.find (keyId);
             if (it != macKeyMap.end ()) {
                 macKeyMap.erase (it);
+                MACMap::iterator it = macMap.find (keyId);
+                if (it != macMap.end ()) {
+                    macMap.erase (it);
+                }
                 return true;
             }
             else if (recursive) {
@@ -671,6 +880,7 @@ namespace thekogans {
 
         void KeyRing::DropAllMACKeys (bool recursive) {
             macKeyMap.clear ();
+            macMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
@@ -702,8 +912,9 @@ namespace thekogans {
 
         bool KeyRing::AddSubring (Ptr subring) {
             if (subring.Get () != 0) {
-                std::pair<KeyRingMap::iterator, bool> result = subringsMap.insert (
-                    KeyRingMap::value_type (subring->GetId (), subring));
+                std::pair<KeyRingMap::iterator, bool> result =
+                    subringsMap.insert (
+                        KeyRingMap::value_type (subring->GetId (), subring));
                 return result.second;
             }
             else {
@@ -739,11 +950,15 @@ namespace thekogans {
         void KeyRing::Clear () {
             keyExchangeParamsMap.clear ();
             keyExchangeKeyMap.clear ();
+            keyExchangeMap.clear ();
             authenticatorParamsMap.clear ();
             authenticatorKeyMap.clear ();
+            authenticatorMap.clear ();
             activeCipherKeyMap.clear ();
             retiredCipherKeyMap.clear ();
+            cipherMap.clear ();
             macKeyMap.clear ();
+            macMap.clear ();
             subringsMap.clear ();
         }
 

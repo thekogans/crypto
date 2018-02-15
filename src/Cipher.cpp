@@ -227,7 +227,7 @@ namespace thekogans {
             if (key.Get () != 0 && cipher != 0) {
                 if (GetMode (cipher) != EVP_CIPH_GCM_MODE) {
                     if (md != 0) {
-                        mac.reset (
+                        mac.Reset (
                             new MAC (
                                 HMAC::CreateKey (
                                     key->GetReadPtr (),
@@ -304,7 +304,7 @@ namespace thekogans {
                     associatedData,
                     associatedDataLength,
                     ivCiphertextAndMAC);
-                if (mac.get () != 0) {
+                if (mac.Get () != 0) {
                     ciphertextHeader.macLength = (util::ui16)mac->SignBuffer (
                         ivCiphertextAndMAC,
                         ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength,
@@ -424,7 +424,7 @@ namespace thekogans {
                 buffer >> ciphertextHeader;
                 util::ui32 ivAndCiphertextLength =
                     ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength;
-                if (mac.get () != 0 ?
+                if (mac.Get () != 0 ?
                         mac->VerifyBufferSignature (
                             buffer.GetReadPtr (),
                             ivAndCiphertextLength,
@@ -468,7 +468,7 @@ namespace thekogans {
                 buffer >> ciphertextHeader;
                 util::ui32 ivAndCiphertextLength =
                     ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength;
-                if (mac.get () != 0 ?
+                if (mac.Get () != 0 ?
                         mac->VerifyBufferSignature (
                             buffer.GetReadPtr (),
                             ivAndCiphertextLength,

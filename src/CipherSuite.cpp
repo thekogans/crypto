@@ -113,6 +113,16 @@ namespace thekogans {
         }
 
         const CipherSuite CipherSuite::Empty;
+        const CipherSuite CipherSuite::Strongest (
+            KEY_EXCHANGE_ECDHE,
+            AUTHENTICATOR_ECDSA,
+            CIPHER_AES_256_GCM,
+            MESSAGE_DIGEST_SHA2_512);
+        const CipherSuite CipherSuite::Weakest (
+            KEY_EXCHANGE_RSA,
+            AUTHENTICATOR_RSA,
+            CIPHER_AES_128_CBC,
+            MESSAGE_DIGEST_SHA2_256);
 
         namespace {
             const char *keyExchanges[] = {
@@ -345,6 +355,19 @@ namespace thekogans {
                     new Cipher (
                         key,
                         GetOpenSSLCipher (cipher),
+                        GetOpenSSLMessageDigest (messageDigest)));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        MAC::Ptr CipherSuite::GetMAC (AsymmetricKey::Ptr key) const {
+            if (key.Get () != 0 && VerifyMACKey (*key)) {
+                return MAC::Ptr (
+                    new MAC (
+                        key,
                         GetOpenSSLMessageDigest (messageDigest)));
             }
             else {

@@ -69,11 +69,26 @@ namespace thekogans {
             /// \see{KeyExchange} \see{AsymmetricKey} map.
             AsymmetricKeyMap keyExchangeKeyMap;
             /// \brief
+            /// Convenient typedef for std::map<ID, KeyExchange::Ptr>.
+            typedef std::map<ID, KeyExchange::Ptr> KeyExchangeMap;
+            /// \brief
+            /// \see{KeyExchange} map.
+            KeyExchangeMap keyExchangeMap;
+            /// \brief
             /// \see{Authenticator} \see{Params} map.
             ParamsMap authenticatorParamsMap;
             /// \brief
             /// \see{Authenticator} \see{AsymmetricKey} map.
             AsymmetricKeyMap authenticatorKeyMap;
+            /// \brief
+            /// Convenient typedef for std::pair<Authenticator::Op, ID>.
+            typedef std::pair<Authenticator::Op, ID> AuthenticatorMapKey;
+            /// \brief
+            /// Convenient typedef for std::map<AuthenticatorMapKey, Authenticator::Ptr>.
+            typedef std::map<AuthenticatorMapKey, Authenticator::Ptr> AuthenticatorMap;
+            /// \brief
+            /// \see{Authenticator} map.
+            AuthenticatorMap authenticatorMap;
             /// \brief
             /// Master \see{Cipher} key.
             SymmetricKey::Ptr masterCipherKey;
@@ -87,8 +102,20 @@ namespace thekogans {
             /// Where active keys go to die.
             SymmetricKeyMap retiredCipherKeyMap;
             /// \brief
+            /// Convenient typedef for std::map<ID, Cipher::Ptr>.
+            typedef std::map<ID, Cipher::Ptr> CipherMap;
+            /// \brief
+            /// \see{Cipher} map.
+            CipherMap cipherMap;
+            /// \brief
             /// \see{MAC} \see{AsymmetricKey} map.
             AsymmetricKeyMap macKeyMap;
+            /// \brief
+            /// Convenient typedef for std::map<ID, MAC::Ptr>.
+            typedef std::map<ID, MAC::Ptr> MACMap;
+            /// \brief
+            /// \see{MAC} map.
+            MACMap macMap;
             /// \brief
             /// Convenient typedef for std::map<ID, Ptr>.
             typedef std::map<ID, Ptr> KeyRingMap;
@@ -179,6 +206,15 @@ namespace thekogans {
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
+            /// Return the \see{KeyExchange} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey}.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{KeyExchange} corresponding to the given keyId
+            /// (KeyExchange::Ptr () if not found).
+            KeyExchange::Ptr GetKeyExchange (
+                const ID &keyId,
+                bool recursive = true);
+            /// \brief
             /// Add a \see{KeyExchange} \see{AsymmetricKey} to this ring.
             /// \param[in] key \see{KeyExchange} \see{AsymmetricKey} to add.
             /// \return true = key added. false = A key with this \see{ID}
@@ -235,6 +271,17 @@ namespace thekogans {
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
+            /// Return the \see{Authenticator} with the given \see{Authenticator::Op} and \see{ID}.
+            /// \param[in] op \see{Authenticator::Op}.
+            /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey}.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{Authenticator} corresponding to the given op and keyId
+            /// (Authenticator::Ptr () if not found).
+            Authenticator::Ptr GetAuthenticator (
+                Authenticator::Op op,
+                const ID &keyId,
+                bool recursive);
+            /// \brief
             /// Add a \see{Authenticator} \see{AsymmetricKey} to this ring.
             /// \param[in] key \see{Authenticator} \see{AsymmetricKey} to add.
             /// \return true = key added. false = A key with this \see{ID}
@@ -274,6 +321,15 @@ namespace thekogans {
             SymmetricKey::Ptr GetCipherKey (
                 const ID &keyId,
                 bool recursive = true) const;
+            /// \brief
+            /// Retrieve the \see{Cipher} corresponding to the given key \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{Cipher} key.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{Cipher} corresponding to the given key \see{ID}
+            /// (\see{Key::Ptr} () if not found).
+            Cipher::Ptr GetCipher (
+                const ID &keyId,
+                bool recursive = true);
 
             /// \brief
             /// Add a \see{Cipher} \see{SymmetricKey} to the ring.
@@ -330,6 +386,14 @@ namespace thekogans {
             AsymmetricKey::Ptr GetMACKey (
                 const ID &keyId,
                 bool recursive = true) const;
+            /// \brief
+            /// Return the \see{MAC} with the given key \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{MAC} key.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{MAC} corresponding to the given keyId (MAC::Ptr () if not found).
+            MAC::Ptr GetMAC (
+                const ID &keyId,
+                bool recursive);
             /// \brief
             /// Add a \see{MAC} \see{AsymmetricKey} to this ring.
             /// \param[in] key \see{MAC} \see{AsymmetricKey} to add.

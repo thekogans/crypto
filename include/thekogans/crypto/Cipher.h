@@ -234,7 +234,7 @@ namespace thekogans {
             } decryptor;
             /// \brief
             /// \see{MAC} used to sign ciphertext in CBC mode.
-            MAC::UniquePtr mac;
+            MAC::Ptr mac;
 
         public:
             /// \brief

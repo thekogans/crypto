@@ -18,9 +18,9 @@
 #if !defined (__thekogans_crypto_MAC_h)
 #define __thekogans_crypto_MAC_h
 
-#include <memory>
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
+#include "thekogans/util/RefCounted.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
@@ -39,10 +39,10 @@ namespace thekogans {
         /// be reused. It will reset it's internal state after every
         /// sign/verify operation ready for the next.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL MAC {
+        struct _LIB_THEKOGANS_CRYPTO_DECL MAC : public util::ThreadSafeRefCounted {
             /// \brief
-            /// Convenient typedef for std::unique_ptr<MAC>.
-            typedef std::unique_ptr<MAC> UniquePtr;
+            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<MAC>.
+            typedef util::ThreadSafeRefCounted::Ptr<MAC> Ptr;
 
         private:
             /// \brief
