@@ -124,6 +124,7 @@ int main (
             keyRing.Reset (
                 new crypto::KeyRing (
                     options.cipherSuite,
+                    crypto::SymmetricKey::Ptr (),
                     options.name,
                     options.description));
         }
