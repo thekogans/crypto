@@ -127,10 +127,13 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] cipherSuite_ \see{CipherSuite} associated with this key ring.
+            /// \param[in] masterCipherKey_ Optional \see{SymmetricKey} master key.
+            /// NOTE: If masterCipherKey_ is NULL, a random master key will be created.
             /// \param[in] name Optional keyring name.
             /// \param[in] description Optional keyring description.
             KeyRing (
                 const CipherSuite &cipherSuite_,
+                SymmetricKey::Ptr masterCipherKey_ = SymmetricKey::Ptr (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -308,8 +311,8 @@ namespace thekogans {
             }
             /// \brief
             /// Set the master \see{Cipher} key to the given key.
-            /// \param[in] masterKey_ New master \see{Cipher} key to set.
-            void SetMasterCipherKey (SymmetricKey::Ptr masterKey_);
+            /// \param[in] masterCipherKey_ New master \see{Cipher} key to set.
+            void SetMasterCipherKey (SymmetricKey::Ptr masterCipherKey_);
 
             /// \brief
             /// Retrieve the \see{Cipher} \see{SymmetricKey} (master, active or retired)

@@ -40,15 +40,20 @@ namespace thekogans {
             THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
         KeyRing::KeyRing (
-            const CipherSuite &cipherSuite_,
-            const std::string &name,
-            const std::string &description) :
-            Serializable (name, description),
-            cipherSuite (cipherSuite_),
-            masterCipherKey (
-                SymmetricKey::FromRandom (
-                    Cipher::GetKeyLength (
-                        CipherSuite::GetOpenSSLCipher (cipherSuite.cipher)))) {}
+                const CipherSuite &cipherSuite_,
+                SymmetricKey::Ptr masterCipherKey_,
+                const std::string &name,
+                const std::string &description) :
+                Serializable (name, description),
+                cipherSuite (cipherSuite_),
+                masterCipherKey (masterCipherKey_) {
+            if (masterCipherKey.Get () == 0) {
+                masterCipherKey =
+                    SymmetricKey::FromRandom (
+                        Cipher::GetKeyLength (
+                            CipherSuite::GetOpenSSLCipher (cipherSuite.cipher)));
+            }
+        }
 
         KeyRing::KeyRing (util::Serializer &serializer) :
                 Serializable (serializer) {
