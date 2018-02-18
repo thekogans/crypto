@@ -180,9 +180,13 @@ namespace thekogans {
                 std::size_t associatedDataLength) {
             util::ReadOnlyFile file (util::NetworkEndian, path);
             util::Buffer::UniquePtr buffer (
-                new util::Buffer (util::NetworkEndian, (util::ui32)file.GetSize ()));
+                new util::Buffer (
+                    util::NetworkEndian,
+                    (util::ui32)file.GetSize ()));
             buffer->AdvanceWriteOffset (
-                file.Read (buffer->GetWritePtr (), buffer->GetDataAvailableForWriting ()));
+                file.Read (
+                    buffer->GetWritePtr (),
+                    buffer->GetDataAvailableForWriting ()));
             if (cipher != 0) {
                 buffer = cipher->Decrypt (
                     buffer->GetReadPtr (),
@@ -200,7 +204,9 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             util::Buffer::UniquePtr buffer (
-                new util::SecureBuffer (util::NetworkEndian, (util::ui32)Size (false)));
+                new util::SecureBuffer (
+                    util::NetworkEndian,
+                    (util::ui32)Size (false)));
             Serialize (*buffer, false);
             if (cipher != 0) {
                 buffer = cipher->Encrypt (
@@ -233,6 +239,30 @@ namespace thekogans {
                         end = subringsMap.end (); it != end; ++it) {
                     Params::Ptr params =
                         it->second->GetKeyExchangeParams (paramsId, recursive);
+                    if (params.Get () != 0) {
+                        return params;
+                    }
+                }
+            }
+            return Params::Ptr ();
+        }
+
+        Params::Ptr KeyRing::GetKeyExchangeParams (
+                const EqualityTest<Params> &equalityTest,
+                bool recursive) const {
+            for (ParamsMap::const_iterator
+                    it = keyExchangeParamsMap.begin (),
+                    end = keyExchangeParamsMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Params::Ptr params =
+                        it->second->GetKeyExchangeParams (equalityTest, recursive);
                     if (params.Get () != 0) {
                         return params;
                     }
@@ -299,6 +329,30 @@ namespace thekogans {
                         end = subringsMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key =
                         it->second->GetKeyExchangeKey (keyId, recursive);
+                    if (key.Get () != 0) {
+                        return key;
+                    }
+                }
+            }
+            return AsymmetricKey::Ptr ();
+        }
+
+        AsymmetricKey::Ptr KeyRing::GetKeyExchangeKey (
+                const EqualityTest<AsymmetricKey> &equalityTest,
+                bool recursive) const {
+            for (AsymmetricKeyMap::const_iterator
+                    it = keyExchangeKeyMap.begin (),
+                    end = keyExchangeKeyMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    AsymmetricKey::Ptr key =
+                        it->second->GetKeyExchangeKey (equalityTest, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
@@ -412,6 +466,30 @@ namespace thekogans {
             return Params::Ptr ();
         }
 
+        Params::Ptr KeyRing::GetAuthenticatorParams (
+                const EqualityTest<Params> &equalityTest,
+                bool recursive) const {
+            for (ParamsMap::const_iterator
+                    it = authenticatorParamsMap.begin (),
+                    end = authenticatorParamsMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Params::Ptr params =
+                        it->second->GetAuthenticatorParams (equalityTest, recursive);
+                    if (params.Get () != 0) {
+                        return params;
+                    }
+                }
+            }
+            return Params::Ptr ();
+        }
+
         bool KeyRing::AddAuthenticatorParams (Params::Ptr params) {
             if (params.Get () != 0 && cipherSuite.VerifyAuthenticatorParams (*params)) {
                 std::pair<ParamsMap::iterator, bool> result =
@@ -469,6 +547,30 @@ namespace thekogans {
                         end = subringsMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key =
                         it->second->GetAuthenticatorKey (keyId, recursive);
+                    if (key.Get () != 0) {
+                        return key;
+                    }
+                }
+            }
+            return AsymmetricKey::Ptr ();
+        }
+
+        AsymmetricKey::Ptr KeyRing::GetAuthenticatorKey (
+                const EqualityTest<AsymmetricKey> &equalityTest,
+                bool recursive) const {
+            for (AsymmetricKeyMap::const_iterator
+                    it = authenticatorKeyMap.begin (),
+                    end = authenticatorKeyMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    AsymmetricKey::Ptr key =
+                        it->second->GetAuthenticatorKey (equalityTest, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
@@ -574,11 +676,9 @@ namespace thekogans {
         void KeyRing::SetMasterCipherKey (SymmetricKey::Ptr masterCipherKey_) {
             if (masterCipherKey_.Get () != 0 &&
                     cipherSuite.VerifyCipherKey (*masterCipherKey_)) {
-                if (masterCipherKey.Get () != 0) {
-                    CipherMap::iterator it = cipherMap.find (masterCipherKey->GetId ());
-                    if (it != cipherMap.end ()) {
-                        cipherMap.erase (it);
-                    }
+                CipherMap::iterator it = cipherMap.find (masterCipherKey->GetId ());
+                if (it != cipherMap.end ()) {
+                    cipherMap.erase (it);
                 }
                 masterCipherKey = masterCipherKey_;
             }
@@ -591,7 +691,7 @@ namespace thekogans {
         SymmetricKey::Ptr KeyRing::GetCipherKey (
                 const ID &keyId,
                 bool recursive) const {
-            if (masterCipherKey.Get () != 0 && masterCipherKey->GetId () == keyId) {
+            if (masterCipherKey->GetId () == keyId) {
                 return masterCipherKey;
             }
             SymmetricKeyMap::const_iterator it = activeCipherKeyMap.find (keyId);
@@ -607,6 +707,39 @@ namespace thekogans {
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
                     SymmetricKey::Ptr key = it->second->GetCipherKey (keyId, recursive);
+                    if (key.Get () != 0) {
+                        return key;
+                    }
+                }
+            }
+            return SymmetricKey::Ptr ();
+        }
+
+        SymmetricKey::Ptr KeyRing::GetCipherKey (
+                const EqualityTest<SymmetricKey> &equalityTest,
+                bool recursive) const {
+            if (equalityTest (*masterCipherKey)) {
+                return masterCipherKey;
+            }
+            for (SymmetricKeyMap::const_iterator
+                    it = activeCipherKeyMap.begin (),
+                    end = activeCipherKeyMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            for (SymmetricKeyMap::const_iterator
+                    it = retiredCipherKeyMap.begin (),
+                    end = retiredCipherKeyMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    SymmetricKey::Ptr key = it->second->GetCipherKey (equalityTest, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
@@ -812,6 +945,29 @@ namespace thekogans {
             return AsymmetricKey::Ptr ();
         }
 
+        AsymmetricKey::Ptr KeyRing::GetMACKey (
+                const EqualityTest<AsymmetricKey> &equalityTest,
+                bool recursive) const {
+            for (AsymmetricKeyMap::const_iterator
+                    it = macKeyMap.begin (),
+                    end = macKeyMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    AsymmetricKey::Ptr key = it->second->GetMACKey (equalityTest, recursive);
+                    if (key.Get () != 0) {
+                        return key;
+                    }
+                }
+            }
+            return AsymmetricKey::Ptr ();
+        }
+
         MAC::Ptr KeyRing::GetMAC (
                 const ID &keyId,
                 bool recursive) {
@@ -907,6 +1063,29 @@ namespace thekogans {
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
                     Ptr subring = it->second->GetSubring (subringId, recursive);
+                    if (subring.Get () != 0) {
+                        return subring;
+                    }
+                }
+            }
+            return Ptr ();
+        }
+
+        KeyRing::Ptr KeyRing::GetSubring (
+                const EqualityTest<KeyRing> &equalityTest,
+                bool recursive) const {
+            for (KeyRingMap::const_iterator
+                    it = subringsMap.begin (),
+                    end = subringsMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Ptr subring = it->second->GetSubring (equalityTest, recursive);
                     if (subring.Get () != 0) {
                         return subring;
                     }
@@ -1118,77 +1297,151 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_CIPHER_SUITE, cipherSuite.ToString ()));
             stream << util::OpenTag (indentationLevel, tagName, attributes, false, true);
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_KEY_EXCHANGE_PARAMS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_KEY_EXCHANGE_PARAMS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (ParamsMap::const_iterator
                         it = keyExchangeParamsMap.begin (),
                         end = keyExchangeParamsMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_KEY_EXCHANGE_PARAM);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_KEY_EXCHANGE_PARAM);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_KEY_EXCHANGE_PARAMS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_KEY_EXCHANGE_PARAMS);
             }
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_KEY_EXCHANGE_KEYS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_KEY_EXCHANGE_KEYS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (AsymmetricKeyMap::const_iterator
                         it = keyExchangeKeyMap.begin (),
                         end = keyExchangeKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_KEY_EXCHANGE_KEY);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_KEY_EXCHANGE_KEY);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_KEY_EXCHANGE_KEYS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_KEY_EXCHANGE_KEYS);
             }
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_AUTHENTICATOR_PARAMS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_AUTHENTICATOR_PARAMS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (ParamsMap::const_iterator
                         it = authenticatorParamsMap.begin (),
                         end = authenticatorParamsMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_AUTHENTICATOR_PARAM);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_AUTHENTICATOR_PARAM);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_AUTHENTICATOR_PARAMS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_AUTHENTICATOR_PARAMS);
             }
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_AUTHENTICATOR_KEYS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_AUTHENTICATOR_KEYS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (AsymmetricKeyMap::const_iterator
                         it = authenticatorKeyMap.begin (),
                         end = authenticatorKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_AUTHENTICATOR_KEY);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_AUTHENTICATOR_KEY);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_AUTHENTICATOR_KEYS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_AUTHENTICATOR_KEYS);
             }
-            stream << masterCipherKey->ToString (indentationLevel + 1, TAG_CIPHER_MASTER_KEY);
+            stream << masterCipherKey->ToString (
+                indentationLevel + 1,
+                TAG_CIPHER_MASTER_KEY);
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_CIPHER_ACTIVE_KEYS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_CIPHER_ACTIVE_KEYS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (SymmetricKeyMap::const_iterator
                         it = activeCipherKeyMap.begin (),
                         end = activeCipherKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_CIPHER_ACTIVE_KEY);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_CIPHER_ACTIVE_KEY);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_CIPHER_ACTIVE_KEYS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_CIPHER_ACTIVE_KEYS);
             }
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_CIPHER_RETIRED_KEYS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_CIPHER_RETIRED_KEYS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (SymmetricKeyMap::const_iterator
                          it = retiredCipherKeyMap.begin (),
                          end = retiredCipherKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_CIPHER_RETIRED_KEY);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_CIPHER_RETIRED_KEY);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_CIPHER_RETIRED_KEYS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_CIPHER_RETIRED_KEYS);
             }
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_MAC_KEYS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_MAC_KEYS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (AsymmetricKeyMap::const_iterator
                         it = macKeyMap.begin (),
                         end = macKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_MAC_KEY);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_MAC_KEY);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_AUTHENTICATOR_KEYS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_AUTHENTICATOR_KEYS);
             }
             {
-                stream << util::OpenTag (indentationLevel + 1, TAG_SUB_RINGS, util::Attributes (), false, true);
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_SUB_RINGS,
+                    util::Attributes (),
+                    false,
+                    true);
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (indentationLevel + 2, TAG_SUB_RING);
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_SUB_RING);
                 }
-                stream << util::CloseTag (indentationLevel + 1, TAG_SUB_RINGS);
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_SUB_RINGS);
             }
             stream << util::CloseTag (indentationLevel, tagName);
             return stream.str ();

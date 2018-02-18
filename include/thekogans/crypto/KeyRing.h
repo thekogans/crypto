@@ -180,6 +180,31 @@ namespace thekogans {
             Params::Ptr GetKeyExchangeParams (
                 const ID &paramsId,
                 bool recursive = true) const;
+            /// \struct KeyRing::EqualityTest KeyRing.h thekogans/crypto/KeyRing.h
+            ///
+            /// \brief
+            /// Equality test template. Use it to locate various parameters, keys and key rings.
+            template<typename T>
+            struct EqualityTest {
+                /// \brief
+                /// dtor.
+                virtual ~EqualityTest () {}
+
+                /// \brief
+                /// Reimplement this function to test for equality.
+                /// \param[in] t Instance to test for equality.
+                /// \return true == equal.
+                virtual bool operator () (const T &t) const throw () = 0;
+            };
+            /// \brief
+            /// Return the \see{KeyExchange} \see{Params} matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each keyExchangeParamsMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First \see{KeyExchange} \see{Params} matching the given EqualityTest
+            /// (Params::Ptr () if not found).
+            Params::Ptr GetKeyExchangeParams (
+                const EqualityTest<Params> &equalityTest,
+                bool recursive = true) const;
             /// \brief
             /// Add a \see{KeyExchange} \see{Params} to this ring.
             /// \param[in] params \see{KeyExchange} \see{Params} to add.
@@ -207,6 +232,15 @@ namespace thekogans {
             /// (AsymmetricKey::Ptr () if not found).
             AsymmetricKey::Ptr GetKeyExchangeKey (
                 const ID &keyId,
+                bool recursive = true) const;
+            /// \brief
+            /// Return the \see{KeyExchange} \see{AsymmetricKey} matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each keyExchangeKeyMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First \see{KeyExchange} \see{AsymmetricKey} matching the given EqualityTest
+            /// (AsymmetricKey::Ptr () if not found).
+            AsymmetricKey::Ptr GetKeyExchangeKey (
+                const EqualityTest<AsymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
             /// Return the \see{KeyExchange} with the given \see{ID}.
@@ -246,6 +280,15 @@ namespace thekogans {
                 const ID &paramsId,
                 bool recursive = true) const;
             /// \brief
+            /// Return the \see{Authenticator} \see{Params} matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each authenticatorParamsMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First \see{Authenticator} \see{Params} matching the given EqualityTest
+            /// (Params::Ptr () if not found).
+            Params::Ptr GetAuthenticatorParams (
+                const EqualityTest<Params> &equalityTest,
+                bool recursive = true) const;
+            /// \brief
             /// Add a \see{Authenticator} \see{Params} to this ring.
             /// \param[in] params \see{Authenticator} \see{Params} to add.
             /// \return true = params added. false = A \see{Params} with
@@ -272,6 +315,15 @@ namespace thekogans {
             /// (AsymmetricKey::Ptr () if not found).
             AsymmetricKey::Ptr GetAuthenticatorKey (
                 const ID &keyId,
+                bool recursive = true) const;
+            /// \brief
+            /// Return the \see{Authenticator} \see{AsymmetricKey} matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each authenticatorKeyMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First \see{Authenticator} \see{AsymmetricKey} matching the given EqualityTest
+            /// (AsymmetricKey::Ptr () if not found).
+            AsymmetricKey::Ptr GetAuthenticatorKey (
+                const EqualityTest<AsymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
             /// Return the \see{Authenticator} with the given \see{Authenticator::Op} and \see{ID}.
@@ -323,6 +375,16 @@ namespace thekogans {
             /// given \see{ID}. \see{Key::Ptr} () if not found.
             SymmetricKey::Ptr GetCipherKey (
                 const ID &keyId,
+                bool recursive = true) const;
+            /// \brief
+            /// Return the \see{Cipher} \see{SymmetricKey} matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each masterCipherKey,
+            /// activeCipherKeyMap and retiredCipherKeyMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First \see{Cipher} \see{SymmetricKey} matching the given EqualityTest
+            /// (SymmetricKey::Ptr () if not found).
+            SymmetricKey::Ptr GetCipherKey (
+                const EqualityTest<SymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
             /// Retrieve the \see{Cipher} corresponding to the given key \see{ID}.
@@ -390,6 +452,15 @@ namespace thekogans {
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
+            /// Return the \see{MAC} \see{AsymmetricKey} matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each macKeyMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First \see{MAC} \see{AsymmetricKey} matching the given EqualityTest
+            /// (AsymmetricKey::Ptr () if not found).
+            AsymmetricKey::Ptr GetMACKey (
+                const EqualityTest<AsymmetricKey> &equalityTest,
+                bool recursive = true) const;
+            /// \brief
             /// Return the \see{MAC} with the given key \see{ID}.
             /// \param[in] keyId \see{ID} of \see{MAC} key.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
@@ -425,6 +496,14 @@ namespace thekogans {
                 const ID &subringId,
                 bool recursive = true) const;
             /// \brief
+            /// Return the sub ring matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each subringMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First Sub ring matching the given EqualityTest (Ptr () if not found).
+            Ptr GetSubring (
+                const EqualityTest<KeyRing> &equalityTest,
+                bool recursive = true) const;
+            /// \brief
             /// Add a sub ring to this ring.
             /// \param[in] subring Sub ring to add.
             /// \return true = sub ring added. false = A sub ring with
@@ -444,6 +523,7 @@ namespace thekogans {
 
             /// \brief
             /// Drop all params, keys and sub rings.
+            /// NOTE: masterCipherKey is left unchanged.
             void Clear ();
 
             /// \brief
