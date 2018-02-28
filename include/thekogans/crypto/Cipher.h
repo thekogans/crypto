@@ -279,6 +279,12 @@ namespace thekogans {
                 const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
 
             /// \brief
+            /// Return the max plaintext length that will fit in to the given payload length.
+            /// \param[in] payloadLength Max payload length.
+            /// \return Max plaintext length that will fit.
+            static std::size_t GetMaxPlaintextLength (std::size_t payloadLength);
+
+            /// \brief
             /// Return max buffer length needed to encrypt the given amount of plaintext.
             /// \param[in] plaintextLength Amount of plaintext to encrypt.
             /// \return Max buffer length needed to encrypt the given amount of plaintext.

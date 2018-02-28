@@ -39,22 +39,6 @@ namespace thekogans {
             KeyRing,
             THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
-        KeyRing::KeyRing (
-                const CipherSuite &cipherSuite_,
-                SymmetricKey::Ptr masterCipherKey_,
-                const std::string &name,
-                const std::string &description) :
-                Serializable (name, description),
-                cipherSuite (cipherSuite_),
-                masterCipherKey (masterCipherKey_) {
-            if (masterCipherKey.Get () == 0) {
-                masterCipherKey =
-                    SymmetricKey::FromRandom (
-                        Cipher::GetKeyLength (
-                            CipherSuite::GetOpenSSLCipher (cipherSuite.cipher)));
-            }
-        }
-
         KeyRing::KeyRing (util::Serializer &serializer) :
                 Serializable (serializer) {
             serializer >> cipherSuite;
@@ -114,32 +98,17 @@ namespace thekogans {
                         key->GetName ().c_str ());
                 }
             }
-            masterCipherKey.Reset (new SymmetricKey (serializer));
-            util::ui32 activeCipherKeyCount;
-            serializer >> activeCipherKeyCount;
-            activeCipherKeyMap.clear ();
-            while (activeCipherKeyCount-- > 0) {
+            util::ui32 cipherKeyCount;
+            serializer >> cipherKeyCount;
+            cipherKeyMap.clear ();
+            while (cipherKeyCount-- > 0) {
                 SymmetricKey::Ptr key (new SymmetricKey (serializer));
                 std::pair<SymmetricKeyMap::iterator, bool> result =
-                    activeCipherKeyMap.insert (
+                    cipherKeyMap.insert (
                         SymmetricKeyMap::value_type (key->GetId (), key));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Cipher active key: %s",
-                        key->GetName ().c_str ());
-                }
-            }
-            util::ui32 retiredCipherKeyCount;
-            serializer >> retiredCipherKeyCount;
-            retiredCipherKeyMap.clear ();
-            while (retiredCipherKeyCount-- > 0) {
-                SymmetricKey::Ptr key (new SymmetricKey (serializer));
-                std::pair<SymmetricKeyMap::iterator, bool> result =
-                    retiredCipherKeyMap.insert (
-                        SymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Cipher retired key: %s",
+                        "Unable to instert Cipher key: %s",
                         key->GetName ().c_str ());
                 }
             }
@@ -155,6 +124,20 @@ namespace thekogans {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Unable to instert MAC key: %s",
                         key->GetName ().c_str ());
+                }
+            }
+            util::ui32 userDataCount;
+            serializer >> userDataCount;
+            userDataMap.clear ();
+            while (userDataCount-- > 0) {
+                Serializable::Ptr userData = Serializable::Get (serializer);
+                std::pair<SerializableMap::iterator, bool> result =
+                    userDataMap.insert (
+                        SerializableMap::value_type (userData->GetId (), userData));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert user data: %s",
+                        userData->GetName ().c_str ());
                 }
             }
             util::ui32 subringCount;
@@ -673,33 +656,11 @@ namespace thekogans {
             }
         }
 
-        void KeyRing::SetMasterCipherKey (SymmetricKey::Ptr masterCipherKey_) {
-            if (masterCipherKey_.Get () != 0 &&
-                    cipherSuite.VerifyCipherKey (*masterCipherKey_)) {
-                CipherMap::iterator it = cipherMap.find (masterCipherKey->GetId ());
-                if (it != cipherMap.end ()) {
-                    cipherMap.erase (it);
-                }
-                masterCipherKey = masterCipherKey_;
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
         SymmetricKey::Ptr KeyRing::GetCipherKey (
                 const ID &keyId,
                 bool recursive) const {
-            if (masterCipherKey->GetId () == keyId) {
-                return masterCipherKey;
-            }
-            SymmetricKeyMap::const_iterator it = activeCipherKeyMap.find (keyId);
-            if (it != activeCipherKeyMap.end ()) {
-                return it->second;
-            }
-            it = retiredCipherKeyMap.find (keyId);
-            if (it != retiredCipherKeyMap.end ()) {
+            SymmetricKeyMap::const_iterator it = cipherKeyMap.find (keyId);
+            if (it != cipherKeyMap.end ()) {
                 return it->second;
             }
             if (recursive) {
@@ -718,19 +679,9 @@ namespace thekogans {
         SymmetricKey::Ptr KeyRing::GetCipherKey (
                 const EqualityTest<SymmetricKey> &equalityTest,
                 bool recursive) const {
-            if (equalityTest (*masterCipherKey)) {
-                return masterCipherKey;
-            }
             for (SymmetricKeyMap::const_iterator
-                    it = activeCipherKeyMap.begin (),
-                    end = activeCipherKeyMap.end (); it != end; ++it) {
-                if (equalityTest (*it->second)) {
-                    return it->second;
-                }
-            }
-            for (SymmetricKeyMap::const_iterator
-                    it = retiredCipherKeyMap.begin (),
-                    end = retiredCipherKeyMap.end (); it != end; ++it) {
+                    it = cipherKeyMap.begin (),
+                    end = cipherKeyMap.end (); it != end; ++it) {
                 if (equalityTest (*it->second)) {
                     return it->second;
                 }
@@ -783,10 +734,10 @@ namespace thekogans {
             return Cipher::Ptr ();
         }
 
-        bool KeyRing::AddCipherActiveKey (SymmetricKey::Ptr key) {
+        bool KeyRing::AddCipherKey (SymmetricKey::Ptr key) {
             if (key.Get () != 0 && cipherSuite.VerifyCipherKey (*key)) {
                 std::pair<SymmetricKeyMap::iterator, bool> result =
-                    activeCipherKeyMap.insert (
+                    cipherKeyMap.insert (
                         SymmetricKeyMap::value_type (key->GetId (), key));
                 return result.second;
             }
@@ -796,42 +747,12 @@ namespace thekogans {
             }
         }
 
-        bool KeyRing::RetireActiveCipherKey (
+        bool KeyRing::DropCipherKey (
                 const ID &keyId,
                 bool recursive) {
-            SymmetricKeyMap::iterator it = activeCipherKeyMap.find (keyId);
-            if (it != activeCipherKeyMap.end ()) {
-                std::pair<SymmetricKeyMap::iterator, bool> result =
-                    retiredCipherKeyMap.insert (
-                        SymmetricKeyMap::value_type (keyId, it->second));
-                if (result.second) {
-                    activeCipherKeyMap.erase (it);
-                    return true;
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to add a retired Cipher key: %s.",
-                        keyId.ToString ().c_str ());
-                }
-            }
-            else if (recursive) {
-                for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
-                    if (it->second->RetireActiveCipherKey (keyId, recursive)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        bool KeyRing::DropActiveCipherKey (
-                const ID &keyId,
-                bool recursive) {
-            SymmetricKeyMap::iterator it = activeCipherKeyMap.find (keyId);
-            if (it != activeCipherKeyMap.end ()) {
-                activeCipherKeyMap.erase (it);
+            SymmetricKeyMap::iterator it = cipherKeyMap.find (keyId);
+            if (it != cipherKeyMap.end ()) {
+                cipherKeyMap.erase (it);
                 CipherMap::iterator it = cipherMap.find (keyId);
                 if (it != cipherMap.end ()) {
                     cipherMap.erase (it);
@@ -842,79 +763,16 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringsMap.begin (),
                         end = subringsMap.end (); it != end; ++it) {
-                    if (it->second->DropActiveCipherKey (keyId, recursive)) {
+                    if (it->second->DropCipherKey (keyId, recursive)) {
                         return true;
                     }
                 }
             }
             return false;
-        }
-
-        void KeyRing::DropActiveCipherKeys (bool recursive) {
-            for (SymmetricKeyMap::const_iterator
-                    it = activeCipherKeyMap.begin (),
-                    end = activeCipherKeyMap.end (); it != end; ++it) {
-                CipherMap::iterator jt = cipherMap.find (it->second->GetId ());
-                if (jt != cipherMap.end ()) {
-                    cipherMap.erase (jt);
-                }
-            }
-            activeCipherKeyMap.clear ();
-            if (recursive) {
-                for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
-                    it->second->DropActiveCipherKeys (recursive);
-                }
-            }
-        }
-
-        bool KeyRing::DropRetiredCipherKey (
-                const ID &keyId,
-                bool recursive) {
-            SymmetricKeyMap::iterator it = retiredCipherKeyMap.find (keyId);
-            if (it != retiredCipherKeyMap.end ()) {
-                retiredCipherKeyMap.erase (it);
-                CipherMap::iterator it = cipherMap.find (keyId);
-                if (it != cipherMap.end ()) {
-                    cipherMap.erase (it);
-                }
-                return true;
-            }
-            else if (recursive) {
-                for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
-                    if (it->second->DropRetiredCipherKey (keyId, recursive)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        void KeyRing::DropRetiredCipherKeys (bool recursive) {
-            for (SymmetricKeyMap::const_iterator
-                    it = retiredCipherKeyMap.begin (),
-                    end = retiredCipherKeyMap.end (); it != end; ++it) {
-                CipherMap::iterator jt = cipherMap.find (it->second->GetId ());
-                if (jt != cipherMap.end ()) {
-                    cipherMap.erase (jt);
-                }
-            }
-            retiredCipherKeyMap.clear ();
-            if (recursive) {
-                for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
-                    it->second->DropRetiredCipherKeys (recursive);
-                }
-            }
         }
 
         void KeyRing::DropAllCipherKeys (bool recursive) {
-            activeCipherKeyMap.clear ();
-            retiredCipherKeyMap.clear ();
+            cipherKeyMap.clear ();
             cipherMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
@@ -1051,6 +909,93 @@ namespace thekogans {
             }
         }
 
+        Serializable::Ptr KeyRing::GetUserData (
+                const ID &id,
+                bool recursive) const {
+            SerializableMap::const_iterator it = userDataMap.find (id);
+            if (it != userDataMap.end ()) {
+                return it->second;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Serializable::Ptr userData = it->second->GetUserData (id, recursive);
+                    if (userData.Get () != 0) {
+                        return userData;
+                    }
+                }
+            }
+            return Serializable::Ptr ();
+        }
+
+        Serializable::Ptr KeyRing::GetUserData (
+                const EqualityTest<Serializable> &equalityTest,
+                bool recursive) const {
+            for (SerializableMap::const_iterator
+                    it = userDataMap.begin (),
+                    end = userDataMap.end (); it != end; ++it) {
+                if (equalityTest (*it->second)) {
+                    return it->second;
+                }
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    Serializable::Ptr userData = it->second->GetUserData (equalityTest, recursive);
+                    if (userData.Get () != 0) {
+                        return userData;
+                    }
+                }
+            }
+            return Serializable::Ptr ();
+        }
+
+        bool KeyRing::AddUserData (Serializable::Ptr userData) {
+            if (userData.Get () != 0) {
+                std::pair<SerializableMap::iterator, bool> result =
+                    userDataMap.insert (
+                        SerializableMap::value_type (userData->GetId (), userData));
+                return result.second;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        bool KeyRing::DropUserData (
+                const ID &id,
+                bool recursive) {
+            SerializableMap::iterator it = userDataMap.find (id);
+            if (it != userDataMap.end ()) {
+                userDataMap.erase (it);
+                return true;
+            }
+            else if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    if (it->second->DropUserData (id, recursive)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        void KeyRing::DropAllUserData (bool recursive) {
+            userDataMap.clear ();
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringsMap.begin (),
+                        end = subringsMap.end (); it != end; ++it) {
+                    it->second->DropAllUserData (recursive);
+                }
+            }
+        }
+
         KeyRing::Ptr KeyRing::GetSubring (
                 const ID &subringId,
                 bool recursive) const {
@@ -1138,11 +1083,11 @@ namespace thekogans {
             authenticatorParamsMap.clear ();
             authenticatorKeyMap.clear ();
             authenticatorMap.clear ();
-            activeCipherKeyMap.clear ();
-            retiredCipherKeyMap.clear ();
+            cipherKeyMap.clear ();
             cipherMap.clear ();
             macKeyMap.clear ();
             macMap.clear ();
+            userDataMap.clear ();
             subringsMap.clear ();
         }
 
@@ -1174,17 +1119,10 @@ namespace thekogans {
                     end = authenticatorKeyMap.end (); it != end; ++it) {
                 size += it->second->Size (false);
             }
-            size += masterCipherKey->Size (false);
             size += util::UI32_SIZE;
             for (SymmetricKeyMap::const_iterator
-                    it = activeCipherKeyMap.begin (),
-                    end = activeCipherKeyMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
-            }
-            size += util::UI32_SIZE;
-            for (SymmetricKeyMap::const_iterator
-                    it = retiredCipherKeyMap.begin (),
-                    end = retiredCipherKeyMap.end (); it != end; ++it) {
+                    it = cipherKeyMap.begin (),
+                    end = cipherKeyMap.end (); it != end; ++it) {
                 size += it->second->Size (false);
             }
             size += util::UI32_SIZE;
@@ -1192,6 +1130,12 @@ namespace thekogans {
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
                 size += it->second->Size (false);
+            }
+            size += util::UI32_SIZE;
+            for (SerializableMap::const_iterator
+                    it = userDataMap.begin (),
+                    end = userDataMap.end (); it != end; ++it) {
+                size += it->second->Size (true);
             }
             size += util::UI32_SIZE;
             for (KeyRingMap::const_iterator
@@ -1231,17 +1175,10 @@ namespace thekogans {
                     end = authenticatorKeyMap.end (); it != end; ++it) {
                 it->second->Serialize (serializer, false);
             }
-            masterCipherKey->Serialize (serializer, false);
-            serializer << (util::ui32)activeCipherKeyMap.size ();
+            serializer << (util::ui32)cipherKeyMap.size ();
             for (SymmetricKeyMap::const_iterator
-                    it = activeCipherKeyMap.begin (),
-                    end = activeCipherKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
-            }
-            serializer << (util::ui32)retiredCipherKeyMap.size ();
-            for (SymmetricKeyMap::const_iterator
-                    it = retiredCipherKeyMap.begin (),
-                    end = retiredCipherKeyMap.end (); it != end; ++it) {
+                    it = cipherKeyMap.begin (),
+                    end = cipherKeyMap.end (); it != end; ++it) {
                 it->second->Serialize (serializer, false);
             }
             serializer << (util::ui32)macKeyMap.size ();
@@ -1249,6 +1186,12 @@ namespace thekogans {
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
                 it->second->Serialize (serializer, false);
+            }
+            serializer << (util::ui32)userDataMap.size ();
+            for (SerializableMap::const_iterator
+                    it = userDataMap.begin (),
+                    end = userDataMap.end (); it != end; ++it) {
+                it->second->Serialize (serializer, true);
             }
             serializer << (util::ui32)subringsMap.size ();
             for (KeyRingMap::const_iterator
@@ -1276,13 +1219,12 @@ namespace thekogans {
         const char * const KeyRing::TAG_AUTHENTICATOR_PARAM = "AuthenticatorParam";
         const char * const KeyRing::TAG_AUTHENTICATOR_KEYS = "AuthenticatorKeys";
         const char * const KeyRing::TAG_AUTHENTICATOR_KEY = "AuthenticatorKey";
-        const char * const KeyRing::TAG_CIPHER_MASTER_KEY = "CipherMasterKey";
-        const char * const KeyRing::TAG_CIPHER_ACTIVE_KEYS = "CipherActiveKeys";
-        const char * const KeyRing::TAG_CIPHER_ACTIVE_KEY = "CipherActiveKey";
-        const char * const KeyRing::TAG_CIPHER_RETIRED_KEYS = "CipherRetiredKeys";
-        const char * const KeyRing::TAG_CIPHER_RETIRED_KEY = "CipherRetiredKey";
+        const char * const KeyRing::TAG_CIPHER_KEYS = "CipherKeys";
+        const char * const KeyRing::TAG_CIPHER_KEY = "CipherKey";
         const char * const KeyRing::TAG_MAC_KEYS = "MACKeys";
         const char * const KeyRing::TAG_MAC_KEY = "MACKey";
+        const char * const KeyRing::TAG_USER_DATAS = "UserDatas";
+        const char * const KeyRing::TAG_USER_DATA = "UserData";
         const char * const KeyRing::TAG_SUB_RINGS = "SubRings";
         const char * const KeyRing::TAG_SUB_RING = "SubRing";
 
@@ -1368,44 +1310,23 @@ namespace thekogans {
                     indentationLevel + 1,
                     TAG_AUTHENTICATOR_KEYS);
             }
-            stream << masterCipherKey->ToString (
-                indentationLevel + 1,
-                TAG_CIPHER_MASTER_KEY);
             {
                 stream << util::OpenTag (
                     indentationLevel + 1,
-                    TAG_CIPHER_ACTIVE_KEYS,
+                    TAG_CIPHER_KEYS,
                     util::Attributes (),
                     false,
                     true);
                 for (SymmetricKeyMap::const_iterator
-                        it = activeCipherKeyMap.begin (),
-                        end = activeCipherKeyMap.end (); it != end; ++it) {
+                        it = cipherKeyMap.begin (),
+                        end = cipherKeyMap.end (); it != end; ++it) {
                     stream << it->second->ToString (
                         indentationLevel + 2,
-                        TAG_CIPHER_ACTIVE_KEY);
+                        TAG_CIPHER_KEY);
                 }
                 stream << util::CloseTag (
                     indentationLevel + 1,
-                    TAG_CIPHER_ACTIVE_KEYS);
-            }
-            {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_CIPHER_RETIRED_KEYS,
-                    util::Attributes (),
-                    false,
-                    true);
-                for (SymmetricKeyMap::const_iterator
-                         it = retiredCipherKeyMap.begin (),
-                         end = retiredCipherKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_CIPHER_RETIRED_KEY);
-                }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_CIPHER_RETIRED_KEYS);
+                    TAG_CIPHER_KEYS);
             }
             {
                 stream << util::OpenTag (
@@ -1423,7 +1344,25 @@ namespace thekogans {
                 }
                 stream << util::CloseTag (
                     indentationLevel + 1,
-                    TAG_AUTHENTICATOR_KEYS);
+                    TAG_MAC_KEYS);
+            }
+            {
+                stream << util::OpenTag (
+                    indentationLevel + 1,
+                    TAG_USER_DATAS,
+                    util::Attributes (),
+                    false,
+                    true);
+                for (SerializableMap::const_iterator
+                        it = userDataMap.begin (),
+                        end = userDataMap.end (); it != end; ++it) {
+                    stream << it->second->ToString (
+                        indentationLevel + 2,
+                        TAG_USER_DATA);
+                }
+                stream << util::CloseTag (
+                    indentationLevel + 1,
+                    TAG_USER_DATAS);
             }
             {
                 stream << util::OpenTag (

@@ -277,6 +277,16 @@ namespace thekogans {
             }
         }
 
+        std::size_t Cipher::GetMaxPlaintextLength (std::size_t payloadLength) {
+            return
+                payloadLength -
+                FrameHeader::SIZE -
+                CiphertextHeader::SIZE -
+                EVP_MAX_IV_LENGTH - // iv
+                EVP_MAX_BLOCK_LENGTH - // padding
+                EVP_MAX_MD_SIZE; // mac
+        }
+
         std::size_t Cipher::GetMaxBufferLength (std::size_t plaintextLength) {
             return
                 FrameHeader::SIZE +

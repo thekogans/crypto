@@ -37,15 +37,18 @@ namespace thekogans {
         /// \struct KeyRing KeyRing.h thekogans/crypto/KeyRing.h
         ///
         /// \brief
-        /// KeyRing is a collection of \see{Params}, \see{SymmetricKey} and \see{AsymmetricKey}
-        /// suitable for use with a particular \see{CipherSuite}. KeyRings design makes it perfectly
-        /// suitable for both duties of securing data on the wire as well as data at rest. In the
-        /// former case, create a KeyRing, call KeyRing::Save and distribute it to the communicating
-        /// peers. Have both peers call KeyRing::Load and use the master key to generate temporary
-        /// session (active) keys. Once the session is over, destroy the KeyRing without calling
-        /// KeyRing::Save. In the later case, create a KeyRing, use it to generate permanent
-        /// encryption (active) keys, then call KeyRing::Save. Later call KeyRing::Load and use
-        /// it to decrypt the data at rest.
+        /// KeyRing is a collection of \see{Params}, \see{AsymmetricKey} and \see{SymmetricKey} and
+        /// user data (\see{Serializable}) suitable for use with a particular \see{CipherSuite}.
+        /// KeyRings design makes it perfectly suitable for both duties of securing data on the wire
+        /// as well as data at rest. In the former case, create a KeyRing containing an appropriate
+        /// \see{CipherSuite}, \see{KeyExchange} \see{Params} or \see{AsymmetricKey}s, \see{Authenticator}
+        /// \see{Params} or \see{AsymmetricKey}, and user data (\see{Serializable}), call KeyRing::Save
+        /// and distribute it to the communicating peers. Have both peers call KeyRing::Load and use
+        /// the enclosed keys and parameters to authenticate each other and perform key exchange to
+        /// generate temporary \see{Cipher} \see{SymmetricKey} session keys. Once the session is over,
+        /// destroy the KeyRing without calling KeyRing::Save. In the later case, create a KeyRing, use
+        /// it to generate permanent encryption (active) keys, then call KeyRing::Save. Later call
+        /// KeyRing::Load and use it to decrypt the data at rest.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyRing : public Serializable {
             /// \brief
@@ -90,17 +93,11 @@ namespace thekogans {
             /// \see{Authenticator} map.
             AuthenticatorMap authenticatorMap;
             /// \brief
-            /// Master \see{Cipher} key.
-            SymmetricKey::Ptr masterCipherKey;
-            /// \brief
             /// Convenient typedef for std::map<ID, SymmetricKey::Ptr>.
             typedef std::map<ID, SymmetricKey::Ptr> SymmetricKeyMap;
             /// \brief
-            /// Active \see{Cipher} \see{SymmetricKey} map.
-            SymmetricKeyMap activeCipherKeyMap;
-            /// \brief
-            /// Where active keys go to die.
-            SymmetricKeyMap retiredCipherKeyMap;
+            /// \see{Cipher} \see{SymmetricKey} map.
+            SymmetricKeyMap cipherKeyMap;
             /// \brief
             /// Convenient typedef for std::map<ID, Cipher::Ptr>.
             typedef std::map<ID, Cipher::Ptr> CipherMap;
@@ -117,6 +114,12 @@ namespace thekogans {
             /// \see{MAC} map.
             MACMap macMap;
             /// \brief
+            /// Convenient typedef for std::map<ID, Serializable::Ptr>.
+            typedef std::map<ID, Serializable::Ptr> SerializableMap;
+            /// \brief
+            /// \see{MAC} map.
+            SerializableMap userDataMap;
+            /// \brief
             /// Convenient typedef for std::map<ID, Ptr>.
             typedef std::map<ID, Ptr> KeyRingMap;
             /// \brief
@@ -127,15 +130,14 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] cipherSuite_ \see{CipherSuite} associated with this key ring.
-            /// \param[in] masterCipherKey_ Optional \see{SymmetricKey} master key.
-            /// NOTE: If masterCipherKey_ is NULL, a random master key will be created.
             /// \param[in] name Optional keyring name.
             /// \param[in] description Optional keyring description.
             KeyRing (
                 const CipherSuite &cipherSuite_,
-                SymmetricKey::Ptr masterCipherKey_ = SymmetricKey::Ptr (),
                 const std::string &name = std::string (),
-                const std::string &description = std::string ());
+                const std::string &description = std::string ()) :
+                Serializable (name, description),
+                cipherSuite (cipherSuite_) {}
             /// \brief
             /// ctor.
             /// \param[in] buffer Buffer containing the serialized key ring.
@@ -356,30 +358,17 @@ namespace thekogans {
             void DropAllAuthenticatorKeys (bool recursive = true);
 
             /// \brief
-            /// Return the master \see{Cipher} key.
-            /// \return Master \see{Cipher} key.
-            inline SymmetricKey::Ptr GetMasterCipherKey () const {
-                return masterCipherKey;
-            }
-            /// \brief
-            /// Set the master \see{Cipher} key to the given key.
-            /// \param[in] masterCipherKey_ New master \see{Cipher} key to set.
-            void SetMasterCipherKey (SymmetricKey::Ptr masterCipherKey_);
-
-            /// \brief
-            /// Retrieve the \see{Cipher} \see{SymmetricKey} (master, active or retired)
-            /// corresponding to the given \see{ID}.
+            /// Retrieve the \see{Cipher} \see{SymmetricKey} corresponding to the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{Cipher} \see{SymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return Master, active or retired \see{SymmetricKey} corresponding to the
-            /// given \see{ID}. \see{Key::Ptr} () if not found.
+            /// \return \see{Cipher} \see{SymmetricKey} corresponding to the given \see{ID}
+            // (\see{Key::Ptr} () if not found).
             SymmetricKey::Ptr GetCipherKey (
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
             /// Return the \see{Cipher} \see{SymmetricKey} matching the given EqualityTest.
-            /// \param[in] equalityTest EqualityTest to call for each masterCipherKey,
-            /// activeCipherKeyMap and retiredCipherKeyMap item.
+            /// \param[in] equalityTest EqualityTest to call for each cipherKeyMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{Cipher} \see{SymmetricKey} matching the given EqualityTest
             /// (SymmetricKey::Ptr () if not found).
@@ -395,51 +384,24 @@ namespace thekogans {
             Cipher::Ptr GetCipher (
                 const ID &keyId,
                 bool recursive = true);
-
             /// \brief
             /// Add a \see{Cipher} \see{SymmetricKey} to the ring.
             /// \param[in] key \see{Cipher} \see{SymmetricKey} to add.
             /// \return true = key added. false = A key with
             /// this id already exists in the ring.
-            bool AddCipherActiveKey (SymmetricKey::Ptr key);
+            bool AddCipherKey (SymmetricKey::Ptr key);
             /// \brief
-            /// Given an active \see{Cipher} \see{SymmetricKey} \see{ID}, move the corresponding
-            /// key to the retired key map.
-            /// \param[in] keyId Active \see{Cipher} \see{SymmetricKey} \see{ID} to retire.
-            /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return true = retired, false = not found.
-            bool RetireActiveCipherKey (
-                const ID &keyId,
-                bool recursive = true);
-            /// \brief
-            /// Given an active \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding key
+            /// Given a \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding key
             /// from the key ring.
-            /// \param[in] keyId Active \see{Cipher} \see{SymmetricKey} \see{ID} to drop from the key ring.
+            /// \param[in] keyId \see{Cipher} \see{SymmetricKey} \see{ID} to drop from the key ring.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
-            bool DropActiveCipherKey (
+            bool DropCipherKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
             /// Drop all active \see{Cipher} \see{SymmetricKey}s.
             /// \param[in] recursive true = descend down to sub rings.
-            void DropActiveCipherKeys (bool recursive = true);
-            /// \brief
-            /// Given a retired \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding
-            /// key from the key ring.
-            /// \param[in] keyId Retired \see{Cipher} \see{SymmetricKey} \see{ID} to drop from the key ring.
-            /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return true = dropped, false = not found.
-            bool DropRetiredCipherKey (
-                const ID &keyId,
-                bool recursive = true);
-            /// \brief
-            /// Drop all \see{Cipher} retired \see{SymmetricKey}s.
-            /// \param[in] recursive descend down to sub rings.
-            void DropRetiredCipherKeys (bool recursive = true);
-            /// \brief
-            /// Drop all \see{Cipher} keys. Master key is not affected.
-            /// \param[in] recursive descend down to sub rings.
             void DropAllCipherKeys (bool recursive = true);
 
             /// \brief
@@ -488,6 +450,43 @@ namespace thekogans {
             void DropAllMACKeys (bool recursive = true);
 
             /// \brief
+            /// Return user data with the given \see{ID}.
+            /// \param[in] id \see{ID} of user data to retrieve.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{Serializable} corresponding to the given id
+            /// (Serializable::Ptr () if not found).
+            Serializable::Ptr GetUserData (
+                const ID &id,
+                bool recursive) const;
+            /// \brief
+            /// Return user data matching the given EqualityTest.
+            /// \param[in] equalityTest EqualityTest to call for each userDataMap item.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return First \see{Serializable} matching the given EqualityTest
+            /// (Serializable::Ptr () if not found).
+            Serializable::Ptr GetUserData (
+                const EqualityTest<Serializable> &equalityTest,
+                bool recursive) const;
+            /// \brief
+            /// Add user data to this ring.
+            /// \param[in] userData \see{Serializable} to add.
+            /// \return true = user data added. false = user data with this \see{ID}
+            /// already exists in the ring.
+            bool AddUserData (Serializable::Ptr userData);
+            /// \brief
+            /// Drop user data with the given \see{ID}.
+            /// \param[in] id \see{ID} of user data to delete.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return true = dropped, false = not found.
+            bool DropUserData (
+                const ID &id,
+                bool recursive);
+            /// \brief
+            /// Drop all user data.
+            /// \param[in] recursive true = descend down to sub rings.
+            void DropAllUserData (bool recursive);
+
+            /// \brief
             /// Return the sub ring with the given id.
             /// \param[in] subringId Id of sub ring to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
@@ -522,8 +521,7 @@ namespace thekogans {
             void DropAllSubrings ();
 
             /// \brief
-            /// Drop all params, keys and sub rings.
-            /// NOTE: masterCipherKey is left unchanged.
+            /// Drop all params, keys, user data and sub rings.
             void Clear ();
 
             /// \brief
@@ -592,26 +590,23 @@ namespace thekogans {
             /// "AuthenticatorKey"
             static const char * const TAG_AUTHENTICATOR_KEY;
             /// \brief
-            /// "CipherMasterKey"
-            static const char * const TAG_CIPHER_MASTER_KEY;
+            /// "CipherKeys"
+            static const char * const TAG_CIPHER_KEYS;
             /// \brief
-            /// "CipherActiveKeys"
-            static const char * const TAG_CIPHER_ACTIVE_KEYS;
-            /// \brief
-            /// "CipherActiveKey"
-            static const char * const TAG_CIPHER_ACTIVE_KEY;
-            /// \brief
-            /// "CipherRetiredKeys"
-            static const char * const TAG_CIPHER_RETIRED_KEYS;
-            /// \brief
-            /// "CipherRetiredKey"
-            static const char * const TAG_CIPHER_RETIRED_KEY;
+            /// "CipherKey"
+            static const char * const TAG_CIPHER_KEY;
             /// \brief
             /// "MACKeys"
             static const char * const TAG_MAC_KEYS;
             /// \brief
             /// "MACKey"
             static const char * const TAG_MAC_KEY;
+            /// \brief
+            /// "UserDatas"
+            static const char * const TAG_USER_DATAS;
+            /// \brief
+            /// "UserData"
+            static const char * const TAG_USER_DATA;
             /// \brief
             /// "SubRings"
             static const char * const TAG_SUB_RINGS;

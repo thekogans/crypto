@@ -124,7 +124,6 @@ int main (
             keyRing.Reset (
                 new crypto::KeyRing (
                     options.cipherSuite,
-                    crypto::SymmetricKey::Ptr (),
                     options.name,
                     options.description));
         }
@@ -149,7 +148,7 @@ int main (
                     crypto::SymmetricKey::FromRandom (
                         crypto::Cipher::GetKeyLength (
                             options.cipherSuite.GetOpenSSLCipher ()));
-                keyRing->AddCipherActiveKey (key);
+                keyRing->AddCipherKey (key);
                 cipher = keyRing->GetCipherSuite ().GetCipher (key);
                 ciphertextLength =
                     (util::ui32)cipher->EncryptAndFrame (
