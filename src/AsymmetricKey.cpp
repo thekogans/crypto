@@ -155,7 +155,7 @@ namespace thekogans {
                         key.get (),
                         cipher,
                         (unsigned char *)symmetricKey,
-                        symmetricKeyLength,
+                        (int)symmetricKeyLength,
                         passwordCallback,
                         userData) :
                     PEM_write_bio_PUBKEY (bio.get (), key.get ())) == 0) {

@@ -54,7 +54,7 @@ namespace {
             if (result) {
                 result = crypto::CipherSuite (cipherSuite.ToString ()) == cipherSuite;
                 if (result) {
-                    util::Buffer buffer (util::HostEndian, cipherSuite.Size ());
+                    util::Buffer buffer (util::HostEndian, (util::ui32)cipherSuite.Size ());
                     buffer << cipherSuite;
                     crypto::CipherSuite cipherSuite_;
                     buffer >> cipherSuite_;
