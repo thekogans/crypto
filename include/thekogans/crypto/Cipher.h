@@ -249,14 +249,18 @@ namespace thekogans {
 
             enum {
                 /// \brief
+                /// Maximum framing overhead length.
+                MAX_FRAMING_OVERHEAD_LENGTH =
+                    FrameHeader::SIZE +
+                    CiphertextHeader::SIZE +
+                    EVP_MAX_IV_LENGTH + // iv
+                    EVP_MAX_BLOCK_LENGTH + // padding
+                    EVP_MAX_MD_SIZE, // mac
+                /// \brief
                 /// Maximum plaintext length.
                 MAX_PLAINTEXT_LENGTH =
                     util::UI32_MAX -
-                    FrameHeader::SIZE -
-                    CiphertextHeader::SIZE -
-                    EVP_MAX_IV_LENGTH - // iv
-                    EVP_MAX_BLOCK_LENGTH - // padding
-                    EVP_MAX_MD_SIZE // mac
+                    MAX_FRAMING_OVERHEAD_LENGTH
             };
 
             /// \brief
@@ -339,6 +343,42 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 const void *associatedData = 0,
                 std::size_t associatedDataLength = 0);
+
+            /// \brief
+            /// Encrypt, mac, and enlengthen plaintext. It writes the following structure in to ciphertext:
+            ///
+            /// |--- FrameHeader ---|------------- CiphertextHeader -------------|--------- ciphertext ---------|
+            /// +-------------------+-----------+-------------------+------------+------+---------------+-------+
+            /// | ciphertext length | iv length | ciphertext length | mac length |  iv  |  ciphertext   |  mac  |
+            /// +-------------------+-----------+-------------------+------------+------+---------------+-------+
+            /// |         4         |     2     |         4         |      2     | iv + ciphertext + mac length |
+            ///
+            /// \param[in] plaintext Plaintext to encrypt.
+            /// \param[in] plaintextLength Plaintext length.
+            /// \param[in] associatedData Optional associated data (GCM mode only).
+            /// \param[in] associatedDataLength Length of optional associated data.
+            /// \param[out] ciphertext Where to write encrypted ciphertext.
+            /// \return Number of bytes written to ciphertext.
+            std::size_t EncryptAndEnlengthen (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                const void *associatedData,
+                std::size_t associatedDataLength,
+                util::ui8 *ciphertext);
+            /// \brief
+            /// Encrypt, mac and enlengthen plaintext. Similar to Encrypt above but allocates a
+            /// buffer large enough to hold a util::ui32 containing the ciphertext length and
+            /// calls EncryptAndEnlengthen above.
+            /// \param[in] plaintext Plaintext to encrypt.
+            /// \param[in] plaintextLength Plaintext length.
+            /// \param[in] associatedData Optional associated data (GCM mode only).
+            /// \param[in] associatedDataLength Length of optional associated data.
+            /// \return An encrypted, mac'ed and framed buffer.
+            util::Buffer::UniquePtr EncryptAndEnlengthen (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                const void *associatedData,
+                std::size_t associatedDataLength);
 
             /// \brief
             /// Encrypt, mac, and frame plaintext. It writes the following structure in to ciphertext:

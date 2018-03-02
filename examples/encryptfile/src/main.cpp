@@ -156,9 +156,8 @@ int main (
             }
             else {
                 ciphertextLength =
-                    (util::ui32)cipher->Encrypt (
+                    (util::ui32)cipher->EncryptAndEnlengthen (
                         plaintext.array, plaintextLength, 0, 0, ciphertext.array);
-                toFile << ciphertextLength;
             }
             if (toFile.Write (ciphertext.array, ciphertextLength) == ciphertextLength) {
                 std::cout << ".";

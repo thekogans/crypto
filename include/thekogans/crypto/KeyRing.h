@@ -47,8 +47,8 @@ namespace thekogans {
         /// the enclosed keys and parameters to authenticate each other and perform key exchange to
         /// generate temporary \see{Cipher} \see{SymmetricKey} session keys. Once the session is over,
         /// destroy the KeyRing without calling KeyRing::Save. In the later case, create a KeyRing, use
-        /// it to generate permanent encryption (active) keys, then call KeyRing::Save. Later call
-        /// KeyRing::Load and use it to decrypt the data at rest.
+        /// it to generate permanent encryption keys, then call KeyRing::Save. Later call KeyRing::Load and
+        /// use it to decrypt the data at rest. See encryptfile and decryptfile examples.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyRing : public Serializable {
             /// \brief

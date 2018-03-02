@@ -53,7 +53,8 @@ namespace thekogans {
             /// Use the public key to encrypt the plaintext.
             /// NOTE: Asymmetric encryption is very slow and should not be used
             /// for bulk encryption duties (See \see{Cipher} for that). You should
-            /// only use it to encrypt message digests (See \see{MessageDigest}).
+            /// only use it to encrypt message digests (See \see{MessageDigest}) or
+            /// \see{SymmetricKey} during key exchange.
             /// \param[in] plaintext Plaintext to encrypt.
             /// \param[in] plaintextLength Length of plaintext.
             /// \param[in] publicKey Public key used for encryption.

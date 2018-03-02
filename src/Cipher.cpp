@@ -278,22 +278,12 @@ namespace thekogans {
         }
 
         std::size_t Cipher::GetMaxPlaintextLength (std::size_t payloadLength) {
-            return
-                payloadLength -
-                FrameHeader::SIZE -
-                CiphertextHeader::SIZE -
-                EVP_MAX_IV_LENGTH - // iv
-                EVP_MAX_BLOCK_LENGTH - // padding
-                EVP_MAX_MD_SIZE; // mac
+            return payloadLength > MAX_FRAMING_OVERHEAD_LENGTH ?
+                payloadLength - MAX_FRAMING_OVERHEAD_LENGTH : 0;
         }
 
         std::size_t Cipher::GetMaxBufferLength (std::size_t plaintextLength) {
-            return
-                FrameHeader::SIZE +
-                CiphertextHeader::SIZE +
-                EVP_MAX_IV_LENGTH + // iv
-                plaintextLength + EVP_MAX_BLOCK_LENGTH + // ciphertext
-                EVP_MAX_MD_SIZE; // mac
+            return plaintextLength + MAX_FRAMING_OVERHEAD_LENGTH;
         }
 
         std::size_t Cipher::Encrypt (
@@ -350,6 +340,60 @@ namespace thekogans {
                         (util::ui32)GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
                     (util::ui32)Encrypt (
+                        plaintext,
+                        plaintextLength,
+                        associatedData,
+                        associatedDataLength,
+                        ciphertext->GetWritePtr ()));
+                return ciphertext;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t Cipher::EncryptAndEnlengthen (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                const void *associatedData,
+                std::size_t associatedDataLength,
+                util::ui8 *ciphertext) {
+            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
+                    ciphertext != 0) {
+                std::size_t ciphertextLength = Encrypt (
+                    plaintext,
+                    plaintextLength,
+                    associatedData,
+                    associatedDataLength,
+                    ciphertext + util::UI32_SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian,
+                    ciphertext,
+                    util::UI32_SIZE);
+                buffer << (util::ui32)ciphertextLength;
+                return util::UI32_SIZE + ciphertextLength;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        util::Buffer::UniquePtr Cipher::EncryptAndEnlengthen (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                const void *associatedData,
+                std::size_t associatedDataLength) {
+            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
+                util::Buffer::UniquePtr ciphertext (
+                    new util::Buffer (
+                        util::NetworkEndian,
+                        (util::ui32)(GetMaxBufferLength (plaintextLength))));
+                ciphertext->AdvanceWriteOffset (
+                    (util::ui32)EncryptAndEnlengthen (
                         plaintext,
                         plaintextLength,
                         associatedData,
