@@ -186,7 +186,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t AsymmetricKey::Size (bool includeType) const {
+        std::size_t AsymmetricKey::Size () const {
             util::i32 keyLength = isPrivate ?
                 i2d_PrivateKey (key.get (), 0) :
                 i2d_PublicKey (key.get (), 0);
@@ -194,7 +194,7 @@ namespace thekogans {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
             return
-                Serializable::Size (includeType) +
+                Serializable::Size () +
                 util::BOOL_SIZE + // isPrivate
                 util::I32_SIZE + // type
                 util::I32_SIZE + // keyLength
@@ -225,10 +225,8 @@ namespace thekogans {
             }
         }
 
-        void AsymmetricKey::Serialize (
-                util::Serializer &serializer,
-                bool includeType) const {
-            Serializable::Serialize (serializer, includeType);
+        void AsymmetricKey::Serialize (util::Serializer &serializer) const {
+            Serializable::Serialize (serializer);
             util::SecureVector<util::ui8> keyBuffer;
             SerializeKey (isPrivate, *key, keyBuffer);
             serializer <<

@@ -526,18 +526,13 @@ namespace thekogans {
 
             /// \brief
             /// Return the serialized keyring size.
-            /// \param[in] includeType true = include key's type in size calculation.
             /// \return Serialized keyring size.
-            virtual std::size_t Size (bool includeType = true) const;
+            virtual std::size_t Size () const;
 
             /// \brief
             /// Save the key ring to a serializer.
             /// \param[in] serializer Serializer to write the keyring to.
-            /// \param[in] includeType true = Serialize keyrings's type
-            /// to be used by \see{Serializable::Get}.
-            virtual void Serialize (
-                util::Serializer &serializer,
-                bool includeType = true) const;
+            virtual void Serialize (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief

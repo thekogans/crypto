@@ -116,18 +116,13 @@ namespace thekogans {
 
             /// \brief
             /// Return the serialized params size.
-            /// \param[in] includeType true = include params' type in size calculation.
             /// \return Serialized params size.
-            virtual std::size_t Size (bool includeType = true) const;
+            virtual std::size_t Size () const;
 
             /// \brief
             /// Serialize the parameters to the given serializer.
             /// \param[out] serializer Serializer to serialize the key to.
-            /// \param[in] includeType true = Serialize params' type to be
-            /// used by \see{Serializable::Get}.
-            virtual void Serialize (
-                util::Serializer &serializer,
-                bool includeType = true) const;
+            virtual void Serialize (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief

@@ -275,7 +275,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t Params::Size (bool includeType) const {
+        std::size_t Params::Size () const {
             util::i32 type = GetType ();
             util::i32 paramsLength = 0;
             if (type == EVP_PKEY_DH) {
@@ -315,7 +315,7 @@ namespace thekogans {
                 }
             }
             return
-                Serializable::Size (includeType) +
+                Serializable::Size () +
                 util::I32_SIZE + // type
                 util::I32_SIZE + // paramsLength
                 paramsLength;
@@ -380,10 +380,8 @@ namespace thekogans {
             }
         }
 
-        void Params::Serialize (
-                util::Serializer &serializer,
-                bool includeType) const {
-            Serializable::Serialize (serializer, includeType);
+        void Params::Serialize (util::Serializer &serializer) const {
+            Serializable::Serialize (serializer);
             util::SecureVector<util::ui8> paramsBuffer;
             SerializeParams (*params, paramsBuffer);
             serializer <<

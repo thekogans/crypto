@@ -149,17 +149,13 @@ namespace thekogans {
 
             /// \brief
             /// Return the serializable size.
-            /// \param[in] includeType true = include serializable's type in size calculation.
             /// \return Serializable size.
-            virtual std::size_t Size (bool includeType = true) const;
+            virtual std::size_t Size () const;
 
             /// \brief
             /// Write the serializable to the given serializer.
             /// \param[out] serializer Serializer to write the serializable to.
-            /// \param[in] includeType true = Serialize serializable's type to be used by Get above.
-            virtual void Serialize (
-                util::Serializer &serializer,
-                bool includeType = true) const;
+            virtual void Serialize (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief

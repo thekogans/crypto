@@ -203,7 +203,7 @@ namespace thekogans {
             /// \brief
             /// Return serialized cipher suite size.
             /// \return Serialized cipher suite size.
-            inline util::ui32 Size () const {
+            inline std::size_t Size () const {
                 return
                     util::Serializer::Size (keyExchange) +
                     util::Serializer::Size (authenticator) +

@@ -189,8 +189,8 @@ namespace thekogans {
             util::Buffer::UniquePtr buffer (
                 new util::SecureBuffer (
                     util::NetworkEndian,
-                    (util::ui32)Size (false)));
-            Serialize (*buffer, false);
+                    (util::ui32)Size ()));
+            Serialize (*buffer);
             if (cipher != 0) {
                 buffer = cipher->Encrypt (
                     buffer->GetReadPtr (),
@@ -1091,113 +1091,112 @@ namespace thekogans {
             subringsMap.clear ();
         }
 
-        std::size_t KeyRing::Size (bool includeType) const {
+        std::size_t KeyRing::Size () const {
             std::size_t size =
-                Serializable::Size (includeType) +
+                Serializable::Size () +
                 cipherSuite.Size ();
             size += util::UI32_SIZE;
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
                     end = keyExchangeParamsMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
+                size += it->second->Size ();
             }
             size += util::UI32_SIZE;
             for (AsymmetricKeyMap::const_iterator
                     it = keyExchangeKeyMap.begin (),
                     end = keyExchangeKeyMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
+                size += it->second->Size ();
             }
             size += util::UI32_SIZE;
             for (ParamsMap::const_iterator
                     it = authenticatorParamsMap.begin (),
                     end = authenticatorParamsMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
+                size += it->second->Size ();
             }
             size += util::UI32_SIZE;
             for (AsymmetricKeyMap::const_iterator
                     it = authenticatorKeyMap.begin (),
                     end = authenticatorKeyMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
+                size += it->second->Size ();
             }
             size += util::UI32_SIZE;
             for (SymmetricKeyMap::const_iterator
                     it = cipherKeyMap.begin (),
                     end = cipherKeyMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
+                size += it->second->Size ();
             }
             size += util::UI32_SIZE;
             for (AsymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
+                size += it->second->Size ();
             }
             size += util::UI32_SIZE;
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
-                size += it->second->Size (true);
+                size += util::Serializer::Size (it->second->Type ()) + it->second->Size ();
             }
             size += util::UI32_SIZE;
             for (KeyRingMap::const_iterator
                     it = subringsMap.begin (),
                     end = subringsMap.end (); it != end; ++it) {
-                size += it->second->Size (false);
+                size += it->second->Size ();
             }
             return size;
         }
 
-        void KeyRing::Serialize (
-                util::Serializer &serializer,
-                bool includeType) const {
-            Serializable::Serialize (serializer, includeType);
+        void KeyRing::Serialize (util::Serializer &serializer) const {
+            Serializable::Serialize (serializer);
             serializer << cipherSuite;
             serializer << (util::ui32)keyExchangeParamsMap.size ();
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
                     end = keyExchangeParamsMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)keyExchangeKeyMap.size ();
             for (AsymmetricKeyMap::const_iterator
                     it = keyExchangeKeyMap.begin (),
                     end = keyExchangeKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)authenticatorParamsMap.size ();
             for (ParamsMap::const_iterator
                     it = authenticatorParamsMap.begin (),
                     end = authenticatorParamsMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)authenticatorKeyMap.size ();
             for (AsymmetricKeyMap::const_iterator
                     it = authenticatorKeyMap.begin (),
                     end = authenticatorKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)cipherKeyMap.size ();
             for (SymmetricKeyMap::const_iterator
                     it = cipherKeyMap.begin (),
                     end = cipherKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)macKeyMap.size ();
             for (AsymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)userDataMap.size ();
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, true);
+                serializer << it->second->Type ();
+                it->second->Serialize (serializer);
             }
             serializer << (util::ui32)subringsMap.size ();
             for (KeyRingMap::const_iterator
                     it = subringsMap.begin (),
                     end = subringsMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer, false);
+                it->second->Serialize (serializer);
             }
         }
 

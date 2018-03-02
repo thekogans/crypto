@@ -58,8 +58,8 @@ TEST (thekogans, SymmetricKey) {
                 1,
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size (false));
-        key1->Serialize (serializer, false);
+        util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size ());
+        key1->Serialize (serializer);
         crypto::SymmetricKey::Ptr key2 (new crypto::SymmetricKey (serializer));
         bool result = *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
@@ -79,9 +79,7 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size ());
         key1->Serialize (serializer);
-        crypto::SymmetricKey::Ptr key2 =
-            util::dynamic_refcounted_pointer_cast<crypto::SymmetricKey> (
-                crypto::Serializable::Get (serializer));
+        crypto::SymmetricKey::Ptr key2 (new crypto::SymmetricKey (serializer));
         bool result = key2.Get () != 0 && *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);

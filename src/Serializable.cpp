@@ -54,20 +54,14 @@ namespace thekogans {
             serializer >> id >> name >> description;
         }
 
-        std::size_t Serializable::Size (bool includeType) const {
+        std::size_t Serializable::Size () const {
             return
-                (includeType ? util::Serializer::Size (Type ()) : 0) +
-                id.Size () +
+                util::Serializer::Size (id) +
                 util::Serializer::Size (name) +
                 util::Serializer::Size (description);
         }
 
-        void Serializable::Serialize (
-                util::Serializer &serializer,
-                bool includeType) const {
-            if (includeType) {
-                serializer << Type ();
-            }
+        void Serializable::Serialize (util::Serializer &serializer) const {
             serializer << id << name << description;
         }
 

@@ -112,18 +112,6 @@ namespace thekogans {
             return *this;
         }
 
-        const CipherSuite CipherSuite::Empty;
-        const CipherSuite CipherSuite::Strongest (
-            KEY_EXCHANGE_ECDHE,
-            AUTHENTICATOR_ECDSA,
-            CIPHER_AES_256_GCM,
-            MESSAGE_DIGEST_SHA2_512);
-        const CipherSuite CipherSuite::Weakest (
-            KEY_EXCHANGE_RSA,
-            AUTHENTICATOR_RSA,
-            CIPHER_AES_128_CBC,
-            MESSAGE_DIGEST_SHA2_256);
-
         namespace {
             const char *keyExchanges[] = {
                 CipherSuite::KEY_EXCHANGE_ECDHE,
@@ -197,6 +185,18 @@ namespace thekogans {
                 return messageDigests_;
             }
         }
+
+        const CipherSuite CipherSuite::Empty;
+        const CipherSuite CipherSuite::Strongest (
+            KEY_EXCHANGE_ECDHE,
+            AUTHENTICATOR_ECDSA,
+            CIPHER_AES_256_GCM,
+            MESSAGE_DIGEST_SHA2_512);
+        const CipherSuite CipherSuite::Weakest (
+            KEY_EXCHANGE_RSA,
+            AUTHENTICATOR_RSA,
+            CIPHER_AES_128_CBC,
+            MESSAGE_DIGEST_SHA2_256);
 
         const std::vector<CipherSuite> &CipherSuite::GetCipherSuites () {
             static std::vector<CipherSuite> cipherSuites = BuildCipherSuites ();

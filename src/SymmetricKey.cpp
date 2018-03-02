@@ -132,16 +132,14 @@ namespace thekogans {
                 description);
         }
 
-        std::size_t SymmetricKey::Size (bool includeType) const {
+        std::size_t SymmetricKey::Size () const {
             return
-                Serializable::Size (includeType) +
+                Serializable::Size () +
                 util::UI32_SIZE + GetDataAvailableForReading ();
         }
 
-        void SymmetricKey::Serialize (
-                util::Serializer &serializer,
-                bool includeType) const {
-            Serializable::Serialize (serializer, includeType);
+        void SymmetricKey::Serialize (util::Serializer &serializer) const {
+            Serializable::Serialize (serializer);
             serializer << GetDataAvailableForReading ();
             serializer.Write (GetReadPtr (), GetDataAvailableForReading ());
         }
