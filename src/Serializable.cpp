@@ -15,40 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include <string>
-#include "thekogans/util/SecureAllocator.h"
-#include "thekogans/util/RandomSource.h"
-#include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/Serializable.h"
 
 namespace thekogans {
     namespace crypto {
-
-        Serializable::Map &Serializable::GetMap () {
-            static Serializable::Map map;
-            return map;
-        }
-
-        Serializable::Ptr Serializable::Get (util::Serializer &serializer) {
-            std::string type;
-            serializer >> type;
-            Map::iterator it = GetMap ().find (type);
-            return it != GetMap ().end () ?
-                it->second (serializer) : Serializable::Ptr ();
-        }
-
-        Serializable::MapInitializer::MapInitializer (
-                const std::string &type,
-                Factory factory) {
-            std::pair<Map::iterator, bool> result =
-                GetMap ().insert (Map::value_type (type, factory));
-            assert (result.second);
-            if (!result.second) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Duplicate Serializable: %s", type.c_str ());
-            }
-        }
 
         Serializable::Serializable (util::Serializer &serializer) {
             serializer >> id >> name >> description;

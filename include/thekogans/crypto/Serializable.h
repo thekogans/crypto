@@ -19,11 +19,8 @@
 #define __thekogans_crypto_Serializable_h
 
 #include <string>
-#include "thekogans/util/Types.h"
-#include "thekogans/util/Heap.h"
-#include "thekogans/util/RefCounted.h"
+#include "thekogans/util/Serializable.h"
 #include "thekogans/util/SpinLock.h"
-#include "thekogans/util/Serializer.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/ID.h"
@@ -39,46 +36,10 @@ namespace thekogans {
         /// It exposes a globally unique id (See \see{ID}) that can be used to locate
         /// objects in the \see{KeyRing}.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::Serializable {
             /// \brief
             /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Serializable>.
             typedef util::ThreadSafeRefCounted::Ptr<Serializable> Ptr;
-
-            /// \brief
-            /// typedef for the Serializable factory function.
-            typedef Ptr (*Factory) (util::Serializer &serializer);
-            /// \brief
-            /// typedef for the Serializable map.
-            typedef std::map<std::string, Factory> Map;
-            /// \brief
-            /// Controls Map's lifetime.
-            /// \return Serializable map.
-            static Map &GetMap ();
-            /// \brief
-            /// Used for Serializable dynamic discovery and creation.
-            /// \param[in] serializer Serializer containing the Serializable.
-            /// \return A deserialized serializable.
-            static Ptr Get (util::Serializer &serializer);
-            /// \struct Serializable::MapInitializer Serializable.h thekogans/crypto/Serializable.h
-            ///
-            /// \brief
-            /// MapInitializer is used to initialize the Serializable::map.
-            /// It should not be used directly, and instead is included
-            /// in THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE/THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE.
-            /// If you are deriving a serializable from Serializable, and you want
-            /// it to be dynamically discoverable/creatable, add
-            /// THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE to it's declaration,
-            /// and THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE to it's definition.
-            struct _LIB_THEKOGANS_CRYPTO_DECL MapInitializer {
-                /// \brief
-                /// ctor. Add serializable of type, and factory for creating it
-                /// to the Serializable::map
-                /// \param[in] type Serializable type (it's class name).
-                /// \param[in] factory Serializable creation factory.
-                MapInitializer (
-                    const std::string &type,
-                    Factory factory);
-            };
 
         protected:
             /// \brief
@@ -143,11 +104,6 @@ namespace thekogans {
             }
 
             /// \brief
-            /// Return serializable type (it's class name).
-            /// \return Serializable type.
-            virtual std::string Type () const = 0;
-
-            /// \brief
             /// Return the serializable size.
             /// \return Serializable size.
             virtual std::size_t Size () const;
@@ -190,31 +146,6 @@ namespace thekogans {
         #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
 
-        /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE_COMMON(type)
-        /// Common code used by Static and Shared versions THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE.
-        #define THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE_COMMON(type)\
-            typedef thekogans::util::ThreadSafeRefCounted::Ptr<type> Ptr;\
-            THEKOGANS_UTIL_DECLARE_HEAP_WITH_LOCK (type, thekogans::util::SpinLock)\
-        public:\
-            static thekogans::crypto::Serializable::Ptr Create (thekogans::util::Serializer &serializer) {\
-                return thekogans::crypto::Serializable::Ptr (new type (serializer));\
-            }\
-            static const char *TYPE;\
-            virtual std::string Type () const {\
-                return TYPE;\
-            }
-
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE_COMMON(type)
-        /// Common code used by Static and Shared versions THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE.
-        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE_COMMON(type, minSerializablesInPage)\
-            const char *type::TYPE = #type;\
-            THEKOGANS_UTIL_IMPLEMENT_HEAP_WITH_LOCK_EX_AND_ALLOCATOR (\
-                type,\
-                thekogans::util::SpinLock,\
-                minSerializablesInPage,\
-                thekogans::util::SecureAllocator::Global)
-
-    #if defined (TOOLCHAIN_TYPE_Static)
         /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)
         /// Dynamic discovery macro. Add this to your class declaration.
         /// Example:
@@ -225,15 +156,7 @@ namespace thekogans {
         /// };
         /// \endcode
         #define THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)\
-            THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE_COMMON (type)\
-            static void StaticInit () {\
-                std::pair<Map::iterator, bool> result =\
-                    GetMap ().insert (Map::value_type (#type, type::Create));\
-                if (!result.second) {\
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (\
-                        "'%s' is already registered.", #type);\
-                }\
-            }
+            THEKOGANS_UTIL_DECLARE_SERIALIZABLE (type, thekogans::util::SpinLock)
 
         /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, minSerializablesInPage)
         /// Dynamic discovery macro. Instantiate one of these in the class cpp file.
@@ -248,38 +171,38 @@ namespace thekogans {
         ///     THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
         /// \endcode
         #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, minSerializablesInPage)\
-            THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE_COMMON (type, minSerializablesInPage)
-    #else // defined (TOOLCHAIN_TYPE_Static)
-        /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)
-        /// Dynamic discovery macro. Add this to your class declaration.
-        /// Example:
-        /// \code{.cpp}
-        /// struct _LIB_THEKOGANS_CRYPTO_DECL SymmetricKey : public Serializable {
-        ///     THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (SymmetricKey)
-        ///     ...
-        /// };
-        /// \endcode
-        #define THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)\
-            THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE_COMMON (type)\
-            static thekogans::crypto::Serializable::MapInitializer mapInitializer;
+            THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (\
+                type,\
+                thekogans::util::SpinLock,\
+                minSerializablesInPage,\
+                thekogans::util::SecureAllocator::Global)
 
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, minSerializablesInPage)
-        /// Dynamic discovery macro. Instantiate one of these in the class cpp file.
-        /// Example:
-        /// \code{.cpp}
-        /// #if !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
-        ///     #define THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE 16
-        /// #endif // !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
-        ///
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-        ///     SymmetricKey,
-        ///     THEKOGANS_CRYPTO_MIN_SYMMETRIC_SERIALIZABLES_IN_PAGE)
-        /// \endcode
-        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, minSerializablesInPage)\
-            THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE_COMMON (type, minSerializablesInPage)\
-            thekogans::crypto::Serializable::MapInitializer type::mapInitializer (\
-                #type, type::Create);
-    #endif // defined (TOOLCHAIN_TYPE_Static)
+        /// \brief
+        /// Serializable serializer.
+        /// \param[in] serializer Where to serialize the frame header.
+        /// \param[in] serializable Serializable to serialize.
+        /// \return serializer.
+        inline util::Serializer &operator << (
+                util::Serializer &serializer,
+                const Serializable::Ptr &serializable) {
+            serializer << serializable->Type ();
+            serializable->Serialize (serializer);
+            return serializer;
+        }
+
+        /// \brief
+        /// Serializable deserializer.
+        /// \param[in] serializer Where to deserialize the frame header.
+        /// \param[in] serializable Serializable to deserialize.
+        /// \return serializer.
+        inline util::Serializer &operator >> (
+                util::Serializer &serializer,
+                Serializable::Ptr &serializable) {
+            serializable =
+                util::dynamic_refcounted_pointer_cast<Serializable> (
+                    util::Serializable::Get (serializer));
+            return serializer;
+        }
 
     } // namespace crypto
 } // namespace thekogans

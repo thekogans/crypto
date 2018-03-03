@@ -130,7 +130,8 @@ namespace thekogans {
             serializer >> userDataCount;
             userDataMap.clear ();
             while (userDataCount-- > 0) {
-                Serializable::Ptr userData = Serializable::Get (serializer);
+                Serializable::Ptr userData;
+                serializer >> userData;
                 std::pair<SerializableMap::iterator, bool> result =
                     userDataMap.insert (
                         SerializableMap::value_type (userData->GetId (), userData));
@@ -1135,7 +1136,7 @@ namespace thekogans {
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
-                size += util::Serializer::Size (it->second->Type ()) + it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
             for (KeyRingMap::const_iterator
@@ -1189,8 +1190,7 @@ namespace thekogans {
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
-                serializer << it->second->Type ();
-                it->second->Serialize (serializer);
+                serializer << it->second;
             }
             serializer << (util::ui32)subringsMap.size ();
             for (KeyRingMap::const_iterator
