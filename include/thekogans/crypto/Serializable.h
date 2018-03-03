@@ -70,6 +70,16 @@ namespace thekogans {
             /// dtor.
             virtual ~Serializable () {}
 
+        #if defined (TOOLCHAIN_TYPE_Static)
+            /// \brief
+            /// Because Serializable uses dynamic initialization, when using
+            /// it in static builds call this method to have the Serializable
+            /// explicitly include all internal serializable types. Without
+            /// calling this api, the only serializables that will be available
+            /// to your application are the ones you explicitly link to.
+            static void StaticInit ();
+        #endif // defined (TOOLCHAIN_TYPE_Static)
+
             /// \brief
             /// Return the serializable id.
             /// \return Serializable id.

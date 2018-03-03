@@ -15,10 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include "thekogans/util/SpinLock.h"
+#include "thekogans/util/LockGuard.h"
+#include "thekogans/crypto/KeyRing.h"
+#include "thekogans/crypto/Params.h"
+#include "thekogans/crypto/SymmetricKey.h"
+#include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/Serializable.h"
 
 namespace thekogans {
     namespace crypto {
+
+    #if defined (TOOLCHAIN_TYPE_Static)
+        void Serializable::StaticInit () {
+            static volatile bool registered = false;
+            static util::SpinLock spinLock;
+            util::LockGuard<util::SpinLock> guard (spinLock);
+            if (!registered) {
+                KeyRing::StaticInit ();
+                Params::StaticInit ();
+                SymmetricKey::StaticInit ();
+                AsymmetricKey::StaticInit ();
+                registered = true;
+            }
+        }
+    #endif // defined (TOOLCHAIN_TYPE_Static)
 
         Serializable::Serializable (util::Serializer &serializer) {
             serializer >> id >> name >> description;

@@ -28,7 +28,7 @@
 #include "thekogans/util/Thread.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
-#include "thekogans/crypto/Serializables.h"
+#include "thekogans/crypto/Serializable.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 
@@ -98,7 +98,7 @@ namespace thekogans {
                 util::ui32 entropyNeeded,
                 util::ui64 workingSetSize) {
         #if defined (TOOLCHAIN_TYPE_Static)
-            Serializables::StaticInit ();
+            Serializable::StaticInit ();
         #endif // defined (TOOLCHAIN_TYPE_Static)
             util::SecureAllocator::ReservePages (workingSetSize, workingSetSize);
         #if OPENSSL_VERSION_NUMBER < 0x10100000L

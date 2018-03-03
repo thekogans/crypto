@@ -55,7 +55,6 @@
     <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Serializable.h</cpp_header>
-    <cpp_header>$(organization)/$(project_directory)/Serializables.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SystemCACertificates.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
@@ -80,7 +79,6 @@
     <cpp_source>Params.cpp</cpp_source>
     <cpp_source>RSA.cpp</cpp_source>
     <cpp_source>Serializable.cpp</cpp_source>
-    <cpp_source>Serializables.cpp</cpp_source>
     <cpp_source>SymmetricKey.cpp</cpp_source>
     <cpp_source>SystemCACertificates.cpp</cpp_source>
     <cpp_source>Version.cpp</cpp_source>
