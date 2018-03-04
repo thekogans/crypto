@@ -189,8 +189,8 @@ namespace thekogans {
                 thekogans::util::SecureAllocator::Global)
 
         /// \brief
-        /// Define Serializable insertion and extraction operators.
-        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (Serializable)
+        /// Define Serializable extraction operator.
+        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (Serializable)
 
     } // namespace crypto
 } // namespace thekogans

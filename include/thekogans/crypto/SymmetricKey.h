@@ -40,7 +40,7 @@ namespace thekogans {
 
         private:
             /// \brief
-            /// Symmetric key..
+            /// Symmetric key.
             util::FixedBuffer<EVP_MAX_KEY_LENGTH> key;
 
         public:
@@ -160,8 +160,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define SymmetricKey insertion and extraction operators.
-        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (SymmetricKey)
+        /// Define SymmetricKey extraction operator.
+        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (SymmetricKey)
 
     } // namespace crypto
 } // namespace thekogans

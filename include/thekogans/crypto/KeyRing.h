@@ -117,7 +117,7 @@ namespace thekogans {
             /// Convenient typedef for std::map<ID, Serializable::Ptr>.
             typedef std::map<ID, Serializable::Ptr> SerializableMap;
             /// \brief
-            /// \see{MAC} map.
+            /// \see{Serializable} map.
             SerializableMap userDataMap;
             /// \brief
             /// Convenient typedef for std::map<ID, Ptr>.
@@ -629,8 +629,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define KeyRing insertion and extraction operators.
-        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (KeyRing)
+        /// Define KeyRing extraction operator.
+        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (KeyRing)
 
     } // namespace crypto
 } // namespace thekogans

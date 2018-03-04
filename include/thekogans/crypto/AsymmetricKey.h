@@ -214,8 +214,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define AsymmetricKey insertion and extraction operators.
-        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (AsymmetricKey)
+        /// Define AsymmetricKey extraction operator.
+        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (AsymmetricKey)
 
     } // namespace crypto
 } // namespace thekogans

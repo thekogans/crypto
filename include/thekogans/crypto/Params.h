@@ -153,8 +153,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define Params insertion and extraction operators.
-        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (Params)
+        /// Define Params extraction operator.
+        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (Params)
 
     } // namespace crypto
 } // namespace thekogans
