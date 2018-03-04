@@ -37,125 +37,8 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             KeyRing,
+            1,
             THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
-
-        KeyRing::KeyRing (util::Serializer &serializer) :
-                Serializable (serializer) {
-            serializer >> cipherSuite;
-            util::ui32 keyExchangeParamsCount;
-            serializer >> keyExchangeParamsCount;
-            keyExchangeParamsMap.clear ();
-            while (keyExchangeParamsCount-- > 0) {
-                Params::Ptr params (new Params (serializer));
-                std::pair<ParamsMap::iterator, bool> result =
-                    keyExchangeParamsMap.insert (
-                        ParamsMap::value_type (params->GetId (), params));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert KeyExchange params: %s",
-                        params->GetName ().c_str ());
-                }
-            }
-            util::ui32 keyExchangeKeyCount;
-            serializer >> keyExchangeKeyCount;
-            keyExchangeKeyMap.clear ();
-            while (keyExchangeKeyCount-- > 0) {
-                AsymmetricKey::Ptr key (new AsymmetricKey (serializer));
-                std::pair<AsymmetricKeyMap::iterator, bool> result =
-                    keyExchangeKeyMap.insert (
-                        AsymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert KeyExchange key: %s",
-                        key->GetName ().c_str ());
-                }
-            }
-            util::ui32 authenticatorParamsCount;
-            serializer >> authenticatorParamsCount;
-            authenticatorParamsMap.clear ();
-            while (authenticatorParamsCount-- > 0) {
-                Params::Ptr params (new Params (serializer));
-                std::pair<ParamsMap::iterator, bool> result =
-                    authenticatorParamsMap.insert (
-                        ParamsMap::value_type (params->GetId (), params));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Authenticator params: %s",
-                        params->GetName ().c_str ());
-                }
-            }
-            util::ui32 authenticatorKeyCount;
-            serializer >> authenticatorKeyCount;
-            authenticatorKeyMap.clear ();
-            while (authenticatorKeyCount-- > 0) {
-                AsymmetricKey::Ptr key (new AsymmetricKey (serializer));
-                std::pair<AsymmetricKeyMap::iterator, bool> result =
-                    authenticatorKeyMap.insert (
-                        AsymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Authenticator key: %s",
-                        key->GetName ().c_str ());
-                }
-            }
-            util::ui32 cipherKeyCount;
-            serializer >> cipherKeyCount;
-            cipherKeyMap.clear ();
-            while (cipherKeyCount-- > 0) {
-                SymmetricKey::Ptr key (new SymmetricKey (serializer));
-                std::pair<SymmetricKeyMap::iterator, bool> result =
-                    cipherKeyMap.insert (
-                        SymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Cipher key: %s",
-                        key->GetName ().c_str ());
-                }
-            }
-            util::ui32 macKeyCount;
-            serializer >> macKeyCount;
-            macKeyMap.clear ();
-            while (macKeyCount-- > 0) {
-                AsymmetricKey::Ptr key (new AsymmetricKey (serializer));
-                std::pair<AsymmetricKeyMap::iterator, bool> result =
-                    macKeyMap.insert (
-                        AsymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert MAC key: %s",
-                        key->GetName ().c_str ());
-                }
-            }
-            util::ui32 userDataCount;
-            serializer >> userDataCount;
-            userDataMap.clear ();
-            while (userDataCount-- > 0) {
-                Serializable::Ptr userData;
-                serializer >> userData;
-                std::pair<SerializableMap::iterator, bool> result =
-                    userDataMap.insert (
-                        SerializableMap::value_type (userData->GetId (), userData));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert user data: %s",
-                        userData->GetName ().c_str ());
-                }
-            }
-            util::ui32 subringCount;
-            serializer >> subringCount;
-            subringsMap.clear ();
-            while (subringCount-- > 0) {
-                Ptr subring (new KeyRing (serializer));
-                std::pair<KeyRingMap::iterator, bool> result =
-                    subringsMap.insert (
-                        KeyRingMap::value_type (subring->GetId (), subring));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert subring: %s",
-                        subring->GetName ().c_str ());
-                }
-            }
-        }
 
         KeyRing::Ptr KeyRing::Load (
                 const std::string &path,
@@ -179,7 +62,9 @@ namespace thekogans {
                     associatedDataLength,
                     true);
             }
-            return KeyRing::Ptr (new KeyRing (*buffer));
+            KeyRing::Ptr keyRing;
+            *buffer >> keyRing;
+            return keyRing;
         }
 
         void KeyRing::Save (
@@ -190,8 +75,8 @@ namespace thekogans {
             util::Buffer::UniquePtr buffer (
                 new util::SecureBuffer (
                     util::NetworkEndian,
-                    (util::ui32)Size ()));
-            Serialize (*buffer);
+                    (util::ui32)util::Serializable::Size (*this)));
+            *buffer << *this;
             if (cipher != 0) {
                 buffer = cipher->Encrypt (
                     buffer->GetReadPtr (),
@@ -1100,37 +985,37 @@ namespace thekogans {
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
                     end = keyExchangeParamsMap.end (); it != end; ++it) {
-                size += it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
             for (AsymmetricKeyMap::const_iterator
                     it = keyExchangeKeyMap.begin (),
                     end = keyExchangeKeyMap.end (); it != end; ++it) {
-                size += it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
             for (ParamsMap::const_iterator
                     it = authenticatorParamsMap.begin (),
                     end = authenticatorParamsMap.end (); it != end; ++it) {
-                size += it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
             for (AsymmetricKeyMap::const_iterator
                     it = authenticatorKeyMap.begin (),
                     end = authenticatorKeyMap.end (); it != end; ++it) {
-                size += it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
             for (SymmetricKeyMap::const_iterator
                     it = cipherKeyMap.begin (),
                     end = cipherKeyMap.end (); it != end; ++it) {
-                size += it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
             for (AsymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
-                size += it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
             for (SerializableMap::const_iterator
@@ -1142,61 +1027,188 @@ namespace thekogans {
             for (KeyRingMap::const_iterator
                     it = subringsMap.begin (),
                     end = subringsMap.end (); it != end; ++it) {
-                size += it->second->Size ();
+                size += util::Serializable::Size (*it->second);
             }
             return size;
         }
 
-        void KeyRing::Serialize (util::Serializer &serializer) const {
-            Serializable::Serialize (serializer);
+        void KeyRing::Read (
+                const Header &header,
+                util::Serializer &serializer) {
+            Serializable::Read (header, serializer);
+            serializer >> cipherSuite;
+            util::ui32 keyExchangeParamsCount;
+            serializer >> keyExchangeParamsCount;
+            keyExchangeParamsMap.clear ();
+            while (keyExchangeParamsCount-- > 0) {
+                Params::Ptr params;
+                serializer >> params;
+                std::pair<ParamsMap::iterator, bool> result =
+                    keyExchangeParamsMap.insert (
+                        ParamsMap::value_type (params->GetId (), params));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert KeyExchange params: %s",
+                        params->GetName ().c_str ());
+                }
+            }
+            util::ui32 keyExchangeKeyCount;
+            serializer >> keyExchangeKeyCount;
+            keyExchangeKeyMap.clear ();
+            while (keyExchangeKeyCount-- > 0) {
+                AsymmetricKey::Ptr key;
+                serializer >> key;
+                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                    keyExchangeKeyMap.insert (
+                        AsymmetricKeyMap::value_type (key->GetId (), key));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert KeyExchange key: %s",
+                        key->GetName ().c_str ());
+                }
+            }
+            util::ui32 authenticatorParamsCount;
+            serializer >> authenticatorParamsCount;
+            authenticatorParamsMap.clear ();
+            while (authenticatorParamsCount-- > 0) {
+                Params::Ptr params;
+                serializer >> params;
+                std::pair<ParamsMap::iterator, bool> result =
+                    authenticatorParamsMap.insert (
+                        ParamsMap::value_type (params->GetId (), params));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert Authenticator params: %s",
+                        params->GetName ().c_str ());
+                }
+            }
+            util::ui32 authenticatorKeyCount;
+            serializer >> authenticatorKeyCount;
+            authenticatorKeyMap.clear ();
+            while (authenticatorKeyCount-- > 0) {
+                AsymmetricKey::Ptr key;
+                serializer >> key;
+                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                    authenticatorKeyMap.insert (
+                        AsymmetricKeyMap::value_type (key->GetId (), key));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert Authenticator key: %s",
+                        key->GetName ().c_str ());
+                }
+            }
+            util::ui32 cipherKeyCount;
+            serializer >> cipherKeyCount;
+            cipherKeyMap.clear ();
+            while (cipherKeyCount-- > 0) {
+                SymmetricKey::Ptr key;
+                serializer >> key;
+                std::pair<SymmetricKeyMap::iterator, bool> result =
+                    cipherKeyMap.insert (
+                        SymmetricKeyMap::value_type (key->GetId (), key));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert Cipher key: %s",
+                        key->GetName ().c_str ());
+                }
+            }
+            util::ui32 macKeyCount;
+            serializer >> macKeyCount;
+            macKeyMap.clear ();
+            while (macKeyCount-- > 0) {
+                AsymmetricKey::Ptr key;
+                serializer >> key;
+                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                    macKeyMap.insert (
+                        AsymmetricKeyMap::value_type (key->GetId (), key));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert MAC key: %s",
+                        key->GetName ().c_str ());
+                }
+            }
+            util::ui32 userDataCount;
+            serializer >> userDataCount;
+            userDataMap.clear ();
+            while (userDataCount-- > 0) {
+                Serializable::Ptr userData;
+                serializer >> userData;
+                std::pair<SerializableMap::iterator, bool> result =
+                    userDataMap.insert (
+                        SerializableMap::value_type (userData->GetId (), userData));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert user data: %s",
+                        userData->GetName ().c_str ());
+                }
+            }
+            util::ui32 subringCount;
+            serializer >> subringCount;
+            subringsMap.clear ();
+            while (subringCount-- > 0) {
+                Ptr subring;
+                serializer >> subring;
+                std::pair<KeyRingMap::iterator, bool> result =
+                    subringsMap.insert (
+                        KeyRingMap::value_type (subring->GetId (), subring));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to instert subring: %s",
+                        subring->GetName ().c_str ());
+                }
+            }
+        }
+
+        void KeyRing::Write (util::Serializer &serializer) const {
+            Serializable::Write (serializer);
             serializer << cipherSuite;
             serializer << (util::ui32)keyExchangeParamsMap.size ();
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
                     end = keyExchangeParamsMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer);
+                serializer << *it->second;
             }
             serializer << (util::ui32)keyExchangeKeyMap.size ();
             for (AsymmetricKeyMap::const_iterator
                     it = keyExchangeKeyMap.begin (),
                     end = keyExchangeKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer);
+                serializer << *it->second;
             }
             serializer << (util::ui32)authenticatorParamsMap.size ();
             for (ParamsMap::const_iterator
                     it = authenticatorParamsMap.begin (),
                     end = authenticatorParamsMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer);
+                serializer << *it->second;
             }
             serializer << (util::ui32)authenticatorKeyMap.size ();
             for (AsymmetricKeyMap::const_iterator
                     it = authenticatorKeyMap.begin (),
                     end = authenticatorKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer);
+                serializer << *it->second;
             }
             serializer << (util::ui32)cipherKeyMap.size ();
             for (SymmetricKeyMap::const_iterator
                     it = cipherKeyMap.begin (),
                     end = cipherKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer);
+                serializer << *it->second;
             }
             serializer << (util::ui32)macKeyMap.size ();
             for (AsymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer);
+                serializer << *it->second;
             }
             serializer << (util::ui32)userDataMap.size ();
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
-                serializer << it->second;
+                serializer << *it->second;
             }
             serializer << (util::ui32)subringsMap.size ();
             for (KeyRingMap::const_iterator
                     it = subringsMap.begin (),
                     end = subringsMap.end (); it != end; ++it) {
-                it->second->Serialize (serializer);
+                serializer << *it->second;
             }
         }
 

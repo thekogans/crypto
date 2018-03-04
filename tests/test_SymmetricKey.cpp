@@ -35,11 +35,11 @@ namespace {
             key1.GetId () == key2.GetId () &&
             key1.GetName () == key2.GetName () &&
             key1.GetDescription () == key2.GetDescription () &&
-            key1.GetDataAvailableForReading () == key2.GetDataAvailableForReading () &&
+            key1.Get ().GetDataAvailableForReading () == key2.Get ().GetDataAvailableForReading () &&
             crypto::TimeInsensitiveCompare (
-                key1.GetReadPtr (),
-                key2.GetReadPtr (),
-                key1.GetDataAvailableForReading ());
+                key1.Get ().GetReadPtr (),
+                key2.Get ().GetReadPtr (),
+                key1.Get ().GetDataAvailableForReading ());
     }
 }
 
@@ -58,9 +58,10 @@ TEST (thekogans, SymmetricKey) {
                 1,
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size ());
-        key1->Serialize (serializer);
-        crypto::SymmetricKey::Ptr key2 (new crypto::SymmetricKey (serializer));
+        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        serializer << *key1;
+        crypto::SymmetricKey::Ptr key2;
+        serializer >> key2;
         bool result = *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);
@@ -77,9 +78,10 @@ TEST (thekogans, SymmetricKey) {
                 1,
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)key1->Size ());
-        key1->Serialize (serializer);
-        crypto::SymmetricKey::Ptr key2 (new crypto::SymmetricKey (serializer));
+        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        serializer << *key1;
+        crypto::SymmetricKey::Ptr key2;
+        serializer >> key2;
         bool result = key2.Get () != 0 && *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);

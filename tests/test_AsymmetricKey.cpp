@@ -41,9 +41,12 @@ TEST (thekogans, AsymmetricKey) {
         crypto::DSA::ParamsFromKeyLength (512)->CreateKey ();
     {
         std::cout << "AsymmetricKey private key...";
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)privateKey->Size ());
-        privateKey->Serialize (serializer);
-        crypto::AsymmetricKey::Ptr privateKey2 (new crypto::AsymmetricKey (serializer));
+        util::Buffer serializer (
+            util::NetworkEndian,
+            (util::ui32)util::Serializable::Size (*privateKey));
+        serializer << *privateKey;
+        crypto::AsymmetricKey::Ptr privateKey2;
+        serializer >> privateKey2;
         bool result = *privateKey == *privateKey2;
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);
@@ -51,9 +54,12 @@ TEST (thekogans, AsymmetricKey) {
     {
         std::cout << "AsymmetricKey public key...";
         crypto::AsymmetricKey::Ptr publicKey = privateKey->GetPublicKey ();
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)publicKey->Size ());
-        publicKey->Serialize (serializer);
-        crypto::AsymmetricKey::Ptr publicKey2 (new crypto::AsymmetricKey (serializer));
+        util::Buffer serializer (
+            util::NetworkEndian,
+            (util::ui32)util::Serializable::Size (*publicKey));
+        serializer << *publicKey;
+        crypto::AsymmetricKey::Ptr publicKey2;
+        serializer >> publicKey2;
         bool result = *publicKey == *publicKey2;
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);

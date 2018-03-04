@@ -75,7 +75,7 @@ namespace thekogans {
                     &context,
                     cipher,
                     OpenSSLInit::engine,
-                    key.GetReadPtr (),
+                    key.Get ().GetReadPtr (),
                     0) != 1 ||
                     (Cipher::GetMode (cipher) == EVP_CIPH_GCM_MODE &&
                         EVP_CIPHER_CTX_ctrl (
@@ -149,7 +149,7 @@ namespace thekogans {
                     &context,
                     cipher,
                     OpenSSLInit::engine,
-                    key.GetReadPtr (),
+                    key.Get ().GetReadPtr (),
                     0) != 1 ||
                     (Cipher::GetMode (cipher) == EVP_CIPH_GCM_MODE &&
                         EVP_CIPHER_CTX_ctrl (
@@ -230,8 +230,8 @@ namespace thekogans {
                         mac.Reset (
                             new MAC (
                                 HMAC::CreateKey (
-                                    key->GetReadPtr (),
-                                    key->GetDataAvailableForReading (),
+                                    key->Get ().GetReadPtr (),
+                                    key->Get ().GetDataAvailableForReading (),
                                     md)));
                     }
                     else {

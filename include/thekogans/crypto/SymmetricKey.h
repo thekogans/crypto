@@ -33,13 +33,17 @@ namespace thekogans {
         /// \brief
         /// SymmetricKey is used by \see{Cipher} for bulk encryption.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL SymmetricKey :
-                public Serializable,
-                public util::FixedBuffer<EVP_MAX_KEY_LENGTH> {
+        struct _LIB_THEKOGANS_CRYPTO_DECL SymmetricKey : public Serializable {
             /// \brief
             /// SymmetricKey is a \see{Serializable}
             THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (SymmetricKey)
 
+        private:
+            /// \brief
+            /// Symmetric key..
+            util::FixedBuffer<EVP_MAX_KEY_LENGTH> key;
+
+        public:
             /// \brief
             /// ctor.
             /// \param[in] name Optional key name.
@@ -48,16 +52,12 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 Serializable (name, description) {}
-            /// \brief
-            /// ctor.
-            /// \param[in] serializer Serializer containing the key.
-            explicit SymmetricKey (util::Serializer &serializer);
 
             /// \brief
             /// Return the key length.
             /// \return Key length.
             inline std::size_t Length () const {
-                return GetDataAvailableForReading ();
+                return key.GetDataAvailableForReading ();
             }
 
             /// \brief
@@ -114,14 +114,29 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
+            /// Return the key buffer.
+            /// \return Key buffer.
+            inline const util::FixedBuffer<EVP_MAX_KEY_LENGTH> &Get () const {
+                return key;
+            }
+
+            // Serializable
+            /// \brief
             /// Return the serialized key size.
             /// \return Serialized key size.
             virtual std::size_t Size () const;
 
             /// \brief
-            /// Serialize the key to the given serializer.
-            /// \param[out] serializer Serializer to serialize the key to.
-            virtual void Serialize (util::Serializer &serializer) const;
+            /// Read the key from the given serializer.
+            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] serializer \see{util::Serializer} to read the key from.
+            virtual void Read (
+                const Header &header,
+                util::Serializer &serializer);
+            /// \brief
+            /// Write the key to the given serializer.
+            /// \param[out] serializer \see{util::Serializer} to write the key to.
+            virtual void Write (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
@@ -143,6 +158,10 @@ namespace thekogans {
             /// SymmetricKey is neither copy constructable, nor assignable.
             THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (SymmetricKey)
         };
+
+        /// \brief
+        /// Define SymmetricKey insertion and extraction operators.
+        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (SymmetricKey)
 
     } // namespace crypto
 } // namespace thekogans

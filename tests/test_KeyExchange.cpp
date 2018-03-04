@@ -29,7 +29,7 @@ namespace {
     bool operator == (
             const crypto::SymmetricKey &key1,
             const crypto::SymmetricKey &key2) {
-        return memcmp (key1.data, key2.data, EVP_MAX_KEY_LENGTH) == 0;
+        return memcmp (key1.Get ().data, key2.Get ().data, EVP_MAX_KEY_LENGTH) == 0;
     }
 
     bool TestParams (

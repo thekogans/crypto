@@ -39,6 +39,7 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             Params,
+            1,
             THEKOGANS_CRYPTO_MIN_PARAMS_IN_PAGE)
 
         Params::Params (
@@ -57,71 +58,6 @@ namespace thekogans {
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        Params::Params (util::Serializer &serializer) :
-                Serializable (serializer),
-                params (EVP_PKEY_new ()) {
-            if (params.get () != 0) {
-                util::i32 type;
-                serializer >> type;
-                if (type == EVP_PKEY_DH || type == EVP_PKEY_DSA || type == EVP_PKEY_EC) {
-                    util::i32 paramsLength;
-                    serializer >> paramsLength;
-                    util::SecureVector<util::ui8> paramsBuffer (paramsLength);
-                    serializer.Read (&paramsBuffer[0], paramsLength);
-                    const util::ui8 *paramsData = &paramsBuffer[0];
-                    if (type == EVP_PKEY_DH) {
-                        DHPtr dhParams (d2i_DHparams (0, &paramsData, paramsLength));
-                        if (dhParams.get () != 0) {
-                            if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
-                                dhParams.release ();
-                            }
-                            else {
-                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                            }
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                    else if (type == EVP_PKEY_DSA) {
-                        DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, paramsLength));
-                        if (dsaParams.get () != 0) {
-                            if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
-                                dsaParams.release ();
-                            }
-                            else {
-                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                            }
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                    else if (type == EVP_PKEY_EC) {
-                        EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, paramsLength));
-                        if (ecParams.get () != 0) {
-                            if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
-                                ecParams.release ();
-                            }
-                            else {
-                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                            }
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid parameters type %d.", type);
-                }
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
         }
 
@@ -321,8 +257,75 @@ namespace thekogans {
                 paramsLength;
         }
 
+        void Params::Read (
+                const Header &header,
+                util::Serializer &serializer) {
+            Serializable::Read (header, serializer);
+            params.reset (EVP_PKEY_new ());
+            if (params.get () != 0) {
+                util::i32 type;
+                serializer >> type;
+                if (type == EVP_PKEY_DH || type == EVP_PKEY_DSA || type == EVP_PKEY_EC) {
+                    util::i32 paramsLength;
+                    serializer >> paramsLength;
+                    util::SecureVector<util::ui8> paramsBuffer (paramsLength);
+                    serializer.Read (&paramsBuffer[0], paramsLength);
+                    const util::ui8 *paramsData = &paramsBuffer[0];
+                    if (type == EVP_PKEY_DH) {
+                        DHPtr dhParams (d2i_DHparams (0, &paramsData, paramsLength));
+                        if (dhParams.get () != 0) {
+                            if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
+                                dhParams.release ();
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else if (type == EVP_PKEY_DSA) {
+                        DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, paramsLength));
+                        if (dsaParams.get () != 0) {
+                            if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
+                                dsaParams.release ();
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else if (type == EVP_PKEY_EC) {
+                        EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, paramsLength));
+                        if (ecParams.get () != 0) {
+                            if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
+                                ecParams.release ();
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Invalid parameters type %d.", type);
+                }
+            }
+            else {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
+        }
+
         namespace {
-            void SerializeParams (
+            void WriteParams (
                     EVP_PKEY &params,
                     util::SecureVector<util::ui8> &paramsBuffer) {
                 util::i32 type = EVP_PKEY_base_id (&params);
@@ -380,10 +383,10 @@ namespace thekogans {
             }
         }
 
-        void Params::Serialize (util::Serializer &serializer) const {
-            Serializable::Serialize (serializer);
+        void Params::Write (util::Serializer &serializer) const {
+            Serializable::Write (serializer);
             util::SecureVector<util::ui8> paramsBuffer;
-            SerializeParams (*params, paramsBuffer);
+            WriteParams (*params, paramsBuffer);
             serializer <<
                 GetType () <<
                 (util::i32)paramsBuffer.size ();
@@ -397,7 +400,7 @@ namespace thekogans {
                 util::ui32 indentationLevel,
                 const char *tagName) const {
             util::SecureVector<util::ui8> paramsBuffer;
-            SerializeParams (*params, paramsBuffer);
+            WriteParams (*params, paramsBuffer);
             std::stringstream stream;
             util::Attributes attributes;
             attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));

@@ -39,14 +39,8 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             SymmetricKey,
+            1,
             THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
-
-        SymmetricKey::SymmetricKey (util::Serializer &serializer) :
-                Serializable (serializer) {
-            serializer >> writeOffset;
-            serializer.Read (data, GetDataAvailableForReading ());
-            memset (GetWritePtr (), 0, GetDataAvailableForWriting ());
-        }
 
         SymmetricKey::Ptr SymmetricKey::FromSecretAndSalt (
                 std::size_t keyLength,
@@ -93,11 +87,14 @@ namespace thekogans {
                         }
                     }
                     std::size_t count = std::min (keyLength, (std::size_t)bufferLength);
-                    memcpy (symmetricKey->GetWritePtr (), &buffer[0], count);
-                    symmetricKey->AdvanceWriteOffset ((util::ui32)count);
+                    memcpy (symmetricKey->key.GetWritePtr (), &buffer[0], count);
+                    symmetricKey->key.AdvanceWriteOffset ((util::ui32)count);
                     keyLength -= count;
                 }
-                memset (symmetricKey->GetWritePtr (), 0, symmetricKey->GetDataAvailableForWriting ());
+                memset (
+                    symmetricKey->key.GetWritePtr (),
+                    0,
+                    symmetricKey->key.GetDataAvailableForWriting ());
                 return symmetricKey;
             }
             else {
@@ -135,13 +132,22 @@ namespace thekogans {
         std::size_t SymmetricKey::Size () const {
             return
                 Serializable::Size () +
-                util::UI32_SIZE + GetDataAvailableForReading ();
+                util::UI32_SIZE + key.GetDataAvailableForReading ();
         }
 
-        void SymmetricKey::Serialize (util::Serializer &serializer) const {
-            Serializable::Serialize (serializer);
-            serializer << GetDataAvailableForReading ();
-            serializer.Write (GetReadPtr (), GetDataAvailableForReading ());
+        void SymmetricKey::Read (
+                const Header &header,
+                util::Serializer &serializer) {
+            Serializable::Read (header, serializer);
+            serializer >> key.writeOffset;
+            serializer.Read (key.data, key.GetDataAvailableForReading ());
+            memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+        }
+
+        void SymmetricKey::Write (util::Serializer &serializer) const {
+            Serializable::Write (serializer);
+            serializer << key.GetDataAvailableForReading ();
+            serializer.Write (key.GetReadPtr (), key.GetDataAvailableForReading ());
         }
 
     #if defined (THEKOGANS_CRYPTO_TESTING)

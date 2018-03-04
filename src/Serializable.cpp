@@ -41,10 +41,6 @@ namespace thekogans {
         }
     #endif // defined (TOOLCHAIN_TYPE_Static)
 
-        Serializable::Serializable (util::Serializer &serializer) {
-            serializer >> id >> name >> description;
-        }
-
         std::size_t Serializable::Size () const {
             return
                 util::Serializer::Size (id) +
@@ -52,7 +48,13 @@ namespace thekogans {
                 util::Serializer::Size (description);
         }
 
-        void Serializable::Serialize (util::Serializer &serializer) const {
+        void Serializable::Read (
+                const Header & /*header*/,
+                util::Serializer &serializer) {
+            serializer >> id >> name >> description;
+        }
+
+        void Serializable::Write (util::Serializer &serializer) const {
             serializer << id << name << description;
         }
 

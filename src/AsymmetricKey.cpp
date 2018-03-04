@@ -38,6 +38,7 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             AsymmetricKey,
+            1,
             THEKOGANS_CRYPTO_MIN_ASYMMETRIC_KEYS_IN_PAGE)
 
         AsymmetricKey::AsymmetricKey (
@@ -60,19 +61,6 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
-        }
-
-        AsymmetricKey::AsymmetricKey (util::Serializer &serializer) :
-                Serializable (serializer) {
-            util::i32 type;
-            util::i32 keyLength;
-            serializer >> isPrivate >> type >> keyLength;
-            util::SecureVector<util::ui8> keyBuffer (keyLength);
-            serializer.Read (&keyBuffer[0], keyLength);
-            const util::ui8 *keyData = &keyBuffer[0];
-            key.reset (isPrivate ?
-                d2i_PrivateKey (type, 0, &keyData, keyLength) :
-                d2i_PublicKey (type, 0, &keyData, keyLength));
         }
 
         AsymmetricKey::Ptr AsymmetricKey::LoadPrivateKeyFromFile (
@@ -201,8 +189,23 @@ namespace thekogans {
                 keyLength;
         }
 
+        void AsymmetricKey::Read (
+                const Header &header,
+                util::Serializer &serializer) {
+            Serializable::Read (header, serializer);
+            util::i32 type;
+            util::i32 keyLength;
+            serializer >> isPrivate >> type >> keyLength;
+            util::SecureVector<util::ui8> keyBuffer (keyLength);
+            serializer.Read (&keyBuffer[0], keyLength);
+            const util::ui8 *keyData = &keyBuffer[0];
+            key.reset (isPrivate ?
+                d2i_PrivateKey (type, 0, &keyData, keyLength) :
+                d2i_PublicKey (type, 0, &keyData, keyLength));
+        }
+
         namespace {
-            void SerializeKey (
+            void WriteKey (
                     bool isPrivate,
                     EVP_PKEY &key,
                     util::SecureVector<util::ui8> &keyBuffer) {
@@ -225,10 +228,10 @@ namespace thekogans {
             }
         }
 
-        void AsymmetricKey::Serialize (util::Serializer &serializer) const {
-            Serializable::Serialize (serializer);
+        void AsymmetricKey::Write (util::Serializer &serializer) const {
+            Serializable::Write (serializer);
             util::SecureVector<util::ui8> keyBuffer;
-            SerializeKey (isPrivate, *key, keyBuffer);
+            WriteKey (isPrivate, *key, keyBuffer);
             serializer <<
                 isPrivate <<
                 GetType () <<
@@ -244,7 +247,7 @@ namespace thekogans {
                 util::ui32 indentationLevel,
                 const char *tagName) const {
             util::SecureVector<util::ui8> keyBuffer;
-            SerializeKey (isPrivate, *key, keyBuffer);
+            WriteKey (isPrivate, *key, keyBuffer);
             std::stringstream stream;
             util::Attributes attributes;
             attributes.push_back (util::Attribute (ATTR_TYPE, Type ()));

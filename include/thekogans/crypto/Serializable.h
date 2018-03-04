@@ -31,10 +31,9 @@ namespace thekogans {
         /// \struct Serializable Serializable.h thekogans/crypto/Serializable.h
         ///
         /// \brief
-        /// Serializable is an abstract base for all supported serializable types (See
-        /// \see{KeyRing}, \see{Params}, \see{SymmetricKey} and \see{AsymmetricKey}).
-        /// It exposes a globally unique id (See \see{ID}) that can be used to locate
-        /// objects in the \see{KeyRing}.
+        /// Serializable extends the util::Serializable to add id, name and description.
+        /// It's the base class for all crypto Serializables (See \see{KeyRing}, \see{Params},
+        /// \see{SymmetricKey} and \see{AsymmetricKey}).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::Serializable {
             /// \brief
@@ -62,13 +61,6 @@ namespace thekogans {
                 const std::string &description_ = std::string ()) :
                 name (name_),
                 description (description_) {}
-            /// \brief
-            /// ctor.
-            /// \param[in] serializer Serializer containing the serializable.
-            explicit Serializable (util::Serializer &serializer);
-            /// \brief
-            /// dtor.
-            virtual ~Serializable () {}
 
         #if defined (TOOLCHAIN_TYPE_Static)
             /// \brief
@@ -119,9 +111,16 @@ namespace thekogans {
             virtual std::size_t Size () const;
 
             /// \brief
+            /// Read the serializable from the given serializer.
+            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] serializer \see{util::Serializer} to read the serializable from.
+            virtual void Read (
+                const Header &header,
+                util::Serializer &serializer);
+            /// \brief
             /// Write the serializable to the given serializer.
-            /// \param[out] serializer Serializer to write the serializable to.
-            virtual void Serialize (util::Serializer &serializer) const;
+            /// \param[out] serializer \see{util::Serializer} to write the serializable to.
+            virtual void Write (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
@@ -168,7 +167,7 @@ namespace thekogans {
         #define THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)\
             THEKOGANS_UTIL_DECLARE_SERIALIZABLE (type, thekogans::util::SpinLock)
 
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, minSerializablesInPage)
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, version, minSerializablesInPage)
         /// Dynamic discovery macro. Instantiate one of these in the class cpp file.
         /// Example:
         /// \code{.cpp}
@@ -178,41 +177,20 @@ namespace thekogans {
         ///
         /// THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
         ///     SymmetricKey,
+        ///     1,
         ///     THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
         /// \endcode
-        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, minSerializablesInPage)\
+        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, version, minSerializablesInPage)\
             THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (\
                 type,\
+                version,\
                 thekogans::util::SpinLock,\
                 minSerializablesInPage,\
                 thekogans::util::SecureAllocator::Global)
 
         /// \brief
-        /// Serializable serializer.
-        /// \param[in] serializer Where to serialize the frame header.
-        /// \param[in] serializable Serializable to serialize.
-        /// \return serializer.
-        inline util::Serializer &operator << (
-                util::Serializer &serializer,
-                const Serializable::Ptr &serializable) {
-            serializer << serializable->Type ();
-            serializable->Serialize (serializer);
-            return serializer;
-        }
-
-        /// \brief
-        /// Serializable deserializer.
-        /// \param[in] serializer Where to deserialize the frame header.
-        /// \param[in] serializable Serializable to deserialize.
-        /// \return serializer.
-        inline util::Serializer &operator >> (
-                util::Serializer &serializer,
-                Serializable::Ptr &serializable) {
-            serializable =
-                util::dynamic_refcounted_pointer_cast<Serializable> (
-                    util::Serializable::Get (serializer));
-            return serializer;
-        }
+        /// Define Serializable insertion and extraction operators.
+        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (Serializable)
 
     } // namespace crypto
 } // namespace thekogans

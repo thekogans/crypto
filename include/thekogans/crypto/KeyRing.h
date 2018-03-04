@@ -138,10 +138,6 @@ namespace thekogans {
                 const std::string &description = std::string ()) :
                 Serializable (name, description),
                 cipherSuite (cipherSuite_) {}
-            /// \brief
-            /// ctor.
-            /// \param[in] buffer Buffer containing the serialized key ring.
-            explicit KeyRing (util::Serializer &serializer);
 
             /// \brief
             /// Load a key ring from a file previously written with Save.
@@ -524,15 +520,23 @@ namespace thekogans {
             /// Drop all params, keys, user data and sub rings.
             void Clear ();
 
+            // Serializable
             /// \brief
             /// Return the serialized keyring size.
             /// \return Serialized keyring size.
             virtual std::size_t Size () const;
 
             /// \brief
-            /// Save the key ring to a serializer.
-            /// \param[in] serializer Serializer to write the keyring to.
-            virtual void Serialize (util::Serializer &serializer) const;
+            /// Read the key ring from the given serializer.
+            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] serializer \see{util::Serializer} to read the key ring from.
+            virtual void Read (
+                const Header &header,
+                util::Serializer &serializer);
+            /// \brief
+            /// Write the key ring to the given serializer.
+            /// \param[in] serializer \see{util::Serializer} to write the key ring to.
+            virtual void Write (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
@@ -623,6 +627,10 @@ namespace thekogans {
             /// KeyRing is neither copy constructable, nor assignable.
             THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (KeyRing)
         };
+
+        /// \brief
+        /// Define KeyRing insertion and extraction operators.
+        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (KeyRing)
 
     } // namespace crypto
 } // namespace thekogans

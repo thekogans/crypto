@@ -53,8 +53,8 @@ namespace thekogans {
                             EVP_PKEY_CTRL_CIPHER, 0, (void *)cipher) == 1 &&
                         EVP_PKEY_CTX_ctrl (ctx.get (), -1, EVP_PKEY_OP_KEYGEN,
                             EVP_PKEY_CTRL_SET_MAC_KEY,
-                            (util::i32)symmetricKey->GetDataAvailableForReading (),
-                            (void *)symmetricKey->GetReadPtr ()) == 1 &&
+                            (util::i32)symmetricKey->Get ().GetDataAvailableForReading (),
+                            (void *)symmetricKey->Get ().GetReadPtr ()) == 1 &&
                         EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                     return AsymmetricKey::Ptr (
                         new AsymmetricKey (EVP_PKEYPtr (key), true, name, description));

@@ -31,9 +31,12 @@ namespace {
             crypto::Params &params) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
-            util::Buffer buffer (util::NetworkEndian, (util::ui32)params.Size ());
-            params.Serialize (buffer);
-            crypto::Params::Ptr params2 (new crypto::Params (buffer));
+            util::Buffer buffer (
+                util::NetworkEndian,
+                (util::ui32)util::Serializable::Size (params));
+            buffer << params;
+            crypto::Params::Ptr params2;
+            buffer >> params2;
             bool result = EVP_PKEY_cmp_parameters (params.Get (), params2->Get ()) == 1;
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;

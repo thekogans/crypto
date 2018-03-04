@@ -66,10 +66,6 @@ namespace thekogans {
                 bool isPrivate_,
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
-            /// \brief
-            /// ctor.
-            /// \param[in] serializer \see{util::Serializer} containing the key.
-            explicit AsymmetricKey (util::Serializer &serializer);
 
             /// \brief
             /// Return true if it's a private key.
@@ -171,15 +167,23 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
 
+            // Serializable
             /// \brief
             /// Return the serialized key size.
             /// \return Serialized key size.
             virtual std::size_t Size () const;
 
             /// \brief
+            /// Read the key from the given serializer.
+            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] serializer \see{util::Serializer} to read the key from.
+            virtual void Read (
+                const Header &header,
+                util::Serializer &serializer);
+            /// \brief
             /// Serialize the key to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
-            virtual void Serialize (util::Serializer &serializer) const;
+            virtual void Write (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
@@ -208,6 +212,10 @@ namespace thekogans {
             /// AsymmetricKey is neither copy constructable, nor assignable.
             THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (AsymmetricKey)
         };
+
+        /// \brief
+        /// Define AsymmetricKey insertion and extraction operators.
+        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (AsymmetricKey)
 
     } // namespace crypto
 } // namespace thekogans

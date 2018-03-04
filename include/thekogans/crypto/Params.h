@@ -114,15 +114,23 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
 
+            // Serializable
             /// \brief
             /// Return the serialized params size.
             /// \return Serialized params size.
             virtual std::size_t Size () const;
 
             /// \brief
-            /// Serialize the parameters to the given serializer.
-            /// \param[out] serializer Serializer to serialize the key to.
-            virtual void Serialize (util::Serializer &serializer) const;
+            /// Read the parameters from the given serializer.
+            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] serializer \see{util::Serializer} to read the parameters from.
+            virtual void Read (
+                const Header &header,
+                util::Serializer &serializer);
+            /// \brief
+            /// Write the parameters to the given serializer.
+            /// \param[out] serializer \see{util::Serializer} to write the parameters to.
+            virtual void Write (util::Serializer &serializer) const;
 
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
@@ -143,6 +151,10 @@ namespace thekogans {
             /// Params is neither copy constructable, nor assignable.
             THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Params)
         };
+
+        /// \brief
+        /// Define Params insertion and extraction operators.
+        THEKOGANS_UTIL_SERIALIZABLE_INSERTION_EXTRACTION_OPERATORS (Params)
 
     } // namespace crypto
 } // namespace thekogans
