@@ -120,8 +120,7 @@ int main (
                     options.password.c_str (),
                     options.password.size ()));
             keyRing.Save (options.path, &cipher);
-            std::cout << "Done" << std::endl << "Master Key ID: " <<
-                keyRing.GetCipherMasterKey ()->GetId ().ToString () << std::endl;
+            std::cout << "Done" << std::endl;
         }
         {
             std::cout << "Verifying key ring...";
@@ -137,7 +136,10 @@ int main (
                     util::GlobalRandomSource::Instance ().GetBytes (
                         originalPlaintext.GetWritePtr (),
                         originalPlaintext.GetDataAvailableForWriting ()));
-                crypto::Cipher cipher (keyRing->GetCipherMasterKey ());
+                crypto::Cipher cipher (
+                    crypto::SymmetricKey::FromRandom (
+                        crypto::Cipher::GetKeyLength (
+                            keyRing->GetCipherSuite ().GetOpenSSLCipher ())));
                 util::Buffer::UniquePtr ciphertext = cipher.Encrypt (
                     originalPlaintext.GetReadPtr (),
                     originalPlaintext.GetDataAvailableForReading ());

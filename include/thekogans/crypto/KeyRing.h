@@ -123,15 +123,15 @@ namespace thekogans {
             /// Convenient typedef for std::map<ID, Ptr>.
             typedef std::map<ID, Ptr> KeyRingMap;
             /// \brief
-            /// Subrings hanging off this keyring.
+            /// Subrings hanging off this key ring.
             KeyRingMap subringsMap;
 
         public:
             /// \brief
             /// ctor.
             /// \param[in] cipherSuite_ \see{CipherSuite} associated with this key ring.
-            /// \param[in] name Optional keyring name.
-            /// \param[in] description Optional keyring description.
+            /// \param[in] name Optional key ring name.
+            /// \param[in] description Optional key ring description.
             KeyRing (
                 const CipherSuite &cipherSuite_,
                 const std::string &name = std::string (),
@@ -522,8 +522,8 @@ namespace thekogans {
 
             // Serializable
             /// \brief
-            /// Return the serialized keyring size.
-            /// \return Serialized keyring size.
+            /// Return the serialized key ring size.
+            /// \return Serialized key ring size.
             virtual std::size_t Size () const;
 
             /// \brief

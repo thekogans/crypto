@@ -162,7 +162,7 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
-                util::HexEncodeBuffer (data, GetDataAvailableForReading ()) << std::endl <<
+                util::HexEncodeBuffer (key.GetReadPtr (), key.GetDataAvailableForReading ()) << std::endl <<
                 util::CloseTag (indentationLevel, tagName);
             return stream.str ();
         }
