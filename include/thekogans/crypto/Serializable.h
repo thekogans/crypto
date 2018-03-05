@@ -105,6 +105,8 @@ namespace thekogans {
                 description = description_;
             }
 
+        protected:
+            // util::Serializable
             /// \brief
             /// Return the serializable size.
             /// \return Serializable size.
@@ -122,6 +124,7 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to write the serializable to.
             virtual void Write (util::Serializer &serializer) const;
 
+        public:
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// "Serializable"
@@ -189,8 +192,8 @@ namespace thekogans {
                 thekogans::util::SecureAllocator::Global)
 
         /// \brief
-        /// Define Serializable extraction operator.
-        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (Serializable)
+        /// Implement Serializable extraction operator.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (Serializable)
 
     } // namespace crypto
 } // namespace thekogans

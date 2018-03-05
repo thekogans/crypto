@@ -154,7 +154,7 @@ namespace thekogans {
             /// EVP_PKEY_RSA, EVP_PKEY_HMAC and EVP_PKEY_CMAC).
             /// \return EVP_PKEY type.
             inline util::i32 GetType () const {
-                return EVP_PKEY_base_id (key.get ());
+                return EVP_PKEY_base_id (Get ());
             }
 
             /// \brief
@@ -167,6 +167,7 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
 
+        protected:
             // Serializable
             /// \brief
             /// Return the serialized key size.
@@ -185,6 +186,7 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
+        public:
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// "Private"
@@ -214,8 +216,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define AsymmetricKey extraction operator.
-        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (AsymmetricKey)
+        /// Implement AsymmetricKey extraction operator.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (AsymmetricKey)
 
     } // namespace crypto
 } // namespace thekogans

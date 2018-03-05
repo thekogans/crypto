@@ -120,6 +120,7 @@ namespace thekogans {
                 return key;
             }
 
+        protected:
             // Serializable
             /// \brief
             /// Return the serialized key size.
@@ -138,6 +139,7 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to write the key to.
             virtual void Write (util::Serializer &serializer) const;
 
+        public:
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// Return the XML representation of a key.
@@ -160,8 +162,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define SymmetricKey extraction operator.
-        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (SymmetricKey)
+        /// Implement SymmetricKey extraction operator.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (SymmetricKey)
 
     } // namespace crypto
 } // namespace thekogans

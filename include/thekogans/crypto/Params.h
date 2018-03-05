@@ -114,6 +114,7 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
 
+        protected:
             // Serializable
             /// \brief
             /// Return the serialized params size.
@@ -132,6 +133,7 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to write the parameters to.
             virtual void Write (util::Serializer &serializer) const;
 
+        public:
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// "ParamsType"
@@ -153,8 +155,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define Params extraction operator.
-        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (Params)
+        /// Implement Params extraction operator.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (Params)
 
     } // namespace crypto
 } // namespace thekogans

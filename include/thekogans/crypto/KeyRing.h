@@ -520,6 +520,7 @@ namespace thekogans {
             /// Drop all params, keys, user data and sub rings.
             void Clear ();
 
+        protected:
             // Serializable
             /// \brief
             /// Return the serialized key ring size.
@@ -538,6 +539,7 @@ namespace thekogans {
             /// \param[in] serializer \see{util::Serializer} to write the key ring to.
             virtual void Write (util::Serializer &serializer) const;
 
+        public:
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// Dump the key ring to std::cout.
@@ -629,8 +631,8 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Define KeyRing extraction operator.
-        THEKOGANS_UTIL_DEFINE_SERIALIZABLE_EXTRACTION_OPERATOR (KeyRing)
+        /// Implement KeyRing extraction operator.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (KeyRing)
 
     } // namespace crypto
 } // namespace thekogans
