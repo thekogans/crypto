@@ -192,7 +192,7 @@ namespace thekogans {
                 /// Reimplement this function to test for equality.
                 /// \param[in] t Instance to test for equality.
                 /// \return true == equal.
-                virtual bool operator () (const T &t) const throw () = 0;
+                virtual bool operator () (const T & /*t*/) const throw () = 0;
             };
             /// \brief
             /// Return the \see{KeyExchange} \see{Params} matching the given EqualityTest.

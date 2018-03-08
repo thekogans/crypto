@@ -62,7 +62,7 @@ namespace thekogans {
                     associatedDataLength,
                     true);
             }
-            KeyRing::Ptr keyRing;
+            Ptr keyRing;
             *buffer >> keyRing;
             return keyRing;
         }
