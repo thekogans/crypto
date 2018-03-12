@@ -39,7 +39,7 @@ namespace thekogans {
         ///
         /// \brief
         /// CipherSuite collects the various algorithms necessary for key exchange, authentication,
-        /// symmetric encryption/decryption and message digest.
+        /// symmetric encryption/decryption, MAC and message digest.
         ///
         /// OpenSSL canonical cipher suite names have the following format: Kx-Auth-Enc-Mode-MD.
         ///
@@ -180,6 +180,14 @@ namespace thekogans {
             /// \return The list of all available cipher suites.
             static const std::vector<CipherSuite> &GetCipherSuites ();
 
+            /// \brief
+            /// Return the list of all available key exchanges.
+            /// \return The list of all available key exchanges.
+            static const std::vector<std::string> &GetKeyExchanges ();
+            /// \brief
+            /// Return the list of all available authenticators.
+            /// \return The list of all available authenticators.
+            static const std::vector<std::string> &GetAuthenticators ();
             /// \brief
             /// Return the list of all available ciphers.
             /// \return The list of all available ciphers.

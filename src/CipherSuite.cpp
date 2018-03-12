@@ -169,6 +169,22 @@ namespace thekogans {
                 return cipherSuites;
             }
 
+            std::vector<std::string> BuildKeyExchanges () {
+                std::vector<std::string> keyExchanges_;
+                for (std::size_t i = 0; i < keyExchangesSize; ++i) {
+                    keyExchanges_.push_back (keyExchanges[i]);
+                }
+                return keyExchanges_;
+            }
+
+            std::vector<std::string> BuildAuthenticators () {
+                std::vector<std::string> authenticators_;
+                for (std::size_t i = 0; i < authenticatorsSize; ++i) {
+                    authenticators_.push_back (authenticators[i]);
+                }
+                return authenticators_;
+            }
+
             std::vector<std::string> BuildCiphers () {
                 std::vector<std::string> ciphers_;
                 for (std::size_t i = 0; i < ciphersSize; ++i) {
@@ -201,6 +217,16 @@ namespace thekogans {
         const std::vector<CipherSuite> &CipherSuite::GetCipherSuites () {
             static std::vector<CipherSuite> cipherSuites = BuildCipherSuites ();
             return cipherSuites;
+        }
+
+        const std::vector<std::string> &CipherSuite::GetKeyExchanges () {
+            static std::vector<std::string> keyExchanges = BuildKeyExchanges ();
+            return keyExchanges;
+        }
+
+        const std::vector<std::string> &CipherSuite::GetAuthenticators () {
+            static std::vector<std::string> authenticators = BuildAuthenticators ();
+            return authenticators;
         }
 
         const std::vector<std::string> &CipherSuite::GetCiphers () {
