@@ -7,10 +7,10 @@
                 guid = "29ed9e9cca7dd3e1d3bd889e8ae93115"
                 schema_version = "2">
   <dependencies>
-    <project organization = "thekogans"
-             name = "util"/>
-    <project organization = "thekogans"
-             name = "crypto"/>
+    <dependency organization = "thekogans"
+                name = "util"/>
+    <dependency organization = "thekogans"
+                name = "crypto"/>
     <toolchain organization = "thekogans"
                name = "openssl_ssl"/>
     <toolchain organization = "thekogans"

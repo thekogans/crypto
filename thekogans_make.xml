@@ -10,8 +10,8 @@
     <feature>THEKOGANS_CRYPTO_HAVE_TESTS</feature>
   </features>
   <dependencies>
-    <project organization = "thekogans"
-             name = "util"/>
+    <dependency organization = "thekogans"
+                name = "util"/>
     <toolchain organization = "thekogans"
                name = "openssl_ssl"/>
     <toolchain organization = "thekogans"
