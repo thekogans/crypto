@@ -40,9 +40,11 @@
     <cpp_header>$(organization)/$(project_directory)/CiphertextHeader.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Config.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/CMAC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Decryptor.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/DH.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/DSA.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/EC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Encryptor.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/FrameHeader.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/HMAC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/ID.h</cpp_header>
@@ -55,6 +57,7 @@
     <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Serializable.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Stats.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SystemCACertificates.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
@@ -65,9 +68,11 @@
     <cpp_source>Cipher.cpp</cpp_source>
     <cpp_source>CipherSuite.cpp</cpp_source>
     <cpp_source>CMAC.cpp</cpp_source>
+    <cpp_source>Decryptor.cpp</cpp_source>
     <cpp_source>DH.cpp</cpp_source>
     <cpp_source>DSA.cpp</cpp_source>
     <cpp_source>EC.cpp</cpp_source>
+    <cpp_source>Encryptor.cpp</cpp_source>
     <cpp_source>HMAC.cpp</cpp_source>
     <cpp_source>ID.cpp</cpp_source>
     <cpp_source>KeyExchange.cpp</cpp_source>
@@ -79,6 +84,7 @@
     <cpp_source>Params.cpp</cpp_source>
     <cpp_source>RSA.cpp</cpp_source>
     <cpp_source>Serializable.cpp</cpp_source>
+    <cpp_source>Stats.cpp</cpp_source>
     <cpp_source>SymmetricKey.cpp</cpp_source>
     <cpp_source>SystemCACertificates.cpp</cpp_source>
     <cpp_source>Version.cpp</cpp_source>

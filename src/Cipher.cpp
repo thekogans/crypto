@@ -27,194 +27,6 @@
 namespace thekogans {
     namespace crypto {
 
-        void Cipher::Stats::Update (std::size_t byteCount) {
-            ++useCount;
-            if (minByteCount > byteCount) {
-                minByteCount = byteCount;
-            }
-            if (maxByteCount < byteCount) {
-                maxByteCount = byteCount;
-            }
-            totalByteCount += byteCount;
-        }
-
-    #if defined (THEKOGANS_CRYPTO_TESTING)
-        const char * const Cipher::Stats::ATTR_USE_COUNT = "UseCount";
-        const char * const Cipher::Stats::ATTR_MIN_BYTE_COUNT = "MinByteCount";
-        const char * const Cipher::Stats::ATTR_MAX_BYTE_COUNT = "MaxByteCount";
-        const char * const Cipher::Stats::ATTR_TOTAL_BYTE_COUNT = "TotalByteCount";
-
-        std::string Cipher::Stats::ToString (
-                util::ui32 indentationLevel,
-                const char *tagName) const {
-            util::Attributes attributes;
-            attributes.push_back (
-                util::Attribute (
-                    ATTR_USE_COUNT,
-                    util::size_tTostring (useCount)));
-            attributes.push_back (
-                util::Attribute (
-                    ATTR_MIN_BYTE_COUNT,
-                    util::size_tTostring (minByteCount)));
-            attributes.push_back (
-                util::Attribute (
-                    ATTR_MAX_BYTE_COUNT,
-                    util::size_tTostring (maxByteCount)));
-            attributes.push_back (
-                util::Attribute (
-                    ATTR_TOTAL_BYTE_COUNT,
-                    util::size_tTostring (totalByteCount)));
-            return util::OpenTag (indentationLevel, tagName, attributes, true, true);
-        }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
-
-        Cipher::Encryptor::Encryptor (
-                const SymmetricKey &key,
-                const EVP_CIPHER *cipher) {
-            if (EVP_EncryptInit_ex (
-                    &context,
-                    cipher,
-                    OpenSSLInit::engine,
-                    key.Get ().GetReadPtr (),
-                    0) != 1 ||
-                    (Cipher::GetMode (cipher) == EVP_CIPH_GCM_MODE &&
-                        EVP_CIPHER_CTX_ctrl (
-                            &context,
-                            EVP_CTRL_GCM_SET_IVLEN,
-                            (util::i32)GetIVLength (),
-                            0) != 1)) {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
-
-        std::size_t Cipher::Encryptor::GetIV (util::ui8 *ciphertext) const {
-            std::size_t ivLength = GetIVLength ();
-            // An explicit iv for each frame will thwart BEAST.
-            // http://www.slideshare.net/danrlde/20120418-luedtke-ssltlscbcbeast
-            util::GlobalRandomSource::Instance ().GetBytes (ciphertext, ivLength);
-            return ivLength;
-        }
-
-        std::size_t Cipher::Encryptor::Encrypt (
-                const void *plaintext,
-                std::size_t plaintextLength,
-                const void *associatedData,
-                std::size_t associatedDataLength,
-                util::ui8 *ivAndCiphertext) {
-            std::size_t ivLength = GetIVLength ();
-            util::i32 updateLength = 0;
-            util::i32 finalLength = 0;
-            if (EVP_EncryptInit_ex (&context, 0, 0, 0, ivAndCiphertext) == 1 &&
-                    (associatedData == 0 || EVP_EncryptUpdate (
-                        &context,
-                        0,
-                        &updateLength,
-                        (const util::ui8 *)associatedData,
-                        (util::i32)associatedDataLength) == 1) &&
-                    EVP_EncryptUpdate (
-                        &context,
-                        ivAndCiphertext + ivLength,
-                        &updateLength,
-                        (const util::ui8 *)plaintext,
-                        (util::i32)plaintextLength) == 1 &&
-                    EVP_EncryptFinal_ex (
-                        &context,
-                        ivAndCiphertext + ivLength + updateLength,
-                        &finalLength) == 1) {
-                stats.Update (plaintextLength);
-                return (std::size_t)(updateLength + finalLength);
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
-
-        std::size_t Cipher::Encryptor::GetTag (void *tag) {
-            if (EVP_CIPHER_CTX_ctrl (
-                    &context,
-                    EVP_CTRL_GCM_GET_TAG,
-                    EVP_GCM_TLS_TAG_LEN,
-                    tag) == 1) {
-                return EVP_GCM_TLS_TAG_LEN;
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
-
-        Cipher::Decryptor::Decryptor (
-                const SymmetricKey &key,
-                const EVP_CIPHER *cipher) {
-            if (EVP_DecryptInit_ex (
-                    &context,
-                    cipher,
-                    OpenSSLInit::engine,
-                    key.Get ().GetReadPtr (),
-                    0) != 1 ||
-                    (Cipher::GetMode (cipher) == EVP_CIPH_GCM_MODE &&
-                        EVP_CIPHER_CTX_ctrl (
-                            &context,
-                            EVP_CTRL_GCM_SET_IVLEN,
-                            (util::i32)GetIVLength (),
-                            0) != 1)) {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
-
-        std::size_t Cipher::Decryptor::Decrypt (
-                const void *ivAndCiphertext,
-                std::size_t ivAndCiphertextLength,
-                const void *associatedData,
-                std::size_t associatedDataLength,
-                util::ui8 *plaintext) {
-            std::size_t ivLength = GetIVLength ();
-            util::i32 updateLength = 0;
-            util::i32 finalLength = 0;
-            if (EVP_DecryptInit_ex (
-                    &context,
-                    0,
-                    0,
-                    0,
-                    (const util::ui8 *)ivAndCiphertext) == 1 &&
-                    (associatedData == 0 || EVP_DecryptUpdate (
-                        &context,
-                        0,
-                        &updateLength,
-                        (const util::ui8 *)associatedData,
-                        (util::i32)associatedDataLength) == 1) &&
-                    EVP_DecryptUpdate (
-                        &context,
-                        plaintext,
-                        &updateLength,
-                        (const util::ui8 *)ivAndCiphertext + ivLength,
-                        (util::i32)(ivAndCiphertextLength - ivLength)) == 1 &&
-                    EVP_DecryptFinal_ex (
-                        &context,
-                        plaintext + updateLength,
-                        &finalLength) == 1) {
-                stats.Update (ivAndCiphertextLength);
-                return (std::size_t)(updateLength + finalLength);
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
-
-        bool Cipher::Decryptor::SetTag (
-                const void *tag,
-                std::size_t tagLength) {
-            if (EVP_CIPHER_CTX_ctrl (
-                    &context,
-                    EVP_CTRL_GCM_SET_TAG,
-                    (util::i32)tagLength,
-                    (void *)tag) == 1) {
-                return true;
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
-
         Cipher::Cipher (
                 SymmetricKey::Ptr key_,
                 const EVP_CIPHER *cipher_,
@@ -239,6 +51,16 @@ namespace thekogans {
                             THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                     }
                 }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t Cipher::GetIVLength (const EVP_CIPHER *cipher) {
+            if (cipher != 0) {
+                return EVP_CIPHER_iv_length (cipher);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -297,22 +119,40 @@ namespace thekogans {
                     ciphertext != 0) {
                 util::ui8 *ivCiphertextAndMAC = ciphertext + CiphertextHeader::SIZE;
                 CiphertextHeader ciphertextHeader;
-                ciphertextHeader.ivLength = (util::ui16)encryptor.GetIV (ivCiphertextAndMAC);
-                ciphertextHeader.ciphertextLength = (util::ui32)encryptor.Encrypt (
+                ciphertextHeader.ivLength =
+                    (util::ui16)encryptor.GetIV (ivCiphertextAndMAC);
+                encryptor.SetIV (ivCiphertextAndMAC);
+                if (associatedData != 0) {
+                    encryptor.SetAssociatedData (
+                        associatedData,
+                        associatedDataLength);
+                }
+                std::size_t updateLength = encryptor.Update (
                     plaintext,
                     plaintextLength,
-                    associatedData,
-                    associatedDataLength,
-                    ivCiphertextAndMAC);
+                    ivCiphertextAndMAC + ciphertextHeader.ivLength);
+                std::size_t finalLength = encryptor.Final (
+                    ivCiphertextAndMAC +
+                    ciphertextHeader.ivLength +
+                    updateLength);
+                ciphertextHeader.ciphertextLength =
+                    (util::ui32)(updateLength + finalLength);
                 if (mac.Get () != 0) {
-                    ciphertextHeader.macLength = (util::ui16)mac->SignBuffer (
-                        ivCiphertextAndMAC,
-                        ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength,
-                        ivCiphertextAndMAC + ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength);
+                    ciphertextHeader.macLength =
+                        (util::ui16)mac->SignBuffer (
+                            ivCiphertextAndMAC,
+                            ciphertextHeader.ivLength +
+                                ciphertextHeader.ciphertextLength,
+                            ivCiphertextAndMAC +
+                                ciphertextHeader.ivLength +
+                               ciphertextHeader.ciphertextLength);
                 }
                 else {
-                    ciphertextHeader.macLength = (util::ui16)encryptor.GetTag (
-                        ivCiphertextAndMAC + ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength);
+                    ciphertextHeader.macLength =
+                        (util::ui16)encryptor.GetTag (
+                            ivCiphertextAndMAC +
+                            ciphertextHeader.ivLength +
+                            ciphertextHeader.ciphertextLength);
                 }
                 util::TenantWriteBuffer buffer (
                     util::NetworkEndian,
@@ -476,28 +316,34 @@ namespace thekogans {
                     (const util::ui8 *)ciphertext,
                     (util::ui32)ciphertextLength);
                 buffer >> ciphertextHeader;
-                util::ui32 ivAndCiphertextLength =
-                    ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength;
-                if (mac.Get () != 0 ?
-                        mac->VerifyBufferSignature (
+                if (mac.Get () != 0 &&
+                        !mac->VerifyBufferSignature (
                             buffer.GetReadPtr (),
-                            ivAndCiphertextLength,
-                            buffer.GetReadPtr () + ivAndCiphertextLength,
-                            ciphertextHeader.macLength) :
-                        decryptor.SetTag (
-                            buffer.GetReadPtr () + ivAndCiphertextLength,
+                            ciphertextHeader.ivLength +
+                                ciphertextHeader.ciphertextLength,
+                            buffer.GetReadPtr () +
+                                ciphertextHeader.ivLength +
+                                ciphertextHeader.ciphertextLength,
                             ciphertextHeader.macLength)) {
-                    return decryptor.Decrypt (
-                        buffer.GetReadPtr (),
-                        ivAndCiphertextLength,
-                        associatedData,
-                        associatedDataLength,
-                        plaintext);
-                }
-                else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "%s", "Ciphertext failed mac verifacion.");
                 }
+                decryptor.SetIV (buffer.GetReadPtr ());
+                buffer.AdvanceReadOffset (ciphertextHeader.ivLength);
+                if (associatedData != 0) {
+                    decryptor.SetAssociatedData (associatedData, associatedDataLength);
+                }
+                std::size_t plaintextLength = decryptor.Update (
+                    buffer.GetReadPtr (),
+                    ciphertextHeader.ciphertextLength,
+                    plaintext);
+                buffer.AdvanceReadOffset (ciphertextHeader.ciphertextLength);
+                if (mac.Get () == 0) {
+                    decryptor.SetTag (
+                        buffer.GetReadPtr (),
+                        ciphertextHeader.macLength);
+                }
+                return plaintextLength + decryptor.Final (plaintext);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -514,39 +360,17 @@ namespace thekogans {
                 util::Endianness endianness) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
                     (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
-                CiphertextHeader ciphertextHeader;
-                util::TenantReadBuffer buffer (
-                    util::NetworkEndian,
-                    (const util::ui8 *)ciphertext,
-                    (util::ui32)ciphertextLength);
-                buffer >> ciphertextHeader;
-                util::ui32 ivAndCiphertextLength =
-                    ciphertextHeader.ivLength + ciphertextHeader.ciphertextLength;
-                if (mac.Get () != 0 ?
-                        mac->VerifyBufferSignature (
-                            buffer.GetReadPtr (),
-                            ivAndCiphertextLength,
-                            buffer.GetReadPtr () + ivAndCiphertextLength,
-                            ciphertextHeader.macLength) :
-                        decryptor.SetTag (
-                            buffer.GetReadPtr () + ivAndCiphertextLength,
-                            ciphertextHeader.macLength)) {
-                    util::Buffer::UniquePtr plaintext (secure ?
-                        new util::SecureBuffer (endianness, ivAndCiphertextLength) :
-                        new util::Buffer (endianness, ivAndCiphertextLength));
-                    plaintext->AdvanceWriteOffset (
-                        (util::ui32)decryptor.Decrypt (
-                            buffer.GetReadPtr (),
-                            ivAndCiphertextLength,
-                            associatedData,
-                            associatedDataLength,
-                            plaintext->GetWritePtr ()));
-                    return plaintext;
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Ciphertext failed mac verifacion.");
-                }
+                util::Buffer::UniquePtr plaintext (secure ?
+                    new util::SecureBuffer (endianness, (util::ui32)ciphertextLength) :
+                    new util::Buffer (endianness, (util::ui32)ciphertextLength));
+                plaintext->AdvanceWriteOffset (
+                    (util::ui32)Decrypt (
+                        ciphertext,
+                        ciphertextLength,
+                        associatedData,
+                        associatedDataLength,
+                        plaintext->GetWritePtr ()));
+                return plaintext;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

@@ -29,6 +29,8 @@
 #include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/SymmetricKey.h"
+#include "thekogans/crypto/Encryptor.h"
+#include "thekogans/crypto/Decryptor.h"
 #include "thekogans/crypto/MAC.h"
 #include "thekogans/crypto/FrameHeader.h"
 #include "thekogans/crypto/CiphertextHeader.h"
@@ -51,62 +53,6 @@ namespace thekogans {
             /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Cipher>.
             typedef util::ThreadSafeRefCounted::Ptr<Cipher> Ptr;
 
-            /// \struct Cipher::Stats Cipher.h thekogans/crypto/Cipher.h
-            ///
-            /// \brief
-            /// Keeps track of usage statistics for various key components.
-            struct _LIB_THEKOGANS_CRYPTO_DECL Stats {
-                /// \brief
-                /// Number of times this component was used.
-                std::size_t useCount;
-                /// \brief
-                /// The shortest buffer this component saw.
-                std::size_t minByteCount;
-                /// \brief
-                /// The longest buffer this component saw.
-                std::size_t maxByteCount;
-                /// \brief
-                /// Total bytes processed by this component.
-                std::size_t totalByteCount;
-
-                /// \brief
-                /// ctor.
-                Stats () :
-                    useCount (0),
-                    minByteCount (0),
-                    maxByteCount (0),
-                    totalByteCount (0) {}
-
-                /// \brief
-                /// Update the usage statistics.
-                /// \param[in] byteCount Current buffer length.
-                void Update (std::size_t byteCount);
-
-            #if defined (THEKOGANS_CRYPTO_TESTING)
-                /// \brief
-                /// "UseCount"
-                static const char * const ATTR_USE_COUNT;
-                /// \brief
-                /// "MinByteCount"
-                static const char * const ATTR_MIN_BYTE_COUNT;
-                /// \brief
-                /// "MaxByteCount"
-                static const char * const ATTR_MAX_BYTE_COUNT;
-                /// \brief
-                /// "TotalByteCount"
-                static const char * const ATTR_TOTAL_BYTE_COUNT;
-
-                /// \brief
-                /// Return the XML representation of stats.
-                /// \param[in] indentationLevel How far to indent the leading tag.
-                /// \param[in] tagName The name of the leading tag.
-                /// \return XML representation of stats.
-                std::string ToString (
-                    util::ui32 indentationLevel,
-                    const char *tagName) const;
-            #endif // defined (THEKOGANS_CRYPTO_TESTING)
-            };
-
         private:
             /// \brief
             /// \see{SymmetricKey} used to encrypt/decrypt.
@@ -117,121 +63,12 @@ namespace thekogans {
             /// \brief
             /// OpenSSL message digest object.
             const EVP_MD *md;
-            /// \struct Cipher::Encryptor Cipher.h thekogans/crypto/Cipher.h
-            ///
             /// \brief
             /// Encapsulates the encryption operation.
-            struct Encryptor {
-                /// \brief
-                /// Cipher context used during encryption.
-                CipherContext context;
-                /// \brief
-                /// Encryptor stats.
-                Stats stats;
-
-                /// \brief
-                /// ctor.
-                /// \param[in] key SymmetricKey used for encryption.
-                /// \param[in] cipher Cipher used for encryption.
-                Encryptor (
-                    const SymmetricKey &key,
-                    const EVP_CIPHER *cipher);
-
-                /// \brief
-                /// Return the length of the initialization vector (IV) associated with the cipher.
-                /// \return The length of the initialization vector (IV) associated with the cipher.
-                inline std::size_t GetIVLength () const {
-                    return EVP_CIPHER_CTX_iv_length (&context);
-                }
-
-                /// \brief
-                /// Generate a random iv.
-                /// \param[out] iv Where to place the generated iv.
-                /// \return Number of bytes written to iv.
-                std::size_t GetIV (util::ui8 *iv) const;
-
-                /// \brief
-                /// Encrypt the plaintext.
-                /// \param[in] plaintext Plaintext to encrypt.
-                /// \param[in] plaintextLength Length of plaintext.
-                /// \param[in] associatedData Optional associated data (GCM mode only).
-                /// \param[in] associatedDataLength Length of optional associated data.
-                /// \param[out] ivAndCiphertext Where to put the encrypted plaintext.
-                /// \return Number of bytes written to ciphertext.
-                std::size_t Encrypt (
-                    const void *plaintext,
-                    std::size_t plaintextLength,
-                    const void *associatedData,
-                    std::size_t associatedDataLength,
-                    util::ui8 *ivAndCiphertext);
-
-                /// \brief
-                /// In GCM mode the cipher creates the mac for us. After
-                /// calling Encrypt, call this method to get the mac (tag
-                /// in GCM parlance).
-                /// \param[out] tag Where to write the tag.
-                /// \return Size of tag (in bytes).
-                std::size_t GetTag (void *tag);
-
-                /// \brief
-                /// Encryptor is neither copy constructable, nor assignable.
-                THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Encryptor)
-            } encryptor;
-            /// \struct Cipher::Decryptor Cipher.h thekogans/crypto/Cipher.h
-            ///
+            Encryptor encryptor;
             /// \brief
             /// Encapsulates the decryption operation.
-            struct Decryptor {
-                /// \brief
-                /// Cipher context used during decryption.
-                CipherContext context;
-                /// \brief
-                /// Decryptor stats.
-                Stats stats;
-
-                /// \brief
-                /// ctor.
-                /// \param[in] key SymmetricKey used for decryption.
-                /// \param[in] cipher Cipher used for decryption.
-                Decryptor (
-                    const SymmetricKey &key,
-                    const EVP_CIPHER *cipher);
-
-                /// \brief
-                /// Return the length of the initialization vector (IV) associated with the cipher.
-                /// \return The length of the initialization vector (IV) associated with the cipher.
-                inline std::size_t GetIVLength () const {
-                    return EVP_CIPHER_CTX_iv_length (&context);
-                }
-
-                /// \brief
-                /// In GCM mode the cipher needs the tag (produced during Encryptor::Encrypt).
-                /// \param[in] tag Buffer containing the tag.
-                /// \param[in] tagLength Length of buffer containing the tag.
-                /// \return true.
-                bool SetTag (
-                    const void *tag,
-                    std::size_t tagLength);
-
-                /// \brief
-                /// Decrypt the ciphertext.
-                /// \param[in] ciphertext Ciphertext to decrypt.
-                /// \param[in] ciphertextLength Length of ciphertext.
-                /// \param[in] associatedData Optional associated data (GCM mode only).
-                /// \param[in] associatedDataLength Length of optional associated data.
-                /// \param[out] plaintext Where to put the decrypted ciphertext.
-                /// \return Number of bytes written to plaintext.
-                std::size_t Decrypt (
-                    const void *ivAndCiphertext,
-                    std::size_t ivAndCiphertextLength,
-                    const void *associatedData,
-                    std::size_t associatedDataLength,
-                    util::ui8 *plaintext);
-
-                /// \brief
-                /// Decryptor is neither copy constructable, nor assignable.
-                THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Decryptor)
-            } decryptor;
+            Decryptor decryptor;
             /// \brief
             /// \see{MAC} used to sign ciphertext in CBC mode.
             MAC::Ptr mac;
@@ -240,8 +77,8 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] key_ \see{SymmetricKey} used to encrypt/decrypt.
-            /// \param[in] cipher OpenSSL EVP_CIPHER.
-            /// \param[in] md OpenSSL EVP_MD (CBC mode only, ignored in GCM mode).
+            /// \param[in] cipher_ OpenSSL EVP_CIPHER.
+            /// \param[in] md_ OpenSSL EVP_MD (CBC mode only, ignored in GCM mode).
             Cipher (
                 SymmetricKey::Ptr key_,
                 const EVP_CIPHER *cipher_ = THEKOGANS_CRYPTO_DEFAULT_CIPHER,
@@ -262,6 +99,12 @@ namespace thekogans {
                     util::UI32_MAX -
                     MAX_FRAMING_OVERHEAD_LENGTH
             };
+
+            /// \brief
+            /// Return the iv length for a given cipher.
+            /// \return IV length for a given cipher.
+            static std::size_t GetIVLength (
+                const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
 
             /// \brief
             /// Return the key length for a given cipher.
@@ -298,14 +141,14 @@ namespace thekogans {
             /// Return the encryptor stats.
             /// \return Encryptor stats.
             inline const Stats &GetEncryptorStats () const {
-                return encryptor.stats;
+                return encryptor.GetStats ();
             }
 
             /// \brief
             /// Return the decryptor stats.
             /// \return Decryptor stats.
             inline const Stats &GetDecryptorStats () const {
-                return decryptor.stats;
+                return decryptor.GetStats ();
             }
 
             /// \brief

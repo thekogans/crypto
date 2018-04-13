@@ -45,7 +45,7 @@ namespace thekogans {
             if (buffer != 0 && bufferLength > 0 && signature != 0) {
                 if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) == 1 &&
                         EVP_DigestSignUpdate (&ctx, buffer, bufferLength) == 1) {
-                    size_t signatureLength = 0;
+                    std::size_t signatureLength = 0;
                     if (EVP_DigestSignFinal (&ctx, signature, &signatureLength) == 1) {
                         return signatureLength;
                     }

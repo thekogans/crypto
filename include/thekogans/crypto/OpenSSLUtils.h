@@ -355,7 +355,7 @@ namespace thekogans {
 
             /// \brief
             /// Address of operator.
-            /// \retunr EVP_CIPHER_CTX *.
+            /// \return EVP_CIPHER_CTX *.
             EVP_CIPHER_CTX *operator & () const {
                 return ctx;
             }
@@ -382,7 +382,7 @@ namespace thekogans {
 
             /// \brief
             /// Address of operator.
-            /// \retunr EVP_MD_CTX *.
+            /// \return EVP_MD_CTX *.
             EVP_MD_CTX *operator & () const {
                 return ctx;
             }
