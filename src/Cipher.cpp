@@ -120,8 +120,7 @@ namespace thekogans {
                 util::ui8 *ivCiphertextAndMAC = ciphertext + CiphertextHeader::SIZE;
                 CiphertextHeader ciphertextHeader;
                 ciphertextHeader.ivLength =
-                    (util::ui16)encryptor.GetIV (ivCiphertextAndMAC);
-                encryptor.SetIV (ivCiphertextAndMAC);
+                    (util::ui16)encryptor.SetIV (ivCiphertextAndMAC);
                 if (associatedData != 0) {
                     encryptor.SetAssociatedData (
                         associatedData,

@@ -31,7 +31,7 @@ namespace thekogans {
         /// \struct Decryptor Decryptor.h thekogans/crypto/Decryptor.h
         ///
         /// \brief
-        /// Decryptor implements stream based symmetric decryption using AES (CBC or GCM mode).
+        /// Decryptor implements symmetric decryption using AES (CBC or GCM mode).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Decryptor {
         private:

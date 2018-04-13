@@ -48,25 +48,16 @@ namespace thekogans {
             }
         }
 
-        std::size_t Encryptor::GetIV (util::ui8 *iv) const {
+        std::size_t Encryptor::SetIV (util::ui8 *iv) {
             if (iv != 0) {
                 // An explicit iv for each frame will thwart BEAST.
                 // http://www.slideshare.net/danrlde/20120418-luedtke-ssltlscbcbeast
                 std::size_t ivLength = GetIVLength ();
                 util::GlobalRandomSource::Instance ().GetBytes (iv, ivLength);
-                return ivLength;
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        void Encryptor::SetIV (const util::ui8 *iv) {
-            if (iv != 0) {
                 if (EVP_EncryptInit_ex (&context, 0, 0, 0, iv) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
+                return ivLength;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

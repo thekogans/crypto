@@ -20,13 +20,9 @@
 
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
-#include "thekogans/util/Flags.h"
 #include "thekogans/util/Heap.h"
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/util/Buffer.h"
-#include "thekogans/util/FixedBuffer.h"
-#include "thekogans/util/SpinLock.h"
-#include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/Encryptor.h"
@@ -34,7 +30,6 @@
 #include "thekogans/crypto/MAC.h"
 #include "thekogans/crypto/FrameHeader.h"
 #include "thekogans/crypto/CiphertextHeader.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {

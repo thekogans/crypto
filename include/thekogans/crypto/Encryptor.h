@@ -31,7 +31,7 @@ namespace thekogans {
         /// \struct Encryptor Encryptor.h thekogans/crypto/Encryptor.h
         ///
         /// \brief
-        /// Encryptor implements stream based symmetric encryption using AES (CBC or GCM mode).
+        /// Encryptor implements symmetric encryption using AES (CBC or GCM mode).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Encryptor {
         private:
@@ -57,16 +57,12 @@ namespace thekogans {
             inline std::size_t GetIVLength () const {
                 return EVP_CIPHER_CTX_iv_length (&context);
             }
+
             /// \brief
             /// Generate a random iv.
             /// \param[out] iv Where to place the generated iv.
             /// \return Number of bytes written to iv.
-            std::size_t GetIV (util::ui8 *iv) const;
-
-            /// \brief
-            /// Set the initialization vector (IV).
-            /// \param[in] iv Initialization vector used for encryption.
-            void SetIV (const util::ui8 *iv);
+            std::size_t SetIV (util::ui8 *iv);
             /// \brief
             /// In GCM mode, call this method 0 or more times to set the
             /// associated data.
