@@ -24,6 +24,7 @@
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
@@ -63,6 +64,35 @@ namespace thekogans {
             MAC (
                 AsymmetricKey::Ptr key_,
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
+
+            /// \brief
+            /// Initialize the context (ctx) and get it ready for MAC generation.
+            /// \param[out] ctx OpenSSL message digest context to initialize.
+            /// \param[in] key OpenSSL EVP_PKEY object.
+            /// \param[in] md OpenSLL message digest object.
+            /// \param[in] engine OpenSLL engine object.
+            static void Init (
+                MDContext &ctx,
+                EVP_PKEY *key = 0,
+                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
+                ENGINE *engine = OpenSSLInit::engine);
+            /// \brief
+            /// Call this method 1 or more times to generate a MAC.
+            /// \param[in] ctx OpenSSL message digest context.
+            /// \param[in] buffer Buffer whose signature to create.
+            /// \param[in] bufferLength Buffer length.
+            static void Update (
+                MDContext &ctx,
+                const void *buffer,
+                std::size_t bufferLength);
+            /// \brief
+            /// Finalize the MAC and return the signature.
+            /// \param[in] ctx OpenSSL message digest context.
+            /// \param[out] signature Where to write the signature.
+            /// \return Number of bytes written to signature.
+            static std::size_t Final (
+                MDContext &ctx,
+                util::ui8 *signature);
 
             /// \brief
             /// Used by \see{Cipher} to MAC in place saving an allocation

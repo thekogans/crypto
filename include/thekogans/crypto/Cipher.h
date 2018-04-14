@@ -39,7 +39,7 @@ namespace thekogans {
         /// \brief
         /// Cipher implements symmetric encryption/decryption using AES (CBC or GCM mode)
         /// Every encryption operation uses a random iv to thwart BEAST. MACs (CBC mode)
-        /// are calculated over ciphertext to avoid the cryptographic doom principle:
+        /// are calculated over ciphertext to avoid the Cryptographic Doom Principle:
         /// https://moxie.org/blog/the-cryptographic-doom-principle/. See the description
         /// of Cipher::Encrypt for more information.
 

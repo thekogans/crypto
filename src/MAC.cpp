@@ -28,7 +28,48 @@ namespace thekogans {
                 key (key_),
                 md (md_) {
             if (key.Get () != 0 && md != 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine, key->Get ()) != 1) {
+                Init (ctx, key->Get (), md, OpenSSLInit::engine);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        void MAC::Init (
+                MDContext &ctx,
+                EVP_PKEY *key,
+                const EVP_MD *md,
+                ENGINE *engine) {
+            if (EVP_DigestSignInit (&ctx, 0, md, engine, key) != 1) {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
+        }
+
+        void MAC::Update (
+                MDContext &ctx,
+                const void *buffer,
+                std::size_t bufferLength) {
+            if (buffer != 0 && bufferLength > 0) {
+                if (EVP_DigestSignUpdate (&ctx, buffer, bufferLength) != 1) {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t MAC::Final (
+                MDContext &ctx,
+                util::ui8 *signature) {
+            if (signature != 0) {
+                std::size_t signatureLength = 0;
+                if (EVP_DigestSignFinal (&ctx, signature, &signatureLength) == 1) {
+                    return signatureLength;
+                }
+                else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
@@ -43,19 +84,9 @@ namespace thekogans {
                 std::size_t bufferLength,
                 util::ui8 *signature) {
             if (buffer != 0 && bufferLength > 0 && signature != 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) == 1 &&
-                        EVP_DigestSignUpdate (&ctx, buffer, bufferLength) == 1) {
-                    std::size_t signatureLength = 0;
-                    if (EVP_DigestSignFinal (&ctx, signature, &signatureLength) == 1) {
-                        return signatureLength;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                Init (ctx, 0, md, 0);
+                Update (ctx, buffer, bufferLength);
+                return Final (ctx, signature);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -67,28 +98,13 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) == 1 &&
-                        EVP_DigestSignUpdate (&ctx, buffer, bufferLength) == 1) {
-                    size_t signatureLength = 0;
-                    if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1) {
-                        util::Buffer::UniquePtr signature (
-                            new util::Buffer (util::HostEndian, (util::ui32)signatureLength));
-                        if (EVP_DigestSignFinal (&ctx,
-                                signature->GetWritePtr (), &signatureLength) == 1) {
-                            signature->AdvanceWriteOffset ((util::ui32)signatureLength);
-                            return signature;
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                Init (ctx, 0, md, 0);
+                Update (ctx, buffer, bufferLength);
+                util::ui8 signature[EVP_MAX_MD_SIZE];
+                std::size_t signatureLength = Final (ctx, signature);
+                return util::Buffer::UniquePtr (
+                    new util::Buffer (
+                        util::HostEndian, signature, signature + signatureLength));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -103,25 +119,15 @@ namespace thekogans {
                 std::size_t signatureLength) {
             if (buffer != 0 && bufferLength > 0 &&
                     signature != 0 && signatureLength > 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) == 1 &&
-                        EVP_DigestSignUpdate (&ctx, buffer, bufferLength) == 1) {
-                    util::ui8 computedSignature[EVP_MAX_MD_SIZE];
-                    std::size_t computedSignatureLength = sizeof (computedSignature);
-                    if (EVP_DigestSignFinal (&ctx,
-                            computedSignature, &computedSignatureLength) == 1) {
-                        return signatureLength == computedSignatureLength &&
-                            TimeInsensitiveCompare (
-                                signature,
-                                computedSignature,
-                                signatureLength);
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                Init (ctx, 0, md, 0);
+                Update (ctx, buffer, bufferLength);
+                util::ui8 computedSignature[EVP_MAX_MD_SIZE];
+                std::size_t computedSignatureLength = Final (ctx, computedSignature);
+                return signatureLength == computedSignatureLength &&
+                    TimeInsensitiveCompare (
+                        signature,
+                        computedSignature,
+                        signatureLength);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

@@ -315,6 +315,9 @@ namespace thekogans {
                     (const util::ui8 *)ciphertext,
                     (util::ui32)ciphertextLength);
                 buffer >> ciphertextHeader;
+                // If we're in CBC mode, verify the MAC before attempting to
+                // decrypt, as per the Cryptographic Doom Principle:
+                // https://moxie.org/blog/the-cryptographic-doom-principle/
                 if (mac.Get () != 0 &&
                         !mac->VerifyBufferSignature (
                             buffer.GetReadPtr (),
