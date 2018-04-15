@@ -20,10 +20,11 @@
 
 #include <openssl/evp.h>
 #include "thekogans/util/RefCounted.h"
-#include "thekogans/util/ByteSwap.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/Signer.h"
+#include "thekogans/crypto/Verifier.h"
 
 namespace thekogans {
     namespace crypto {
@@ -56,25 +57,25 @@ namespace thekogans {
             /// Operation (Sign/Verify) to perform.
             Op op;
             /// \brief
-            /// Private (Sign)/Public (Verify) \see{AsymmetricKey}.
-            AsymmetricKey::Ptr key;
+            /// Used if op == Sign.
+            Signer::Ptr signer;
             /// \brief
-            /// OpenSSL message digest object.
-            const EVP_MD *md;
-            /// \brief
-            /// Message digest context.
-            MDContext ctx;
+            /// Used if op == Verify.
+            Verifier::Ptr verifier;
 
         public:
             /// \brief
             /// ctor.
             /// \param[in] op_ Operation (Sign/Verify) to perform.
-            /// \param[in] key_ Private (Sign)/Public (Verify) key.
-            /// \param[in] md_ OpenSSL message digest to use.
+            /// \param[in] key Private (Sign)/Public (Verify) key.
+            /// \param[in] md OpenSSL message digest to use.
             Authenticator (
                 Op op_,
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
+                AsymmetricKey::Ptr key,
+                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) :
+                op (op_),
+                signer (op == Sign ? new Signer (key, md) : 0),
+                verifier (op == Verify ? new Verifier (key, md) : 0) {}
 
             /// \brief
             /// Create a buffer signature.

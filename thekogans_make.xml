@@ -57,9 +57,11 @@
     <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Serializable.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Signer.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Stats.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/SystemCACertificates.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Verifier.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
   </cpp_headers>
   <cpp_sources prefix = "src">
@@ -84,9 +86,11 @@
     <cpp_source>Params.cpp</cpp_source>
     <cpp_source>RSA.cpp</cpp_source>
     <cpp_source>Serializable.cpp</cpp_source>
+    <cpp_source>Signer.cpp</cpp_source>
     <cpp_source>Stats.cpp</cpp_source>
     <cpp_source>SymmetricKey.cpp</cpp_source>
     <cpp_source>SystemCACertificates.cpp</cpp_source>
+    <cpp_source>Verifier.cpp</cpp_source>
     <cpp_source>Version.cpp</cpp_source>
   </cpp_sources>
   <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_TESTS)">

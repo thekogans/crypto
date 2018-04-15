@@ -26,52 +26,18 @@
 namespace thekogans {
     namespace crypto {
 
-        Authenticator::Authenticator (
-                Op op_,
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md_) :
-                op (op_),
-                key (key_),
-                md (md_) {
-            if (key.Get () != 0 && md != 0) {
-                if ((op == Sign ?
-                        EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine, key->Get ()) :
-                        EVP_DigestVerifyInit (&ctx, 0, md, OpenSSLInit::engine, key->Get ())) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
         util::Buffer::UniquePtr Authenticator::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) == 1 &&
-                        EVP_DigestSignUpdate (&ctx, buffer, bufferLength) == 1) {
-                    size_t signatureLength = 0;
-                    if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1 &&
-                            signatureLength > 0) {
-                        util::Buffer::UniquePtr signature (
-                            new util::Buffer (util::HostEndian, (util::ui32)signatureLength));
-                        if (EVP_DigestSignFinal (&ctx,
-                                signature->GetWritePtr (), &signatureLength) == 1) {
-                            signature->AdvanceWriteOffset ((util::ui32)signatureLength);
-                            return signature;
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                if (op == Sign) {
+                    signer->Init ();
+                    signer->Update (buffer, bufferLength);
+                    return signer->Final ();
                 }
                 else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "Authenticator is setup for verify operation.");
                 }
             }
             else {
@@ -87,13 +53,14 @@ namespace thekogans {
                 std::size_t signatureLength) {
             if (buffer != 0 && bufferLength > 0 &&
                     signature != 0 && signatureLength > 0) {
-                if (EVP_DigestVerifyInit (&ctx, 0, md, 0, 0) == 1 &&
-                        EVP_DigestVerifyUpdate (&ctx, buffer, bufferLength) == 1) {
-                    return EVP_DigestVerifyFinal (&ctx,
-                        (const util::ui8 *)signature, signatureLength) == 1;
+                if (op == Verify) {
+                    verifier->Init ();
+                    verifier->Update (buffer, bufferLength);
+                    return verifier->Final (signature, signatureLength);
                 }
                 else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "Authenticator is setup for sign operation.");
                 }
             }
             else {
@@ -103,35 +70,20 @@ namespace thekogans {
         }
 
         util::Buffer::UniquePtr Authenticator::SignFile (const std::string &path) {
-            if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) == 1) {
+            if (op == Sign) {
+                signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 util::FixedArray<util::ui8, 4096> buffer;
                 for (util::ui32 count = file.Read (buffer.array, 4096);
                         count != 0;
                         count = file.Read (buffer.array, 4096)) {
-                    if (EVP_DigestSignUpdate (&ctx, buffer.array, count) != 1) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                    signer->Update (buffer.array, count);
                 }
-                size_t signatureLength = 0;
-                if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1 && signatureLength > 0) {
-                    util::Buffer::UniquePtr signature (
-                        new util::Buffer (util::HostEndian, (util::ui32)signatureLength));
-                    if (EVP_DigestSignFinal (&ctx,
-                            signature->GetWritePtr (), &signatureLength) == 1) {
-                        signature->AdvanceWriteOffset ((util::ui32)signatureLength);
-                        return signature;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                return signer->Final ();
             }
             else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "%s", "Authenticator is setup for verify operation.");
             }
         }
 
@@ -140,21 +92,20 @@ namespace thekogans {
                 const void *signature,
                 std::size_t signatureLength) {
             if (signature != 0 && signatureLength > 0) {
-                if (EVP_DigestVerifyInit (&ctx, 0, md, 0, 0) == 1) {
+                if (op == Verify) {
+                    verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;
                     for (util::ui32 count = file.Read (buffer.array, 4096);
                             count != 0;
                             count = file.Read (buffer.array, 4096)) {
-                        if (EVP_DigestVerifyUpdate (&ctx, buffer.array, count) != 1) {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
+                        verifier->Update (buffer.array, count);
                     }
-                    return EVP_DigestVerifyFinal (&ctx,
-                        (const util::ui8 *)signature, signatureLength) == 1;
+                    return verifier->Final (signature, signatureLength);
                 }
                 else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "Authenticator is setup for sign operation.");
                 }
             }
             else {
