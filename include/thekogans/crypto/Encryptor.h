@@ -32,6 +32,12 @@ namespace thekogans {
         ///
         /// \brief
         /// Encryptor implements symmetric encryption using AES (CBC or GCM mode).
+        /// NOTE: Encryptor implements a low level API and is exposed in case you
+        /// need to encrypt multiple disjoint buffers. That said, there are a lot
+        /// of pitfalls to using it (no \see{MAC}...). You are strongly encouraged
+        /// to use \see{Cipher} as it uses best industry practices. At the very
+        /// least you should consult \see{Cipher::Encrypt} to make sure your code
+        /// is secure.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Encryptor {
         private:
@@ -52,17 +58,10 @@ namespace thekogans {
                 const EVP_CIPHER *cipher);
 
             /// \brief
-            /// Return the length of the initialization vector (IV) associated with the cipher.
-            /// \return The length of the initialization vector (IV) associated with the cipher.
-            inline std::size_t GetIVLength () const {
-                return EVP_CIPHER_CTX_iv_length (&context);
-            }
-
-            /// \brief
-            /// Generate a random iv.
+            /// Generate a random iv and initialize the encryptor.
             /// \param[out] iv Where to place the generated iv.
             /// \return Number of bytes written to iv.
-            std::size_t SetIV (util::ui8 *iv);
+            std::size_t Init (util::ui8 *iv);
             /// \brief
             /// In GCM mode, call this method 0 or more times to set the
             /// associated data.
@@ -94,6 +93,13 @@ namespace thekogans {
             /// \param[out] tag Where to write the tag.
             /// \return Size of tag (in bytes).
             std::size_t GetTag (util::ui8 *tag);
+
+            /// \brief
+            /// Return the length of the initialization vector (IV) associated with the cipher.
+            /// \return The length of the initialization vector (IV) associated with the cipher.
+            inline std::size_t GetIVLength () const {
+                return EVP_CIPHER_CTX_iv_length (&context);
+            }
 
             /// \brief
             /// Return the reference to stats.

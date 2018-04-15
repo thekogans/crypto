@@ -65,6 +65,9 @@ namespace thekogans {
                 AsymmetricKey::Ptr key_,
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
+            // NOTE: This is the low level API used SignBuffer/VerifyBufferSignature below.
+            // It exists so that you can mac multiple disjoint buffers.
+
             /// \brief
             /// Initialize the context (ctx) and get it ready for MAC generation.
             void Init ();
@@ -80,6 +83,9 @@ namespace thekogans {
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
             std::size_t Final (util::ui8 *signature);
+
+            // NOTE: This is the high level API. If you use it, you don't need to concern
+            // yourself with the low level API above.
 
             /// \brief
             /// Used by \see{Cipher} to MAC in place saving an allocation

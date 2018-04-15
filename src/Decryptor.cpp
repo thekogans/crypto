@@ -48,7 +48,7 @@ namespace thekogans {
             }
         }
 
-        void Decryptor::SetIV (const util::ui8 *iv) {
+        void Decryptor::Init (const util::ui8 *iv) {
             if (iv != 0) {
                 if (EVP_DecryptInit_ex (&context, 0, 0, 0, iv) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

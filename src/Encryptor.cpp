@@ -48,7 +48,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t Encryptor::SetIV (util::ui8 *iv) {
+        std::size_t Encryptor::Init (util::ui8 *iv) {
             if (iv != 0) {
                 // An explicit iv for each frame will thwart BEAST.
                 // http://www.slideshare.net/danrlde/20120418-luedtke-ssltlscbcbeast

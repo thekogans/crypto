@@ -120,7 +120,7 @@ namespace thekogans {
                 util::ui8 *ivCiphertextAndMAC = ciphertext + CiphertextHeader::SIZE;
                 CiphertextHeader ciphertextHeader;
                 ciphertextHeader.ivLength =
-                    (util::ui16)encryptor.SetIV (ivCiphertextAndMAC);
+                    (util::ui16)encryptor.Init (ivCiphertextAndMAC);
                 if (associatedData != 0) {
                     encryptor.SetAssociatedData (
                         associatedData,
@@ -330,7 +330,7 @@ namespace thekogans {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "%s", "Ciphertext failed mac verifacion.");
                 }
-                decryptor.SetIV (buffer.GetReadPtr ());
+                decryptor.Init (buffer.GetReadPtr ());
                 buffer.AdvanceReadOffset (ciphertextHeader.ivLength);
                 if (associatedData != 0) {
                     decryptor.SetAssociatedData (associatedData, associatedDataLength);

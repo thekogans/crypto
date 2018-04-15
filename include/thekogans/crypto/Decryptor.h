@@ -32,6 +32,12 @@ namespace thekogans {
         ///
         /// \brief
         /// Decryptor implements symmetric decryption using AES (CBC or GCM mode).
+        /// NOTE: Decryptor implements a low level API and is exposed in case you
+        /// need to decrypt multiple disjoint buffers. That said, there are a lot
+        /// of pitfalls to using it (no \see{MAC} validation...). You are strongly
+        /// encouraged to use \see{Cipher} as it uses best industry practices. At
+        /// the very least you should consult \see{Cipher::Decrypt} to make sure
+        /// your code is secure.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Decryptor {
         private:
@@ -52,16 +58,9 @@ namespace thekogans {
                 const EVP_CIPHER *cipher);
 
             /// \brief
-            /// Return the length of the initialization vector (IV) associated with the cipher.
-            /// \return The length of the initialization vector (IV) associated with the cipher.
-            inline std::size_t GetIVLength () const {
-                return EVP_CIPHER_CTX_iv_length (&context);
-            }
-
-            /// \brief
-            /// Set the initialization vector (IV).
+            /// Set the initialization vector (IV) and initialize the decryptor.
             /// \param[in] iv Initialization vector used for decryption.
-            void SetIV (const util::ui8 *iv);
+            void Init (const util::ui8 *iv);
             /// \brief
             /// In GCM mode, call this method 0 or more times to set the
             /// associated data.
@@ -94,6 +93,13 @@ namespace thekogans {
             /// \param[out] plaintext Where to write the plaintext.
             /// \return Count of bytest written to plaintext.
             std::size_t Final (util::ui8 *plaintext);
+
+            /// \brief
+            /// Return the length of the initialization vector (IV) associated with the cipher.
+            /// \return The length of the initialization vector (IV) associated with the cipher.
+            inline std::size_t GetIVLength () const {
+                return EVP_CIPHER_CTX_iv_length (&context);
+            }
 
             /// \brief
             /// Return the reference to stats.
