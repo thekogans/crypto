@@ -19,7 +19,6 @@
 #define __thekogans_crypto_FrameHeader_h
 
 #include "thekogans/util/Types.h"
-#include "thekogans/util/Constants.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/ID.h"

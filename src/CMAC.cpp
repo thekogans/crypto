@@ -16,9 +16,9 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include <openssl/evp.h>
-#include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/SymmetricKey.h"
-#include "thekogans/crypto/Cipher.h"
+#include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/CMAC.h"
 
 namespace thekogans {
@@ -34,9 +34,9 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             if (secret != 0 && secretLength > 0 &&
-                    Cipher::GetMode (cipher) == EVP_CIPH_CBC_MODE) {
+                    GetCipherMode (cipher) == EVP_CIPH_CBC_MODE) {
                 SymmetricKey::Ptr symmetricKey = SymmetricKey::FromSecretAndSalt (
-                    Cipher::GetKeyLength (cipher),
+                    GetCipherKeyLength (cipher),
                     secret,
                     secretLength,
                     salt,

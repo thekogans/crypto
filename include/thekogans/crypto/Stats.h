@@ -18,8 +18,9 @@
 #if !defined (__thekogans_crypto_Stats_h)
 #define __thekogans_crypto_Stats_h
 
-#include <string>
+#include <cstddef>
 #if defined (THEKOGANS_CRYPTO_TESTING)
+    #include <string>
     #include "thekogans/util/Types.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include "thekogans/crypto/Config.h"

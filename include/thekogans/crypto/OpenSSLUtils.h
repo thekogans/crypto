@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_OpenSSLUtils_h)
 #define __thekogans_crypto_OpenSSLUtils_h
 
+#include <cstddef>
 #include <ctime>
 #include <memory>
 #include <string>
@@ -388,6 +389,35 @@ namespace thekogans {
             }
         };
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
+
+        /// \brief
+        /// Return the iv length for a given OpenSSL cipher.
+        /// \param[in] cipher OpenSSL cipher object.
+        /// \return IV length for a given cipher.
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API GetCipherIVLength (
+            const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
+
+        /// \brief
+        /// Return the key length for a given OpenSSL cipher.
+        /// \param[in] cipher OpenSSL cipher object.
+        /// \return Key length for a given cipher.
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API GetCipherKeyLength (
+            const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
+
+        /// \brief
+        /// Return the mode (EVP_CIPH_CBC_MODE or EVP_CIPH_GCM_MODE) for a given OpenSSL cipher.
+        /// \param[in] cipher OpenSSL cipher object.
+        /// \return EVP_CIPH_CBC_MODE or EVP_CIPH_GCM_MODE.
+        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API GetCipherMode (
+            const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
+
+        /// \brief
+        /// Return true if the given OpenSSL cipher supports Authenticated Encryption with
+        /// Associated Data (AEAD).
+        /// \param[in] cipher OpenSSL cipher object.
+        /// \return true = AEAD cipher.
+        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API IsCipherAEAD (
+            const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
 
         /// \brief
         /// Convert OpenSSL EVP_PKEY key type to string.

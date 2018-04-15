@@ -19,7 +19,6 @@
 #define __thekogans_crypto_CiphertextHeader_h
 
 #include "thekogans/util/Types.h"
-#include "thekogans/util/Constants.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
 

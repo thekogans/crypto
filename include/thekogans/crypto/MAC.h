@@ -18,13 +18,13 @@
 #if !defined (__thekogans_crypto_MAC_h)
 #define __thekogans_crypto_MAC_h
 
+#include <cstddef>
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
-#include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {

@@ -20,6 +20,7 @@
 #include <openssl/x509v3.h>
 #include <openssl/dh.h>
 #include <openssl/hmac.h>
+#include "thekogans/util/Flags.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
@@ -134,6 +135,51 @@ namespace thekogans {
         void RSADeleter::operator () (RSA *rsa) {
             if (rsa != 0) {
                 RSA_free (rsa);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
+        GetCipherIVLength (const EVP_CIPHER *cipher) {
+            if (cipher != 0) {
+                return EVP_CIPHER_iv_length (cipher);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
+        GetCipherKeyLength (const EVP_CIPHER *cipher) {
+            if (cipher != 0) {
+                return EVP_CIPHER_key_length (cipher);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API
+        GetCipherMode (const EVP_CIPHER *cipher) {
+            if (cipher != 0) {
+                return EVP_CIPHER_mode (cipher);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API
+        IsCipherAEAD (const EVP_CIPHER *cipher) {
+            if (cipher != 0) {
+                return util::Flags<unsigned long> (EVP_CIPHER_flags (cipher)).Test (
+                    EVP_CIPH_FLAG_AEAD_CIPHER);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
         }
 

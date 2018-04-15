@@ -18,6 +18,8 @@
 #if !defined (__thekogans_crypto_DH_h)
 #define __thekogans_crypto_DH_h
 
+#include <cstddef>
+#include <string>
 #include <openssl/dh.h>
 #include <openssl/bn.h>
 #include "thekogans/util/Serializer.h"

@@ -72,7 +72,7 @@ namespace {
                             if (result) {
                                 crypto::Cipher::Ptr cipher = cipherSuite.GetCipher (
                                     crypto::SymmetricKey::FromRandom (
-                                        crypto::Cipher::GetKeyLength (
+                                        crypto::GetCipherKeyLength (
                                             cipherSuite.GetOpenSSLCipher (cipherSuite.cipher))));
                                 result = cipher.Get () != 0;
                                 if (result) {

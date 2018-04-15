@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_CipherSuite_h)
 #define __thekogans_crypto_CipherSuite_h
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>

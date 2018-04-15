@@ -18,9 +18,9 @@
 #if !defined (__thekogans_crypto_Cipher_h)
 #define __thekogans_crypto_Cipher_h
 
+#include <cstddef>
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
-#include "thekogans/util/Heap.h"
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
@@ -28,8 +28,8 @@
 #include "thekogans/crypto/Encryptor.h"
 #include "thekogans/crypto/Decryptor.h"
 #include "thekogans/crypto/MAC.h"
-#include "thekogans/crypto/FrameHeader.h"
 #include "thekogans/crypto/CiphertextHeader.h"
+#include "thekogans/crypto/FrameHeader.h"
 
 namespace thekogans {
     namespace crypto {
@@ -96,31 +96,6 @@ namespace thekogans {
             };
 
             /// \brief
-            /// Return the iv length for a given cipher.
-            /// \return IV length for a given cipher.
-            static std::size_t GetIVLength (
-                const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
-
-            /// \brief
-            /// Return the key length for a given cipher.
-            /// \return Key length for a given cipher.
-            static std::size_t GetKeyLength (
-                const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
-
-            /// \brief
-            /// Return the mode (EVP_CIPH_CBC_MODE or EVP_CIPH_GCM_MODE) for a given cipher.
-            /// \return EVP_CIPH_CBC_MODE or EVP_CIPH_GCM_MODE.
-            static util::i32 GetMode (
-                const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
-
-            /// \brief
-            /// Return true if the given cipher supports Authenticated Encryption with
-            /// Associated Data (AEAD).
-            /// \return true = AEAD cipher.
-            static bool IsAEAD (
-                const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
-
-            /// \brief
             /// Return the max plaintext length that will fit in to the given payload length.
             /// \param[in] payloadLength Max payload length.
             /// \return Max plaintext length that will fit.
@@ -150,7 +125,7 @@ namespace thekogans {
             /// Encrypt and mac plaintext. This is the workhorse encryption function
             /// used by others below. It writes the following structure in to ciphertext:
             ///
-            /// |------------- CiphertextHeader -------------|--------- ciphertext ---------|
+            /// |---------- \see{CiphertextHeader} ----------|--------- ciphertext ---------|
             /// +-----------+-------------------+------------+------+---------------+-------+
             /// | iv length | ciphertext length | mac length |  iv  |  ciphertext   |  mac  |
             /// +-----------+-------------------+------------+------+---------------+-------+
@@ -185,7 +160,7 @@ namespace thekogans {
             /// \brief
             /// Encrypt, mac, and enlengthen plaintext. It writes the following structure in to ciphertext:
             ///
-            /// |--- FrameHeader ---|------------- CiphertextHeader -------------|--------- ciphertext ---------|
+            /// |--- FrameHeader ---|---------- \see{CiphertextHeader} ----------|--------- ciphertext ---------|
             /// +-------------------+-----------+-------------------+------------+------+---------------+-------+
             /// | ciphertext length | iv length | ciphertext length | mac length |  iv  |  ciphertext   |  mac  |
             /// +-------------------+-----------+-------------------+------------+------+---------------+-------+
@@ -221,7 +196,7 @@ namespace thekogans {
             /// \brief
             /// Encrypt, mac, and frame plaintext. It writes the following structure in to ciphertext:
             ///
-            /// |-------- FrameHeader -------|------------- CiphertextHeader -------------|--------- ciphertext ---------|
+            /// |-------- FrameHeader -------|---------- \see{CiphertextHeader} ----------|--------- ciphertext ---------|
             /// +--------+-------------------+-----------+-------------------+------------+------+---------------+-------+
             /// | key id | ciphertext length | iv length | ciphertext length | mac length |  iv  |  ciphertext   |  mac  |
             /// +--------+-------------------+-----------+-------------------+------------+------+---------------+-------+
@@ -256,7 +231,8 @@ namespace thekogans {
 
             /// \brief
             /// Verify the ciphertext MAC and, if matches, decrypt it.
-            /// \param[in] ciphertext IV, ciphertext and MAC returned by one of Encrypt above.
+            /// \param[in] ciphertext \see{CiphertextHeader}, IV, ciphertext and MAC
+            /// returned by the first Encrypt above.
             /// \param[in] ciphertextLength Length of ciphertext.
             /// \param[in] associatedData Optional associated data (GCM mode only).
             /// \param[in] associatedDataLength Length of optional associated data.
@@ -270,7 +246,8 @@ namespace thekogans {
                 util::ui8 *plaintext);
             /// \brief
             /// Verify the ciphertext MAC and, if matches, decrypt it.
-            /// \param[in] ciphertext IV, ciphertext and MAC returned by one of Encrypt above.
+            /// \param[in] ciphertext \see{CiphertextHeader}, IV, ciphertext and MAC
+            /// returned the first of Encrypt above.
             /// \param[in] ciphertextLength Length of ciphertext.
             /// \param[in] associatedData Optional associated data (GCM mode only).
             /// \param[in] associatedDataLength Length of optional associated data.

@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_Encryptor_h)
 #define __thekogans_crypto_Encryptor_h
 
+#include <cstddef>
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"

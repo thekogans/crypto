@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_MessageDigest_h)
 #define __thekogans_crypto_MessageDigest_h
 
+#include <cstddef>
 #include <string>
 #include <openssl/evp.h>
 #include "thekogans/util/RefCounted.h"

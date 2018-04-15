@@ -18,9 +18,9 @@
 #if !defined (__thekogans_crypto_EC_h)
 #define __thekogans_crypto_EC_h
 
+#include <string>
 #include <openssl/bn.h>
-#include "thekogans/util/Serializer.h"
-#include "thekogans/util/Buffer.h"
+#include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Params.h"
 

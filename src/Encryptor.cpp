@@ -17,7 +17,7 @@
 
 #include "thekogans/util/Exception.h"
 #include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/Cipher.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/Encryptor.h"
 
 namespace thekogans {
@@ -33,7 +33,7 @@ namespace thekogans {
                             OpenSSLInit::engine,
                             key.Get ().GetReadPtr (),
                             0) != 1 ||
-                        (Cipher::GetMode (cipher) == EVP_CIPH_GCM_MODE &&
+                        (GetCipherMode (cipher) == EVP_CIPH_GCM_MODE &&
                             EVP_CIPHER_CTX_ctrl (
                                 &context,
                                 EVP_CTRL_GCM_SET_IVLEN,

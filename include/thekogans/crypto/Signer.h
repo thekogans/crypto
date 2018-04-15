@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_Signer_h)
 #define __thekogans_crypto_Signer_h
 
+#include <cstddef>
 #include <memory>
 #include <openssl/evp.h>
 #include "thekogans/util/Buffer.h"

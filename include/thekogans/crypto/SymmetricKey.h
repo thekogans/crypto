@@ -18,8 +18,12 @@
 #if !defined (__thekogans_crypto_SymmetricKey_h)
 #define __thekogans_crypto_SymmetricKey_h
 
+#include <cstddef>
 #include <string>
 #include <openssl/evp.h>
+#if defined (THEKOGANS_CRYPTO_TESTING)
+    #include "thekogans/util/Types.h"
+#endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include "thekogans/util/FixedBuffer.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"

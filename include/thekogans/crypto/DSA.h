@@ -18,8 +18,8 @@
 #if !defined (__thekogans_crypto_DSA_h)
 #define __thekogans_crypto_DSA_h
 
-#include "thekogans/util/Serializer.h"
-#include "thekogans/util/Buffer.h"
+#include <cstddef>
+#include <string>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Params.h"
 

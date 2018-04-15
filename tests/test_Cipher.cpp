@@ -70,7 +70,7 @@ TEST (thekogans, CBC) {
     crypto::OpenSSLInit openSSLInit;
     crypto::Cipher cipher (
         crypto::SymmetricKey::FromSecretAndSalt (
-            crypto::Cipher::GetKeyLength (EVP_aes_256_cbc ()),
+            crypto::GetCipherKeyLength (EVP_aes_256_cbc ()),
             password.c_str (),
             password.size ()),
         EVP_aes_256_gcm ());
@@ -87,7 +87,7 @@ TEST (thekogans, GCM) {
     crypto::OpenSSLInit openSSLInit;
     crypto::Cipher cipher (
         crypto::SymmetricKey::FromSecretAndSalt (
-            crypto::Cipher::GetKeyLength (),
+            crypto::GetCipherKeyLength (),
             password.c_str (),
             password.size ()));
     CHECK_EQUAL (

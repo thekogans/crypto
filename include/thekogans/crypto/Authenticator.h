@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_Authenticator_h)
 #define __thekogans_crypto_Authenticator_h
 
+#include <cstddef>
 #include <openssl/evp.h>
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/util/Buffer.h"

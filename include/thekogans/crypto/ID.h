@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_ID_h)
 #define __thekogans_crypto_ID_h
 
+#include <cstddef>
 #include <cstring>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/Serializer.h"

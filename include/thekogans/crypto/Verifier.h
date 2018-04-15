@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_Verifier_h)
 #define __thekogans_crypto_Verifier_h
 
+#include <cstddef>
 #include <memory>
 #include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
@@ -30,7 +31,7 @@ namespace thekogans {
         /// \struct Verifier Verifier.h thekogans/crypto/Verifier.h
         ///
         /// \brief
-        /// Verifier implements public key verify operation.
+        /// Verifier implements public key signature verification operation.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Verifier {
             /// \brief

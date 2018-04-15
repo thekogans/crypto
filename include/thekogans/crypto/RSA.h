@@ -18,6 +18,8 @@
 #if !defined (__thekogans_crypto_RSA_h)
 #define __thekogans_crypto_RSA_h
 
+#include <cstddef>
+#include <string>
 #include <openssl/rsa.h>
 #include "thekogans/util/ByteSwap.h"
 #include "thekogans/util/Buffer.h"

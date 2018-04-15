@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include "thekogans/util/Flags.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/crypto/OpenSSLInit.h"
@@ -37,7 +36,7 @@ namespace thekogans {
                 encryptor (*key, cipher),
                 decryptor (*key, cipher) {
             if (key.Get () != 0 && cipher != 0) {
-                if (GetMode (cipher) != EVP_CIPH_GCM_MODE) {
+                if (GetCipherMode (cipher) != EVP_CIPH_GCM_MODE) {
                     if (md != 0) {
                         mac.Reset (
                             new MAC (
@@ -51,47 +50,6 @@ namespace thekogans {
                             THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                     }
                 }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        std::size_t Cipher::GetIVLength (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
-                return EVP_CIPHER_iv_length (cipher);
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        std::size_t Cipher::GetKeyLength (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
-                return EVP_CIPHER_key_length (cipher);
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        util::i32 Cipher::GetMode (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
-                return EVP_CIPHER_mode (cipher);
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        bool Cipher::IsAEAD (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
-                return util::Flags<unsigned long> (EVP_CIPHER_flags (cipher)).Test (
-                    EVP_CIPH_FLAG_AEAD_CIPHER);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -115,7 +73,7 @@ namespace thekogans {
                 std::size_t associatedDataLength,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
                     ciphertext != 0) {
                 util::ui8 *ivCiphertextAndMAC = ciphertext + CiphertextHeader::SIZE;
                 CiphertextHeader ciphertextHeader;
@@ -172,7 +130,7 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::UniquePtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
@@ -199,7 +157,7 @@ namespace thekogans {
                 std::size_t associatedDataLength,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
                     ciphertext != 0) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
@@ -226,7 +184,7 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::UniquePtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
@@ -253,7 +211,7 @@ namespace thekogans {
                 std::size_t associatedDataLength,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
                     ciphertext != 0) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
@@ -280,7 +238,7 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::UniquePtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
@@ -307,7 +265,7 @@ namespace thekogans {
                 std::size_t associatedDataLength,
                 util::ui8 *plaintext) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
                     plaintext != 0) {
                 CiphertextHeader ciphertextHeader;
                 util::TenantReadBuffer buffer (
@@ -361,7 +319,7 @@ namespace thekogans {
                 bool secure,
                 util::Endianness endianness) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    (IsAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::UniquePtr plaintext (secure ?
                     new util::SecureBuffer (endianness, (util::ui32)ciphertextLength) :
                     new util::Buffer (endianness, (util::ui32)ciphertextLength));

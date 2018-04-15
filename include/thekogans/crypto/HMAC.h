@@ -18,6 +18,8 @@
 #if !defined (__thekogans_crypto_HMAC_h)
 #define __thekogans_crypto_HMAC_h
 
+#include <cstddef>
+#include <string>
 #include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"

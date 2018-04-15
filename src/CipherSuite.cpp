@@ -338,7 +338,7 @@ namespace thekogans {
         }
 
         bool CipherSuite::VerifyCipherKey (const SymmetricKey &key) const {
-            return Cipher::GetKeyLength (GetOpenSSLCipher (cipher)) == key.Length ();
+            return GetCipherKeyLength (GetOpenSSLCipher (cipher)) == key.Length ();
         }
 
         bool CipherSuite::VerifyMACKey (const AsymmetricKey &key) const {

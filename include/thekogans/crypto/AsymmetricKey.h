@@ -18,10 +18,11 @@
 #if !defined (__thekogans_crypto_AsymmetricKey_h)
 #define __thekogans_crypto_AsymmetricKey_h
 
+#include <cstddef>
 #include <string>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
-#include "thekogans/util/Exception.h"
+#include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Serializable.h"
 #include "thekogans/crypto/OpenSSLUtils.h"

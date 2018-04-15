@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_KeyRing_h)
 #define __thekogans_crypto_KeyRing_h
 
+#include <cstddef>
 #include <string>
 #include <list>
 #include <map>
@@ -29,7 +30,10 @@
 #include "thekogans/crypto/Params.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/KeyExchange.h"
+#include "thekogans/crypto/Authenticator.h"
 #include "thekogans/crypto/Cipher.h"
+#include "thekogans/crypto/MAC.h"
 
 namespace thekogans {
     namespace crypto {

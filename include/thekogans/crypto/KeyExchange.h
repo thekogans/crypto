@@ -18,6 +18,8 @@
 #if !defined (__thekogans_crypto_KeyExchange_h)
 #define __thekogans_crypto_KeyExchange_h
 
+#include <cstddef>
+#include <string>
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
