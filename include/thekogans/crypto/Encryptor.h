@@ -59,6 +59,21 @@ namespace thekogans {
                 const EVP_CIPHER *cipher);
 
             /// \brief
+            /// Return the length of the initialization vector (IV) associated with the cipher.
+            /// \return The length of the initialization vector (IV) associated with the cipher.
+            inline std::size_t GetIVLength () const {
+                return EVP_CIPHER_CTX_iv_length (&context);
+            }
+
+            /// \brief
+            /// Return max buffer length needed to encrypt the given amount of plaintext.
+            /// \param[in] plaintextLength Amount of plaintext to encrypt.
+            /// \return Max buffer length needed to encrypt the given amount of plaintext.
+            static std::size_t GetMaxBufferLength (std::size_t plaintextLength) {
+                return plaintextLength + EVP_MAX_BLOCK_LENGTH;
+            }
+
+            /// \brief
             /// Generate a random iv and initialize the encryptor.
             /// \param[out] iv Where to place the generated iv.
             /// \return Number of bytes written to iv.
@@ -94,13 +109,6 @@ namespace thekogans {
             /// \param[out] tag Where to write the tag.
             /// \return Size of tag (in bytes).
             std::size_t GetTag (util::ui8 *tag);
-
-            /// \brief
-            /// Return the length of the initialization vector (IV) associated with the cipher.
-            /// \return The length of the initialization vector (IV) associated with the cipher.
-            inline std::size_t GetIVLength () const {
-                return EVP_CIPHER_CTX_iv_length (&context);
-            }
 
             /// \brief
             /// Return the reference to stats.

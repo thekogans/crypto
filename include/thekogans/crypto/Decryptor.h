@@ -59,6 +59,14 @@ namespace thekogans {
                 const EVP_CIPHER *cipher);
 
             /// \brief
+            /// Return max buffer length needed to decrypt the given amount of ciphertext.
+            /// \param[in] ciphertextLength Amount of ciphertext to decrypt.
+            /// \return Max buffer length needed to decrypt the given amount of ciphertext.
+            static std::size_t GetMaxBufferLength (std::size_t ciphertextLength) {
+                return ciphertextLength;
+            }
+
+            /// \brief
             /// Set the initialization vector (IV) and initialize the decryptor.
             /// \param[in] iv Initialization vector used for decryption.
             void Init (const util::ui8 *iv);
@@ -94,13 +102,6 @@ namespace thekogans {
             /// \param[out] plaintext Where to write the plaintext.
             /// \return Count of bytest written to plaintext.
             std::size_t Final (util::ui8 *plaintext);
-
-            /// \brief
-            /// Return the length of the initialization vector (IV) associated with the cipher.
-            /// \return The length of the initialization vector (IV) associated with the cipher.
-            inline std::size_t GetIVLength () const {
-                return EVP_CIPHER_CTX_iv_length (&context);
-            }
 
             /// \brief
             /// Return the reference to stats.

@@ -37,7 +37,7 @@ namespace thekogans {
                             EVP_CIPHER_CTX_ctrl (
                                 &context,
                                 EVP_CTRL_GCM_SET_IVLEN,
-                                (util::i32)GetIVLength (),
+                                EVP_CIPHER_CTX_iv_length (&context),
                                 0) != 1)) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
