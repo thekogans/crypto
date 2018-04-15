@@ -116,7 +116,7 @@ int main (
                 options.description);
             crypto::Cipher cipher (
                 crypto::SymmetricKey::FromSecretAndSalt (
-                    crypto::Cipher::GetKeyLength (),
+                    crypto::GetCipherKeyLength (),
                     options.password.c_str (),
                     options.password.size ()));
             keyRing.Save (options.path, &cipher);
@@ -126,7 +126,7 @@ int main (
             std::cout << "Verifying key ring...";
             crypto::Cipher cipher (
                 crypto::SymmetricKey::FromSecretAndSalt (
-                    crypto::Cipher::GetKeyLength (),
+                    crypto::GetCipherKeyLength (),
                     options.password.c_str (),
                     options.password.size ()));
             crypto::KeyRing::Ptr keyRing = crypto::KeyRing::Load (options.path, &cipher);
@@ -138,7 +138,7 @@ int main (
                         originalPlaintext.GetDataAvailableForWriting ()));
                 crypto::Cipher cipher (
                     crypto::SymmetricKey::FromRandom (
-                        crypto::Cipher::GetKeyLength (
+                        crypto::GetCipherKeyLength (
                             keyRing->GetCipherSuite ().GetOpenSSLCipher ())));
                 util::Buffer::UniquePtr ciphertext = cipher.Encrypt (
                     originalPlaintext.GetReadPtr (),

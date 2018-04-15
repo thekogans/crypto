@@ -131,7 +131,7 @@ int main (
             cipher.Reset (
                 new crypto::Cipher (
                     crypto::SymmetricKey::FromSecretAndSalt (
-                        crypto::Cipher::GetKeyLength (),
+                        crypto::GetCipherKeyLength (),
                         options.password.c_str (),
                         options.password.size ())));
         }
@@ -146,7 +146,7 @@ int main (
             if (keyRing.Get () != 0) {
                 crypto::SymmetricKey::Ptr key =
                     crypto::SymmetricKey::FromRandom (
-                        crypto::Cipher::GetKeyLength (
+                        crypto::GetCipherKeyLength (
                             options.cipherSuite.GetOpenSSLCipher ()));
                 keyRing->AddCipherKey (key);
                 cipher = keyRing->GetCipherSuite ().GetCipher (key);
@@ -176,7 +176,7 @@ int main (
             cipher.Reset (
                 new crypto::Cipher (
                     crypto::SymmetricKey::FromSecretAndSalt (
-                        crypto::Cipher::GetKeyLength (
+                        crypto::GetCipherKeyLength (
                             options.cipherSuite.GetOpenSSLCipher ()),
                         options.password.c_str (),
                         options.password.size ())));
