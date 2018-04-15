@@ -183,6 +183,17 @@ namespace thekogans {
             }
         }
 
+        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API
+        GetMDLength (const EVP_MD *md) {
+            if (md != 0) {
+                return EVP_MD_size (md);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
         _LIB_THEKOGANS_CRYPTO_DECL std::string _LIB_THEKOGANS_CRYPTO_API
         EVP_PKEYtypeTostring (util::i32 type) {
             switch (type) {

@@ -38,23 +38,31 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr MessageDigest::HashBuffer (
+        void MessageDigest::Init () {
+            if (EVP_DigestInit_ex (&ctx, 0, 0) != 1) {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
+        }
+
+        void MessageDigest::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestInit_ex (&ctx, 0, 0) == 1 &&
-                        EVP_DigestUpdate (&ctx, buffer, bufferLength) == 1) {
-                    util::Buffer::UniquePtr hash (
-                        new util::Buffer (util::HostEndian, EVP_MAX_MD_SIZE));
-                    util::ui32 hashLength = EVP_MAX_MD_SIZE;
-                    if (EVP_DigestFinal_ex (&ctx, hash->GetWritePtr (), &hashLength) == 1) {
-                        hash->AdvanceWriteOffset (hashLength);
-                        memset (hash->GetWritePtr (), 0, hash->GetDataAvailableForWriting ());
-                        return hash;
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                if (EVP_DigestUpdate (&ctx, buffer, bufferLength) != 1) {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t MessageDigest::Final (util::ui8 *digest) {
+            if (digest != 0) {
+                util::ui32 digestLength = 0;
+                if (EVP_DigestFinal_ex (&ctx, digest, &digestLength) == 1) {
+                    return digestLength;
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -66,32 +74,38 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr MessageDigest::HashFile (const std::string &path) {
-            if (EVP_DigestInit_ex (&ctx, 0, 0) == 1) {
-                util::ReadOnlyFile file (util::HostEndian, path);
-                util::FixedArray<util::ui8, 4096> buffer;
-                for (util::ui32 count = file.Read (buffer.array, 4096);
-                        count != 0;
-                        count = file.Read (buffer.array, 4096)) {
-                    if (EVP_DigestUpdate (&ctx, buffer.array, count) != 1) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
+        util::Buffer::UniquePtr MessageDigest::HashBuffer (
+                const void *buffer,
+                std::size_t bufferLength) {
+            if (buffer != 0 && bufferLength > 0) {
+                Init ();
+                Update (buffer, bufferLength);
                 util::Buffer::UniquePtr hash (
-                    new util::Buffer (util::HostEndian, EVP_MAX_MD_SIZE));
-                util::ui32 hashLength = 0;
-                if (EVP_DigestFinal_ex (&ctx, hash->GetWritePtr (), &hashLength) == 1) {
-                    hash->AdvanceWriteOffset (hashLength);
-                    memset (hash->GetWritePtr (), 0, hash->GetDataAvailableForWriting ());
-                    return hash;
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                    new util::Buffer (util::HostEndian, GetMDLength (md)));
+                hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
+                assert (hash->GetDataAvailableForWriting () == 0);
+                return hash;
             }
             else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+        }
+
+        util::Buffer::UniquePtr MessageDigest::HashFile (const std::string &path) {
+            Init ();
+            util::ReadOnlyFile file (util::HostEndian, path);
+            util::FixedArray<util::ui8, 4096> buffer;
+            for (util::ui32 count = file.Read (buffer.array, 4096);
+                    count != 0;
+                    count = file.Read (buffer.array, 4096)) {
+                Update (buffer.array, count);
+            }
+            util::Buffer::UniquePtr hash (
+                new util::Buffer (util::HostEndian, GetMDLength (md)));
+            hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
+            assert (hash->GetDataAvailableForWriting () == 0);
+            return hash;
         }
 
     } // namespace crypto

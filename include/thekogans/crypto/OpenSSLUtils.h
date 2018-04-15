@@ -420,6 +420,13 @@ namespace thekogans {
             const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
 
         /// \brief
+        /// Return the length of the digest given an OpenSSL message digest object.
+        /// \param[in] md OpenSSL message digest object.
+        /// \return Length of the digest for the given OpenSSL message digest object.
+        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API GetMDLength (
+            const EVP_MD *md);
+
+        /// \brief
         /// Convert OpenSSL EVP_PKEY key type to string.
         /// \param[in] type One of EVP_PKEY_RSA, EVP_PKEY_DSA, EVP_PKEY_DH,
         /// EVP_PKEY_EC, EVP_PKEY_HMAC or EVP_PKEY_CMAC to "RSA", "DSA", "DH",

@@ -32,7 +32,7 @@ namespace thekogans {
         /// \brief
         /// Generate Elliptic Curve (EC) parameters using various given techniques.
         /// Call \see{Params::CreateKey} to derive the key. Use the derived key with
-        /// \see{KeyExchange} to perform key exchange (ECDH[E}) and to \see{Authenticatior}
+        /// \see{KeyExchange} to perform key exchange (ECDH[E}) and with \see{Authenticatior}
         /// to sign/verify (ECDSA).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL EC {

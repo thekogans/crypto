@@ -57,6 +57,26 @@ namespace thekogans {
             /// \param[in] md_ OpenSSL message digest to use.
             MessageDigest (const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
+            // NOTE: This is the low level API used by HashBuffer/HashFile below.
+            // It exists so that you can compute a digest over multiple disjoint
+            // buffers.
+
+            /// \brief
+            /// Initialize the context (ctx) and get it ready for MAC generation.
+            void Init ();
+            /// \brief
+            /// Call this method 1 or more times to generate a digest.
+            /// \param[in] buffer Buffer whose digest to create.
+            /// \param[in] bufferLength Buffer length.
+            void Update (
+                const void *buffer,
+                std::size_t bufferLength);
+            /// \brief
+            /// Finalize the digest computation and return it.
+            /// \param[out] digest Where to write the digest.
+            /// \return Number of bytes written to digest.
+            std::size_t Final (util::ui8 *digest);
+
             /// \brief
             /// Create a buffer hash (MessageDigest).
             /// \param[in] buffer Buffer whose hash to create.

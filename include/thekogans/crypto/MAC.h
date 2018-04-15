@@ -65,7 +65,7 @@ namespace thekogans {
                 AsymmetricKey::Ptr key_,
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
-            // NOTE: This is the low level API used SignBuffer/VerifyBufferSignature below.
+            // NOTE: This is the low level API used by SignBuffer/VerifyBufferSignature below.
             // It exists so that you can mac multiple disjoint buffers.
 
             /// \brief
