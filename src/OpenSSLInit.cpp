@@ -124,11 +124,28 @@ namespace thekogans {
             OpenSSL_add_all_algorithms ();
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureBuffer entropy (util::HostEndian, entropyNeeded);
-                {
-                    util::RandomSource randomSource;
-                    randomSource.GetBytes (entropy.data, entropy.length);
+                // Start by trying to get seed bytes.
+                entropy.AdvanceWriteOffset (
+                    util::GlobalRandomSource::Instance ().GetSeed (
+                        entropy.GetWritePtr (),
+                        entropy.GetDataAvailableForWriting ()));
+                // If entropy couldn't be satisfied with seed bytes,
+                // get random bytes.
+                if (entropy.GetDataAvailableForWriting () > 0) {
+                    entropy.AdvanceWriteOffset (
+                        util::GlobalRandomSource::Instance ().GetBytes (
+                            entropy.GetWritePtr (),
+                            entropy.GetDataAvailableForWriting ()));
                 }
-                RAND_seed (entropy.data, (util::i32)entropy.length);
+                if (entropy.GetDataAvailableForWriting () == 0) {
+                    RAND_seed (
+                        entropy.GetReadPtr (),
+                        (util::i32)entropy.GetDataAvailableForReading ());
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to get %u random bytes for seed.", entropy.length);
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (

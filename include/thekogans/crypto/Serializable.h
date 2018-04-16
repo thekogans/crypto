@@ -19,6 +19,9 @@
 #define __thekogans_crypto_Serializable_h
 
 #include <string>
+#if defined (THEKOGANS_CRYPTO_TESTING)
+    #include "thekogans/util/Types.h"
+#endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include "thekogans/util/Serializable.h"
 #include "thekogans/util/SpinLock.h"
 #include "thekogans/util/SecureAllocator.h"

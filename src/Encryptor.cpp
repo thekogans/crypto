@@ -53,11 +53,16 @@ namespace thekogans {
                 // An explicit iv for each frame will thwart BEAST.
                 // http://www.slideshare.net/danrlde/20120418-luedtke-ssltlscbcbeast
                 std::size_t ivLength = GetIVLength ();
-                util::GlobalRandomSource::Instance ().GetBytes (iv, ivLength);
-                if (EVP_EncryptInit_ex (&context, 0, 0, 0, iv) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                if (util::GlobalRandomSource::Instance ().GetBytes (iv, ivLength) == ivLength) {
+                    if (EVP_EncryptInit_ex (&context, 0, 0, 0, iv) != 1) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                    return ivLength;
                 }
-                return ivLength;
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to get %u random bytes for iv.", ivLength);
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

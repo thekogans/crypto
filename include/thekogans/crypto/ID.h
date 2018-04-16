@@ -49,7 +49,10 @@ namespace thekogans {
             /// \brief
             /// ctor.
             ID () {
-                util::GlobalRandomSource::Instance ().GetBytes (data, SIZE);
+                if (util::GlobalRandomSource::Instance ().GetBytes (data, SIZE) != SIZE) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to get %u random bytes for ID.", SIZE);
+                }
             }
             /// \brief
             /// ctor. Initialize to a given value.

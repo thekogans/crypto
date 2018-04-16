@@ -116,17 +116,22 @@ namespace thekogans {
                 randomLength = MIN_RANDOM_LENGTH;
             }
             util::SecureVector<util::ui8> random (randomLength);
-            util::GlobalRandomSource::Instance ().GetBytes (&random[0], randomLength);
-            return FromSecretAndSalt (
-                keyLength,
-                &random[0],
-                randomLength,
-                salt,
-                saltLength,
-                md,
-                count,
-                name,
-                description);
+            if (util::GlobalRandomSource::Instance ().GetBytes (&random[0], randomLength) == randomLength) {
+                return FromSecretAndSalt (
+                    keyLength,
+                    &random[0],
+                    randomLength,
+                    salt,
+                    saltLength,
+                    md,
+                    count,
+                    name,
+                    description);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unable to get %u random bytes for key.", randomLength);
+            }
         }
 
         std::size_t SymmetricKey::Size () const {
