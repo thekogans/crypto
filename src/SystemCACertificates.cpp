@@ -262,7 +262,7 @@ namespace thekogans {
                 OSStatus errorCode = SecTrustSettingsCopyCertificates (domains[i], &certs);
                 if (certs != 0) {
                     CFArrayRefPtr certsPtr (certs);
-                    for (util::i32 j = 0, numCerts = CFArrayGetCount (certs); j < numCerts; ++j) {
+                    for (util::i32 j = 0, numCerts = (util::i32)CFArrayGetCount (certs); j < numCerts; ++j) {
                         SecCertificateRef cert = (SecCertificateRef)CFArrayGetValueAtIndex (certs, j);
                         if (cert != 0) {
                             CFErrorRef error = 0;

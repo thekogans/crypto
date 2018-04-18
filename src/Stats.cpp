@@ -15,6 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#if defined (THEKOGANS_CRYPTO_TESTING)
+    #include "thekogans/util/XMLUtils.h"
+#endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include "thekogans/crypto/Stats.h"
 
 namespace thekogans {
@@ -39,10 +42,10 @@ namespace thekogans {
         }
 
     #if defined (THEKOGANS_CRYPTO_TESTING)
-        const char * const Cipher::Stats::ATTR_USE_COUNT = "UseCount";
-        const char * const Cipher::Stats::ATTR_MIN_BYTE_COUNT = "MinByteCount";
-        const char * const Cipher::Stats::ATTR_MAX_BYTE_COUNT = "MaxByteCount";
-        const char * const Cipher::Stats::ATTR_TOTAL_BYTE_COUNT = "TotalByteCount";
+        const char * const Stats::ATTR_USE_COUNT = "UseCount";
+        const char * const Stats::ATTR_MIN_BYTE_COUNT = "MinByteCount";
+        const char * const Stats::ATTR_MAX_BYTE_COUNT = "MaxByteCount";
+        const char * const Stats::ATTR_TOTAL_BYTE_COUNT = "TotalByteCount";
 
         std::string Stats::ToString (
                 util::ui32 indentationLevel,
