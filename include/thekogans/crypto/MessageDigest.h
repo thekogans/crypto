@@ -58,11 +58,12 @@ namespace thekogans {
             MessageDigest (const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
             // NOTE: This is the low level API used by HashBuffer/HashFile below.
-            // It exists so that you can compute a digest over multiple disjoint
-            // buffers.
+            // It exists so that you can compute a message digest over multiple
+            // disjoint buffers.
 
             /// \brief
-            /// Initialize the context (ctx) and get it ready for MAC generation.
+            /// Initialize the context (ctx) and get it ready
+            /// for message digest generation.
             void Init ();
             /// \brief
             /// Call this method 1 or more times to generate a digest.
@@ -78,7 +79,7 @@ namespace thekogans {
             std::size_t Final (util::ui8 *digest);
 
             /// \brief
-            /// Create a buffer hash (MessageDigest).
+            /// Create a buffer hash (message digest).
             /// \param[in] buffer Buffer whose hash to create.
             /// \param[in] bufferLength Buffer length.
             /// \return Buffer hash.
@@ -86,7 +87,7 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength);
             /// \brief
-            /// Create a file hash (MessageDigest).
+            /// Create a file hash (message digest).
             /// \param[in] path File whose hash to create.
             /// \return File hash.
             util::Buffer::UniquePtr HashFile (const std::string &path);

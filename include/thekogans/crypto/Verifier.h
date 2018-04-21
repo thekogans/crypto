@@ -31,7 +31,7 @@ namespace thekogans {
         /// \struct Verifier Verifier.h thekogans/crypto/Verifier.h
         ///
         /// \brief
-        /// Verifier implements public key signature verification operation.
+        /// Verifier implements the public key signature verification operation.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Verifier {
             /// \brief

@@ -33,9 +33,9 @@ namespace thekogans {
         /// \struct AsymmetricKey AsymmetricKey.h thekogans/crypto/AsymmetricKey.h
         ///
         /// \brief
-        /// AsymmetricKey wraps a EVP_PKEY and provides the functionality exposed by \see{Serializable}.
-        /// AsymmetricKey makes it very convenient to serialize asymmetric keys for saving to
-        /// files or transferring across the network.
+        /// AsymmetricKey wraps a EVP_PKEY and provides the functionality exposed by
+        /// \see{Serializable}. AsymmetricKey makes it very convenient to serialize
+        /// asymmetric keys for saving to files or transferring across the network.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
             /// \brief

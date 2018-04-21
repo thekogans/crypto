@@ -74,10 +74,10 @@ namespace thekogans {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 util::FixedArray<util::ui8, 4096> buffer;
-                for (util::ui32 count = file.Read (buffer.array, 4096);
+                for (util::ui32 count = file.Read (buffer, 4096);
                         count != 0;
-                        count = file.Read (buffer.array, 4096)) {
-                    signer->Update (buffer.array, count);
+                        count = file.Read (buffer, 4096)) {
+                    signer->Update (buffer, count);
                 }
                 return signer->Final ();
             }
@@ -96,10 +96,10 @@ namespace thekogans {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;
-                    for (util::ui32 count = file.Read (buffer.array, 4096);
+                    for (util::ui32 count = file.Read (buffer, 4096);
                             count != 0;
-                            count = file.Read (buffer.array, 4096)) {
-                        verifier->Update (buffer.array, count);
+                            count = file.Read (buffer, 4096)) {
+                        verifier->Update (buffer, count);
                     }
                     return verifier->Final (signature, signatureLength);
                 }

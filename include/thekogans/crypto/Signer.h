@@ -32,7 +32,7 @@ namespace thekogans {
         /// \struct Signer Signer.h thekogans/crypto/Signer.h
         ///
         /// \brief
-        /// Signer implements public key sign operation.
+        /// Signer implements the public key sign operation.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Signer {
             /// \brief
