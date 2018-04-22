@@ -82,7 +82,7 @@ namespace thekogans {
                 Update (buffer, bufferLength);
                 util::Buffer::UniquePtr hash (
                     new util::Buffer (util::HostEndian, GetMDLength (md)));
-                hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
+                hash->AdvanceWriteOffset ((util::ui32)Final (hash->GetWritePtr ()));
                 assert (hash->GetDataAvailableForWriting () == 0);
                 return hash;
             }
@@ -103,7 +103,7 @@ namespace thekogans {
             }
             util::Buffer::UniquePtr hash (
                 new util::Buffer (util::HostEndian, GetMDLength (md)));
-            hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
+            hash->AdvanceWriteOffset ((util::ui32)Final (hash->GetWritePtr ()));
             assert (hash->GetDataAvailableForWriting () == 0);
             return hash;
         }
