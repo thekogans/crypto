@@ -104,8 +104,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Params::Ptr params =
                         it->second->GetKeyExchangeParams (paramsId, recursive);
                     if (params.Get () != 0) {
@@ -128,8 +128,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Params::Ptr params =
                         it->second->GetKeyExchangeParams (equalityTest, recursive);
                     if (params.Get () != 0) {
@@ -164,8 +164,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropKeyExchangeParams (paramsId, recursive)) {
                         return true;
                     }
@@ -178,8 +178,8 @@ namespace thekogans {
             keyExchangeParamsMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     it->second->DropAllKeyExchangeParams (recursive);
                 }
             }
@@ -194,8 +194,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key =
                         it->second->GetKeyExchangeKey (keyId, recursive);
                     if (key.Get () != 0) {
@@ -218,8 +218,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key =
                         it->second->GetKeyExchangeKey (equalityTest, recursive);
                     if (key.Get () != 0) {
@@ -253,8 +253,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     KeyExchange::Ptr keyExchange =
                         it->second->GetKeyExchange (keyId, recursive);
                     if (keyExchange.Get () != 0) {
@@ -292,8 +292,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropKeyExchangeKey (keyId, recursive)) {
                         return true;
                     }
@@ -307,8 +307,8 @@ namespace thekogans {
             keyExchangeMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     it->second->DropAllKeyExchangeKeys (recursive);
                 }
             }
@@ -323,8 +323,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Params::Ptr params =
                         it->second->GetAuthenticatorParams (paramsId, recursive);
                     if (params.Get () != 0) {
@@ -347,8 +347,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Params::Ptr params =
                         it->second->GetAuthenticatorParams (equalityTest, recursive);
                     if (params.Get () != 0) {
@@ -382,8 +382,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropAuthenticatorParams (paramsId, recursive)) {
                         return true;
                     }
@@ -396,8 +396,8 @@ namespace thekogans {
             authenticatorParamsMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     it->second->DropAllAuthenticatorParams (recursive);
                 }
             }
@@ -412,8 +412,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key =
                         it->second->GetAuthenticatorKey (keyId, recursive);
                     if (key.Get () != 0) {
@@ -436,8 +436,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key =
                         it->second->GetAuthenticatorKey (equalityTest, recursive);
                     if (key.Get () != 0) {
@@ -474,8 +474,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Authenticator::Ptr authenticator =
                         it->second->GetAuthenticator (op, keyId, recursive);
                     if (authenticator.Get () != 0) {
@@ -520,8 +520,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropAuthenticatorKey (keyId, recursive)) {
                         return true;
                     }
@@ -535,8 +535,8 @@ namespace thekogans {
             authenticatorMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     it->second->DropAllAuthenticatorKeys (recursive);
                 }
             }
@@ -551,8 +551,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     SymmetricKey::Ptr key = it->second->GetCipherKey (keyId, recursive);
                     if (key.Get () != 0) {
                         return key;
@@ -574,8 +574,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     SymmetricKey::Ptr key = it->second->GetCipherKey (equalityTest, recursive);
                     if (key.Get () != 0) {
                         return key;
@@ -608,8 +608,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Cipher::Ptr cipher =
                         it->second->GetCipher (keyId, recursive);
                     if (cipher.Get () != 0) {
@@ -647,8 +647,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropCipherKey (keyId, recursive)) {
                         return true;
                     }
@@ -662,8 +662,8 @@ namespace thekogans {
             cipherMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     it->second->DropAllCipherKeys (recursive);
                 }
             }
@@ -678,8 +678,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key = it->second->GetMACKey (keyId, recursive);
                     if (key.Get () != 0) {
                         return key;
@@ -701,8 +701,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::Ptr key = it->second->GetMACKey (equalityTest, recursive);
                     if (key.Get () != 0) {
                         return key;
@@ -734,8 +734,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     MAC::Ptr mac =
                         it->second->GetMAC (keyId, recursive);
                     if (mac.Get () != 0) {
@@ -773,8 +773,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropMACKey (keyId, recursive)) {
                         return true;
                     }
@@ -788,8 +788,8 @@ namespace thekogans {
             macMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     it->second->DropAllMACKeys (recursive);
                 }
             }
@@ -804,8 +804,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Serializable::Ptr userData = it->second->GetUserData (id, recursive);
                     if (userData.Get () != 0) {
                         return userData;
@@ -827,8 +827,8 @@ namespace thekogans {
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Serializable::Ptr userData = it->second->GetUserData (equalityTest, recursive);
                     if (userData.Get () != 0) {
                         return userData;
@@ -861,8 +861,8 @@ namespace thekogans {
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropUserData (id, recursive)) {
                         return true;
                     }
@@ -875,8 +875,8 @@ namespace thekogans {
             userDataMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     it->second->DropAllUserData (recursive);
                 }
             }
@@ -885,14 +885,14 @@ namespace thekogans {
         KeyRing::Ptr KeyRing::GetSubring (
                 const ID &subringId,
                 bool recursive) const {
-            KeyRingMap::const_iterator it = subringsMap.find (subringId);
-            if (it != subringsMap.end ()) {
+            KeyRingMap::const_iterator it = subringMap.find (subringId);
+            if (it != subringMap.end ()) {
                 return it->second;
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Ptr subring = it->second->GetSubring (subringId, recursive);
                     if (subring.Get () != 0) {
                         return subring;
@@ -906,16 +906,16 @@ namespace thekogans {
                 const EqualityTest<KeyRing> &equalityTest,
                 bool recursive) const {
             for (KeyRingMap::const_iterator
-                    it = subringsMap.begin (),
-                    end = subringsMap.end (); it != end; ++it) {
+                    it = subringMap.begin (),
+                    end = subringMap.end (); it != end; ++it) {
                 if (equalityTest (*it->second)) {
                     return it->second;
                 }
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     Ptr subring = it->second->GetSubring (equalityTest, recursive);
                     if (subring.Get () != 0) {
                         return subring;
@@ -928,7 +928,7 @@ namespace thekogans {
         bool KeyRing::AddSubring (Ptr subring) {
             if (subring.Get () != 0) {
                 std::pair<KeyRingMap::iterator, bool> result =
-                    subringsMap.insert (
+                    subringMap.insert (
                         KeyRingMap::value_type (subring->GetId (), subring));
                 return result.second;
             }
@@ -941,15 +941,15 @@ namespace thekogans {
         bool KeyRing::DropSubring (
                 const ID &subringId,
                 bool recursive) {
-            KeyRingMap::iterator it = subringsMap.find (subringId);
-            if (it != subringsMap.end ()) {
-                subringsMap.erase (it);
+            KeyRingMap::iterator it = subringMap.find (subringId);
+            if (it != subringMap.end ()) {
+                subringMap.erase (it);
                 return true;
             }
             else if (recursive) {
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     if (it->second->DropSubring (subringId, recursive)) {
                         return true;
                     }
@@ -959,7 +959,7 @@ namespace thekogans {
         }
 
         void KeyRing::DropAllSubrings () {
-            subringsMap.clear ();
+            subringMap.clear ();
         }
 
         void KeyRing::Clear () {
@@ -974,7 +974,7 @@ namespace thekogans {
             macKeyMap.clear ();
             macMap.clear ();
             userDataMap.clear ();
-            subringsMap.clear ();
+            subringMap.clear ();
         }
 
         std::size_t KeyRing::Size () const {
@@ -1025,8 +1025,8 @@ namespace thekogans {
             }
             size += util::UI32_SIZE;
             for (KeyRingMap::const_iterator
-                    it = subringsMap.begin (),
-                    end = subringsMap.end (); it != end; ++it) {
+                    it = subringMap.begin (),
+                    end = subringMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
             return size;
@@ -1144,12 +1144,12 @@ namespace thekogans {
             }
             util::ui32 subringCount;
             serializer >> subringCount;
-            subringsMap.clear ();
+            subringMap.clear ();
             while (subringCount-- > 0) {
                 Ptr subring;
                 serializer >> subring;
                 std::pair<KeyRingMap::iterator, bool> result =
-                    subringsMap.insert (
+                    subringMap.insert (
                         KeyRingMap::value_type (subring->GetId (), subring));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -1204,10 +1204,10 @@ namespace thekogans {
                     end = userDataMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)subringsMap.size ();
+            serializer << (util::ui32)subringMap.size ();
             for (KeyRingMap::const_iterator
-                    it = subringsMap.begin (),
-                    end = subringsMap.end (); it != end; ++it) {
+                    it = subringMap.begin (),
+                    end = subringMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
         }
@@ -1383,8 +1383,8 @@ namespace thekogans {
                     false,
                     true);
                 for (KeyRingMap::const_iterator
-                        it = subringsMap.begin (),
-                        end = subringsMap.end (); it != end; ++it) {
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
                     stream << it->second->ToString (
                         indentationLevel + 2,
                         TAG_SUB_RING);

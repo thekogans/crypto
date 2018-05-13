@@ -41,7 +41,7 @@ namespace thekogans {
         /// \struct KeyRing KeyRing.h thekogans/crypto/KeyRing.h
         ///
         /// \brief
-        /// KeyRing is a collection of \see{Params}, \see{AsymmetricKey} and \see{SymmetricKey} and
+        /// KeyRing is a collection of \see{Params}, \see{AsymmetricKey}, \see{SymmetricKey} and
         /// user data (\see{Serializable}) suitable for use with a particular \see{CipherSuite}.
         /// KeyRings design makes it perfectly suitable for both duties of securing data on the wire
         /// as well as data at rest. In the former case, create a KeyRing containing an appropriate
@@ -128,7 +128,7 @@ namespace thekogans {
             typedef std::map<ID, Ptr> KeyRingMap;
             /// \brief
             /// Subrings hanging off this key ring.
-            KeyRingMap subringsMap;
+            KeyRingMap subringMap;
 
         public:
             /// \brief
