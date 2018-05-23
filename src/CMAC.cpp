@@ -18,6 +18,7 @@
 #include <openssl/evp.h>
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/CMAC.h"
 

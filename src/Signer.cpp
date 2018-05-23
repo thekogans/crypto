@@ -16,6 +16,7 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/Signer.h"
 
 namespace thekogans {

@@ -27,6 +27,7 @@
     #include "thekogans/util/XMLUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 
 namespace thekogans {

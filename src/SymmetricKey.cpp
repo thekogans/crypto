@@ -27,6 +27,7 @@
     #include "thekogans/util/StringUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/SymmetricKey.h"
 

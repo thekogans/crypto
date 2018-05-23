@@ -166,6 +166,8 @@ namespace thekogans {
             /// +-------------------+-----------+-------------------+------------+------+---------------+-------+
             /// |         4         |     2     |         4         |      2     | iv + ciphertext + mac length |
             ///
+            /// NOTE: FrameHeader::ciphertext length refers to everything that follows (CiphertextHeader + ciphertext).
+            ///
             /// \param[in] plaintext Plaintext to encrypt.
             /// \param[in] plaintextLength Plaintext length.
             /// \param[in] associatedData Optional associated data (GCM mode only).
@@ -201,6 +203,8 @@ namespace thekogans {
             /// | key id | ciphertext length | iv length | ciphertext length | mac length |  iv  |  ciphertext   |  mac  |
             /// +--------+-------------------+-----------+-------------------+------------+------+---------------+-------+
             /// |   32   |         4         |     2     |         4         |      2     | iv + ciphertext + mac length |
+            ///
+            /// NOTE: FrameHeader::ciphertext length refers to everything that follows (CiphertextHeader + ciphertext).
             ///
             /// \param[in] plaintext Plaintext to encrypt.
             /// \param[in] plaintextLength Plaintext length.

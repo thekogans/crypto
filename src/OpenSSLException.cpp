@@ -1,4 +1,4 @@
-// Copyright 2011 Boris Kogan (boris@thekogans.net)
+// Copyright 2016 Boris Kogan (boris@thekogans.net)
 //
 // This file is part of libthekogans_crypto.
 //
@@ -15,32 +15,30 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include <openssl/evp.h>
-#include <openssl/dsa.h>
-#include "thekogans/crypto/OpenSSLInit.h"
+#include <openssl/err.h>
 #include "thekogans/crypto/OpenSSLException.h"
-#include "thekogans/crypto/DSA.h"
 
 namespace thekogans {
     namespace crypto {
 
-        Params::Ptr DSA::ParamsFromKeyLength (
-                std::size_t keyLength,
-                const std::string &name,
-                const std::string &description) {
-            if (keyLength > 0) {
-                EVP_PKEY *params = 0;
-                EVP_PKEY_CTXPtr ctx (
-                    EVP_PKEY_CTX_new_id (EVP_PKEY_DSA, OpenSSLInit::engine));
-                if (ctx.get () != 0 &&
-                        EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
-                        EVP_PKEY_CTX_set_dsa_paramgen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
-                        EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                    return Params::Ptr (new Params (EVP_PKEYPtr (params), name, description));
+        _LIB_THEKOGANS_CRYPTO_DECL util::Exception _LIB_THEKOGANS_CRYPTO_API
+        CreateOpenSSLException (
+                const char *file,
+                const char *function,
+                util::ui32 line,
+                const char *buildTime,
+                const char *message) {
+            if (file != 0 && function != 0 && buildTime != 0 && message != 0) {
+                THEKOGANS_UTIL_ERROR_CODE errorCode = ERR_get_error ();
+                char buffer[256];
+                ERR_error_string_n (errorCode, buffer, sizeof (buffer));
+                util::Exception exception (file, function, line, buildTime,
+                    errorCode, util::FormatString ("[0x%x:%d - %s]%s",
+                        errorCode, errorCode, buffer, message));
+                while ((errorCode = ERR_get_error_line (&file, (util::i32 *)&line)) != 0) {
+                    exception.NoteLocation (file, "", line, "");
                 }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                return exception;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

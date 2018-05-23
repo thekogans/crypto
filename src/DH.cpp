@@ -17,6 +17,7 @@
 
 #include <openssl/opensslv.h>
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/DH.h"
 
 namespace thekogans {

@@ -36,6 +36,7 @@
 #include <openssl/ssl.h>
 #include "thekogans/util/Exception.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/SystemCACertificates.h"
 
 namespace thekogans {

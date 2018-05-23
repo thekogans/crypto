@@ -52,6 +52,8 @@
     <cpp_header>$(organization)/$(project_directory)/KeyRing.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/MAC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/MessageDigest.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLAllocator.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLException.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLInit.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLUtils.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
@@ -81,6 +83,8 @@
     <cpp_source>KeyRing.cpp</cpp_source>
     <cpp_source>MAC.cpp</cpp_source>
     <cpp_source>MessageDigest.cpp</cpp_source>
+    <cpp_source>OpenSSLAllocator.cpp</cpp_source>
+    <cpp_source>OpenSSLException.cpp</cpp_source>
     <cpp_source>OpenSSLInit.cpp</cpp_source>
     <cpp_source>OpenSSLUtils.cpp</cpp_source>
     <cpp_source>Params.cpp</cpp_source>

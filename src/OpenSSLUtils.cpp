@@ -16,31 +16,17 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
-#include <openssl/err.h>
 #include <openssl/x509v3.h>
 #include <openssl/dh.h>
 #include <openssl/hmac.h>
 #include "thekogans/util/Flags.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {
-
-        OpenSSLAllocator OpenSSLAllocator::Global;
-
-        void *OpenSSLAllocator::Alloc (std::size_t size) {
-            return size > 0 ? OPENSSL_malloc (size) : 0;
-        }
-
-        void OpenSSLAllocator::Free (
-                void *ptr,
-                std::size_t /*size*/) {
-            if (ptr != 0) {
-                OPENSSL_free (ptr);
-            }
-        }
 
         void BN_CTXDeleter::operator () (BN_CTX *ctx) {
             if (ctx != 0) {
@@ -403,31 +389,6 @@ namespace thekogans {
                     value >>= 8;
                 }
                 return OTP (key, keyLength, buffer, 8, passwordLength, md);
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        _LIB_THEKOGANS_CRYPTO_DECL util::Exception _LIB_THEKOGANS_CRYPTO_API
-        CreateOpenSSLException (
-                const char *file,
-                const char *function,
-                util::ui32 line,
-                const char *buildTime,
-                const char *message) {
-            if (file != 0 && function != 0 && buildTime != 0 && message != 0) {
-                THEKOGANS_UTIL_ERROR_CODE errorCode = ERR_get_error ();
-                char buffer[256];
-                ERR_error_string_n (errorCode, buffer, sizeof (buffer));
-                util::Exception exception (file, function, line, buildTime,
-                    errorCode, util::FormatString ("[0x%x:%d - %s]%s",
-                        errorCode, errorCode, buffer, message));
-                while ((errorCode = ERR_get_error_line (&file, (util::i32 *)&line)) != 0) {
-                    exception.NoteLocation (file, "", line, "");
-                }
-                return exception;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

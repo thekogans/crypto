@@ -17,6 +17,7 @@
 
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/KeyExchange.h"
 
 namespace thekogans {

@@ -20,6 +20,7 @@
 #include "thekogans/util/File.h"
 #include "thekogans/util/FixedArray.h"
 #include "thekogans/crypto/OpenSSLInit.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/MessageDigest.h"
 
 namespace thekogans {
