@@ -26,6 +26,7 @@ namespace thekogans {
         Params::Ptr DH::ParamsFromPrimeLengthAndGenerator (
                 std::size_t primeLength,
                 std::size_t generator,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             EVP_PKEY *params = 0;
@@ -36,7 +37,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_set_dh_paramgen_prime_len (ctx.get (), (util::i32)primeLength) == 1 &&
                     EVP_PKEY_CTX_set_dh_paramgen_generator (ctx.get (), (util::i32)generator) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return Params::Ptr (new Params (EVP_PKEYPtr (params), name, description));
+                return Params::Ptr (new Params (EVP_PKEYPtr (params), id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -67,6 +68,7 @@ namespace thekogans {
         Params::Ptr DH::ParamsFromPrimeAndGenerator (
                 BIGNUM &prime,
                 BIGNUM &generator,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             DHPtr dhParams (DH_new ());
@@ -76,7 +78,7 @@ namespace thekogans {
                     if (params.get () != 0 &&
                             EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                         dhParams.release ();
-                        return Params::Ptr (new Params (std::move (params), name, description));
+                        return Params::Ptr (new Params (std::move (params), id, name, description));
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -101,6 +103,7 @@ namespace thekogans {
 
             Params::Ptr ParamsFromDHParams (
                     const DHParams &params,
+                    const ID &id,
                     const std::string &name,
                     const std::string &description) {
                 BIGNUMPtr prime (BN_new ());
@@ -108,7 +111,7 @@ namespace thekogans {
                 if (prime.get () != 0 && generator.get () != 0) {
                     BN_bin2bn (params.prime, params.primeLength, prime.get ());
                     BN_bin2bn (params.generator, params.generatorLength, generator.get ());
-                    return DH::ParamsFromPrimeAndGenerator (*prime, *generator, name, description);
+                    return DH::ParamsFromPrimeAndGenerator (*prime, *generator, id, name, description);
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -343,9 +346,10 @@ namespace thekogans {
 
         Params::Ptr DH::ParamsFromRFC3526Prime (
                 RFC3526Prime prime,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return ParamsFromDHParams (rfc3526params[prime], name, description);
+            return ParamsFromDHParams (rfc3526params[prime], id, name, description);
         }
 
         namespace {
@@ -456,9 +460,10 @@ namespace thekogans {
 
         Params::Ptr DH::ParamsFromRFC5114Prime (
                 RFC5114Prime prime,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return ParamsFromDHParams (rfc5114params[prime], name, description);
+            return ParamsFromDHParams (rfc5114params[prime], id, name, description);
         }
 
         namespace {
@@ -526,9 +531,10 @@ namespace thekogans {
 
         Params::Ptr DH::ParamsDavidPrime (
                 DavidPrime prime,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return ParamsFromDHParams (davidparams[prime], name, description);
+            return ParamsFromDHParams (davidparams[prime], id, name, description);
         }
 
     } // namespace crypto

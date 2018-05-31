@@ -60,11 +60,13 @@ namespace thekogans {
             /// CRYPTO_add (&key_->references, 1, CRYPTO_LOCK_EVP_PKEY); before
             /// passing the EVP_PKEYPtr in to the ctor.
             /// \param[in] isPrivate_ true = contains both private and public keys.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             AsymmetricKey (
                 EVP_PKEYPtr key_,
                 bool isPrivate_,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -82,6 +84,7 @@ namespace thekogans {
             /// \param[in] userData User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Private key.
@@ -89,6 +92,7 @@ namespace thekogans {
                 const std::string &path,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -98,6 +102,7 @@ namespace thekogans {
             /// \param[in] userData User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public key.
@@ -105,6 +110,7 @@ namespace thekogans {
                 const std::string &path,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -114,6 +120,7 @@ namespace thekogans {
             /// \param[in] userData User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public key.
@@ -121,6 +128,7 @@ namespace thekogans {
                 const std::string &path,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -161,10 +169,12 @@ namespace thekogans {
             /// \brief
             /// Return the public key associated with this private key.
             /// If this is a public key only, return a duplicate.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public part of the privateKey (or duplicate of the pubilc key).
             Ptr GetPublicKey (
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
 

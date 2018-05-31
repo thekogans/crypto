@@ -45,9 +45,10 @@ namespace thekogans {
 
         Params::Params (
                 EVP_PKEYPtr params_,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) :
-                Serializable (name, description),
+                Serializable (id, name, description),
                 params (std::move (params_)) {
             if (params.get () != 0) {
                 util::i32 type = GetType ();
@@ -63,6 +64,7 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr Params::CreateKey (
+                const ID &id,
                 const std::string &name,
                 const std::string &description) const {
             EVP_PKEY *key = 0;
@@ -72,7 +74,7 @@ namespace thekogans {
                     EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
                     EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                 return AsymmetricKey::Ptr (
-                    new AsymmetricKey (EVP_PKEYPtr (key), true, name, description));
+                    new AsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -84,6 +86,7 @@ namespace thekogans {
                 util::i32 type,
                 pem_password_cb *passwordCallback,
                 void *userData,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             if (type == EVP_PKEY_DH) {
@@ -95,7 +98,7 @@ namespace thekogans {
                         if (params.get () != 0) {
                             if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                                 dhParams.release ();
-                                return Ptr (new Params (std::move (params), name, description));
+                                return Ptr (new Params (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -122,7 +125,7 @@ namespace thekogans {
                         if (params.get () != 0) {
                             if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
                                 dsaParams.release ();
-                                return Ptr (new Params (std::move (params), name, description));
+                                return Ptr (new Params (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -152,7 +155,7 @@ namespace thekogans {
                             if (params.get () != 0) {
                                 if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                     ecParams.release ();
-                                    return Params::Ptr (new Params (std::move (params), name, description));
+                                    return Params::Ptr (new Params (std::move (params), id, name, description));
                                 }
                                 else {
                                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

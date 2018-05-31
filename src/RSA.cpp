@@ -30,6 +30,7 @@ namespace thekogans {
         AsymmetricKey::Ptr RSA::CreateKey (
                 std::size_t keyLength,
                 BIGNUMPtr publicExponent,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             if (keyLength > 0 && publicExponent.get () != 0) {
@@ -43,7 +44,7 @@ namespace thekogans {
                         EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                     publicExponent.release ();
                     return AsymmetricKey::Ptr (
-                        new AsymmetricKey (EVP_PKEYPtr (key), true, name, description));
+                        new AsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

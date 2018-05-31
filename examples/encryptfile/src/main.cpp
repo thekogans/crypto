@@ -53,6 +53,7 @@ int main (
     struct Options : public util::CommandLineOptions {
         bool help;
         crypto::CipherSuite cipherSuite;
+        crypto::ID id;
         std::string name;
         std::string description;
         util::ui32 blockSize;
@@ -73,6 +74,10 @@ int main (
                 }
                 case 'c': {
                     cipherSuite = crypto::CipherSuite (value);
+                    break;
+                }
+                case 'i': {
+                    id = crypto::ID (value.c_str (), value.size ());
                     break;
                 }
                 case 'n': {
@@ -97,7 +102,7 @@ int main (
             path = value;
         }
     } options;
-    options.Parse (argc, argv, "hcndbp");
+    options.Parse (argc, argv, "hcindbp");
     if (options.help || options.password.empty () || options.path.empty ()) {
         std::cout << "usage: " << argv[0] << " [-h] [-c:'" << GetCipherSuites () << "'] "
             "[-n:'optional key ring name'] [-d:'optional key ring description'] "
@@ -124,6 +129,7 @@ int main (
             keyRing.Reset (
                 new crypto::KeyRing (
                     options.cipherSuite,
+                    options.id,
                     options.name,
                     options.description));
         }

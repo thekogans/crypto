@@ -34,6 +34,7 @@ namespace thekogans {
                 const BIGNUM &gy,
                 const BIGNUM &n,
                 const BIGNUM &c,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             BN_CTXPtr ctx (BN_CTX_new ());
@@ -53,7 +54,7 @@ namespace thekogans {
                             if (params.get () != 0 &&
                                     EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                 ecParams.release ();
-                                return Params::Ptr (new Params (std::move (params), name, description));
+                                return Params::Ptr (new Params (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -78,6 +79,7 @@ namespace thekogans {
 
         Params::Ptr EC::ParamsFromNamedCurve (
                 util::i32 nid,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             EVP_PKEY *params = 0;
@@ -88,7 +90,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_set_ec_paramgen_curve_nid (ctx.get (), nid) == 1 &&
                     EVP_PKEY_CTX_set_ec_param_enc (ctx.get (), OPENSSL_EC_NAMED_CURVE) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return Params::Ptr (new Params (EVP_PKEYPtr (params), name, description));
+                return Params::Ptr (new Params (EVP_PKEYPtr (params), id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -115,6 +117,7 @@ namespace thekogans {
 
             Params::Ptr ParamsFromEllipticCurve (
                     const EllipticCurve &curve,
+                    const ID &id,
                     const std::string &name,
                     const std::string &description) {
                 BIGNUMPtr p (BN_new ());
@@ -136,7 +139,7 @@ namespace thekogans {
                     BN_bin2bn (curve.gy, curve.gyLength, gy.get ());
                     BN_bin2bn (curve.n, curve.nLength, n.get ());
                     BN_bin2bn (curve.c, curve.cLength, c.get ());
-                    return EC::ParamsFromGFpCurve (*p, *a, *b, *gx, *gy, *n, *c, name, description);
+                    return EC::ParamsFromGFpCurve (*p, *a, *b, *gx, *gy, *n, *c, id, name, description);
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -425,9 +428,10 @@ namespace thekogans {
 
         Params::Ptr EC::ParamsFromRFC5114Curve (
                 RFC5114Curve curve,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return ParamsFromEllipticCurve (rfc5114curves[curve], name, description);
+            return ParamsFromEllipticCurve (rfc5114curves[curve], id, name, description);
         }
 
         namespace {
@@ -1241,9 +1245,10 @@ namespace thekogans {
 
         Params::Ptr EC::ParamsFromRFC5639Curve (
                 RFC5639Curve curve,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return ParamsFromEllipticCurve (rfc5639curves[curve], name, description);
+            return ParamsFromEllipticCurve (rfc5639curves[curve], id, name, description);
         }
 
     } // namespace crypto

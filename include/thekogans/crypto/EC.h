@@ -45,6 +45,7 @@ namespace thekogans {
             /// \param[in] gy Generator point y component.
             /// \param[in] n Group order.
             /// \param[in] c Curve co-factor.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return GFp elliptic curve parameters.
@@ -56,6 +57,7 @@ namespace thekogans {
                 const BIGNUM &gy,
                 const BIGNUM &n,
                 const BIGNUM &c,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -63,11 +65,13 @@ namespace thekogans {
             /// Generate Elliptic Curve (EC) parameters given an OpenSSL curve id
             /// (ex: NID_X9_62_prime256v1).
             /// \param[in] nid OpenSSL curve id.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return OpenSSL named elliptic curve parameters.
             static Params::Ptr ParamsFromNamedCurve (
                 util::i32 nid,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -93,11 +97,13 @@ namespace thekogans {
             /// \brief
             /// Generate GFp elliptic curve parameters from the values found in RFC5114.
             /// \param[in] curve One of the RFC5114_CURVE_* values from above.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return GFp elliptic curve parameters.
             static Params::Ptr ParamsFromRFC5114Curve (
                 RFC5114Curve curve,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -150,11 +156,13 @@ namespace thekogans {
             /// \brief
             /// Generate GFp elliptic curve parameters from the values found in RFC5639.
             /// \param[in] curve One of the RFC5639_CURVE_* values from above.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return GFp elliptic curve parameters.
             static Params::Ptr ParamsFromRFC5639Curve (
                 RFC5639Curve curve,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
         };

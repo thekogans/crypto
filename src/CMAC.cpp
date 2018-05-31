@@ -32,6 +32,7 @@ namespace thekogans {
                 std::size_t saltLength,
                 const EVP_CIPHER *cipher,
                 std::size_t count,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             if (secret != 0 && secretLength > 0 &&
@@ -44,6 +45,7 @@ namespace thekogans {
                     saltLength,
                     THEKOGANS_CRYPTO_DEFAULT_MD,
                     count,
+                    id,
                     name,
                     description);
                 EVP_PKEY *key = 0;
@@ -58,7 +60,7 @@ namespace thekogans {
                             (void *)symmetricKey->Get ().GetReadPtr ()) == 1 &&
                         EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                     return AsymmetricKey::Ptr (
-                        new AsymmetricKey (EVP_PKEYPtr (key), true, name, description));
+                        new AsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

@@ -45,9 +45,10 @@ namespace thekogans {
         AsymmetricKey::AsymmetricKey (
                 EVP_PKEYPtr key_,
                 bool isPrivate_,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) :
-                Serializable (name, description),
+                Serializable (id, name, description),
                 key (std::move (key_)),
                 isPrivate (isPrivate_) {
             if (key.get () != 0) {
@@ -68,6 +69,7 @@ namespace thekogans {
                 const std::string &path,
                 pem_password_cb *passwordCallback,
                 void *userData,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             BIOPtr bio (BIO_new_file (path.c_str (), "r"));
@@ -76,6 +78,7 @@ namespace thekogans {
                     new AsymmetricKey (
                         EVP_PKEYPtr (PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData)),
                         true,
+                        id,
                         name,
                         description));
             }
@@ -88,6 +91,7 @@ namespace thekogans {
                 const std::string &path,
                 pem_password_cb *passwordCallback,
                 void *userData,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             BIOPtr bio (BIO_new_file (path.c_str (), "r"));
@@ -96,6 +100,7 @@ namespace thekogans {
                     new AsymmetricKey (
                         EVP_PKEYPtr (PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData)),
                         false,
+                        id,
                         name,
                         description));
             }
@@ -108,6 +113,7 @@ namespace thekogans {
                 const std::string &path,
                 pem_password_cb *passwordCallback,
                 void *userData,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             BIOPtr bio (BIO_new_file (path.c_str (), "r"));
@@ -118,6 +124,7 @@ namespace thekogans {
                         new AsymmetricKey (
                             EVP_PKEYPtr (X509_get_pubkey (certificate.get ())),
                             false,
+                            id,
                             name,
                             description));
                 }
@@ -153,6 +160,7 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr AsymmetricKey::GetPublicKey (
+                const ID &id,
                 const std::string &name,
                 const std::string &description) const {
             BIOPtr bio (BIO_new (BIO_s_mem ()));
@@ -161,6 +169,7 @@ namespace thekogans {
                     new AsymmetricKey (
                         EVP_PKEYPtr (PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0)),
                         false,
+                        id,
                         name,
                         description));
                 if (publicKey->Get () != 0) {

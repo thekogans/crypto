@@ -44,6 +44,7 @@ namespace thekogans {
                 std::size_t saltLength,
                 const EVP_MD *md,
                 std::size_t count,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             if (publicKey.Get () != 0 && keyLength > 0 && md != 0) {
@@ -61,6 +62,7 @@ namespace thekogans {
                             saltLength,
                             md,
                             count,
+                            id,
                             name,
                             description);
                     }

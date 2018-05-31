@@ -26,6 +26,7 @@ namespace thekogans {
 
         Params::Ptr DSA::ParamsFromKeyLength (
                 std::size_t keyLength,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             if (keyLength > 0) {
@@ -36,7 +37,7 @@ namespace thekogans {
                         EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_dsa_paramgen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
                         EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                    return Params::Ptr (new Params (EVP_PKEYPtr (params), name, description));
+                    return Params::Ptr (new Params (EVP_PKEYPtr (params), id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

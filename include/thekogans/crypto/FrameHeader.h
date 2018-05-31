@@ -34,7 +34,7 @@ namespace thekogans {
         /// with the information contained in the FrameHeader. This information is
         /// sent in the clear as it defines control necessary to decrypt  the packet.
         /// 2. Data blocks at rest are prefixed by FrameHeader to identify which
-        /// \see{Key} from the \see{KeyRing} was used to encrypt which block.
+        /// \see{SymmetricKey} from the \see{KeyRing} was used to encrypt which block.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL FrameHeader {
             /// \brief

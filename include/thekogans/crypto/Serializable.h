@@ -57,11 +57,14 @@ namespace thekogans {
         public:
             /// \brief
             /// ctor.
+            /// \param[in] id_ Optional serializable id.
             /// \param[in] name_ Optional serializable name.
             /// \param[in] description_ Optional serializable description.
             Serializable (
+                const ID &id_ = ID (),
                 const std::string &name_ = std::string (),
                 const std::string &description_ = std::string ()) :
+                id (id_),
                 name (name_),
                 description (description_) {}
 

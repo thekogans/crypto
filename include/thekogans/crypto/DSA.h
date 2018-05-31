@@ -37,11 +37,13 @@ namespace thekogans {
             /// \brief
             /// Create DSA key parameters.
             /// \param[in] keyLength The length of the key.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return DSA key parameters.
             static Params::Ptr ParamsFromKeyLength (
                 std::size_t keyLength,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
         };

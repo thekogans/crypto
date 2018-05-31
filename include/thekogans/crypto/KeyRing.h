@@ -134,13 +134,15 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] cipherSuite_ \see{CipherSuite} associated with this key ring.
+            /// \param[in] id Optional key ring id.
             /// \param[in] name Optional key ring name.
             /// \param[in] description Optional key ring description.
             KeyRing (
                 const CipherSuite &cipherSuite_,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
-                Serializable (name, description),
+                Serializable (id, name, description),
                 cipherSuite (cipherSuite_) {}
 
             /// \brief

@@ -51,12 +51,13 @@ namespace thekogans {
                 std::size_t saltLength,
                 const EVP_MD *md,
                 std::size_t count,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             if (keyLength > 0 &&
                     secret != 0 && secretLength > 0 &&
                     md != 0 && count > 0) {
-                Ptr symmetricKey (new SymmetricKey (name, description));
+                Ptr symmetricKey (new SymmetricKey (id, name, description));
                 util::SecureVector<util::ui8> buffer (EVP_MAX_MD_SIZE);
                 util::ui32 bufferLength = 0;
                 MDContext context;
@@ -111,6 +112,7 @@ namespace thekogans {
                 std::size_t saltLength,
                 const EVP_MD *md,
                 std::size_t count,
+                const ID &id,
                 const std::string &name,
                 const std::string &description) {
             if (randomLength < MIN_RANDOM_LENGTH) {
@@ -126,6 +128,7 @@ namespace thekogans {
                     saltLength,
                     md,
                     count,
+                    id,
                     name,
                     description);
             }

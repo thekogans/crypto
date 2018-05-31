@@ -43,12 +43,14 @@ namespace thekogans {
             /// the slowest as finding suitable primes for DH is not easy.
             /// \param[in] primeLength Length of prime to generate.
             /// \param[in] generator DH generator.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::Ptr ParamsFromPrimeLengthAndGenerator (
                 std::size_t primeLength,
                 std::size_t generator = DH_GENERATOR_2,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -60,12 +62,14 @@ namespace thekogans {
             /// by the community and are considered safe.
             /// \param[in] prime DH prime.
             /// \param[in] generator DH generator.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::Ptr ParamsFromPrimeAndGenerator (
                 BIGNUM &prime,
                 BIGNUM &generator,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -96,11 +100,13 @@ namespace thekogans {
             /// NOTE: No generator parameter is required as the RFC
             /// specifies that generator = 2.
             /// \param[in] prime One of RFC3526_PRIME_* values above.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::Ptr ParamsFromRFC3526Prime (
                 RFC3526Prime prime,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -122,11 +128,13 @@ namespace thekogans {
             /// NOTE: No generator parameter is required as the RFC
             /// prescribes specific generators for each prime size.
             /// \param[in] prime One of RFC5114_PRIME_* values above.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::Ptr ParamsFromRFC5114Prime (
                 RFC5114Prime prime,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -143,13 +151,15 @@ namespace thekogans {
             /// \brief
             /// Generate DH parameters from primes found in David's blog.
             /// \param[in] prime One of DAVID_PRIME_* values above.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::Ptr ParamsDavidPrime (
                 DavidPrime prime,
-                const std::string &name,
-                const std::string &description);
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
         };
 
     } // namespace crypto

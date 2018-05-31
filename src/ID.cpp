@@ -16,6 +16,7 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include "thekogans/util/Exception.h"
+#include "thekogans/crypto/MessageDigest.h"
 #include "thekogans/crypto/ID.h"
 
 namespace thekogans {
@@ -31,6 +32,24 @@ namespace thekogans {
         }
 
         const ID ID::Empty (_data_);
+
+        ID::ID (const void *buffer,
+                std::size_t length) {
+            if (buffer != 0 && length > 0) {
+                MessageDigest messageDigest (EVP_sha256 ());
+                messageDigest.Init ();
+                messageDigest.Update (buffer, length);
+                length = messageDigest.Final (data);
+                if (length != SIZE) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Incorrect ID length (%u, %u).", length, SIZE);
+                }
+            }
+            else if (util::GlobalRandomSource::Instance ().GetBytes (data, SIZE) != SIZE) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unable to get %u random bytes for ID.", SIZE);
+            }
+        }
 
         ID::ID (util::Serializer &serializer) {
             if (serializer.Read (data, ID::SIZE) != ID::SIZE) {

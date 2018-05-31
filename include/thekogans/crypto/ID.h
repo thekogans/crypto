@@ -48,12 +48,11 @@ namespace thekogans {
 
             /// \brief
             /// ctor.
-            ID () {
-                if (util::GlobalRandomSource::Instance ().GetBytes (data, SIZE) != SIZE) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to get %u random bytes for ID.", SIZE);
-                }
-            }
+            /// \param[in] buffer Optional data to hash in to id.
+            /// NOTE: if none is provided, ID will use random bytes.
+            /// \param[in] buffer Optional data length.
+            ID (const void *buffer = 0,
+                std::size_t length = 0);
             /// \brief
             /// ctor. Initialize to a given value.
             /// \param[in] data_ Value to initialize to.

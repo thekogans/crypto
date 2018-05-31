@@ -43,6 +43,7 @@ namespace thekogans {
             /// NOTE: By definition the cupher has to be in CBC mode.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new CMAC key.
@@ -53,6 +54,7 @@ namespace thekogans {
                 std::size_t saltLength = 0,
                 const EVP_CIPHER *cipher = EVP_aes_256_cbc (),
                 std::size_t count = 1,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
         };

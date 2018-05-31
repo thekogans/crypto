@@ -57,10 +57,12 @@ namespace thekogans {
             /// it in it's dtor. If that's not what you need, make sure to call
             /// CRYPTO_add (&key_->references, 1, CRYPTO_LOCK_EVP_PKEY); before
             /// passing the EVP_PKEYPtr in to the ctor.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             Params (
                 EVP_PKEYPtr params_,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -76,6 +78,7 @@ namespace thekogans {
             /// \param[in] userData User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
+            /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return Private key parameters.
@@ -84,6 +87,7 @@ namespace thekogans {
                 util::i32 type,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -109,10 +113,12 @@ namespace thekogans {
 
             /// \brief
             /// Create an \see{AsymmetricKey} based on parameters.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return \see{AsymmetricKey} based on parameters.
             AsymmetricKey::Ptr CreateKey (
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
 

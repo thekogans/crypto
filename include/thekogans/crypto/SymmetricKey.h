@@ -50,12 +50,14 @@ namespace thekogans {
         public:
             /// \brief
             /// ctor.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             SymmetricKey (
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
-                Serializable (name, description) {}
+                Serializable (id, name, description) {}
 
             /// \brief
             /// Return the key length.
@@ -74,6 +76,7 @@ namespace thekogans {
             /// \param[in] md OpenSSL message digest to use for hashing.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
@@ -85,6 +88,7 @@ namespace thekogans {
                 std::size_t saltLength = 0,
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -104,6 +108,7 @@ namespace thekogans {
             /// \param[in] md OpenSSL message digest to use for hashing.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
+            /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
@@ -114,6 +119,7 @@ namespace thekogans {
                 std::size_t saltLength = 0,
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
+                const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
