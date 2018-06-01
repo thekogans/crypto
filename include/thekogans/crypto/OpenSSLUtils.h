@@ -385,7 +385,7 @@ namespace thekogans {
         /// \param[in] md OpenSSL message digest object.
         /// \return Length of the digest for the given OpenSSL message digest object.
         _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API GetMDLength (
-            const EVP_MD *md);
+            const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD);
 
         /// \brief
         /// Convert OpenSSL EVP_PKEY key type to string.

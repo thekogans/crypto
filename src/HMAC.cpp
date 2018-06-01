@@ -36,11 +36,11 @@ namespace thekogans {
                 const std::string &description) {
             if (secret != 0 && secretLength > 0 && md != 0) {
                 SymmetricKey::Ptr symmetricKey = SymmetricKey::FromSecretAndSalt (
-                    EVP_MD_size (md),
                     secret,
                     secretLength,
                     salt,
                     saltLength,
+                    GetMDLength (md),
                     md,
                     count,
                     id,

@@ -67,8 +67,8 @@ namespace thekogans {
             /// \param[in] description Optional parameters description.
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::Ptr ParamsFromPrimeAndGenerator (
-                BIGNUM &prime,
-                BIGNUM &generator,
+                const BIGNUM &prime,
+                const BIGNUM &generator,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());

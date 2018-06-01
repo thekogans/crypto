@@ -55,11 +55,11 @@ namespace thekogans {
                     util::SecureVector<util::ui8> secret (secretLength);
                     if (EVP_PKEY_derive (ctx.get (), &secret[0], &secretLength) == 1) {
                         return SymmetricKey::FromSecretAndSalt (
-                            keyLength,
                             &secret[0],
                             secretLength,
                             salt,
                             saltLength,
+                            keyLength,
                             md,
                             count,
                             id,

@@ -28,6 +28,7 @@
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Serializable.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {
@@ -68,11 +69,11 @@ namespace thekogans {
 
             /// \brief
             /// Generate a key given secret (password) and length.
-            /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] secret Shared secret from which to derive the key.
             /// \param[in] secretLength Shared secret length.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
+            /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] md OpenSSL message digest to use for hashing.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
@@ -81,11 +82,11 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
             static Ptr FromSecretAndSalt (
-                std::size_t keyLength,
                 const void *secret,
                 std::size_t secretLength,
                 const void *salt = 0,
                 std::size_t saltLength = 0,
+                std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
                 const ID &id = ID (),
@@ -113,7 +114,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
             static Ptr FromRandom (
-                std::size_t keyLength,
+                std::size_t keyLength = GetCipherKeyLength (),
                 std::size_t randomLength = MIN_RANDOM_LENGTH,
                 const void *salt = 0,
                 std::size_t saltLength = 0,

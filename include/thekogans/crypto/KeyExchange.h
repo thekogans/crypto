@@ -76,7 +76,7 @@ namespace thekogans {
             /// \return Shared \see{SymmetricKey}.
             SymmetricKey::Ptr DeriveSharedSymmetricKey (
                 AsymmetricKey::Ptr publicKey,
-                std::size_t keyLength,
+                std::size_t keyLength = GetCipherKeyLength (),
                 const void *salt = 0,
                 std::size_t saltLength = 0,
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,

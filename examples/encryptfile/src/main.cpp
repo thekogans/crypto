@@ -137,7 +137,6 @@ int main (
             cipher.Reset (
                 new crypto::Cipher (
                     crypto::SymmetricKey::FromSecretAndSalt (
-                        crypto::GetCipherKeyLength (),
                         options.password.c_str (),
                         options.password.size ())));
         }
@@ -182,10 +181,12 @@ int main (
             cipher.Reset (
                 new crypto::Cipher (
                     crypto::SymmetricKey::FromSecretAndSalt (
-                        crypto::GetCipherKeyLength (
-                            options.cipherSuite.GetOpenSSLCipher ()),
                         options.password.c_str (),
-                        options.password.size ())));
+                        options.password.size (),
+                        0,
+                        0,
+                        crypto::GetCipherKeyLength (
+                            options.cipherSuite.GetOpenSSLCipher ()))));
             keyRing->Save (options.path + ".tkr", cipher.Get ());
             std::cout << "Done" << std::endl;
         }

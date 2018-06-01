@@ -122,7 +122,6 @@ int main (
                 options.description);
             crypto::Cipher cipher (
                 crypto::SymmetricKey::FromSecretAndSalt (
-                    crypto::GetCipherKeyLength (),
                     options.password.c_str (),
                     options.password.size ()));
             keyRing.Save (options.path, &cipher);
@@ -132,7 +131,6 @@ int main (
             std::cout << "Verifying key ring...";
             crypto::Cipher cipher (
                 crypto::SymmetricKey::FromSecretAndSalt (
-                    crypto::GetCipherKeyLength (),
                     options.password.c_str (),
                     options.password.size ()));
             crypto::KeyRing::Ptr keyRing = crypto::KeyRing::Load (options.path, &cipher);

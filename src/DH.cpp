@@ -66,8 +66,8 @@ namespace thekogans {
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
         Params::Ptr DH::ParamsFromPrimeAndGenerator (
-                BIGNUM &prime,
-                BIGNUM &generator,
+                const BIGNUM &prime,
+                const BIGNUM &generator,
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {

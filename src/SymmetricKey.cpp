@@ -44,19 +44,18 @@ namespace thekogans {
             THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 
         SymmetricKey::Ptr SymmetricKey::FromSecretAndSalt (
-                std::size_t keyLength,
                 const void *secret,
                 std::size_t secretLength,
                 const void *salt,
                 std::size_t saltLength,
+                std::size_t keyLength,
                 const EVP_MD *md,
                 std::size_t count,
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (keyLength > 0 &&
-                    secret != 0 && secretLength > 0 &&
-                    md != 0 && count > 0) {
+            if (secret != 0 && secretLength > 0 &&
+                    keyLength > 0 && md != 0 && count > 0) {
                 Ptr symmetricKey (new SymmetricKey (id, name, description));
                 util::SecureVector<util::ui8> buffer (EVP_MAX_MD_SIZE);
                 util::ui32 bufferLength = 0;
@@ -121,11 +120,11 @@ namespace thekogans {
             util::SecureVector<util::ui8> random (randomLength);
             if (util::GlobalRandomSource::Instance ().GetBytes (&random[0], randomLength) == randomLength) {
                 return FromSecretAndSalt (
-                    keyLength,
                     &random[0],
                     randomLength,
                     salt,
                     saltLength,
+                    keyLength,
                     md,
                     count,
                     id,

@@ -38,11 +38,11 @@ namespace thekogans {
             if (secret != 0 && secretLength > 0 &&
                     GetCipherMode (cipher) == EVP_CIPH_CBC_MODE) {
                 SymmetricKey::Ptr symmetricKey = SymmetricKey::FromSecretAndSalt (
-                    GetCipherKeyLength (cipher),
                     secret,
                     secretLength,
                     salt,
                     saltLength,
+                    GetCipherKeyLength (cipher),
                     THEKOGANS_CRYPTO_DEFAULT_MD,
                     count,
                     id,

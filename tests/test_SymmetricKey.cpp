@@ -49,11 +49,11 @@ TEST (thekogans, SymmetricKey) {
         std::cout << "SymmetricKey::FromSecretAndSalt...";
         crypto::SymmetricKey::Ptr key1 =
             crypto::SymmetricKey::FromSecretAndSalt (
-                32,
                 secret.c_str (),
                 secret.size (),
                 salt.c_str (),
                 salt.size (),
+                32,
                 THEKOGANS_CRYPTO_DEFAULT_MD,
                 1,
                 "test",

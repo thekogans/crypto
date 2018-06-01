@@ -80,7 +80,6 @@ int main (
         crypto::Cipher::Ptr cipher (
             new crypto::Cipher (
                 crypto::SymmetricKey::FromSecretAndSalt (
-                    crypto::GetCipherKeyLength (),
                     options.password.c_str (),
                     options.password.size ())));
         crypto::KeyRing::Ptr keyRing;

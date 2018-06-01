@@ -47,7 +47,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return A new RSA key.
             static AsymmetricKey::Ptr CreateKey (
-                std::size_t keyLength,
+                std::size_t keyLength = GetCipherKeyLength (),
                 BIGNUMPtr publicExponent = BIGNUMFromui32 (65537),
                 const ID &id = ID (),
                 const std::string &name = std::string (),
