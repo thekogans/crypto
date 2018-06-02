@@ -22,7 +22,6 @@
 #include <string>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Params.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {
@@ -43,7 +42,7 @@ namespace thekogans {
             /// \param[in] description Optional parameters description.
             /// \return DSA key parameters.
             static Params::Ptr ParamsFromKeyLength (
-                std::size_t keyLength = GetCipherKeyLength (),
+                std::size_t keyLength,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());

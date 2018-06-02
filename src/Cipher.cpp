@@ -102,7 +102,7 @@ namespace thekogans {
                                 ciphertextHeader.ciphertextLength,
                             ivCiphertextAndMAC +
                                 ciphertextHeader.ivLength +
-                               ciphertextHeader.ciphertextLength);
+                                ciphertextHeader.ciphertextLength);
                 }
                 else {
                     ciphertextHeader.macLength =

@@ -142,6 +142,9 @@ int main (
                         originalPlaintext.GetDataAvailableForWriting ()));
                 crypto::Cipher cipher (
                     crypto::SymmetricKey::FromRandom (
+                        crypto::SymmetricKey::MIN_RANDOM_LENGTH,
+                        0,
+                        0,
                         crypto::GetCipherKeyLength (
                             keyRing->GetCipherSuite ().GetOpenSSLCipher ())));
                 util::Buffer::UniquePtr ciphertext = cipher.Encrypt (

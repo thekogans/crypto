@@ -108,6 +108,13 @@ namespace thekogans {
             static std::size_t GetMaxBufferLength (std::size_t plaintextLength);
 
             /// \brief
+            /// Return the key id.
+            /// \return Key id.
+            inline const ID &GetKeyId () const {
+                return key->GetId ();
+            }
+
+            /// \brief
             /// Return the encryptor stats.
             /// \return Encryptor stats.
             inline const Stats &GetEncryptorStats () const {

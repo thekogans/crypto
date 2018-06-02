@@ -53,7 +53,7 @@ TEST (thekogans, SymmetricKey) {
                 secret.size (),
                 salt.c_str (),
                 salt.size (),
-                32,
+                crypto::GetCipherKeyLength (),
                 THEKOGANS_CRYPTO_DEFAULT_MD,
                 1,
                 "test",
@@ -70,10 +70,10 @@ TEST (thekogans, SymmetricKey) {
         std::cout << "SymmetricKey::FromRandom...";
         crypto::SymmetricKey::Ptr key1 =
             crypto::SymmetricKey::FromRandom (
-                32,
                 crypto::SymmetricKey::MIN_RANDOM_LENGTH,
                 0,
                 0,
+                crypto::GetCipherKeyLength (),
                 THEKOGANS_CRYPTO_DEFAULT_MD,
                 1,
                 "test",

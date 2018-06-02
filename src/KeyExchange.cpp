@@ -39,9 +39,9 @@ namespace thekogans {
 
         SymmetricKey::Ptr KeyExchange::DeriveSharedSymmetricKey (
                 AsymmetricKey::Ptr publicKey,
-                std::size_t keyLength,
                 const void *salt,
                 std::size_t saltLength,
+                std::size_t keyLength,
                 const EVP_MD *md,
                 std::size_t count,
                 const ID &id,

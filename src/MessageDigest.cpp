@@ -94,8 +94,8 @@ namespace thekogans {
         }
 
         util::Buffer::UniquePtr MessageDigest::HashFile (const std::string &path) {
-            Init ();
             util::ReadOnlyFile file (util::HostEndian, path);
+            Init ();
             util::FixedArray<util::ui8, 4096> buffer;
             for (util::ui32 count = file.Read (buffer, 4096);
                     count != 0;

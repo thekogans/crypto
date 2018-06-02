@@ -151,6 +151,9 @@ int main (
             if (keyRing.Get () != 0) {
                 crypto::SymmetricKey::Ptr key =
                     crypto::SymmetricKey::FromRandom (
+                        crypto::SymmetricKey::MIN_RANDOM_LENGTH,
+                        0,
+                        0,
                         crypto::GetCipherKeyLength (
                             options.cipherSuite.GetOpenSSLCipher ()));
                 keyRing->AddCipherKey (key);

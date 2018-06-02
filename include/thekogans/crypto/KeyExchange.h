@@ -64,9 +64,9 @@ namespace thekogans {
             /// Given the peer's public key, use my private key to derive the
             /// shared \see{SymmetricKey}.
             /// \param[in] publicKey Peer's public key.
-            /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
+            /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] md OpenSSL message digest to use for the signing operation.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
@@ -76,9 +76,9 @@ namespace thekogans {
             /// \return Shared \see{SymmetricKey}.
             SymmetricKey::Ptr DeriveSharedSymmetricKey (
                 AsymmetricKey::Ptr publicKey,
-                std::size_t keyLength = GetCipherKeyLength (),
                 const void *salt = 0,
                 std::size_t saltLength = 0,
+                std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
                 const ID &id = ID (),
