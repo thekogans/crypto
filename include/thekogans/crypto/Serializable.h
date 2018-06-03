@@ -75,6 +75,7 @@ namespace thekogans {
             /// explicitly include all internal serializable types. Without
             /// calling this api, the only serializables that will be available
             /// to your application are the ones you explicitly link to.
+            /// NOTE: If you're using OpenSSLInit, this call is done for you.
             static void StaticInit ();
         #endif // defined (TOOLCHAIN_TYPE_Static)
 

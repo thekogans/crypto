@@ -20,11 +20,11 @@
 
 #include <cstddef>
 #include <cstring>
+#include <openssl/sha.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/Serializer.h"
-#include "thekogans/util/RandomSource.h"
-#include "thekogans/util/Exception.h"
 #include "thekogans/util/StringUtils.h"
+#include "thekogans/util/Exception.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 
@@ -40,17 +40,17 @@ namespace thekogans {
             /// \enum
             /// ID size.
             enum {
-                SIZE = 32
+                SIZE = SHA256_DIGEST_LENGTH
             };
             /// \brief
-            /// Key ID.
+            /// \see{Serializable} ID.
             util::ui8 data[SIZE];
 
             /// \brief
             /// ctor.
             /// \param[in] buffer Optional data to hash in to id.
             /// NOTE: if none is provided, ID will use random bytes.
-            /// \param[in] buffer Optional data length.
+            /// \param[in] length Optional buffer length.
             ID (const void *buffer = 0,
                 std::size_t length = 0);
             /// \brief
