@@ -25,14 +25,14 @@ namespace thekogans {
     namespace crypto {
 
         Decryptor::Decryptor (
-                const SymmetricKey &key,
+                SymmetricKey::Ptr key,
                 const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
+            if (key.Get () != 0 && cipher != 0) {
                 if (EVP_DecryptInit_ex (
                             &context,
                             cipher,
                             OpenSSLInit::engine,
-                            key.Get ().GetReadPtr (),
+                            key->Get ().GetReadPtr (),
                             0) != 1 ||
                         (GetCipherMode (cipher) == EVP_CIPH_GCM_MODE &&
                             EVP_CIPHER_CTX_ctrl (

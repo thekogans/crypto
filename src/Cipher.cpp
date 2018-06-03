@@ -33,8 +33,8 @@ namespace thekogans {
                 key (key_),
                 cipher (cipher_),
                 md (md_),
-                encryptor (*key, cipher),
-                decryptor (*key, cipher) {
+                encryptor (key, cipher),
+                decryptor (key, cipher) {
             if (key.Get () != 0 && cipher != 0) {
                 if (GetCipherMode (cipher) != EVP_CIPH_GCM_MODE) {
                     if (md != 0) {
