@@ -53,8 +53,12 @@ namespace thekogans {
                 isPrivate (isPrivate_) {
             if (key.get () != 0) {
                 util::i32 type = GetType ();
-                if (type != EVP_PKEY_DH && type != EVP_PKEY_DSA && type != EVP_PKEY_EC &&
-                        type != EVP_PKEY_RSA && type != EVP_PKEY_HMAC && type != EVP_PKEY_CMAC) {
+                if (type != EVP_PKEY_DH &&
+                        type != EVP_PKEY_DSA &&
+                        type != EVP_PKEY_EC &&
+                        type != EVP_PKEY_RSA &&
+                        type != EVP_PKEY_HMAC &&
+                        type != EVP_PKEY_CMAC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Invalid parameters type %d.", type);
                 }
@@ -145,7 +149,7 @@ namespace thekogans {
                 pem_password_cb *passwordCallback,
                 void *userData) {
             BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
-            if (bio.get () != 0 || (isPrivate ?
+            if (bio.get () == 0 || (isPrivate ?
                     PEM_write_bio_PrivateKey (
                         bio.get (),
                         key.get (),
@@ -185,18 +189,20 @@ namespace thekogans {
         }
 
         std::size_t AsymmetricKey::Size () const {
-            util::i32 keyLength = isPrivate ?
-                i2d_PrivateKey (key.get (), 0) :
-                i2d_PublicKey (key.get (), 0);
-            if (keyLength <= 0) {
+            BIOPtr bio (BIO_new (BIO_s_mem ()));
+            if (bio.get () != 0 && (isPrivate ?
+                    PEM_write_bio_PrivateKey (bio.get (), key.get (), 0, 0, 0, 0, 0) :
+                    PEM_write_bio_PUBKEY (bio.get (), key.get ())) == 1) {
+                return
+                    Serializable::Size () +
+                    util::BOOL_SIZE + // isPrivate
+                    util::I32_SIZE + // type
+                    util::I32_SIZE + // keyLength
+                    BIO_ctrl_pending (bio.get ()); // key
+            }
+            else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
-            return
-                Serializable::Size () +
-                util::BOOL_SIZE + // isPrivate
-                util::I32_SIZE + // type
-                util::I32_SIZE + // keyLength
-                keyLength;
         }
 
         void AsymmetricKey::Read (
@@ -208,10 +214,16 @@ namespace thekogans {
             serializer >> isPrivate >> type >> keyLength;
             util::SecureVector<util::ui8> keyBuffer (keyLength);
             serializer.Read (&keyBuffer[0], keyLength);
-            const util::ui8 *keyData = &keyBuffer[0];
-            key.reset (isPrivate ?
-                d2i_PrivateKey (type, 0, &keyData, keyLength) :
-                d2i_PublicKey (type, 0, &keyData, keyLength));
+            BIOPtr bio (BIO_new (BIO_s_mem ()));
+            if (bio.get () != 0) {
+                BIO_write (bio.get (), &keyBuffer[0], keyLength);
+                key.reset (isPrivate ?
+                    PEM_read_bio_PrivateKey (bio.get (), 0, 0, 0) :
+                    PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
+            }
+            else {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
         }
 
         namespace {
@@ -219,17 +231,14 @@ namespace thekogans {
                     bool isPrivate,
                     EVP_PKEY &key,
                     util::SecureVector<util::ui8> &keyBuffer) {
-                util::i32 keyLength = isPrivate ?
-                    i2d_PrivateKey (&key, 0) :
-                    i2d_PublicKey (&key, 0);
-                if (keyLength > 0) {
-                    keyBuffer.resize (keyLength);
-                    util::ui8 *keyData = &keyBuffer[0];
-                    if (isPrivate) {
-                        i2d_PrivateKey (&key, &keyData);
-                    }
-                    else {
-                        i2d_PublicKey (&key, &keyData);
+                BIOPtr bio (BIO_new (BIO_s_mem ()));
+                if (bio.get () != 0 && (isPrivate ?
+                        PEM_write_bio_PrivateKey (bio.get (), &key, 0, 0, 0, 0, 0) :
+                        PEM_write_bio_PUBKEY (bio.get (), &key)) == 1) {
+                    util::ui8 *ptr = 0;
+                    keyBuffer.resize (BIO_get_mem_data (bio.get (), &ptr));
+                    if (!keyBuffer.empty () && ptr != 0) {
+                        memcpy (&keyBuffer[0], ptr, keyBuffer.size ());
                     }
                 }
                 else {
