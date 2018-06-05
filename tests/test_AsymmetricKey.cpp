@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <CppUnitXLite/CppUnitXLite.cpp>
+#include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
