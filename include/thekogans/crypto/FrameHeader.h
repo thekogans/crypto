@@ -65,6 +65,13 @@ namespace thekogans {
                 util::ui32 ciphertextLength_) :
                 keyId (keyId_),
                 ciphertextLength (ciphertextLength_) {}
+
+            /// \brief
+            /// Return the frame header size.
+            /// \return Frame header size.
+            inline std::size_t Size () const {
+                return SIZE;
+            }
         };
 
         /// \brief
