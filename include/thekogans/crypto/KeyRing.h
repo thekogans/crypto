@@ -258,9 +258,12 @@ namespace thekogans {
             /// \brief
             /// Add a \see{KeyExchange} \see{AsymmetricKey} to this ring.
             /// \param[in] key \see{KeyExchange} \see{AsymmetricKey} to add.
+            /// \param[in] keyExchange Optional \see{KeyExchange} to add.
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
-            bool AddKeyExchangeKey (AsymmetricKey::Ptr key);
+            bool AddKeyExchangeKey (
+                AsymmetricKey::Ptr key,
+                KeyExchange::Ptr keyExchange = KeyExchange::Ptr ());
             /// \brief
             /// Drop a \see{KeyExchange} \see{AsymmetricKey} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey} to delete.
@@ -343,9 +346,12 @@ namespace thekogans {
             /// \brief
             /// Add a \see{Authenticator} \see{AsymmetricKey} to this ring.
             /// \param[in] key \see{Authenticator} \see{AsymmetricKey} to add.
+            /// \param[in] authenticator Optional \see{Authenticator} to add.
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
-            bool AddAuthenticatorKey (AsymmetricKey::Ptr key);
+            bool AddAuthenticatorKey (
+                AsymmetricKey::Ptr key,
+                Authenticator::Ptr authenticator = Authenticator::Ptr ());
             /// \brief
             /// Drop a \see{Authenticator} \see{AsymmetricKey} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey} to delete.
@@ -389,9 +395,12 @@ namespace thekogans {
             /// \brief
             /// Add a \see{Cipher} \see{SymmetricKey} to the ring.
             /// \param[in] key \see{Cipher} \see{SymmetricKey} to add.
+            /// \param[in] cipher Optional \see{Cipher} to add.
             /// \return true = key added. false = A key with
             /// this id already exists in the ring.
-            bool AddCipherKey (SymmetricKey::Ptr key);
+            bool AddCipherKey (
+                SymmetricKey::Ptr key,
+                Cipher::Ptr cipher = Cipher::Ptr ());
             /// \brief
             /// Given a \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding key
             /// from the key ring.
@@ -435,9 +444,12 @@ namespace thekogans {
             /// \brief
             /// Add a \see{MAC} \see{AsymmetricKey} to this ring.
             /// \param[in] key \see{MAC} \see{AsymmetricKey} to add.
+            /// \param[in] mac Optional \see{MAC} to add.
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
-            bool AddMACKey (AsymmetricKey::Ptr key);
+            bool AddMACKey (
+                AsymmetricKey::Ptr key,
+                MAC::Ptr mac = MAC::Ptr ());
             /// \brief
             /// Drop a \see{MAC} \see{AsymmetricKey} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{MAC} \see{AsymmetricKey} to delete.

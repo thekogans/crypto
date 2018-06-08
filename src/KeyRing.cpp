@@ -265,11 +265,23 @@ namespace thekogans {
             return KeyExchange::Ptr ();
         }
 
-        bool KeyRing::AddKeyExchangeKey (AsymmetricKey::Ptr key) {
+        bool KeyRing::AddKeyExchangeKey (
+                AsymmetricKey::Ptr key,
+                KeyExchange::Ptr keyExchange) {
             if (key.Get () != 0 && cipherSuite.VerifyKeyExchangeKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result =
                     keyExchangeKeyMap.insert (
                         AsymmetricKeyMap::value_type (key->GetId (), key));
+                if (result.second && keyExchange.Get () != 0) {
+                    std::pair<KeyExchangeMap::iterator, bool> result =
+                        keyExchangeMap.insert (
+                            KeyExchangeMap::value_type (key->GetId (), keyExchange));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to add a KeyExchange: %s.",
+                            key->GetId ().ToString ().c_str ());
+                    }
+                }
                 return result.second;
             }
             else {
@@ -486,11 +498,25 @@ namespace thekogans {
             return Authenticator::Ptr ();
         }
 
-        bool KeyRing::AddAuthenticatorKey (AsymmetricKey::Ptr key) {
+        bool KeyRing::AddAuthenticatorKey (
+                AsymmetricKey::Ptr key,
+                Authenticator::Ptr authenticator) {
             if (key.Get () != 0 && cipherSuite.VerifyAuthenticatorKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result =
                     authenticatorKeyMap.insert (
                         AsymmetricKeyMap::value_type (key->GetId (), key));
+                if (result.second && authenticator.Get () != 0) {
+                    std::pair<AuthenticatorMap::iterator, bool> result =
+                        authenticatorMap.insert (
+                            AuthenticatorMap::value_type (
+                                AuthenticatorMapKey (authenticator->GetOp (), key->GetId ()),
+                                authenticator));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to add an Authenticator: %s.",
+                            key->GetId ().ToString ().c_str ());
+                    }
+                }
                 return result.second;
             }
             else {
@@ -620,11 +646,23 @@ namespace thekogans {
             return Cipher::Ptr ();
         }
 
-        bool KeyRing::AddCipherKey (SymmetricKey::Ptr key) {
+        bool KeyRing::AddCipherKey (
+                SymmetricKey::Ptr key,
+                Cipher::Ptr cipher) {
             if (key.Get () != 0 && cipherSuite.VerifyCipherKey (*key)) {
                 std::pair<SymmetricKeyMap::iterator, bool> result =
                     cipherKeyMap.insert (
                         SymmetricKeyMap::value_type (key->GetId (), key));
+                if (result.second && cipher.Get () != 0) {
+                    std::pair<CipherMap::iterator, bool> result =
+                        cipherMap.insert (
+                            CipherMap::value_type (key->GetId (), cipher));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to add a Cipher: %s.",
+                            key->GetId ().ToString ().c_str ());
+                    }
+                }
                 return result.second;
             }
             else {
@@ -746,11 +784,23 @@ namespace thekogans {
             return MAC::Ptr ();
         }
 
-        bool KeyRing::AddMACKey (AsymmetricKey::Ptr key) {
+        bool KeyRing::AddMACKey (
+                AsymmetricKey::Ptr key,
+                MAC::Ptr mac) {
             if (key.Get () != 0 && cipherSuite.VerifyMACKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result =
                     macKeyMap.insert (
                         AsymmetricKeyMap::value_type (key->GetId (), key));
+                if (result.second && mac.Get () != 0) {
+                    std::pair<MACMap::iterator, bool> result =
+                        macMap.insert (
+                            MACMap::value_type (key->GetId (), mac));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to add a MAC: %s.",
+                            key->GetId ().ToString ().c_str ());
+                    }
+                }
                 return result.second;
             }
             else {
@@ -978,9 +1028,7 @@ namespace thekogans {
         }
 
         std::size_t KeyRing::Size () const {
-            std::size_t size =
-                Serializable::Size () +
-                cipherSuite.Size ();
+            std::size_t size = Serializable::Size () + cipherSuite.Size ();
             size += util::UI32_SIZE;
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
