@@ -78,6 +78,13 @@ namespace thekogans {
                 signer (op == Sign ? new Signer (key, md) : 0),
                 verifier (op == Verify ? new Verifier (key, md) : 0) {}
 
+            /// \break
+            /// Return the operation (Op) this authenticator performs.
+            /// \return Operation (Op) this authenticator performs.
+            inline Op GetOp () const {
+                return op;
+            }
+
             /// \brief
             /// Create a buffer signature.
             /// \param[in] buffer Buffer whose signature to create.
