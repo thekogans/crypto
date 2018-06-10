@@ -86,6 +86,13 @@ namespace thekogans {
             }
 
             /// \brief
+            /// Return the key associated with this authenticator.
+            /// \return \see{Signer} or \see{Verifier} key (depending on op).
+            inline AsymmetricKey::Ptr GetKey () const {
+                return op == Sign ? signer->GetKey () : verifier->GetKey ();
+            }
+
+            /// \brief
             /// Create a buffer signature.
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.

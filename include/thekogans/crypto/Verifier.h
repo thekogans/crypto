@@ -59,6 +59,13 @@ namespace thekogans {
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
             /// \brief
+            /// Return the verifier key.
+            /// \return \see{AsymmetricKey} key used for verification.
+            inline AsymmetricKey::Ptr GetKey () const {
+                return key;
+            }
+
+            /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.
             void Init ();
             /// \brief

@@ -54,6 +54,13 @@ namespace thekogans {
             explicit KeyExchange (AsymmetricKey::Ptr privateKey_);
 
             /// \brief
+            /// Return the private key used for key exchange.
+            /// \return \see{AsymmetricKey} private key.
+            inline AsymmetricKey::Ptr GetPrivateKey () const {
+                return privateKey;
+            }
+
+            /// \brief
             /// Call this method to get the public key (your half of the shared secret).
             /// \return The public key.
             inline AsymmetricKey::Ptr GetPublicKey () const {

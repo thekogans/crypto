@@ -108,10 +108,10 @@ namespace thekogans {
             static std::size_t GetMaxBufferLength (std::size_t plaintextLength);
 
             /// \brief
-            /// Return the key id.
-            /// \return Key id.
-            inline const ID &GetKeyId () const {
-                return key->GetId ();
+            /// Return the cipher key.
+            /// \return Cipher \see{SymmetricKey}.
+            inline SymmetricKey::Ptr GetKey () const {
+                return key;
             }
 
             /// \brief
@@ -173,7 +173,7 @@ namespace thekogans {
             /// +-------------------+-----------+-------------------+------------+------+---------------+-------+
             /// |         4         |     2     |         4         |      2     | iv + ciphertext + mac length |
             ///
-            /// NOTE: FrameHeader::ciphertext length refers to everything that follows (CiphertextHeader + ciphertext).
+            /// NOTE: FrameHeader::ciphertext length refers to everything that follows (\see{CiphertextHeader} + ciphertext).
             ///
             /// \param[in] plaintext Plaintext to encrypt.
             /// \param[in] plaintextLength Plaintext length.
@@ -211,7 +211,7 @@ namespace thekogans {
             /// +--------+-------------------+-----------+-------------------+------------+------+---------------+-------+
             /// |   32   |         4         |     2     |         4         |      2     | iv + ciphertext + mac length |
             ///
-            /// NOTE: FrameHeader::ciphertext length refers to everything that follows (CiphertextHeader + ciphertext).
+            /// NOTE: FrameHeader::ciphertext length refers to everything that follows (\see{CiphertextHeader} + ciphertext).
             ///
             /// \param[in] plaintext Plaintext to encrypt.
             /// \param[in] plaintextLength Plaintext length.

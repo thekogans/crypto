@@ -60,6 +60,13 @@ namespace thekogans {
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
             /// \brief
+            /// Return the signer key.
+            /// \return \see{AsymmetricKey} key used for signing.
+            inline AsymmetricKey::Ptr GetKey () const {
+                return key;
+            }
+
+            /// \brief
             /// Initialize the signer and get it ready for the next signature.
             void Init ();
             /// \brief
