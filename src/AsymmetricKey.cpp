@@ -255,10 +255,7 @@ namespace thekogans {
             Serializable::Write (serializer);
             util::SecureVector<util::ui8> keyBuffer;
             WriteKey (isPrivate, *key, keyBuffer);
-            serializer <<
-                isPrivate <<
-                GetType () <<
-                (util::i32)keyBuffer.size ();
+            serializer << isPrivate << GetType () << (util::i32)keyBuffer.size ();
             serializer.Write (&keyBuffer[0], (util::ui32)keyBuffer.size ());
         }
 

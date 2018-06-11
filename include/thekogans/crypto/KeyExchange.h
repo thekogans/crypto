@@ -62,9 +62,15 @@ namespace thekogans {
 
             /// \brief
             /// Call this method to get the public key (your half of the shared secret).
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
             /// \return The public key.
-            inline AsymmetricKey::Ptr GetPublicKey () const {
-                return privateKey->GetPublicKey ();
+            inline AsymmetricKey::Ptr GetPublicKey (
+                    const ID &id = ID (),
+                    const std::string &name = std::string (),
+                    const std::string &description = std::string ()) const {
+                return privateKey->GetPublicKey (id, name, description);
             }
 
             /// \brief

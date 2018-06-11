@@ -370,7 +370,7 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{Cipher} \see{SymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Cipher} \see{SymmetricKey} corresponding to the given \see{ID}
-            // (\see{Key::Ptr} () if not found).
+            /// (\see{SymmetricKey::Ptr} () if not found).
             SymmetricKey::Ptr GetCipherKey (
                 const ID &keyId,
                 bool recursive = true) const;
@@ -388,7 +388,7 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{Cipher} key.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Cipher} corresponding to the given key \see{ID}
-            /// (\see{Key::Ptr} () if not found).
+            /// (\see{Cipher::Ptr} () if not found).
             Cipher::Ptr GetCipher (
                 const ID &keyId,
                 bool recursive = true);

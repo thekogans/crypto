@@ -33,22 +33,35 @@ namespace thekogans {
 
         const ID ID::Empty (_data_);
 
-        ID::ID (const void *buffer,
-                std::size_t length) {
-            if (buffer != 0 && length > 0) {
+        namespace {
+            void HashBuffer (
+                    const void *buffer,
+                    std::size_t length,
+                    util::ui8 *hash) {
                 MessageDigest messageDigest (EVP_sha256 ());
                 messageDigest.Init ();
                 messageDigest.Update (buffer, length);
-                length = messageDigest.Final (data);
-                if (length != SIZE) {
+                length = messageDigest.Final (hash);
+                if (length != ID::SIZE) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Incorrect ID length (%u, %u).", length, SIZE);
+                        "Incorrect ID length (%u, %u).", length, ID::SIZE);
                 }
+            }
+        }
+
+        ID::ID (const void *buffer,
+                std::size_t length) {
+            if (buffer != 0 && length > 0) {
+                HashBuffer (buffer, length, data);
             }
             else if (util::GlobalRandomSource::Instance ().GetBytes (data, SIZE) != SIZE) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Unable to get %u random bytes for ID.", SIZE);
             }
+        }
+
+        ID::ID (const std::string &id) {
+            HashBuffer (id.c_str (), id.size (), data);
         }
 
         ID::ID (util::Serializer &serializer) {

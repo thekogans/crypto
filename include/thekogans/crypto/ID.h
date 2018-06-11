@@ -54,6 +54,10 @@ namespace thekogans {
             ID (const void *buffer = 0,
                 std::size_t length = 0);
             /// \brief
+            /// ctor.
+            /// \param[in] id String to hash in to id.
+            explicit ID (const std::string &id);
+            /// \brief
             /// ctor. Initialize to a given value.
             /// \param[in] data_ Value to initialize to.
             explicit ID (const util::ui8 data_[SIZE]) {
