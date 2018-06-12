@@ -393,6 +393,10 @@ namespace thekogans {
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
+            /// Return a \see{Cipher} based on randomly chosen \see{SymmetricKey}.
+            /// \return \see{Cipher} based on randomly chosen \see{SymmetricKey}.
+            Cipher::Ptr GetRandomCipher ();
+            /// \brief
             /// Add a \see{Cipher} \see{SymmetricKey} to the ring.
             /// \param[in] key \see{Cipher} \see{SymmetricKey} to add.
             /// \param[in] cipher Optional \see{Cipher} to add.
