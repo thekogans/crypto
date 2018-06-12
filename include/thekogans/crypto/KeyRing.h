@@ -394,6 +394,14 @@ namespace thekogans {
                 bool recursive = true);
             /// \brief
             /// Return a \see{Cipher} based on randomly chosen \see{SymmetricKey}.
+            /// NOTE: This is a special purpose method meant to be used by communicating
+            /// peers that used \see{KeyExchange} to establish shared keys. The sending
+            /// peer uses this method to select keys at random to encrypt packets on the
+            /// wire using \see{Cipher::EncryptAndFrame}. The receiving peer uses the
+            /// \see{FrameHeader::keyId} to retrieve it's key to decrypt the packet.
+            /// This way the peers can rotate keys (for every packet if need be) for
+            /// better security.
+            /// WARNING: This method runs in O(cipherKeyMap.size ()).
             /// \return \see{Cipher} based on randomly chosen \see{SymmetricKey}.
             Cipher::Ptr GetRandomCipher ();
             /// \brief

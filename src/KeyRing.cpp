@@ -650,28 +650,26 @@ namespace thekogans {
         Cipher::Ptr KeyRing::GetRandomCipher () {
             Cipher::Ptr cipher;
             if (!cipherKeyMap.empty ()) {
-                SymmetricKey::Ptr key;
-                {
-                    SymmetricKeyMap::const_iterator it = cipherKeyMap.begin ();
+                SymmetricKeyMap::const_iterator keyIt = cipherKeyMap.begin ();
+                if (cipherKeyMap.size () > 1) {
                     std::advance (
-                        it,
+                        keyIt,
                         util::GlobalRandomSource::Instance ().Getui32 () % cipherKeyMap.size ());
-                    key = it->second;
                 }
-                CipherMap::iterator it = cipherMap.find (key->GetId ());
-                if (it == cipherMap.end ()) {
-                    cipher = cipherSuite.GetCipher (key);
+                CipherMap::iterator cipherIt = cipherMap.find (keyIt->second->GetId ());
+                if (cipherIt == cipherMap.end ()) {
+                    cipher = cipherSuite.GetCipher (keyIt->second);
                     std::pair<CipherMap::iterator, bool> result =
                         cipherMap.insert (
-                            CipherMap::value_type (key->GetId (), cipher));
+                            CipherMap::value_type (keyIt->second->GetId (), cipher));
                     if (!result.second) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to add a Cipher: %s.",
-                            key->GetId ().ToString ().c_str ());
+                            keyIt->second->GetId ().ToString ().c_str ());
                     }
                 }
                 else {
-                    cipher = it->second;
+                    cipher = cipherIt->second;
                 }
             }
             return cipher;
