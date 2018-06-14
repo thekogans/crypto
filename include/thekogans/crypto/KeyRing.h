@@ -210,6 +210,10 @@ namespace thekogans {
                 const EqualityTest<Params> &equalityTest,
                 bool recursive = true) const;
             /// \brief
+            /// Return randomly chosen \see{KeyExchange} \see{Params}.
+            /// \return Randomly chosen \see{KeyExchange} \see{Params}.
+            Params::Ptr GetRandomKeyExchangeParams () const;
+            /// \brief
             /// Add a \see{KeyExchange} \see{Params} to this ring.
             /// \param[in] params \see{KeyExchange} \see{Params} to add.
             /// \return true = params added. false = A \see{Params} with

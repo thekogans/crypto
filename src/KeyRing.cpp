@@ -141,6 +141,20 @@ namespace thekogans {
             return Params::Ptr ();
         }
 
+        Params::Ptr KeyRing::GetRandomKeyExchangeParams () const {
+            Params::Ptr params;
+            if (!keyExchangeParamsMap.empty ()) {
+                ParamsMap::const_iterator it = keyExchangeParamsMap.begin ();
+                if (keyExchangeParamsMap.size () > 1) {
+                    std::advance (
+                        it,
+                        util::GlobalRandomSource::Instance ().Getui32 () % keyExchangeParamsMap.size ());
+                }
+                params = it->second;
+            }
+            return params;
+        }
+
         bool KeyRing::AddKeyExchangeParams (Params::Ptr params) {
             if (params.Get () != 0 &&
                     cipherSuite.VerifyKeyExchangeParams (*params)) {
