@@ -251,6 +251,10 @@ namespace thekogans {
                 const EqualityTest<AsymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
+            /// Return randomly chosen \see{KeyExchange} \see{AsymmetricKey}.
+            /// \return Randomly chosen \see{KeyExchange} \see{AsymmetricKey}.
+            AsymmetricKey::Ptr GetRandomKeyExchangeKey () const;
+            /// \brief
             /// Return the \see{KeyExchange} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey}.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.

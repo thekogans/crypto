@@ -245,6 +245,20 @@ namespace thekogans {
             return AsymmetricKey::Ptr ();
         }
 
+        AsymmetricKey::Ptr KeyRing::GetRandomKeyExchangeKey () const {
+            AsymmetricKey::Ptr key;
+            if (!keyExchangeKeyMap.empty ()) {
+                AsymmetricKeyMap::const_iterator it = keyExchangeKeyMap.begin ();
+                if (keyExchangeKeyMap.size () > 1) {
+                    std::advance (
+                        it,
+                        util::GlobalRandomSource::Instance ().Getui32 () % keyExchangeKeyMap.size ());
+                }
+                key = it->second;
+            }
+            return key;
+        }
+
         KeyExchange::Ptr KeyRing::GetKeyExchange (
                 const ID &keyId,
                 bool recursive) {
