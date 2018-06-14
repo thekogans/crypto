@@ -285,14 +285,14 @@ namespace thekogans {
             MessageDigest::Ptr GetMessageDigest () const;
 
             /// \brief
-            /// Return the OpenSSL EVP_CIPHER represented by the given cipher.
-            /// \return OpenSSL EVP_CIPHER represented by the given cipher.
+            /// Return the OpenSSL EVP_CIPHER represented by cipher.
+            /// \return OpenSSL EVP_CIPHER represented by cipher.
             inline const EVP_CIPHER *GetOpenSSLCipher () const {
                 return GetOpenSSLCipher (cipher);
             }
             /// \brief
-            /// Return the OpenSSL EVP_MD represented by the given messageDigest.
-            /// \return OpenSSL EVP_MD represented by the given messageDigest.
+            /// Return the OpenSSL EVP_MD represented by messageDigest.
+            /// \return OpenSSL EVP_MD represented by messageDigest.
             inline const EVP_MD *GetOpenSSLMessageDigest () const {
                 return GetOpenSSLMessageDigest (messageDigest);
             }
