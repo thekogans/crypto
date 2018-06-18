@@ -124,7 +124,7 @@ namespace thekogans {
             /// \param[in] header \see{util::Serializable::Header}.
             /// \param[in] serializer \see{util::Serializer} to read the serializable from.
             virtual void Read (
-                const Header &header,
+                const Header & /*header*/,
                 util::Serializer &serializer);
             /// \brief
             /// Write the serializable to the given serializer.
