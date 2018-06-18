@@ -102,6 +102,7 @@ namespace thekogans {
                 std::size_t ciphertextLength,
                 AsymmetricKey::Ptr privateKey,
                 util::i32 padding,
+                bool secure,
                 util::Endianness endianness) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
                     privateKey.Get () != 0 && privateKey->GetType () == EVP_PKEY_RSA) {
@@ -113,7 +114,8 @@ namespace thekogans {
                     size_t plaintextLength = 0;
                     if (EVP_PKEY_decrypt (ctx.get (), 0, &plaintextLength,
                             (const util::ui8 *)ciphertext, ciphertextLength) == 1) {
-                        util::Buffer::UniquePtr plaintext (
+                        util::Buffer::UniquePtr plaintext (secure ?
+                            new util::SecureBuffer (endianness, (util::ui32)plaintextLength) :
                             new util::Buffer (endianness, (util::ui32)plaintextLength));
                         if (EVP_PKEY_decrypt (ctx.get (),
                                 plaintext->GetWritePtr (), &plaintextLength,
