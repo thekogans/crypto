@@ -39,6 +39,13 @@ namespace thekogans {
             return
                 Params::Size () +
                 util::Serializable::Size (*params) +
+                util::Serializer::Size (salt) +
+                util::Serializer::Size (keyLength) +
+                util::Serializer::Size (messageDigest) +
+                util::Serializer::Size (count) +
+                util::Serializer::Size (keyId) +
+                util::Serializer::Size (name) +
+                util::Serializer::Size (description) +
                 util::Serializable::Size (*publicKey);
         }
 
@@ -52,7 +59,7 @@ namespace thekogans {
                 keyLength >>
                 messageDigest >>
                 count >>
-                id >>
+                keyId >>
                 name >>
                 description >>
                 publicKey;
@@ -66,7 +73,7 @@ namespace thekogans {
                 keyLength <<
                 messageDigest <<
                 count <<
-                id <<
+                keyId <<
                 name <<
                 description <<
                 *publicKey;
@@ -142,7 +149,7 @@ namespace thekogans {
                                 dhParams->keyLength,
                                 CipherSuite::GetOpenSSLMessageDigest (dhParams->messageDigest),
                                 dhParams->count,
-                                dhParams->id,
+                                dhParams->keyId,
                                 dhParams->name,
                                 dhParams->description);
                         }
