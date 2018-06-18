@@ -54,15 +54,15 @@ namespace thekogans {
 
                 /// \brief
                 /// ctor.
-                /// \param[in] keyExchangeId KeyExchange id (see \see{KeyRing::AddKeyExchange}).
+                /// \param[in] id KeyExchange id (see \see{KeyRing::AddKeyExchange}).
                 /// \param[in] keyId_ Private/Public RSA \see{AsymmetricKey} id.
                 /// \param[in] buffer_ Encrypted \see{SymmetricKey} (client).
                 /// \see{SymmetricKey} signature (server).
                 RSAParams (
-                    const ID &keyExchangeId,
+                    const ID &id,
                     const ID &keyId_,
                     util::Buffer::UniquePtr buffer_) :
-                    Params (keyExchangeId),
+                    Params (id),
                     keyId (keyId_),
                     buffer (std::move (buffer_)) {}
 
@@ -104,7 +104,7 @@ namespace thekogans {
             };
             /// \brief
             /// ctor.
-            /// \param[in] keyExchangeId \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
+            /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
             /// \param[in] key_ Public \see{AsymmetricKey used for
             /// RSA \see{SymmetricKey} derivation.
             /// \param[in] secretLength Length of random data to use for
@@ -115,11 +115,11 @@ namespace thekogans {
             /// \param[in] md OpenSSL message digest to use for the signing operation.
             /// \param[in] count A security counter. Increment the count to slow down
             /// key derivation.
-            /// \param[in] id Optional key id.
+            /// \param[in] keyId Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             RSAKeyExchange (
-                const ID &keyExchangeId,
+                const ID &id,
                 AsymmetricKey::Ptr key_,
                 std::size_t secretLength = DEFAULT_SECRET_LENGTH,
                 const void *salt = 0,
@@ -127,18 +127,18 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
-                const ID &id = ID (),
+                const ID &keyId = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
             /// ctor.
-            /// \param[in] keyExchangeId \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
+            /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
             /// \param[in] key_ Private \see{AsymmetricKey} used for
             /// RSA \see{SymmetricKey} derivation.
             /// \param[in] buffer Encrypted \see{SymmetricKey} (client).
             /// \see{SymmetricKey} signature (server).
             RSAKeyExchange (
-                const ID &keyExchangeId,
+                const ID &id,
                 AsymmetricKey::Ptr key_,
                 util::Buffer &buffer);
 

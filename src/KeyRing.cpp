@@ -363,11 +363,11 @@ namespace thekogans {
             if (keyExchange.Get () != 0) {
                 std::pair<KeyExchangeMap::iterator, bool> result =
                     keyExchangeMap.insert (
-                        KeyExchangeMap::value_type (keyExchange->keyExchangeId, keyExchange));
+                        KeyExchangeMap::value_type (keyExchange->id, keyExchange));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Unable to add a KeyExchange: %s.",
-                        keyExchange->keyExchangeId.ToString ().c_str ());
+                        keyExchange->id.ToString ().c_str ());
                 }
                 return keyExchange;
             }
@@ -404,14 +404,14 @@ namespace thekogans {
                 if (dhParams.Get () != 0) {
                     return KeyExchange::Ptr (
                         new DHEKeyExchange (
-                            dhParams->keyExchangeId,
+                            dhParams->id,
                             dhParams->params,
                             !dhParams->salt.empty () ? &dhParams->salt[0] : 0,
                             dhParams->salt.size (),
                             dhParams->keyLength,
                             CipherSuite::GetOpenSSLMessageDigest (dhParams->messageDigest),
                             dhParams->count,
-                            dhParams->id,
+                            dhParams->keyId,
                             dhParams->name,
                             dhParams->description));
                 }
@@ -429,7 +429,7 @@ namespace thekogans {
                     if (key.Get () != 0 && key->IsPrivate ()) {
                         return KeyExchange::Ptr (
                             new RSAKeyExchange (
-                                rsaParams->keyExchangeId,
+                                rsaParams->id,
                                 key,
                                 *rsaParams->buffer));
                     }

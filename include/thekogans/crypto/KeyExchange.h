@@ -49,13 +49,13 @@ namespace thekogans {
 
                 /// \brief
                 /// KeyExchange id (see \see{KeyRing::AddKeyExchange}).
-                ID keyExchangeId;
+                ID id;
 
                 /// \brief
                 /// ctor.
-                /// \param[in] keyExchangeId_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
-                Params (const ID &keyExchangeId_ = ID ()) :
-                    keyExchangeId (keyExchangeId_) {}
+                /// \param[in] id_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
+                Params (const ID &id_ = ID ()) :
+                    id (id_) {}
 
             protected:
                 // util::Serializable
@@ -80,22 +80,22 @@ namespace thekogans {
         protected:
             /// \brief
             /// KeyExchange id (see \see{KeyRing::AddKeyExchange}).
-            ID keyExchangeId;
+            ID id;
 
             /// \brief
-            /// \see{KeyRing} needs access to keyExchangeId.
+            /// \see{KeyRing} needs access to id.
             friend struct KeyRing;
 
         public:
             /// \brief
             /// ctor.
-            /// \param[in] keyExchangeId_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
-            explicit KeyExchange (const ID &keyExchangeId_) :
-                keyExchangeId (keyExchangeId_) {}
+            /// \param[in] id_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
+            explicit KeyExchange (const ID &id_) :
+                id (id_) {}
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
-            /// \param[in] keyExchangeId KeyExchange id (see \see{KeyRing::AddKeyExchange}).
+            /// \param[in] id KeyExchange id (see \see{KeyRing::AddKeyExchange}).
             /// \return Parameters (\see{DHParams} or \see{RSAParams}) to send to the key exchange peer.
             virtual Params::Ptr GetParams () const = 0;
 

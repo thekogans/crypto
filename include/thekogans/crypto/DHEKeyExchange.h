@@ -62,7 +62,7 @@ namespace thekogans {
                 util::ui32 count;
                 /// \brief
                 /// \see{SymmetricKey} id.
-                ID id;
+                ID keyId;
                 /// \brief
                 /// \see{SymmetricKey} name.
                 std::string name;
@@ -75,35 +75,35 @@ namespace thekogans {
 
                 /// \brief
                 /// ctor.
-                /// \param[in] keyExchangeId KeyExchange id (see \see{KeyRing::AddKeyExchange}).
+                /// \param[in] id KeyExchange id (see \see{KeyRing::AddKeyExchange}).
                 /// \param[in] params_ \see{EC} or \see{DH} key exchange params.
                 /// \param[in] salt_ Salt for \see{SymmetricKey} derivation.
                 /// \param[in] keyLength_ Length of the resulting \see{SymmetricKey} (in bytes).
                 /// \param[in] messageDigest_ OpenSSL message digest to use for hashing.
                 /// \param[in] count_ A security counter. Increment the count to slow down
                 /// \see{SymmetricKey} derivation.
-                /// \param[in] id_ \see{SymmetricKey} id.
+                /// \param[in] keyId_ \see{SymmetricKey} id.
                 /// \param[in] name_ \see{SymmetricKey} name.
                 /// \param[in] description_ \see{SymmetricKey} description.
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
                 DHParams (
-                    const ID &keyExchangeId,
+                    const ID &id,
                     crypto::Params::Ptr params_,
                     const std::vector<util::ui8> &salt_,
                     util::ui32 keyLength_,
                     const std::string &messageDigest_,
                     util::ui32 count_,
-                    const ID &id_,
+                    const ID &keyId_,
                     const std::string &name_,
                     const std::string &description_,
                     AsymmetricKey::Ptr publicKey_) :
-                    Params (keyExchangeId),
+                    Params (id),
                     params (params_),
                     salt (salt_),
                     keyLength (keyLength_),
                     messageDigest (messageDigest_),
                     count (count_),
-                    id (id_),
+                    keyId (keyId_),
                     name (name_),
                     description (description_),
                     publicKey (publicKey_) {}
@@ -150,7 +150,7 @@ namespace thekogans {
             std::size_t count;
             /// \brief
             /// \see{SymmetricKey} id.
-            ID id;
+            ID keyId;
             /// \brief
             /// \see{SymmetricKey} name.
             std::string name;
@@ -164,7 +164,7 @@ namespace thekogans {
         public:
             /// \brief
             /// ctor.
-            /// \param[in] keyExchangeId \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
+            /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
             /// \param[in] params_ DH/EC \see{Params} used for DHE \see{SymmetricKey} derivation.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
@@ -172,18 +172,18 @@ namespace thekogans {
             /// \param[in] md OpenSSL message digest to use for hashing.
             /// \param[in] count A security counter. Increment the count to slow down
             /// \see{SymmetricKey} derivation.
-            /// \param[in] id Optional \see{SymmetricKey} id.
+            /// \param[in] keyId Optional \see{SymmetricKey} id.
             /// \param[in] name Optional \see{SymmetricKey} name.
             /// \param[in] description Optional \see{SymmetricKey} description.
             DHEKeyExchange (
-                const ID &keyExchangeId,
+                const ID &id,
                 crypto::Params::Ptr params_,
                 const void *salt_ = 0,
                 std::size_t saltLength_ = 0,
                 std::size_t keyLength_ = GetCipherKeyLength (),
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count_ = 1,
-                const ID &id_ = ID (),
+                const ID &keyId_ = ID (),
                 const std::string &name_ = std::string (),
                 const std::string &description_ = std::string ());
 

@@ -51,7 +51,7 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (RSAKeyExchange::RSAParams, 1, 16)
 
         RSAKeyExchange::RSAKeyExchange (
-                const ID &keyExchangeId,
+                const ID &id,
                 AsymmetricKey::Ptr key_,
                 std::size_t secretLength,
                 const void *salt,
@@ -59,10 +59,10 @@ namespace thekogans {
                 std::size_t keyLength,
                 const EVP_MD *md,
                 std::size_t count,
-                const ID &id,
+                const ID &keyId,
                 const std::string &name,
                 const std::string &description) :
-                KeyExchange (keyExchangeId),
+                KeyExchange (id),
                 key (key_) {
             if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && !key->IsPrivate () &&
                     secretLength > 0 && md != 0 && count > 0) {
@@ -77,7 +77,7 @@ namespace thekogans {
                         keyLength,
                         md,
                         count,
-                        id,
+                        keyId,
                         name,
                         description);
                 }
@@ -94,10 +94,10 @@ namespace thekogans {
         }
 
         RSAKeyExchange::RSAKeyExchange (
-                const ID &keyExchangeId,
+                const ID &id,
                 AsymmetricKey::Ptr key_,
                 util::Buffer &buffer) :
-                KeyExchange (keyExchangeId),
+                KeyExchange (id),
                 key (key_) {
             if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && key->IsPrivate ()) {
                 util::Buffer::UniquePtr symmetricKeyBuffer =
@@ -125,7 +125,7 @@ namespace thekogans {
                 Authenticator authenticator (Authenticator::Sign, key);
                 return Params::Ptr (
                     new RSAParams (
-                        keyExchangeId,
+                        id,
                         key->GetId (),
                         authenticator.SignBuffer (
                             symmetricKeyBuffer.GetReadPtr (),
@@ -133,7 +133,7 @@ namespace thekogans {
             }
             return Params::Ptr (
                 new RSAParams (
-                    keyExchangeId,
+                    id,
                     key->GetId (),
                     RSA::EncryptBuffer (
                         symmetricKeyBuffer.GetReadPtr (),

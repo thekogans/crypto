@@ -22,17 +22,17 @@ namespace thekogans {
     namespace crypto {
 
         std::size_t KeyExchange::Params::Size () const {
-            return util::Serializer::Size (keyExchangeId);
+            return util::Serializer::Size (id);
         }
 
         void KeyExchange::Params::Read (
                 const Header & /*header*/,
                 util::Serializer &serializer) {
-            serializer >> keyExchangeId;
+            serializer >> id;
         }
 
         void KeyExchange::Params::Write (util::Serializer &serializer) const {
-            serializer << keyExchangeId;
+            serializer << id;
         }
 
     } // namespace crypto

@@ -67,17 +67,17 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (DHEKeyExchange::DHParams, 1, 16)
 
         DHEKeyExchange::DHEKeyExchange (
-                const ID &keyExchangeId,
+                const ID &id,
                 crypto::Params::Ptr params_,
                 const void *salt_,
                 std::size_t saltLength_,
                 std::size_t keyLength_,
                 const EVP_MD *md_,
                 std::size_t count_,
-                const ID &id_,
+                const ID &keyId_,
                 const std::string &name_,
                 const std::string &description_) :
-                KeyExchange (keyExchangeId),
+                KeyExchange (id),
                 params (params_),
                 salt (
                     salt_ != 0 && saltLength_ > 0 ?
@@ -88,7 +88,7 @@ namespace thekogans {
                 keyLength (keyLength_),
                 messageDigest (CipherSuite::GetOpenSSLMessageDigestName (md_)),
                 count (count_),
-                id (id_),
+                keyId (keyId_),
                 name (name_),
                 description (description_) {
             util::i32 type = params->GetType ();
@@ -104,13 +104,13 @@ namespace thekogans {
         KeyExchange::Params::Ptr DHEKeyExchange::GetParams () const {
             return Params::Ptr (
                 new DHParams (
-                    keyExchangeId,
+                    id,
                     params,
                     salt,
                     keyLength,
                     messageDigest,
                     count,
-                    id,
+                    keyId,
                     name,
                     description,
                     key->GetPublicKey ()));
