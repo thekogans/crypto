@@ -27,21 +27,35 @@
 using namespace thekogans;
 
 namespace {
-    crypto::AsymmetricKey::Ptr GetKeyForAlgorithm (const std::string &algorithm) {
-        if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_ECDHE ||
-                algorithm == crypto::CipherSuite::AUTHENTICATOR_ECDSA) {
-            return crypto::EC::ParamsFromRFC5114Curve (
-                crypto::EC::RFC5114_CURVE_192)->CreateKey ();
+    crypto::KeyExchange::Ptr GetKeyExchange (const std::string &algorithm) {
+        if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_ECDHE) {
+            return crypto::KeyExchange::Ptr (
+                new crypto::KeyExchange (
+                    crypto::EC::ParamsFromRFC5114Curve (
+                        crypto::EC::RFC5114_CURVE_192)));
         }
         if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_DHE) {
-            return crypto::DH::ParamsFromRFC3526Prime (
-                crypto::DH::RFC3526_PRIME_1536)->CreateKey ();
+            return crypto::KeyExchange::Ptr (
+                new crypto::KeyExchange (
+                    crypto::DH::ParamsFromRFC3526Prime (
+                        crypto::DH::RFC3526_PRIME_1536)));
+        }
+        if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_RSA) {
+            return crypto::KeyExchange::Ptr (
+                new crypto::KeyExchange (crypto::RSA::CreateKey (512)->GetPublicKey ()));
+        }
+        return crypto::KeyExchange::Ptr ();
+    }
+
+    crypto::AsymmetricKey::Ptr GetKeyForAlgorithm (const std::string &algorithm) {
+        if (algorithm == crypto::CipherSuite::AUTHENTICATOR_ECDSA) {
+            return crypto::EC::ParamsFromRFC5114Curve (
+                crypto::EC::RFC5114_CURVE_192)->CreateKey ();
         }
         if (algorithm == crypto::CipherSuite::AUTHENTICATOR_DSA) {
             return crypto::DSA::ParamsFromKeyLength (512)->CreateKey ();
         }
-        if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_RSA ||
-                algorithm == crypto::CipherSuite::AUTHENTICATOR_RSA) {
+        if (algorithm == crypto::CipherSuite::AUTHENTICATOR_RSA) {
             return crypto::RSA::CreateKey (512);
         }
         return crypto::AsymmetricKey::Ptr ();
@@ -60,8 +74,7 @@ namespace {
                     buffer >> cipherSuite_;
                     result = cipherSuite_ == cipherSuite;
                     if (result) {
-                        crypto::KeyExchange::Ptr keyExchange =
-                            cipherSuite.GetKeyExchange (GetKeyForAlgorithm (cipherSuite.keyExchange));
+                        crypto::KeyExchange::Ptr keyExchange = GetKeyExchange (cipherSuite.keyExchange);
                         result = keyExchange.Get () != 0;
                         if (result) {
                             crypto::Authenticator::Ptr authenticator =
