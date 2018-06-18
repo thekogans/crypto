@@ -28,6 +28,13 @@
 namespace thekogans {
     namespace crypto {
 
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
+            DHEKeyExchange::DHParams,
+            1,
+            util::SpinLock,
+            16,
+            util::DefaultAllocator::Global)
+
         std::size_t DHEKeyExchange::DHParams::Size () const {
             return
                 Params::Size () +
@@ -64,13 +71,6 @@ namespace thekogans {
                 description <<
                 *publicKey;
         }
-
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
-            DHEKeyExchange::DHParams,
-            1,
-            util::SpinLock,
-            16,
-            util::DefaultAllocator::Global)
 
         DHEKeyExchange::DHEKeyExchange (
                 const ID &id,

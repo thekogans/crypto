@@ -29,6 +29,13 @@
 namespace thekogans {
     namespace crypto {
 
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
+            RSAKeyExchange::RSAParams,
+            1,
+            util::SpinLock,
+            16,
+            util::DefaultAllocator::Global)
+
         std::size_t RSAKeyExchange::RSAParams::Size () const {
             return
                 Params::Size () +
@@ -48,13 +55,6 @@ namespace thekogans {
             Params::Write (serializer);
             serializer << keyId << *buffer;
         }
-
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
-            RSAKeyExchange::RSAParams,
-            1,
-            util::SpinLock,
-            16,
-            util::DefaultAllocator::Global)
 
         RSAKeyExchange::RSAKeyExchange (
                 const ID &id,
