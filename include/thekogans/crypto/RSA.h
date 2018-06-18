@@ -75,6 +75,7 @@ namespace thekogans {
             /// \param[in] ciphertextLength Length of ciphertext.
             /// \param[in] privateKey Private key used for decryption.
             /// \param[in] padding RSA padding type.
+            /// \param[in] secure true == return util::SecureBuffer.
             /// \param[in] endianness Endianness type of the resulting plaintext.
             /// \return Decrypted ciphertext.
             static util::Buffer::UniquePtr DecryptBuffer (
@@ -82,6 +83,7 @@ namespace thekogans {
                 std::size_t ciphertextLength,
                 AsymmetricKey::Ptr privateKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING,
+                bool secure = false,
                 util::Endianness endianness = util::NetworkEndian);
         };
 
