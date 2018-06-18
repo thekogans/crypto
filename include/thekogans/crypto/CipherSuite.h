@@ -257,10 +257,40 @@ namespace thekogans {
             bool VerifyMACKey (const AsymmetricKey &key) const;
 
             /// \brief
-            /// Return the \see{KeyExchange} instance represented by keyExchange.
-            /// \param[in] privateKey \see{AsymmetricKey} private key to use for key exchange.
+            /// Return an instance of \see{KeyExchange} represented by keyExchange ([EC]DHE).
+            /// \param[in] params \see{Params} (DH/EC) to use for key exchange.
             /// \return \see{KeyExchange} instance represented by keyExchange.
-            KeyExchange::Ptr GetKeyExchange (AsymmetricKey::Ptr privateKey) const;
+            KeyExchange::Ptr GetKeyExchangeFromParams (Params::Ptr params) const;
+            /// \brief
+            /// Return an instance of \see{KeyExchange} represented by keyExchange (client side RSA).
+            /// \param[in] key Public (RSA) \see{AsymmetricKey} to use for key exchange.
+            /// \param[in] secretLength Length of random data to use for \see{SymmetricKey} derivation.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
+            /// \param[in] count A security counter. Increment the count to slow down
+            /// key derivation.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return \see{KeyExchange} instance represented by keyExchange.
+            KeyExchange::Ptr GetKeyExchangeFromKey (
+                AsymmetricKey::Ptr key,
+                util::ui32 secretLength = KeyExchange::DEFAULT_SECRET_LENGTH,
+                const void *salt = 0,
+                std::size_t saltLength = 0,
+                std::size_t count = 1,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ()) const;
+            /// \brief
+            /// Return an instance of \see{KeyExchange} represented by keyExchange (server side RSA).
+            /// \param[in] key Private (RSA) \see{AsymmetricKey} to use for key exchange.
+            /// \param[in] buffer An \see{SymmetricKey} encrypted with the public \see{AsymmetricKey}
+            /// corresponding to the given private \see{AsymmetricKey}.
+            /// \return \see{KeyExchange} instance represented by keyExchange.
+            KeyExchange::Ptr GetKeyExchangeFromKey (
+                AsymmetricKey::Ptr key,
+                util::Buffer &buffer) const;
             /// \brief
             /// Return the \see{Authenticator} instance represented by authenticator.
             /// \param[in] op Operation (Sign/Verify) to perform.

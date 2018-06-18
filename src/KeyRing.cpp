@@ -27,6 +27,7 @@
 #if defined (THEKOGANS_CRYPTO_TESTING)
     #include "thekogans/util/XMLUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/crypto/RSA.h"
 #include "thekogans/crypto/KeyRing.h"
 
 namespace thekogans {
@@ -245,72 +246,11 @@ namespace thekogans {
             return AsymmetricKey::Ptr ();
         }
 
-        AsymmetricKey::Ptr KeyRing::GetRandomKeyExchangeKey () const {
-            AsymmetricKey::Ptr key;
-            if (!keyExchangeKeyMap.empty ()) {
-                AsymmetricKeyMap::const_iterator it = keyExchangeKeyMap.begin ();
-                if (keyExchangeKeyMap.size () > 1) {
-                    std::advance (
-                        it,
-                        util::GlobalRandomSource::Instance ().Getui32 () % keyExchangeKeyMap.size ());
-                }
-                key = it->second;
-            }
-            return key;
-        }
-
-        KeyExchange::Ptr KeyRing::GetKeyExchange (
-                const ID &keyId,
-                bool recursive) {
-            KeyExchangeMap::const_iterator it = keyExchangeMap.find (keyId);
-            if (it != keyExchangeMap.end ()) {
-                return it->second;
-            }
-            AsymmetricKey::Ptr key = GetKeyExchangeKey (keyId, false);
-            if (key.Get () != 0) {
-                KeyExchange::Ptr keyExchange =
-                    cipherSuite.GetKeyExchange (key);
-                std::pair<KeyExchangeMap::iterator, bool> result =
-                    keyExchangeMap.insert (
-                        KeyExchangeMap::value_type (keyId, keyExchange));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to add a KeyExchange: %s.",
-                        keyId.ToString ().c_str ());
-                }
-                return keyExchange;
-            }
-            if (recursive) {
-                for (KeyRingMap::const_iterator
-                        it = subringMap.begin (),
-                        end = subringMap.end (); it != end; ++it) {
-                    KeyExchange::Ptr keyExchange =
-                        it->second->GetKeyExchange (keyId, recursive);
-                    if (keyExchange.Get () != 0) {
-                        return keyExchange;
-                    }
-                }
-            }
-            return KeyExchange::Ptr ();
-        }
-
-        bool KeyRing::AddKeyExchangeKey (
-                AsymmetricKey::Ptr key,
-                KeyExchange::Ptr keyExchange) {
+        bool KeyRing::AddKeyExchangeKey (AsymmetricKey::Ptr key) {
             if (key.Get () != 0 && cipherSuite.VerifyKeyExchangeKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result =
                     keyExchangeKeyMap.insert (
                         AsymmetricKeyMap::value_type (key->GetId (), key));
-                if (result.second && keyExchange.Get () != 0) {
-                    std::pair<KeyExchangeMap::iterator, bool> result =
-                        keyExchangeMap.insert (
-                            KeyExchangeMap::value_type (key->GetId (), keyExchange));
-                    if (!result.second) {
-                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                            "Unable to add a KeyExchange: %s.",
-                            key->GetId ().ToString ().c_str ());
-                    }
-                }
                 return result.second;
             }
             else {
@@ -353,6 +293,118 @@ namespace thekogans {
                     it->second->DropAllKeyExchangeKeys (recursive);
                 }
             }
+        }
+
+        KeyExchange::Params::Ptr KeyRing::AddKeyExchange (
+                const ID &id,
+                bool recursive) {
+            crypto::KeyExchange::Ptr keyExchange;
+            if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
+                    cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
+                crypto::Params::Ptr params = id != ID::Empty ?
+                    GetKeyExchangeParams (id) :
+                    GetRandomKeyExchangeParams ();
+                if (params.Get () != 0) {
+                    keyExchange = cipherSuite.GetKeyExchangeFromParams (params);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to get params for id: %s",
+                        id.ToString ().c_str ());
+                }
+            }
+            else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
+                crypto::AsymmetricKey::Ptr key = GetKeyExchangeKey (id);
+                if (key.Get () != 0 && !key->IsPrivate ()) {
+                    keyExchange = cipherSuite.GetKeyExchangeFromKey (key);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to get key for id: %s",
+                        id.ToString ().c_str ());
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unknown key exchange type: %s",
+                    cipherSuite.keyExchange.c_str ());
+            }
+            if (keyExchange.Get () != 0) {
+                KeyExchange::Params::Ptr params = keyExchange->GetParams (ID ());
+                std::pair<KeyExchangeMap::iterator, bool> result =
+                    keyExchangeMap.insert (
+                        KeyExchangeMap::value_type (params->keyExchangeId, keyExchange));
+                if (!result.second) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to add a KeyExchange: %s.",
+                        id.ToString ().c_str ());
+                }
+                return params;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
+                    KeyExchange::Params::Ptr params =
+                        it->second->AddKeyExchange (id, recursive);
+                    if (params.Get () != 0) {
+                        return params;
+                    }
+                }
+            }
+            return KeyExchange::Params::Ptr ();
+        }
+
+        KeyExchange::Ptr KeyRing::CreateKeyExchange (
+                KeyExchange::Params::Ptr params,
+                bool recursive) {
+            if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
+                    cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
+                KeyExchange::DHParams::Ptr dhParams =
+                    util::dynamic_refcounted_pointer_cast<KeyExchange::DHParams> (params);
+                return cipherSuite.GetKeyExchangeFromParams (dhParams->params);
+            }
+            else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
+                KeyExchange::RSAParams::Ptr rsaParams =
+                    util::dynamic_refcounted_pointer_cast<KeyExchange::RSAParams> (params);
+                AsymmetricKey::Ptr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
+                if (key.Get () != 0 && key->IsPrivate ()) {
+                    return cipherSuite.GetKeyExchangeFromKey (key, *rsaParams->buffer);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to get key for id: %s",
+                        rsaParams->keyId.ToString ().c_str ());
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unknown key exchange type: %s",
+                    cipherSuite.keyExchange.c_str ());
+            }
+        }
+
+        KeyExchange::Ptr KeyRing::GetKeyExchange (
+                const ID &id,
+                bool recursive) {
+            KeyExchangeMap::iterator it = keyExchangeMap.find (id);
+            if (it != keyExchangeMap.end ()) {
+                KeyExchange::Ptr keyExchange = it->second;
+                keyExchangeMap.erase (it);
+                return keyExchange;
+            }
+            if (recursive) {
+                for (KeyRingMap::const_iterator
+                        it = subringMap.begin (),
+                        end = subringMap.end (); it != end; ++it) {
+                    KeyExchange::Ptr keyExchange =
+                        it->second->GetKeyExchange (id, recursive);
+                    if (keyExchange.Get () != 0) {
+                        return keyExchange;
+                    }
+                }
+            }
+            return KeyExchange::Ptr ();
         }
 
         Params::Ptr KeyRing::GetAuthenticatorParams (

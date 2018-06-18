@@ -251,27 +251,11 @@ namespace thekogans {
                 const EqualityTest<AsymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
-            /// Return randomly chosen \see{KeyExchange} \see{AsymmetricKey}.
-            /// \return Randomly chosen \see{KeyExchange} \see{AsymmetricKey}.
-            AsymmetricKey::Ptr GetRandomKeyExchangeKey () const;
-            /// \brief
-            /// Return the \see{KeyExchange} with the given \see{ID}.
-            /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey}.
-            /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{KeyExchange} corresponding to the given keyId
-            /// (KeyExchange::Ptr () if not found).
-            KeyExchange::Ptr GetKeyExchange (
-                const ID &keyId,
-                bool recursive = true);
-            /// \brief
             /// Add a \see{KeyExchange} \see{AsymmetricKey} to this ring.
             /// \param[in] key \see{KeyExchange} \see{AsymmetricKey} to add.
-            /// \param[in] keyExchange Optional \see{KeyExchange} to add.
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
-            bool AddKeyExchangeKey (
-                AsymmetricKey::Ptr key,
-                KeyExchange::Ptr keyExchange = KeyExchange::Ptr ());
+            bool AddKeyExchangeKey (AsymmetricKey::Ptr key);
             /// \brief
             /// Drop a \see{KeyExchange} \see{AsymmetricKey} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey} to delete.
@@ -284,6 +268,43 @@ namespace thekogans {
             /// Drop all \see{KeyExchange} \see{AsymmetricKey}.
             /// \param[in] recursive true = descend down to sub rings.
             void DropAllKeyExchangeKeys (bool recursive = true);
+
+            /// \brief
+            /// Create a \see{KeyExchange} and return it's \see{KeyExchange::Params}.
+            /// If \see{CipherSuite} key exchange is [EC]DHE, id represents \see{DH}
+            /// or \see{EC} \see{Params} used to create an ephemeral \see{AsymmetricKey}.
+            /// If id is \see{ID::Empty}, random params are used.
+            /// If \see{CipherSuite} key exchange is RSA, id represents a public RSA
+            /// \see{AsymmetricKey} used to encrypt a random \see{SymmetricKey}.
+            /// For RSA key exchange, id cannot be \see{ID::Empty}.
+            /// This method is used by the initiator (client) of the key exchange.
+            /// \param[in] id \see{ID} of \see{Params} or \see{AsymmetricKey}.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{KeyExchange::Params::Ptr} corresponding to the given id
+            /// (\see{KeyExchange::Params::Ptr} () if not found).
+            KeyExchange::Params::Ptr AddKeyExchange (
+                const ID &id,
+                bool recursive = true);
+            /// \brief
+            /// Create a \see{KeyExchange} based on the given \see{KeyExchange::Params}
+            /// (returned by AddKeyExchange above).
+            /// This method is used by the receiver (server) of the key exchange request.
+            /// \param[in] params \see{KeyExchange::Params::Ptr} returned by AddKeyExchange.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{KeyExchange::Ptr} corresponding to the given params.
+            KeyExchange::Ptr CreateKeyExchange (
+                KeyExchange::Params::Ptr params,
+                bool recursive = true);
+            /// \brief
+            /// Return the previously created \see{KeyExchange} by AddKeyExchange above.
+            /// This method is used by the key exchange initiator (client) after receiving
+            /// the server's \see{KeyExchange::Params}.
+            /// \param[in] id \see{KeyExchange::Params::keyExchangeId}.
+            /// \param[in] recursive true = if not found locally, descend down to sub rings.
+            /// \return \see{KeyExchange::Ptr} corresponding to the given id.
+            KeyExchange::Ptr GetKeyExchange (
+                const ID &id,
+                bool recursive = true);
 
             /// \brief
             /// Return the \see{Authenticator} \see{Params} with the given \see{ID}.

@@ -316,10 +316,7 @@ namespace thekogans {
 
         bool CipherSuite::VerifyKeyExchangeKey (const AsymmetricKey &key) const {
             util::i32 type = key.GetType ();
-            return
-                (keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE && type == EVP_PKEY_EC) ||
-                (keyExchange == CipherSuite::KEY_EXCHANGE_DHE && type == EVP_PKEY_DH) ||
-                (keyExchange == CipherSuite::KEY_EXCHANGE_RSA && type == EVP_PKEY_RSA);
+            return keyExchange == CipherSuite::KEY_EXCHANGE_RSA && type == EVP_PKEY_RSA;
         }
 
         bool CipherSuite::VerifyAuthenticatorParams (const Params &params) const {
@@ -346,9 +343,50 @@ namespace thekogans {
             return type == EVP_PKEY_HMAC || type == EVP_PKEY_CMAC;
         }
 
-        KeyExchange::Ptr CipherSuite::GetKeyExchange (AsymmetricKey::Ptr privateKey) const {
-            if (privateKey.Get () != 0 && VerifyKeyExchangeKey (*privateKey)) {
-                return KeyExchange::Ptr (new KeyExchange (privateKey));
+        KeyExchange::Ptr CipherSuite::GetKeyExchangeFromParams (Params::Ptr params) const {
+            if (params.Get () != 0 && VerifyKeyExchangeParams (*params)) {
+                return KeyExchange::Ptr (new KeyExchange (params));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        KeyExchange::Ptr CipherSuite::GetKeyExchangeFromKey (
+                AsymmetricKey::Ptr key,
+                util::ui32 secretLength,
+                const void *salt,
+                std::size_t saltLength,
+                std::size_t count,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) const {
+            if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
+                return KeyExchange::Ptr (
+                    new KeyExchange (
+                        key,
+                        secretLength,
+                        salt,
+                        saltLength,
+                        GetCipherKeyLength (GetOpenSSLCipher ()),
+                        GetOpenSSLMessageDigest (),
+                        count,
+                        id,
+                        name,
+                        description));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        KeyExchange::Ptr CipherSuite::GetKeyExchangeFromKey (
+                AsymmetricKey::Ptr key,
+                util::Buffer &buffer) const {
+            if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
+                return KeyExchange::Ptr (new KeyExchange (key, buffer));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
