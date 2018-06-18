@@ -21,7 +21,7 @@
 #include "thekogans/crypto/DH.h"
 #include "thekogans/crypto/EC.h"
 #include "thekogans/crypto/AsymmetricKey.h"
-#include "thekogans/crypto/KeyExchange.h"
+#include "thekogans/crypto/DHEKeyExchange.h"
 
 using namespace thekogans;
 
@@ -37,12 +37,12 @@ namespace {
             crypto::Params::Ptr params) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
-            crypto::KeyExchange keyExchange1 (params);
-            crypto::KeyExchange keyExchange2 (params);
+            crypto::DHEKeyExchange keyExchange1 (crypto::ID (), params);
+            crypto::DHEKeyExchange keyExchange2 (crypto::ID (), params);
             crypto::SymmetricKey::Ptr key1 =
-                keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams (crypto::ID ()));
+                keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
             crypto::SymmetricKey::Ptr key2 =
-                keyExchange2.DeriveSharedSymmetricKey (keyExchange1.GetParams (crypto::ID ()));
+                keyExchange2.DeriveSharedSymmetricKey (keyExchange1.GetParams ());
             bool result = *key1 == *key2;
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;

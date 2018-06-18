@@ -23,6 +23,8 @@
 #include "thekogans/crypto/DH.h"
 #include "thekogans/crypto/DSA.h"
 #include "thekogans/crypto/RSA.h"
+#include "thekogans/crypto/DHEKeyExchange.h"
+#include "thekogans/crypto/RSAKeyExchange.h"
 
 using namespace thekogans;
 
@@ -30,19 +32,23 @@ namespace {
     crypto::KeyExchange::Ptr GetKeyExchange (const std::string &algorithm) {
         if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_ECDHE) {
             return crypto::KeyExchange::Ptr (
-                new crypto::KeyExchange (
+                new crypto::DHEKeyExchange (
+                    crypto::ID (),
                     crypto::EC::ParamsFromRFC5114Curve (
                         crypto::EC::RFC5114_CURVE_192)));
         }
         if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_DHE) {
             return crypto::KeyExchange::Ptr (
-                new crypto::KeyExchange (
+                new crypto::DHEKeyExchange (
+                    crypto::ID (),
                     crypto::DH::ParamsFromRFC3526Prime (
                         crypto::DH::RFC3526_PRIME_1536)));
         }
         if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_RSA) {
             return crypto::KeyExchange::Ptr (
-                new crypto::KeyExchange (crypto::RSA::CreateKey (512)->GetPublicKey ()));
+                new crypto::RSAKeyExchange (
+                    crypto::ID (),
+                    crypto::RSA::CreateKey (512)->GetPublicKey ()));
         }
         return crypto::KeyExchange::Ptr ();
     }

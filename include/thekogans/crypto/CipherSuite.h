@@ -204,10 +204,20 @@ namespace thekogans {
             /// \return OpenSSL EVP_CIPHER represented by the given cipher.
             static const EVP_CIPHER *GetOpenSSLCipher (const std::string &cipher);
             /// \brief
+            /// Return the cipher name represented by the given OpenSSL EVP_CIPHER.
+            /// \param[in] cipher OpenSSL EVP_CIPHER whose name to return.
+            /// \return Cipher name represented by the given OpenSSL EVP_CIPHER.
+            static std::string GetOpenSSLCipherName (const EVP_CIPHER *cipher);
+            /// \brief
             /// Return the OpenSSL EVP_MD represented by the given messageDigest.
             /// \param[in] messageDigest Message digest name to convert to OpenSSL EVP_MD.
             /// \return OpenSSL EVP_MD represented by the given messageDigest.
             static const EVP_MD *GetOpenSSLMessageDigest (const std::string &messageDigest);
+            /// \brief
+            /// Return the message digest name represented by the given OpenSSL EVP_MD.
+            /// \param[in] md OpenSSL EVP_MD whose name to return.
+            /// \return Message digest name represented by the given OpenSSL EVP_MD.
+            static std::string GetOpenSSLMessageDigestName (const EVP_MD *md);
 
             /// \brief
             /// Return serialized cipher suite size.
@@ -256,41 +266,6 @@ namespace thekogans {
             /// \return true = given key is appropriate.
             bool VerifyMACKey (const AsymmetricKey &key) const;
 
-            /// \brief
-            /// Return an instance of \see{KeyExchange} represented by keyExchange ([EC]DHE).
-            /// \param[in] params \see{Params} (DH/EC) to use for key exchange.
-            /// \return \see{KeyExchange} instance represented by keyExchange.
-            KeyExchange::Ptr GetKeyExchangeFromParams (Params::Ptr params) const;
-            /// \brief
-            /// Return an instance of \see{KeyExchange} represented by keyExchange (client side RSA).
-            /// \param[in] key Public (RSA) \see{AsymmetricKey} to use for key exchange.
-            /// \param[in] secretLength Length of random data to use for \see{SymmetricKey} derivation.
-            /// \param[in] salt An optional buffer containing salt.
-            /// \param[in] saltLength Salt length.
-            /// \param[in] count A security counter. Increment the count to slow down
-            /// key derivation.
-            /// \param[in] id Optional key id.
-            /// \param[in] name Optional key name.
-            /// \param[in] description Optional key description.
-            /// \return \see{KeyExchange} instance represented by keyExchange.
-            KeyExchange::Ptr GetKeyExchangeFromKey (
-                AsymmetricKey::Ptr key,
-                util::ui32 secretLength = KeyExchange::DEFAULT_SECRET_LENGTH,
-                const void *salt = 0,
-                std::size_t saltLength = 0,
-                std::size_t count = 1,
-                const ID &id = ID (),
-                const std::string &name = std::string (),
-                const std::string &description = std::string ()) const;
-            /// \brief
-            /// Return an instance of \see{KeyExchange} represented by keyExchange (server side RSA).
-            /// \param[in] key Private (RSA) \see{AsymmetricKey} to use for key exchange.
-            /// \param[in] buffer An \see{SymmetricKey} encrypted with the public \see{AsymmetricKey}
-            /// corresponding to the given private \see{AsymmetricKey}.
-            /// \return \see{KeyExchange} instance represented by keyExchange.
-            KeyExchange::Ptr GetKeyExchangeFromKey (
-                AsymmetricKey::Ptr key,
-                util::Buffer &buffer) const;
             /// \brief
             /// Return the \see{Authenticator} instance represented by authenticator.
             /// \param[in] op Operation (Sign/Verify) to perform.

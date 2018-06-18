@@ -31,6 +31,7 @@
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/KeyExchange.h"
+#include "thekogans/crypto/RSAKeyExchange.h"
 #include "thekogans/crypto/Authenticator.h"
 #include "thekogans/crypto/Cipher.h"
 #include "thekogans/crypto/MAC.h"
@@ -270,20 +271,35 @@ namespace thekogans {
             void DropAllKeyExchangeKeys (bool recursive = true);
 
             /// \brief
-            /// Create a \see{KeyExchange} and return it's \see{KeyExchange::Params}.
+            /// Create a \see{KeyExchange} instance (\see{DHEKeyExchange} or \see{RSAKeyExchange}).
             /// If \see{CipherSuite} key exchange is [EC]DHE, id represents \see{DH}
-            /// or \see{EC} \see{Params} used to create an ephemeral \see{AsymmetricKey}.
+            /// or \see{EC} \see{Params} used to create an ephemeral DH \see{AsymmetricKey}.
             /// If id is \see{ID::Empty}, random params are used.
             /// If \see{CipherSuite} key exchange is RSA, id represents a public RSA
             /// \see{AsymmetricKey} used to encrypt a random \see{SymmetricKey}.
             /// For RSA key exchange, id cannot be \see{ID::Empty}.
             /// This method is used by the initiator (client) of the key exchange.
-            /// \param[in] id \see{ID} of \see{Params} or \see{AsymmetricKey}.
+            /// \param[in] paramsOrKeyId \see{ID} of \see{Params} or \see{AsymmetricKey}.
+            /// \param[in] secretLength Length of random data to use for \see{SymmetricKey} derivation.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
+            /// \param[in] count A security counter. Increment the count to slow down
+            /// key derivation.
+            /// \param[in] keyId Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{KeyExchange::Params::Ptr} corresponding to the given id
             /// (\see{KeyExchange::Params::Ptr} () if not found).
-            KeyExchange::Params::Ptr AddKeyExchange (
-                const ID &id,
+            KeyExchange::Ptr AddKeyExchange (
+                const ID &paramsOrKeyId,
+                std::size_t secretLength = RSAKeyExchange::DEFAULT_SECRET_LENGTH,
+                const void *salt = 0,
+                std::size_t saltLength = 0,
+                std::size_t count = 1,
+                const ID &keyId = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string (),
                 bool recursive = true);
             /// \brief
             /// Create a \see{KeyExchange} based on the given \see{KeyExchange::Params}
@@ -299,11 +315,11 @@ namespace thekogans {
             /// Return the previously created \see{KeyExchange} by AddKeyExchange above.
             /// This method is used by the key exchange initiator (client) after receiving
             /// the server's \see{KeyExchange::Params}.
-            /// \param[in] id \see{KeyExchange::Params::keyExchangeId}.
+            /// \param[in] keyExchangeId \see{KeyExchange::keyExchangeId}.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{KeyExchange::Ptr} corresponding to the given id.
             KeyExchange::Ptr GetKeyExchange (
-                const ID &id,
+                const ID &keyExchangeId,
                 bool recursive = true);
 
             /// \brief

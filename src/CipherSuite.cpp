@@ -248,6 +248,15 @@ namespace thekogans {
             return 0;
         }
 
+        std::string CipherSuite::GetOpenSSLCipherName (const EVP_CIPHER *cipher) {
+            for (std::size_t i = 0; i < ciphersSize; ++i) {
+                if (ciphers[i].cipher == cipher) {
+                    return ciphers[i].name;
+                }
+            }
+            return std::string ();
+        }
+
         const EVP_MD *CipherSuite::GetOpenSSLMessageDigest (const std::string &messageDigest) {
             for (std::size_t i = 0; i < messageDigestsSize; ++i) {
                 if (messageDigests[i].name == messageDigest) {
@@ -255,6 +264,15 @@ namespace thekogans {
                 }
             }
             return 0;
+        }
+
+        std::string CipherSuite::GetOpenSSLMessageDigestName (const EVP_MD *md) {
+            for (std::size_t i = 0; i < messageDigestsSize; ++i) {
+                if (messageDigests[i].md == md) {
+                    return messageDigests[i].name;
+                }
+            }
+            return std::string ();
         }
 
         namespace {
@@ -341,57 +359,6 @@ namespace thekogans {
         bool CipherSuite::VerifyMACKey (const AsymmetricKey &key) const {
             util::i32 type = key.GetType ();
             return type == EVP_PKEY_HMAC || type == EVP_PKEY_CMAC;
-        }
-
-        KeyExchange::Ptr CipherSuite::GetKeyExchangeFromParams (Params::Ptr params) const {
-            if (params.Get () != 0 && VerifyKeyExchangeParams (*params)) {
-                return KeyExchange::Ptr (new KeyExchange (params));
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        KeyExchange::Ptr CipherSuite::GetKeyExchangeFromKey (
-                AsymmetricKey::Ptr key,
-                util::ui32 secretLength,
-                const void *salt,
-                std::size_t saltLength,
-                std::size_t count,
-                const ID &id,
-                const std::string &name,
-                const std::string &description) const {
-            if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
-                return KeyExchange::Ptr (
-                    new KeyExchange (
-                        key,
-                        secretLength,
-                        salt,
-                        saltLength,
-                        GetCipherKeyLength (GetOpenSSLCipher ()),
-                        GetOpenSSLMessageDigest (),
-                        count,
-                        id,
-                        name,
-                        description));
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        KeyExchange::Ptr CipherSuite::GetKeyExchangeFromKey (
-                AsymmetricKey::Ptr key,
-                util::Buffer &buffer) const {
-            if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
-                return KeyExchange::Ptr (new KeyExchange (key, buffer));
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
         }
 
         Authenticator::Ptr CipherSuite::GetAuthenticator (

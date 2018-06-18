@@ -27,6 +27,7 @@
 #if defined (THEKOGANS_CRYPTO_TESTING)
     #include "thekogans/util/XMLUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/crypto/DHEKeyExchange.h"
 #include "thekogans/crypto/RSA.h"
 #include "thekogans/crypto/KeyRing.h"
 
@@ -295,17 +296,35 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Params::Ptr KeyRing::AddKeyExchange (
+        KeyExchange::Ptr KeyRing::AddKeyExchange (
+                const ID &paramsOrKeyId,
+                std::size_t secretLength,
+                const void *salt,
+                std::size_t saltLength,
+                std::size_t count,
                 const ID &id,
+                const std::string &name,
+                const std::string &description,
                 bool recursive) {
             crypto::KeyExchange::Ptr keyExchange;
             if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
                     cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
-                crypto::Params::Ptr params = id != ID::Empty ?
-                    GetKeyExchangeParams (id) :
+                crypto::Params::Ptr params = paramsOrKeyId != ID::Empty ?
+                    GetKeyExchangeParams (paramsOrKeyId) :
                     GetRandomKeyExchangeParams ();
                 if (params.Get () != 0) {
-                    keyExchange = cipherSuite.GetKeyExchangeFromParams (params);
+                    keyExchange.Reset (
+                        new DHEKeyExchange (
+                            ID (),
+                            params,
+                            salt,
+                            saltLength,
+                            GetCipherKeyLength (cipherSuite.GetOpenSSLCipher ()),
+                            cipherSuite.GetOpenSSLMessageDigest (),
+                            count,
+                            id,
+                            name,
+                            description));
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -314,9 +333,21 @@ namespace thekogans {
                 }
             }
             else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
-                crypto::AsymmetricKey::Ptr key = GetKeyExchangeKey (id);
+                crypto::AsymmetricKey::Ptr key = GetKeyExchangeKey (paramsOrKeyId);
                 if (key.Get () != 0 && !key->IsPrivate ()) {
-                    keyExchange = cipherSuite.GetKeyExchangeFromKey (key);
+                    keyExchange.Reset (
+                        new RSAKeyExchange (
+                            ID (),
+                            key,
+                            secretLength,
+                            salt,
+                            saltLength,
+                            GetCipherKeyLength (cipherSuite.GetOpenSSLCipher ()),
+                            cipherSuite.GetOpenSSLMessageDigest (),
+                            count,
+                            id,
+                            name,
+                            description));
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -330,29 +361,37 @@ namespace thekogans {
                     cipherSuite.keyExchange.c_str ());
             }
             if (keyExchange.Get () != 0) {
-                KeyExchange::Params::Ptr params = keyExchange->GetParams (ID ());
                 std::pair<KeyExchangeMap::iterator, bool> result =
                     keyExchangeMap.insert (
-                        KeyExchangeMap::value_type (params->keyExchangeId, keyExchange));
+                        KeyExchangeMap::value_type (keyExchange->keyExchangeId, keyExchange));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Unable to add a KeyExchange: %s.",
-                        id.ToString ().c_str ());
+                        keyExchange->keyExchangeId.ToString ().c_str ());
                 }
-                return params;
+                return keyExchange;
             }
             if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    KeyExchange::Params::Ptr params =
-                        it->second->AddKeyExchange (id, recursive);
-                    if (params.Get () != 0) {
-                        return params;
+                    KeyExchange::Ptr keyExchange =
+                        it->second->AddKeyExchange (
+                            paramsOrKeyId,
+                            secretLength,
+                            salt,
+                            saltLength,
+                            count,
+                            id,
+                            name,
+                            description,
+                            recursive);
+                    if (keyExchange.Get () != 0) {
+                        return keyExchange;
                     }
                 }
             }
-            return KeyExchange::Params::Ptr ();
+            return KeyExchange::Ptr ();
         }
 
         KeyExchange::Ptr KeyRing::CreateKeyExchange (
@@ -360,21 +399,50 @@ namespace thekogans {
                 bool recursive) {
             if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
                     cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
-                KeyExchange::DHParams::Ptr dhParams =
-                    util::dynamic_refcounted_pointer_cast<KeyExchange::DHParams> (params);
-                return cipherSuite.GetKeyExchangeFromParams (dhParams->params);
-            }
-            else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
-                KeyExchange::RSAParams::Ptr rsaParams =
-                    util::dynamic_refcounted_pointer_cast<KeyExchange::RSAParams> (params);
-                AsymmetricKey::Ptr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
-                if (key.Get () != 0 && key->IsPrivate ()) {
-                    return cipherSuite.GetKeyExchangeFromKey (key, *rsaParams->buffer);
+                DHEKeyExchange::DHParams::Ptr dhParams =
+                    util::dynamic_refcounted_pointer_cast<DHEKeyExchange::DHParams> (params);
+                if (dhParams.Get () != 0) {
+                    return KeyExchange::Ptr (
+                        new DHEKeyExchange (
+                            dhParams->keyExchangeId,
+                            dhParams->params,
+                            !dhParams->salt.empty () ? &dhParams->salt[0] : 0,
+                            dhParams->salt.size (),
+                            dhParams->keyLength,
+                            CipherSuite::GetOpenSSLMessageDigest (dhParams->messageDigest),
+                            dhParams->count,
+                            dhParams->id,
+                            dhParams->name,
+                            dhParams->description));
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to get key for id: %s",
-                        rsaParams->keyId.ToString ().c_str ());
+                        "Incorrect key exchange parameters type (expected %s).",
+                        "DHEKeyExchange::DHParams");
+                }
+            }
+            else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
+                RSAKeyExchange::RSAParams::Ptr rsaParams =
+                    util::dynamic_refcounted_pointer_cast<RSAKeyExchange::RSAParams> (params);
+                if (rsaParams.Get () != 0) {
+                    AsymmetricKey::Ptr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
+                    if (key.Get () != 0 && key->IsPrivate ()) {
+                        return KeyExchange::Ptr (
+                            new RSAKeyExchange (
+                                rsaParams->keyExchangeId,
+                                key,
+                                *rsaParams->buffer));
+                    }
+                    else {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to get key for id: %s",
+                            rsaParams->keyId.ToString ().c_str ());
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Incorrect key exchange parameters type (expected %s).",
+                        "RSAKeyExchange::RSAParams");
                 }
             }
             else {
@@ -385,9 +453,9 @@ namespace thekogans {
         }
 
         KeyExchange::Ptr KeyRing::GetKeyExchange (
-                const ID &id,
+                const ID &keyExchangeId,
                 bool recursive) {
-            KeyExchangeMap::iterator it = keyExchangeMap.find (id);
+            KeyExchangeMap::iterator it = keyExchangeMap.find (keyExchangeId);
             if (it != keyExchangeMap.end ()) {
                 KeyExchange::Ptr keyExchange = it->second;
                 keyExchangeMap.erase (it);
@@ -398,7 +466,7 @@ namespace thekogans {
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
                     KeyExchange::Ptr keyExchange =
-                        it->second->GetKeyExchange (id, recursive);
+                        it->second->GetKeyExchange (keyExchangeId, recursive);
                     if (keyExchange.Get () != 0) {
                         return keyExchange;
                     }

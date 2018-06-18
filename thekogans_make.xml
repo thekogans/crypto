@@ -42,6 +42,7 @@
     <cpp_header>$(organization)/$(project_directory)/CMAC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Decryptor.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/DH.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/DHEKeyExchange.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/DSA.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/EC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Encryptor.h</cpp_header>
@@ -58,6 +59,7 @@
     <cpp_header>$(organization)/$(project_directory)/OpenSSLUtils.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/RSAKeyExchange.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Serializable.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Signer.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Stats.h</cpp_header>
@@ -74,6 +76,7 @@
     <cpp_source>CMAC.cpp</cpp_source>
     <cpp_source>Decryptor.cpp</cpp_source>
     <cpp_source>DH.cpp</cpp_source>
+    <cpp_source>DHEKeyExchange.cpp</cpp_source>
     <cpp_source>DSA.cpp</cpp_source>
     <cpp_source>EC.cpp</cpp_source>
     <cpp_source>Encryptor.cpp</cpp_source>
@@ -89,6 +92,7 @@
     <cpp_source>OpenSSLUtils.cpp</cpp_source>
     <cpp_source>Params.cpp</cpp_source>
     <cpp_source>RSA.cpp</cpp_source>
+    <cpp_source>RSAKeyExchange.cpp</cpp_source>
     <cpp_source>Serializable.cpp</cpp_source>
     <cpp_source>Signer.cpp</cpp_source>
     <cpp_source>Stats.cpp</cpp_source>
