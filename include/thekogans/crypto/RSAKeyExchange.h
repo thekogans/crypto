@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <string>
 #include "thekogans/util/Serializable.h"
+#include "thekogans/util/SpinLock.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/KeyExchange.h"
 #include "thekogans/crypto/AsymmetricKey.h"
@@ -44,7 +45,7 @@ namespace thekogans {
             struct _LIB_THEKOGANS_CRYPTO_DECL RSAParams : public KeyExchange::Params {
                 /// \brief
                 /// RSAParams is a \see{util::Serializable}.
-                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (RSAParams)
+                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (RSAParams, util::SpinLock)
 
                 /// \brief
                 /// Private/Public RSA \see{AsymmetricKey} id.
