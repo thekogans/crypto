@@ -262,7 +262,7 @@ namespace thekogans {
             /// \param[in] ciphertextLength Length of ciphertext.
             /// \param[in] associatedData Optional associated data (GCM mode only).
             /// \param[in] associatedDataLength Length of optional associated data.
-            /// \param[in] secure true = return util::SecureBuffer.
+            /// \param[in] secure true == return util::SecureBuffer.
             /// \param[in] endianness Resulting plaintext buffer endianness.
             /// \return Plaintext.
             util::Buffer::UniquePtr Decrypt (

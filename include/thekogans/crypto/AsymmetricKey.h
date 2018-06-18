@@ -71,6 +71,23 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
+            /// Return the EVP_PKEY *.
+            /// \return EVP_PKEY *.
+            inline EVP_PKEY *Get () const {
+                return key.get ();
+            }
+
+            /// \brief
+            /// Return the EVP_PKEY type.
+            /// NOTE: While type can be any of the OpenSSL supported EVP_PKEY types,
+            /// thekogans_crypto only supports (EVP_PKEY_DH, EVP_PKEY_DSA, EVP_PKEY_EC,
+            /// EVP_PKEY_RSA, EVP_PKEY_HMAC and EVP_PKEY_CMAC).
+            /// \return EVP_PKEY type.
+            inline util::i32 GetType () const {
+                return EVP_PKEY_base_id (Get ());
+            }
+
+            /// \brief
             /// Return true if it's a private key.
             /// \return true if it's a private key.
             inline bool IsPrivate () const {
@@ -148,23 +165,6 @@ namespace thekogans {
                 std::size_t symmetricKeyLength = 0,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0);
-
-            /// \brief
-            /// Return the EVP_PKEY *.
-            /// \return EVP_PKEY *.
-            inline EVP_PKEY *Get () const {
-                return key.get ();
-            }
-
-            /// \brief
-            /// Return the EVP_PKEY type.
-            /// NOTE: While type can be any of the OpenSSL supported EVP_PKEY types,
-            /// thekogans_crypto only supports (EVP_PKEY_DH, EVP_PKEY_DSA, EVP_PKEY_EC,
-            /// EVP_PKEY_RSA, EVP_PKEY_HMAC and EVP_PKEY_CMAC).
-            /// \return EVP_PKEY type.
-            inline util::i32 GetType () const {
-                return EVP_PKEY_base_id (Get ());
-            }
 
             /// \brief
             /// Return the public key associated with this private key.
