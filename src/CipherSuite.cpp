@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include "thekogans/crypto/DHEKeyExchange.h"
+#include "thekogans/crypto/RSAKeyExchange.h"
 #include "thekogans/crypto/CipherSuite.h"
 
 namespace thekogans {
@@ -359,6 +361,66 @@ namespace thekogans {
         bool CipherSuite::VerifyMACKey (const AsymmetricKey &key) const {
             util::i32 type = key.GetType ();
             return type == EVP_PKEY_HMAC || type == EVP_PKEY_CMAC;
+        }
+
+        KeyExchange::Ptr CipherSuite::GetDHEKeyExchange (
+                const ID &keyExchangeId,
+                Params::Ptr params,
+                const void *salt,
+                std::size_t saltLength,
+                std::size_t count,
+                const ID &keyId,
+                const std::string &name,
+                const std::string &description) const {
+            if (params.Get () != 0 && VerifyKeyExchangeParams (*params)) {
+                return KeyExchange::Ptr (
+                    new DHEKeyExchange (
+                        keyExchangeId,
+                        params,
+                        salt,
+                        saltLength,
+                        GetCipherKeyLength (GetOpenSSLCipher ()),
+                        GetOpenSSLMessageDigest (),
+                        count,
+                        keyId,
+                        name,
+                        description));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        KeyExchange::Ptr CipherSuite::GetRSAKeyExchange (
+                const ID &keyExchangeId,
+                AsymmetricKey::Ptr key,
+                util::ui32 secretLength,
+                const void *salt,
+                std::size_t saltLength,
+                std::size_t count,
+                const ID &keyId,
+                const std::string &name,
+                const std::string &description) const {
+            if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
+                return KeyExchange::Ptr (
+                    new RSAKeyExchange (
+                        keyExchangeId,
+                        key,
+                        secretLength,
+                        salt,
+                        saltLength,
+                        GetCipherKeyLength (GetOpenSSLCipher ()),
+                        GetOpenSSLMessageDigest (),
+                        count,
+                        keyId,
+                        name,
+                        description));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
         Authenticator::Ptr CipherSuite::GetAuthenticator (

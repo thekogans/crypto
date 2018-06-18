@@ -29,6 +29,7 @@
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/KeyExchange.h"
+#include "thekogans/crypto/RSAKeyExchange.h"
 #include "thekogans/crypto/Authenticator.h"
 #include "thekogans/crypto/Cipher.h"
 #include "thekogans/crypto/MessageDigest.h"
@@ -266,6 +267,50 @@ namespace thekogans {
             /// \return true = given key is appropriate.
             bool VerifyMACKey (const AsymmetricKey &key) const;
 
+            /// \brief
+            /// Return an instance of the \see{DHEKeyExchange} represented by keyExchange (client side [EC]DHE).
+            /// \param[in] keyExchangeId \see{KeyExchange::keyExchangeId}.
+            /// \param[in] params DH/EC \see{Params} to use for key exchange.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
+            /// \param[in] count A security counter. Increment the count to slow down
+            /// \see{SymmetricKey} derivation.
+            /// \param[in] keyId Optional \see{SymmetricKey} id.
+            /// \param[in] name Optional \see{SymmetricKey} name.
+            /// \param[in] description Optional \see{SymmetricKey} description.
+            /// \return \see{DHEKeyExchange} instance represented by keyExchange.
+            KeyExchange::Ptr GetDHEKeyExchange (
+                const ID &keyExchangeId,
+                Params::Ptr params,
+                const void *salt = 0,
+                std::size_t saltLength = 0,
+                std::size_t count = 1,
+                const ID &keyId = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ()) const;
+            /// \brief
+            /// Return an instance of the \see{RSAKeyExchange} represented by keyExchange (client side RSA).
+            /// \param[in] keyExchangeId \see{KeyExchange::keyExchangeId}.
+            /// \param[in] key Public RSA \see{AsymmetricKey} to use for key exchange.
+            /// \param[in] secretLength Length of random data to use for \see{SymmetricKey} derivation.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
+            /// \param[in] count A security counter. Increment the count to slow down
+            /// \see{SymmetricKey} derivation.
+            /// \param[in] keyId Optional \see{SymmetricKey} id.
+            /// \param[in] name Optional \see{SymmetricKey} name.
+            /// \param[in] description Optional \see{SymmetricKey} description.
+            /// \return \see{RSAKeyExchange} instance represented by keyExchange.
+            KeyExchange::Ptr GetRSAKeyExchange (
+                const ID &keyExchangeId,
+                AsymmetricKey::Ptr key,
+                util::ui32 secretLength = RSAKeyExchange::DEFAULT_SECRET_LENGTH,
+                const void *salt = 0,
+                std::size_t saltLength = 0,
+                std::size_t count = 1,
+                const ID &keyId = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ()) const;
             /// \brief
             /// Return the \see{Authenticator} instance represented by authenticator.
             /// \param[in] op Operation (Sign/Verify) to perform.
