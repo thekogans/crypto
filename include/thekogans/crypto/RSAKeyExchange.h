@@ -88,6 +88,9 @@ namespace thekogans {
             };
 
             /// \brief
+            /// \see{Serializable} needs access to DHParams.
+            friend struct Serializable;
+            /// \brief
             /// \see{KeyRing} needs access to RSAParams.
             friend struct KeyRing;
 

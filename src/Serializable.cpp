@@ -21,6 +21,8 @@
 #include "thekogans/crypto/Params.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/DHEKeyExchange.h"
+#include "thekogans/crypto/RSAKeyExchange.h"
 #include "thekogans/crypto/Serializable.h"
 
 namespace thekogans {
@@ -36,6 +38,8 @@ namespace thekogans {
                 Params::StaticInit ();
                 SymmetricKey::StaticInit ();
                 AsymmetricKey::StaticInit ();
+                DHEKeyExchange::DHParams::StaticInit ();
+                RSAKeyExchange::RSAParams::StaticInit ();
                 registered = true;
             }
         }
