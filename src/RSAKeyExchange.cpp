@@ -16,6 +16,7 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include "thekogans/util/RefCounted.h"
+#include "thekogans/util/DefaultAllocator.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Buffer.h"
@@ -48,7 +49,12 @@ namespace thekogans {
             serializer << keyId << *buffer;
         }
 
-        THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (RSAKeyExchange::RSAParams, 1, 16)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
+            RSAKeyExchange::RSAParams,
+            1,
+            util::SpinLock,
+            16,
+            util::DefaultAllocator::Global)
 
         RSAKeyExchange::RSAKeyExchange (
                 const ID &id,

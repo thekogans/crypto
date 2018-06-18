@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <string>
+#include "thekogans/util/Serializable.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/KeyExchange.h"
 #include "thekogans/crypto/Params.h"
@@ -41,8 +42,8 @@ namespace thekogans {
             /// DHE key exchange parameters.
             struct _LIB_THEKOGANS_CRYPTO_DECL DHParams : public KeyExchange::Params {
                 /// \brief
-                /// DHParams is a \see{Serializable}.
-                THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (DHParams)
+                /// DHParams is a \see{util::Serializable}.
+                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (DHParams)
 
                 /// \brief
                 /// \see{EC} or \see{DH} key exchange params.

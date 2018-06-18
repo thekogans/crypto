@@ -16,6 +16,7 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include "thekogans/util/SecureAllocator.h"
+#include "thekogans/util/DefaultAllocator.h"
 #include "thekogans/util/Serializable.h"
 #include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/SymmetricKey.h"
@@ -64,7 +65,12 @@ namespace thekogans {
                 *publicKey;
         }
 
-        THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (DHEKeyExchange::DHParams, 1, 16)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
+            DHEKeyExchange::DHParams,
+            1,
+            util::SpinLock,
+            16,
+            util::DefaultAllocator::Global)
 
         DHEKeyExchange::DHEKeyExchange (
                 const ID &id,
