@@ -369,13 +369,12 @@ namespace thekogans {
                         "Unable to add a KeyExchange: %s.",
                         keyExchange->GetId ().ToString ().c_str ());
                 }
-                return keyExchange;
             }
-            if (recursive) {
+            else if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    KeyExchange::Ptr keyExchange =
+                    keyExchange =
                         it->second->AddKeyExchange (
                             paramsOrKeyId,
                             secretLength,
@@ -387,11 +386,11 @@ namespace thekogans {
                             description,
                             recursive);
                     if (keyExchange.Get () != 0) {
-                        return keyExchange;
+                        break;
                     }
                 }
             }
-            return KeyExchange::Ptr ();
+            return keyExchange;
         }
 
         KeyExchange::Ptr KeyRing::CreateKeyExchange (
