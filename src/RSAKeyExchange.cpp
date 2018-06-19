@@ -47,8 +47,7 @@ namespace thekogans {
                 const Header &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
-            buffer.reset (new util::Buffer (util::NetworkEndian));
-            serializer >> keyId >> *buffer;
+            serializer >> keyId >> buffer;
         }
 
         void RSAKeyExchange::RSAParams::Write (util::Serializer &serializer) const {
