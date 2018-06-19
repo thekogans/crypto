@@ -116,8 +116,8 @@ namespace thekogans {
 
         DHEKeyExchange::DHEKeyExchange (Params::Ptr params) :
                 KeyExchange (ID::Empty) {
-            DHEKeyExchange::DHParams::Ptr dhParams =
-                util::dynamic_refcounted_pointer_cast<DHEKeyExchange::DHParams> (params);
+            DHParams::Ptr dhParams =
+                util::dynamic_refcounted_pointer_cast<DHParams> (params);
             if (dhParams.Get () != 0) {
                 id = dhParams->id;
                 this->params = dhParams->params;
