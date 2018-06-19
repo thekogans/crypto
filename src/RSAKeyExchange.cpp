@@ -101,19 +101,27 @@ namespace thekogans {
         RSAKeyExchange::RSAKeyExchange (
                 const ID &id,
                 AsymmetricKey::Ptr key_,
-                util::Buffer &buffer) :
+                Params::Ptr params) :
                 KeyExchange (id),
                 key (key_) {
-            if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && key->IsPrivate ()) {
-                util::Buffer::UniquePtr symmetricKeyBuffer =
-                    RSA::DecryptBuffer (
-                        buffer.GetReadPtr (),
-                        buffer.GetDataAvailableForReading (),
-                        key,
-                        RSA_PKCS1_OAEP_PADDING,
-                        true);
-                SymmetricKey::Ptr symmetricKey;
-                *symmetricKeyBuffer >> symmetricKey;
+            if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && key->IsPrivate () &&
+                    params.Get () != 0) {
+                RSAParams::Ptr rsaParams =
+                    util::dynamic_refcounted_pointer_cast<RSAParams> (params);
+                if (rsaParams.Get () != 0) {
+                    util::Buffer::UniquePtr symmetricKeyBuffer =
+                        RSA::DecryptBuffer (
+                            rsaParams->buffer->GetReadPtr (),
+                            rsaParams->buffer->GetDataAvailableForReading (),
+                            key,
+                            RSA_PKCS1_OAEP_PADDING,
+                            true);
+                    *symmetricKeyBuffer >> symmetricKey;
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

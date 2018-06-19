@@ -428,10 +428,7 @@ namespace thekogans {
                     AsymmetricKey::Ptr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
                     if (key.Get () != 0 && key->IsPrivate ()) {
                         return KeyExchange::Ptr (
-                            new RSAKeyExchange (
-                                rsaParams->id,
-                                key,
-                                *rsaParams->buffer));
+                            new RSAKeyExchange (rsaParams->id, key, params));
                     }
                     else {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (

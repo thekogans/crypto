@@ -35,6 +35,10 @@ namespace thekogans {
         ///
         /// \brief
         /// A class for computing and exchanging shared \see{SymmetricKey}s using \see{RSA}.
+        /// VERY IMPORTANT: The initiator (client) used the public RSA key to encrypt a
+        /// random \see{SymmetricKey}. The size of the \see{SymmetricKey} + RSA padding
+        /// used to encrypt it puts a lower bound on the size of RSA keys that can be used
+        /// for key exchange (1536 bits).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL RSAKeyExchange : public KeyExchange {
         private:
@@ -108,7 +112,7 @@ namespace thekogans {
                 DEFAULT_SECRET_LENGTH = 1024
             };
             /// \brief
-            /// ctor.
+            /// ctor. Used by the initiator (client).
             /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
             /// \param[in] key_ Public \see{AsymmetricKey used for
             /// RSA \see{SymmetricKey} derivation.
@@ -136,16 +140,14 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
-            /// ctor.
+            /// ctor. Used by receiver (server).
             /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
-            /// \param[in] key_ Private \see{AsymmetricKey} used for
-            /// RSA \see{SymmetricKey} derivation.
-            /// \param[in] buffer Encrypted \see{SymmetricKey} (client).
-            /// \see{SymmetricKey} signature (server).
+            /// \param[in] key_ Private \see{AsymmetricKey} used for RSA \see{SymmetricKey} derivation.
+            /// \param[in] params \see{RSAParams} containing the encrypted \see{SymmetricKey}.
             RSAKeyExchange (
                 const ID &id,
                 AsymmetricKey::Ptr key_,
-                util::Buffer &buffer);
+                Params::Ptr params);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
