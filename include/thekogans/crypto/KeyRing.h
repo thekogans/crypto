@@ -272,12 +272,12 @@ namespace thekogans {
 
             /// \brief
             /// Create a \see{KeyExchange} instance (\see{DHEKeyExchange} or \see{RSAKeyExchange}).
-            /// If \see{CipherSuite} key exchange is [EC]DHE, id represents \see{DH}
+            /// If \see{CipherSuite} key exchange is [EC]DHE, paramsOrKeyId represents \see{DH}
             /// or \see{EC} \see{Params} used to create an ephemeral DH \see{AsymmetricKey}.
-            /// If id is \see{ID::Empty}, random params are used.
-            /// If \see{CipherSuite} key exchange is RSA, id represents a public RSA
-            /// \see{AsymmetricKey} used to encrypt a random \see{SymmetricKey}.
-            /// For RSA key exchange, id cannot be \see{ID::Empty}.
+            /// If paramsOrKeyId is \see{ID::Empty}, random params are used.
+            /// If \see{CipherSuite} key exchange is \see{RSA}, paramsOrKeyId represents a public
+            /// \see{RSA} \see{AsymmetricKey} used to encrypt a random \see{SymmetricKey}.
+            /// For \see{RSA} key exchange, paramsOrKeyId cannot be \see{ID::Empty}.
             /// This method is used by the initiator (client) of the key exchange.
             /// \param[in] paramsOrKeyId \see{ID} of \see{Params} or \see{AsymmetricKey}.
             /// \param[in] secretLength Length of random data to use for \see{SymmetricKey} derivation.
@@ -302,8 +302,7 @@ namespace thekogans {
                 const std::string &description = std::string (),
                 bool recursive = true);
             /// \brief
-            /// Create a \see{KeyExchange} based on the given \see{KeyExchange::Params}
-            /// (returned by AddKeyExchange above).
+            /// Create a \see{KeyExchange} based on the given \see{KeyExchange::Params}.
             /// This method is used by the receiver (server) of the key exchange request.
             /// \param[in] params \see{KeyExchange::Params::Ptr} returned by AddKeyExchange.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
@@ -317,7 +316,7 @@ namespace thekogans {
             /// the server's \see{KeyExchange::Params}.
             /// \param[in] keyExchangeId \see{KeyExchange::keyExchangeId}.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{KeyExchange::Ptr} corresponding to the given id.
+            /// \return \see{KeyExchange::Ptr} corresponding to the given keyExchangeId.
             KeyExchange::Ptr GetKeyExchange (
                 const ID &keyExchangeId,
                 bool recursive = true);

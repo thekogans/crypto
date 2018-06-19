@@ -114,6 +114,28 @@ namespace thekogans {
             }
         }
 
+        DHEKeyExchange::DHEKeyExchange (Params::Ptr params) :
+                KeyExchange (ID::Empty) {
+            DHEKeyExchange::DHParams::Ptr dhParams =
+                util::dynamic_refcounted_pointer_cast<DHEKeyExchange::DHParams> (params);
+            if (dhParams.Get () != 0) {
+                id = dhParams->id;
+                this->params = dhParams->params;
+                salt = dhParams->salt;
+                keyLength = dhParams->keyLength;
+                messageDigest = dhParams->messageDigest;
+                count = dhParams->count;
+                keyId = dhParams->keyId;
+                name = dhParams->name;
+                description = dhParams->description;
+                key = this->params->CreateKey ();
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
         KeyExchange::Params::Ptr DHEKeyExchange::GetParams () const {
             return Params::Ptr (
                 new DHParams (

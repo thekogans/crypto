@@ -32,6 +32,11 @@ namespace thekogans {
         ///
         /// \brief
         /// Base class for computing and exchanging shared \see{SymmetricKey}s.
+        /// VERY, VERY IMPORTANT: KeyExchange is designed for a one-shot use case
+        /// and is not reusable. Multiple calls to \see{DeriveSharedSymmetricKey}
+        /// will return the same \see{SymmetricKey}. If you need to exchange multiple
+        /// keys, you need to instantiate multiple KeyExchange (\see{DHEKeyExchange}
+        /// and \see{RSAKeyExchange}) instances.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange : public util::ThreadSafeRefCounted {
             /// \brief
@@ -82,16 +87,19 @@ namespace thekogans {
             /// KeyExchange id (see \see{KeyRing::AddKeyExchange}).
             ID id;
 
-            /// \brief
-            /// \see{KeyRing} needs access to id.
-            friend struct KeyRing;
-
         public:
             /// \brief
             /// ctor.
             /// \param[in] id_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
             explicit KeyExchange (const ID &id_) :
                 id (id_) {}
+
+            /// \brief
+            /// Return the key exchange id.
+            /// \return Key exchange id.
+            inline const ID &GetId () const {
+                return id;
+            }
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.

@@ -99,13 +99,13 @@ namespace thekogans {
         }
 
         RSAKeyExchange::RSAKeyExchange (
-                const ID &id,
                 AsymmetricKey::Ptr key_,
                 Params::Ptr params) :
-                KeyExchange (id),
+                KeyExchange (ID::Empty),
                 key (key_) {
             if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && key->IsPrivate () &&
                     params.Get () != 0) {
+                id = params->id;
                 RSAParams::Ptr rsaParams =
                     util::dynamic_refcounted_pointer_cast<RSAParams> (params);
                 if (rsaParams.Get () != 0) {

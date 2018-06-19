@@ -34,6 +34,11 @@ namespace thekogans {
         ///
         /// \brief
         /// A class for computing and exchanging shared \see{SymmetricKey}s using DHE.
+        /// NOTE: To promote best practice, only ephemeral Diffie-Hellman (DHE) key
+        /// exchange is supported. This is why the ctor only takes \see{Params}. It
+        /// will use them to create an ephemeral private key to be used in the exchange.
+        /// If you need to do key exchange using a precomputed private key, use
+        /// \see{RSAKeyExchange}.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL DHEKeyExchange : public KeyExchange {
         private:
@@ -138,7 +143,7 @@ namespace thekogans {
             friend struct KeyRing;
 
             /// \brief
-            /// DH/EC \see{Params} used for DHE \see{SymmetricKey} derivation.
+            /// \see{DH}/\see{EC} \see{Params} used for DHE \see{SymmetricKey} derivation.
             crypto::Params::Ptr params;
             /// \brief
             /// Salt for \see{SymmetricKey} derivation.
@@ -163,14 +168,14 @@ namespace thekogans {
             /// \see{SymmetricKey} description.
             std::string description;
             /// \brief
-            /// Private \see{DH} \see{AsymmetricKey} used for key exchange.
+            /// Private \see{DH}/\see{EC} \see{AsymmetricKey} used for key exchange.
             AsymmetricKey::Ptr key;
 
         public:
             /// \brief
-            /// ctor.
+            /// ctor. Used by the initiator of the key exchange request (client).
             /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
-            /// \param[in] params_ DH/EC \see{Params} used for DHE \see{SymmetricKey} derivation.
+            /// \param[in] params_ \see{DH}/\see{EC} \see{Params} used for DHE \see{SymmetricKey} derivation.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
             /// \param[in] keyLength Length of the resulting \see{SymmetricKey} (in bytes).
@@ -191,6 +196,10 @@ namespace thekogans {
                 const ID &keyId_ = ID (),
                 const std::string &name_ = std::string (),
                 const std::string &description_ = std::string ());
+            /// \brief
+            /// ctor. Used by the receiver of the key exchange request (server).
+            /// \param[in] params \see{DHParams} containing info to create a shared \see{SymmetricKey}.
+            explicit DHEKeyExchange (Params::Ptr params);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.

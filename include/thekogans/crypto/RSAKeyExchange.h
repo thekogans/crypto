@@ -35,10 +35,11 @@ namespace thekogans {
         ///
         /// \brief
         /// A class for computing and exchanging shared \see{SymmetricKey}s using \see{RSA}.
-        /// VERY IMPORTANT: The initiator (client) used the public RSA key to encrypt a
-        /// random \see{SymmetricKey}. The size of the \see{SymmetricKey} + RSA padding
-        /// used to encrypt it puts a lower bound on the size of RSA keys that can be used
-        /// for key exchange (1536 bits).
+        /// VERY IMPORTANT: The initiator (client) used the public \see{RSA} key to encrypt
+        /// a random \see{SymmetricKey}. The size of the \see{SymmetricKey} + \see{RSA} padding
+        /// used to encrypt it puts a lower bound on the size of \see{RSA} keys that can be used
+        /// for key exchange (1536 bits). Given that today's (2018) best practice is to use
+        /// \see{RSA} keys no smaller than 2048 bits, this limitation shouldn't be an issue.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL RSAKeyExchange : public KeyExchange {
         private:
@@ -52,7 +53,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_DECLARE_SERIALIZABLE (RSAParams, util::SpinLock)
 
                 /// \brief
-                /// Private/Public RSA \see{AsymmetricKey} id.
+                /// Private/Public \see{RSA} \see{AsymmetricKey} id.
                 ID keyId;
                 /// \brief
                 /// Encrypted \see{SymmetricKey} (client). \see{SymmetricKey} signature (server).
@@ -99,7 +100,7 @@ namespace thekogans {
             friend struct KeyRing;
 
             /// \brief
-            /// Private/public \see{AsymmetricKey} used for RSA \see{SymmetricKey} derivation.
+            /// Private/public \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
             AsymmetricKey::Ptr key;
             /// \brief
             /// Shared \see{SymmetricKey} created by the client and signed by the server.
@@ -112,7 +113,7 @@ namespace thekogans {
                 DEFAULT_SECRET_LENGTH = 1024
             };
             /// \brief
-            /// ctor. Used by the initiator (client).
+            /// ctor. Used by the initiator of the key exchange request (client).
             /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
             /// \param[in] key_ Public \see{AsymmetricKey used for
             /// RSA \see{SymmetricKey} derivation.
@@ -140,12 +141,10 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
-            /// ctor. Used by receiver (server).
-            /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
-            /// \param[in] key_ Private \see{AsymmetricKey} used for RSA \see{SymmetricKey} derivation.
+            /// ctor. Used by the receiver of the key exchange request (server).
+            /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
             /// \param[in] params \see{RSAParams} containing the encrypted \see{SymmetricKey}.
             RSAKeyExchange (
-                const ID &id,
                 AsymmetricKey::Ptr key_,
                 Params::Ptr params);
 
