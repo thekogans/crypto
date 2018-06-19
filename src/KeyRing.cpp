@@ -437,24 +437,26 @@ namespace thekogans {
         KeyExchange::Ptr KeyRing::GetKeyExchange (
                 const ID &keyExchangeId,
                 bool recursive) {
+            KeyExchange::Ptr keyExchange;
             KeyExchangeMap::iterator it = keyExchangeMap.find (keyExchangeId);
             if (it != keyExchangeMap.end ()) {
-                KeyExchange::Ptr keyExchange = it->second;
-                keyExchangeMap.erase (it);
-                return keyExchange;
+                keyExchange = it->second;
             }
-            if (recursive) {
+            if (keyExchange.Get () != 0) {
+                keyExchangeMap.erase (it);
+            }
+            else if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    KeyExchange::Ptr keyExchange =
+                    keyExchange =
                         it->second->GetKeyExchange (keyExchangeId, recursive);
                     if (keyExchange.Get () != 0) {
-                        return keyExchange;
+                        break;
                     }
                 }
             }
-            return KeyExchange::Ptr ();
+            return keyExchange;
         }
 
         Params::Ptr KeyRing::GetAuthenticatorParams (
