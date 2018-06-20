@@ -42,7 +42,7 @@ namespace thekogans {
         /// \struct KeyRing KeyRing.h thekogans/crypto/KeyRing.h
         ///
         /// \brief
-        /// KeyRing is a collection of \see{Params}, \see{AsymmetricKey}, \see{SymmetricKey} and
+        /// KeyRing is a container for \see{Params}, \see{AsymmetricKey}, \see{SymmetricKey} and
         /// user data (\see{Serializable}) suitable for use with a particular \see{CipherSuite}.
         /// KeyRings design makes it perfectly suitable for both duties of securing data on the wire
         /// as well as data at rest. In the former case, create a KeyRing containing an appropriate
@@ -304,6 +304,17 @@ namespace thekogans {
             /// \brief
             /// Create a \see{KeyExchange} based on the given \see{KeyExchange::Params}.
             /// This method is used by the receiver (server) of the key exchange request.
+            /// VERY IMPORTANT: \see{RSAKeyExchange} private \see{AsymmetricKey} will be
+            /// located using \see{RSAKeyExchange::RSAParams::keyId}. Recall that this
+            /// key id came from AddKeyExchange::paramsOrKeyId, which was the id of the
+            /// public \see{AsymmetricKey} used to initiate the key exchange. This means
+            /// that for \see{RSA} \see{AsymmetricKey} keys, both private and public keys
+            /// must have the same id. You can accomplish this like this:
+            /// \code{.cpp}
+            /// using namespace thekogans;
+            /// crypto::AsymmetricKey::Ptr privateKey = crypto::RSA:CreateKey (bits);
+            /// crypto::AsymmetricKey::Ptr publicKey = privateKey->GetPublicKey (privateKey->GetId ());
+            /// \endcode
             /// \param[in] params \see{KeyExchange::Params::Ptr} returned by AddKeyExchange.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{KeyExchange::Ptr} corresponding to the given params.

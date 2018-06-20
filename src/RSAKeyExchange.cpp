@@ -103,25 +103,19 @@ namespace thekogans {
                 Params::Ptr params) :
                 KeyExchange (ID::Empty),
                 key (key_) {
+            RSAParams::Ptr rsaParams =
+                util::dynamic_refcounted_pointer_cast<RSAParams> (params);
             if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && key->IsPrivate () &&
-                    params.Get () != 0) {
-                id = params->id;
-                RSAParams::Ptr rsaParams =
-                    util::dynamic_refcounted_pointer_cast<RSAParams> (params);
-                if (rsaParams.Get () != 0) {
-                    util::Buffer::UniquePtr symmetricKeyBuffer =
-                        RSA::DecryptBuffer (
-                            rsaParams->buffer->GetReadPtr (),
-                            rsaParams->buffer->GetDataAvailableForReading (),
-                            key,
-                            RSA_PKCS1_OAEP_PADDING,
-                            true);
-                    *symmetricKeyBuffer >> symmetricKey;
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                }
+                    rsaParams.Get () != 0) {
+                id = rsaParams->id;
+                util::Buffer::UniquePtr symmetricKeyBuffer =
+                    RSA::DecryptBuffer (
+                        rsaParams->buffer->GetReadPtr (),
+                        rsaParams->buffer->GetDataAvailableForReading (),
+                        key,
+                        RSA_PKCS1_OAEP_PADDING,
+                        true);
+                *symmetricKeyBuffer >> symmetricKey;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

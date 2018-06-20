@@ -406,9 +406,8 @@ namespace thekogans {
                         util::dynamic_refcounted_pointer_cast<RSAKeyExchange::RSAParams> (params);
                     if (rsaParams.Get () != 0) {
                         AsymmetricKey::Ptr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
-                        if (key.Get () != 0 && key->IsPrivate ()) {
-                            return KeyExchange::Ptr (
-                                new RSAKeyExchange (key, params));
+                        if (key.Get () != 0) {
+                            return KeyExchange::Ptr (new RSAKeyExchange (key, params));
                         }
                         else {
                             THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
