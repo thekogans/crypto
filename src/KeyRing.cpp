@@ -417,8 +417,9 @@ namespace thekogans {
                     }
                     else {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                            "Incorrect key exchange parameters type (expected %s).",
-                            "RSAKeyExchange::RSAParams");
+                            "Incorrect key exchange parameters type: %s, "
+                            "expected RSAKeyExchange::RSAParams.",
+                            params->GetType ().c_str ());
                     }
                 }
                 else {
