@@ -27,7 +27,8 @@ namespace thekogans {
         Decryptor::Decryptor (
                 SymmetricKey::Ptr key,
                 const EVP_CIPHER *cipher) {
-            if (key.Get () != 0 && cipher != 0) {
+            if (key.Get () != 0 && cipher != 0 &&
+                    key->Length () == GetCipherKeyLength (cipher)) {
                 if (EVP_DecryptInit_ex (
                             &context,
                             cipher,

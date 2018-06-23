@@ -56,7 +56,7 @@ namespace thekogans {
             /// \param[in] cipher Cipher used for decryption.
             Decryptor (
                 SymmetricKey::Ptr key,
-                const EVP_CIPHER *cipher);
+                const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
 
             /// \brief
             /// Return max buffer length needed to decrypt the given amount of ciphertext.

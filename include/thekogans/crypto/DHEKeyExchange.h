@@ -39,6 +39,10 @@ namespace thekogans {
         /// will use them to create an ephemeral private key to be used in the exchange.
         /// If you need to do key exchange using a precomputed private key, use
         /// \see{RSAKeyExchange}.
+        /// WARNING: Unlike \see{RSAKeyExchange}, DHEKeyExchange cannot be used to
+        /// exchange \see{SymmetricKey} keys in the clear securely. An authenticetion
+        /// mechanism is needed to make sure you're exchanging keys with the intended
+        /// peer and not a man-in-the-middle (MITM).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL DHEKeyExchange : public KeyExchange {
         private:

@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include <cassert>
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/util/DefaultAllocator.h"
 #include "thekogans/util/SecureAllocator.h"
@@ -149,6 +150,7 @@ namespace thekogans {
         }
 
         SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
+            assert (symmetrickey.Get () != 0);
             if (key->IsPrivate ()) {
                 return symmetricKey;
             }

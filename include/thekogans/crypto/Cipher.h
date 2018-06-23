@@ -205,7 +205,7 @@ namespace thekogans {
             /// \brief
             /// Encrypt, mac, and frame plaintext. It writes the following structure in to ciphertext:
             ///
-            /// |-------- FrameHeader -------|---------- \see{CiphertextHeader} ----------|--------- ciphertext ---------|
+            /// |----- \see{FrameHeader} ----|---------- \see{CiphertextHeader} ----------|--------- ciphertext ---------|
             /// +--------+-------------------+-----------+-------------------+------------+------+---------------+-------+
             /// | key id | ciphertext length | iv length | ciphertext length | mac length |  iv  |  ciphertext   |  mac  |
             /// +--------+-------------------+-----------+-------------------+------------+------+---------------+-------+

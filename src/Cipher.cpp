@@ -35,7 +35,8 @@ namespace thekogans {
                 md (md_),
                 encryptor (key, cipher),
                 decryptor (key, cipher) {
-            if (key.Get () != 0 && cipher != 0) {
+            if (key.Get () != 0 && cipher != 0 &&
+                    key->Length () == GetCipherKeyLength (cipher)) {
                 if (GetCipherMode (cipher) != EVP_CIPH_GCM_MODE) {
                     if (md != 0) {
                         mac.Reset (

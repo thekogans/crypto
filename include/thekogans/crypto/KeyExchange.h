@@ -36,7 +36,7 @@ namespace thekogans {
         /// and is not reusable. Multiple calls to \see{DeriveSharedSymmetricKey}
         /// will return the same \see{SymmetricKey}. If you need to exchange multiple
         /// keys, you need to instantiate multiple KeyExchange (\see{DHEKeyExchange}
-        /// and \see{RSAKeyExchange}) instances.
+        /// or/and \see{RSAKeyExchange}) instances.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange : public util::ThreadSafeRefCounted {
             /// \brief

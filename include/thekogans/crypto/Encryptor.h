@@ -56,7 +56,7 @@ namespace thekogans {
             /// \param[in] cipher Cipher used for encryption.
             Encryptor (
                 SymmetricKey::Ptr key,
-                const EVP_CIPHER *cipher);
+                const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
 
             /// \brief
             /// Return the length of the initialization vector (IV) associated with the cipher.
