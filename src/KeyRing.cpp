@@ -266,10 +266,6 @@ namespace thekogans {
             AsymmetricKeyMap::iterator it = keyExchangeKeyMap.find (keyId);
             if (it != keyExchangeKeyMap.end ()) {
                 keyExchangeKeyMap.erase (it);
-                KeyExchangeMap::iterator it = keyExchangeMap.find (keyId);
-                if (it != keyExchangeMap.end ()) {
-                    keyExchangeMap.erase (it);
-                }
                 return true;
             }
             else if (recursive) {
@@ -286,7 +282,6 @@ namespace thekogans {
 
         void KeyRing::DropAllKeyExchangeKeys (bool recursive) {
             keyExchangeKeyMap.clear ();
-            keyExchangeMap.clear ();
             if (recursive) {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),

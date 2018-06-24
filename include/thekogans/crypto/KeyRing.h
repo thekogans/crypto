@@ -272,8 +272,8 @@ namespace thekogans {
 
             /// \brief
             /// Create a \see{KeyExchange} instance (\see{DHEKeyExchange} or \see{RSAKeyExchange}).
-            /// If \see{CipherSuite} key exchange is [EC]DHE, paramsOrKeyId represents \see{DH}
-            /// or \see{EC} \see{Params} used to create an ephemeral DH \see{AsymmetricKey}.
+            /// If \see{CipherSuite} key exchange is [EC]DHE, paramsOrKeyId represents a \see{DH}
+            /// or a \see{EC} \see{Params} used to create an ephemeral \see{DH} \see{AsymmetricKey}.
             /// If paramsOrKeyId is \see{ID::Empty}, random params are used.
             /// If \see{CipherSuite} key exchange is \see{RSA}, paramsOrKeyId represents a public
             /// \see{RSA} \see{AsymmetricKey} used to encrypt a random \see{SymmetricKey}.
@@ -289,8 +289,8 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{KeyExchange::Params::Ptr} corresponding to the given id
-            /// (\see{KeyExchange::Params::Ptr} () if not found).
+            /// \return \see{KeyExchange::Ptr} corresponding to the given paramsOrKeyId
+            /// (\see{KeyExchange::Ptr} () if not found).
             KeyExchange::Ptr AddKeyExchange (
                 const ID &paramsOrKeyId,
                 std::size_t secretLength = RSAKeyExchange::DEFAULT_SECRET_LENGTH,
@@ -325,9 +325,11 @@ namespace thekogans {
             /// Return the previously created \see{KeyExchange} by AddKeyExchange above.
             /// This method is used by the key exchange initiator (client) after receiving
             /// the server's \see{KeyExchange::Params}.
+            /// NOTE: This method removes the \see{KeyExchange} identified by the given
+            /// keyExchangeId from the key ring before returning it.
             /// \param[in] keyExchangeId \see{KeyExchange::keyExchangeId}.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{KeyExchange::Ptr} corresponding to the given keyExchangeId.
+            /// \return \see{KeyExchange} corresponding to the given keyExchangeId.
             KeyExchange::Ptr GetKeyExchange (
                 const ID &keyExchangeId,
                 bool recursive = true);
