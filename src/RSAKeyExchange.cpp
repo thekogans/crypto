@@ -150,7 +150,7 @@ namespace thekogans {
         }
 
         SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
-            assert (symmetrickey.Get () != 0);
+            assert (symmetricKey.Get () != 0);
             if (key->IsPrivate ()) {
                 return symmetricKey;
             }
