@@ -237,12 +237,12 @@ namespace thekogans {
             bool IsValid () const;
 
             /// \brief
-            /// Verify that the given params are appropriate for this cipher suite \see{KeyExchange}.
+            /// Verify that the given params are appropriate for this cipher suite \see{DHEKeyExchange}.
             /// \param[in] params \see{Params} to verify.
             /// \return true = given params are appropriate.
             bool VerifyKeyExchangeParams (const Params &params) const;
             /// \brief
-            /// Verify that the given key is appropriate for this cipher suite \see{KeyExchange}.
+            /// Verify that the given key is appropriate for this cipher suite \see{RSAKeyExchange}.
             /// \param[in] key \see{AsymmetricKey} to verify.
             /// \return true = given key is appropriate.
             bool VerifyKeyExchangeKey (const AsymmetricKey &key) const;
