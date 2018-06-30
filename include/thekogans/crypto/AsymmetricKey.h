@@ -95,6 +95,13 @@ namespace thekogans {
             }
 
             /// \brief
+            /// Return the key length (in bits).
+            /// \return Key length (in bits).
+            inline std::size_t Length () const {
+                return (std::size_t)EVP_PKEY_bits (key.get ());
+            }
+
+            /// \brief
             /// Load a PEM encoded private key from a file.
             /// \param[in] path File containing a private key.
             /// \param[in] passwordCallback Provide a password if file is encrypted.
