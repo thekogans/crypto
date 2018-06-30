@@ -78,6 +78,11 @@ namespace thekogans {
                 std::size_t bufferLength);
             /// \brief
             /// Finalize the signing operation and return the signature.
+            /// \param[out] signature Where to write the signature.
+            /// \return Number of bytes written to signature.
+            std::size_t Final (util::ui8 *signature);
+            /// \brief
+            /// Finalize the signing operation and return the signature.
             /// \return Signature.
             util::Buffer::UniquePtr Final ();
 

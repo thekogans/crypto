@@ -58,6 +58,16 @@ namespace thekogans {
             }
         }
 
+        std::size_t Signer::Final (util::ui8 *signature) {
+            std::size_t signatureLength = 0;
+            if (EVP_DigestSignFinal (&ctx, signature, &signatureLength) == 1) {
+                return signatureLength;
+            }
+            else {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
+        }
+
         util::Buffer::UniquePtr Signer::Final () {
             std::size_t signatureLength = 0;
             if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1 && signatureLength > 0) {
