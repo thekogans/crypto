@@ -56,6 +56,48 @@ namespace thekogans {
             }
         }
 
+        namespace {
+            std::string paddingTostring (util::i32 padding) {
+                return padding == RSA_PKCS1_PADDING ? "RSA_PKCS1_PADDING" :
+                    padding == RSA_SSLV23_PADDING ? "RSA_SSLV23_PADDING" :
+                    padding == RSA_NO_PADDING ? "RSA_NO_PADDING" :
+                    padding == RSA_PKCS1_OAEP_PADDING ? "RSA_PKCS1_OAEP_PADDING" :
+                    padding == RSA_X931_PADDING ? "RSA_X931_PADDING" :
+                    padding == RSA_PKCS1_PSS_PADDING ? "RSA_PKCS1_PSS_PADDING" : "Unknown";
+            }
+        }
+
+        std::size_t RSA::GetMaxPlaintextLength (
+                std::size_t keyLength,
+                util::i32 padding) {
+            if (util::OneBitCount (keyLength) == 1) {
+                std::size_t paddingLength = 0;
+                switch (padding) {
+                    case RSA_PKCS1_PADDING:
+                    case RSA_SSLV23_PADDING:
+                        paddingLength = 12;
+                        break;
+                    case RSA_NO_PADDING:
+                        break;
+                    case RSA_PKCS1_OAEP_PADDING:
+                        paddingLength = 42;
+                        break;
+                    case RSA_X931_PADDING:
+                    case RSA_PKCS1_PSS_PADDING:
+                    default:
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Invalid padding type: %d.",
+                            paddingTostring (padding).c_str ());
+                }
+                return (keyLength >> 3) - paddingLength;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Key length (%d) must be a power of 2.",
+                    keyLength);
+            }
+        }
+
         util::Buffer::UniquePtr RSA::EncryptBuffer (
                 const void *plaintext,
                 std::size_t plaintextLength,

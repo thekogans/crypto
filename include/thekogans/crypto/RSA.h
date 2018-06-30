@@ -34,13 +34,13 @@ namespace thekogans {
         ///
         /// \brief
         /// Use RSA to generate private/public key pairs that can be used for
-        /// key exchange (\see{KeyExchange}) and sign/verify (\see{Authenticator})
+        /// key exchange (\see{RSAKeyExchange}) and sign/verify (\see{Authenticator})
         /// operations. RSA is also used to perform asymmetric encryption/decryption.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL RSA {
             /// \brief
             /// Create an RSA key.
-            /// \param[in] keyLength The length of the key.
+            /// \param[in] keyLength The length of the key (in bits).
             /// \param[in] publicExponent RSA key public exponent.
             /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
@@ -54,6 +54,15 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
+            /// Return the max plaintextLength that can be passed to EncryptBuffer below.
+            /// \param[in] keyLength Length of key (in bits).
+            /// \param[in] paddin OpenSSL RSA padding type.
+            /// \return Max plaintextLength that can be passed to EncryptBuffer below.
+            static std::size_t GetMaxPlaintextLength (
+                std::size_t keyLength,
+                util::i32 padding = RSA_PKCS1_OAEP_PADDING);
+
+            /// \brief
             /// Use the public key to encrypt the plaintext.
             /// NOTE: Asymmetric encryption is very slow and should not be used
             /// for bulk encryption duties (See \see{Cipher} for that). You should
@@ -64,6 +73,9 @@ namespace thekogans {
             /// \param[in] publicKey Public key used for encryption.
             /// \param[in] padding RSA padding type.
             /// \return Encrypted plaintext.
+            /// VERY IMPORTANT: plaintextLength must be <= keyLength / 8 - padding length.
+            /// Ex: For a 1024 bit key, using RSA_PKCS1_OAEP_PADDING, plaintextLength <=
+            /// 1024 / 8 – 42 = 128 – 42 = 86.
             static util::Buffer::UniquePtr EncryptBuffer (
                 const void *plaintext,
                 std::size_t plaintextLength,
