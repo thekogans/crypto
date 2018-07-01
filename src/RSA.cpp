@@ -382,9 +382,10 @@ namespace thekogans {
                     std::size_t keyLength,
                     util::i32 padding = RSA_PKCS1_OAEP_PADDING) {
                 std::size_t maxPlaintextLength = RSA::GetMaxPlaintextLength (keyLength, padding);
-                for (std::size_t i = 0, count = CipherSuite::GetCiphers ().size (); i < count; ++i) {
-                    if (RSAHeader::Size (i) <= maxPlaintextLength) {
-                        return i;
+                for (std::size_t cipherIndex = 0, count = CipherSuite::GetCiphers ().size ();
+                        cipherIndex < count; ++cipherIndex) {
+                    if (RSAHeader::Size (cipherIndex) <= maxPlaintextLength) {
+                        return cipherIndex;
                     }
                 }
                 return util::NIDX;
@@ -402,7 +403,7 @@ namespace thekogans {
                     publicKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 std::size_t keyLength = publicKey->Length ();
-                std::size_t cipherIndex = GetCipherIndex (keyLength);
+                std::size_t cipherIndex = GetCipherIndex (keyLength, padding);
                 if (cipherIndex != util::NIDX) {
                     util::Buffer::UniquePtr buffer (
                         new util::Buffer (
