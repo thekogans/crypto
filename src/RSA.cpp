@@ -374,6 +374,23 @@ namespace thekogans {
                 }
             };
 
+            inline util::Serializer &operator << (
+                    util::Serializer &serializer,
+                    const RSAHeader &header) {
+                serializer << header.cipherIndex << header.keyLength;
+                serializer.Write (header.key, header.keyLength);
+                return serializer;
+            }
+
+            inline util::Serializer &operator >> (
+                    util::Serializer &serializer,
+                    RSAHeader &header) {
+                serializer >> header.cipherIndex >> header.keyLength;
+                serializer.Read (header.key, header.keyLength);
+                memset (&header.key[header.keyLength], 0, EVP_MAX_KEY_LENGTH - header.keyLength);
+                return serializer;
+            }
+
             std::size_t GetCipherIndex (
                     std::size_t keyLength,
                     util::i32 padding = RSA_PKCS1_OAEP_PADDING) {
@@ -412,14 +429,17 @@ namespace thekogans {
                         util::NetworkEndian,
                         GetMaxBufferLength (keyLength) +
                         Cipher::GetMaxBufferLength (plaintextLength)));
-                RSAHeader header (
+                util::SecureBuffer headerBuffer (
+                    util::NetworkEndian,
+                    RSAHeader::Size (cipherIndex));
+                headerBuffer << RSAHeader (
                     cipherIndex,
                     key->Length (),
                     key->Get ().GetReadPtr ());
                 buffer->AdvanceWriteOffset (
                     RSA::EncryptAndEnlengthen (
-                        &header,
-                        header.Size (),
+                        headerBuffer.GetReadPtr (),
+                        headerBuffer.GetDataAvailableForReading (),
                         publicKey,
                         padding,
                         buffer->GetWritePtr ()));
@@ -459,14 +479,19 @@ namespace thekogans {
                     (util::ui32)ciphertextLength);
                 util::ui32 headerLength;
                 buffer >> headerLength;
-                RSAHeader header;
-                RSA::Decrypt (
-                    buffer.GetReadPtr (),
-                    headerLength,
-                    privateKey,
-                    padding,
-                    (util::ui8 *)&header);
+                util::SecureBuffer headerBuffer (
+                    util::NetworkEndian,
+                    headerLength);
+                headerBuffer.AdvanceWriteOffset (
+                    RSA::Decrypt (
+                        buffer.GetReadPtr (),
+                        headerLength,
+                        privateKey,
+                        padding,
+                        headerBuffer.GetWritePtr ()));
                 buffer.AdvanceReadOffset (headerLength);
+                RSAHeader header;
+                headerBuffer >> header;
                 Cipher cipher (
                     SymmetricKey::Ptr (
                         new SymmetricKey (
