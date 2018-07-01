@@ -110,7 +110,7 @@ namespace thekogans {
                     rsaParams.Get () != 0) {
                 id = rsaParams->id;
                 util::Buffer::UniquePtr symmetricKeyBuffer =
-                    RSA::DecryptBuffer (
+                    RSADecrypt (
                         rsaParams->buffer->GetReadPtr (),
                         rsaParams->buffer->GetDataAvailableForReading (),
                         key,
@@ -143,7 +143,7 @@ namespace thekogans {
                 new RSAParams (
                     id,
                     key->GetId (),
-                    RSA::EncryptBuffer (
+                    RSAEncrypt (
                         symmetricKeyBuffer.GetReadPtr (),
                         symmetricKeyBuffer.GetDataAvailableForReading (),
                         key)));
@@ -151,34 +151,31 @@ namespace thekogans {
 
         SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
             assert (symmetricKey.Get () != 0);
-            if (key->IsPrivate ()) {
-                return symmetricKey;
-            }
-            RSAParams::Ptr rsaParams =
-                util::dynamic_refcounted_pointer_cast<RSAParams> (params);
-            if (rsaParams.Get () != 0) {
-                util::SecureBuffer symmetricKeyBuffer (
-                    util::NetworkEndian,
-                    (util::ui32)util::Serializable::Size (*symmetricKey));
-                symmetricKeyBuffer << *symmetricKey;
-                Authenticator authenticator (Authenticator::Verify, key);
-                if (authenticator.VerifyBufferSignature (
-                        symmetricKeyBuffer.GetReadPtr (),
-                        symmetricKeyBuffer.GetDataAvailableForReading (),
-                        rsaParams->buffer->GetReadPtr (),
-                        rsaParams->buffer->GetDataAvailableForReading ())) {
-                    return symmetricKey;
+            if (!key->IsPrivate ()) {
+                RSAParams::Ptr rsaParams =
+                    util::dynamic_refcounted_pointer_cast<RSAParams> (params);
+                if (rsaParams.Get () != 0) {
+                    util::SecureBuffer symmetricKeyBuffer (
+                        util::NetworkEndian,
+                        (util::ui32)util::Serializable::Size (*symmetricKey));
+                    symmetricKeyBuffer << *symmetricKey;
+                    Authenticator authenticator (Authenticator::Verify, key);
+                    if (!authenticator.VerifyBufferSignature (
+                            symmetricKeyBuffer.GetReadPtr (),
+                            symmetricKeyBuffer.GetDataAvailableForReading (),
+                            rsaParams->buffer->GetReadPtr (),
+                            rsaParams->buffer->GetDataAvailableForReading ())) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Key (%s) failed signature verification.",
+                            symmetricKey->GetId ().ToString ().c_str ());
+                    }
                 }
                 else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Key (%s) failed signature verification.",
-                        symmetricKey->GetId ().ToString ().c_str ());
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                 }
             }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
+            return symmetricKey;
         }
 
     } // namespace crypto

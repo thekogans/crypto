@@ -20,6 +20,8 @@
 #endif // defined (TOOLCHAIN_OS_Windows)
 #include "thekogans/util/FixedArray.h"
 #include "thekogans/util/File.h"
+#include "thekogans/crypto/CipherSuite.h"
+#include "thekogans/crypto/FrameHeader.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/RSA.h"
@@ -33,7 +35,7 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (keyLength > 0 && publicExponent.get () != 0) {
+            if (keyLength > 0 && (keyLength & ~3) == keyLength && publicExponent.get () != 0) {
                 EVP_PKEY *key = 0;
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new_id (EVP_PKEY_RSA, OpenSSLInit::engine));
@@ -57,73 +59,49 @@ namespace thekogans {
         }
 
         namespace {
-            std::string paddingTostring (util::i32 padding) {
-                return padding == RSA_PKCS1_PADDING ? "RSA_PKCS1_PADDING" :
-                    padding == RSA_SSLV23_PADDING ? "RSA_SSLV23_PADDING" :
-                    padding == RSA_NO_PADDING ? "RSA_NO_PADDING" :
-                    padding == RSA_PKCS1_OAEP_PADDING ? "RSA_PKCS1_OAEP_PADDING" :
-                    padding == RSA_X931_PADDING ? "RSA_X931_PADDING" :
-                    padding == RSA_PKCS1_PSS_PADDING ? "RSA_PKCS1_PSS_PADDING" : "Unknown";
+            inline bool IsValidPadding (util::i32 padding) {
+                return padding == RSA_PKCS1_PADDING ||
+                    padding == RSA_SSLV23_PADDING ||
+                    padding == RSA_NO_PADDING ||
+                    padding == RSA_PKCS1_OAEP_PADDING;
             }
         }
 
         std::size_t RSA::GetMaxPlaintextLength (
                 std::size_t keyLength,
                 util::i32 padding) {
-            if (util::OneBitCount (keyLength) == 1) {
-                std::size_t paddingLength = 0;
-                switch (padding) {
-                    case RSA_PKCS1_PADDING:
-                    case RSA_SSLV23_PADDING:
-                        paddingLength = 12;
-                        break;
-                    case RSA_NO_PADDING:
-                        break;
-                    case RSA_PKCS1_OAEP_PADDING:
-                        paddingLength = 42;
-                        break;
-                    case RSA_X931_PADDING:
-                    case RSA_PKCS1_PSS_PADDING:
-                    default:
-                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                            "Invalid padding type: %d.",
-                            paddingTostring (padding).c_str ());
-                }
+            if (keyLength > 0 && (keyLength & ~3) == keyLength && IsValidPadding (padding)) {
+                std::size_t paddingLength =
+                    padding == RSA_PKCS1_PADDING || padding == RSA_SSLV23_PADDING ? 12 :
+                    padding == RSA_PKCS1_OAEP_PADDING ? 42 : 0;
                 return (keyLength >> 3) - paddingLength;
             }
             else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Key length (%d) must be a power of 2.",
-                    keyLength);
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
         }
 
-        util::Buffer::UniquePtr RSA::EncryptBuffer (
+        std::size_t RSA::Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 AsymmetricKey::Ptr publicKey,
-                util::i32 padding) {
+                util::i32 padding,
+                util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && publicKey->GetType () == EVP_PKEY_RSA) {
+                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding) &&
+                    ciphertext != 0) {
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new (publicKey->Get (), OpenSSLInit::engine));
                 if (ctx.get () != 0 &&
                         EVP_PKEY_encrypt_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_padding (ctx.get (), padding) == 1) {
-                    size_t ciphertextLength = 0;
-                    if (EVP_PKEY_encrypt (ctx.get (), 0, &ciphertextLength,
+                    size_t ciphertextLength = publicKey->Length ();
+                    if (EVP_PKEY_encrypt (ctx.get (), ciphertext, &ciphertextLength,
                             (const util::ui8 *)plaintext, plaintextLength) == 1) {
-                        util::Buffer::UniquePtr ciphertext (
-                            new util::Buffer (util::HostEndian, (util::ui32)ciphertextLength));
-                        if (EVP_PKEY_encrypt (ctx.get (),
-                                ciphertext->GetWritePtr (), &ciphertextLength,
-                                (const util::ui8 *)plaintext, plaintextLength) == 1) {
-                            ciphertext->AdvanceWriteOffset ((util::ui32)ciphertextLength);
-                            return ciphertext;
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
+                        return ciphertextLength;
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -139,35 +117,176 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr RSA::DecryptBuffer (
+        util::Buffer::UniquePtr RSA::Encrypt (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                AsymmetricKey::Ptr publicKey,
+                util::i32 padding) {
+            if (plaintext != 0 && plaintextLength > 0 &&
+                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding)) {
+                util::Buffer::UniquePtr ciphertext (
+                    new util::Buffer (
+                        util::NetworkEndian,
+                        (util::ui32)publicKey->Length ()));
+                ciphertext->AdvanceWriteOffset (
+                    (util::ui32)Encrypt (
+                        plaintext,
+                        plaintextLength,
+                        publicKey,
+                        padding,
+                        ciphertext->GetWritePtr ()));
+                return ciphertext;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t RSA::EncryptAndEnlengthen (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                AsymmetricKey::Ptr publicKey,
+                util::i32 padding,
+                util::ui8 *ciphertext) {
+            if (plaintext != 0 && plaintextLength > 0 &&
+                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding) &&
+                    ciphertext != 0) {
+                std::size_t ciphertextLength = Encrypt (
+                    plaintext,
+                    plaintextLength,
+                    publicKey,
+                    padding,
+                    ciphertext + util::UI32_SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian,
+                    ciphertext,
+                    util::UI32_SIZE);
+                buffer << (util::ui32)ciphertextLength;
+                return util::UI32_SIZE + ciphertextLength;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        namespace {
+            inline std::size_t GetMaxBufferLength (std::size_t keyLength) {
+                return FrameHeader::SIZE + keyLength;
+            }
+        }
+
+        util::Buffer::UniquePtr RSA::EncryptAndEnlengthen (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                AsymmetricKey::Ptr publicKey,
+                util::i32 padding) {
+            if (plaintext != 0 && plaintextLength > 0 &&
+                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding)) {
+                util::Buffer::UniquePtr ciphertext (
+                    new util::Buffer (
+                        util::NetworkEndian,
+                        (util::ui32)(GetMaxBufferLength (plaintextLength))));
+                ciphertext->AdvanceWriteOffset (
+                    (util::ui32)EncryptAndEnlengthen (
+                        plaintext,
+                        plaintextLength,
+                        publicKey,
+                        padding,
+                        ciphertext->GetWritePtr ()));
+                return ciphertext;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t RSA::EncryptAndFrame (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                AsymmetricKey::Ptr publicKey,
+                util::i32 padding,
+                util::ui8 *ciphertext) {
+            if (plaintext != 0 && plaintextLength > 0 &&
+                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding) &&
+                    ciphertext != 0) {
+                std::size_t ciphertextLength = Encrypt (
+                    plaintext,
+                    plaintextLength,
+                    publicKey,
+                    padding,
+                    ciphertext + FrameHeader::SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian,
+                    ciphertext,
+                    FrameHeader::SIZE);
+                buffer << FrameHeader (publicKey->GetId (), (util::ui32)ciphertextLength);
+                return FrameHeader::SIZE + ciphertextLength;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        util::Buffer::UniquePtr RSA::EncryptAndFrame (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                AsymmetricKey::Ptr publicKey,
+                util::i32 padding) {
+            if (plaintext != 0 && plaintextLength > 0 &&
+                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding)) {
+                util::Buffer::UniquePtr ciphertext (
+                    new util::Buffer (
+                        util::NetworkEndian,
+                        (util::ui32)(GetMaxBufferLength (plaintextLength))));
+                ciphertext->AdvanceWriteOffset (
+                    (util::ui32)EncryptAndFrame (
+                        plaintext,
+                        plaintextLength,
+                        publicKey,
+                        padding,
+                        ciphertext->GetWritePtr ()));
+                return ciphertext;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t RSA::Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
                 AsymmetricKey::Ptr privateKey,
                 util::i32 padding,
-                bool secure,
-                util::Endianness endianness) {
+                util::ui8 *plaintext) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    privateKey.Get () != 0 && privateKey->GetType () == EVP_PKEY_RSA) {
+                    privateKey.Get () != 0 && privateKey->IsPrivate () &&
+                    privateKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding) &&
+                    plaintext != 0) {
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new (privateKey->Get (), OpenSSLInit::engine));
                 if (ctx.get () != 0 &&
                         EVP_PKEY_decrypt_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_padding (ctx.get (), padding) == 1) {
-                    size_t plaintextLength = 0;
-                    if (EVP_PKEY_decrypt (ctx.get (), 0, &plaintextLength,
+                    size_t plaintextLength = privateKey->Length ();
+                    if (EVP_PKEY_decrypt (ctx.get (), plaintext, &plaintextLength,
                             (const util::ui8 *)ciphertext, ciphertextLength) == 1) {
-                        util::Buffer::UniquePtr plaintext (secure ?
-                            new util::SecureBuffer (endianness, (util::ui32)plaintextLength) :
-                            new util::Buffer (endianness, (util::ui32)plaintextLength));
-                        if (EVP_PKEY_decrypt (ctx.get (),
-                                plaintext->GetWritePtr (), &plaintextLength,
-                                (const util::ui8 *)ciphertext, ciphertextLength) == 1) {
-                            plaintext->AdvanceWriteOffset ((util::ui32)plaintextLength);
-                            return plaintext;
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
+                        return plaintextLength;
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -175,6 +294,217 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        util::Buffer::UniquePtr RSA::Decrypt (
+                const void *ciphertext,
+                std::size_t ciphertextLength,
+                AsymmetricKey::Ptr privateKey,
+                util::i32 padding,
+                bool secure,
+                util::Endianness endianness) {
+            if (ciphertext != 0 && ciphertextLength > 0 &&
+                    privateKey.Get () != 0 && privateKey->IsPrivate () &&
+                    privateKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding)) {
+                util::Buffer::UniquePtr plaintext (secure ?
+                    new util::SecureBuffer (endianness, (util::ui32)privateKey->Length ()) :
+                    new util::Buffer (endianness, (util::ui32)privateKey->Length ()));
+                plaintext->AdvanceWriteOffset (
+                    (util::ui32)Decrypt (
+                        ciphertext,
+                        ciphertextLength,
+                        privateKey,
+                        padding,
+                        plaintext->GetWritePtr ()));
+                return plaintext;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        namespace {
+            struct RSAHeader {
+                std::string cipherName;
+                util::ui8 keyLength;
+                util::ui8 key[EVP_MAX_KEY_LENGTH];
+
+                RSAHeader (
+                        const std::string &cipherName_ = std::string (),
+                        util::ui8 keyLength_ = 0,
+                        const util::ui8 *key_ = 0) :
+                        cipherName (cipherName_),
+                        keyLength (keyLength_) {
+                    if (keyLength > 0 && key_ != 0) {
+                        memcpy (key, key_, keyLength);
+                        memset (&key[keyLength], 0, EVP_MAX_KEY_LENGTH - keyLength);
+                    }
+                }
+                ~RSAHeader () {
+                    memset (key, 0, EVP_MAX_KEY_LENGTH);
+                }
+
+                static std::size_t Size (const std::string &cipherName) {
+                    return
+                        util::Serializer::Size (cipherName) +
+                        util::UI8_SIZE +
+                        GetCipherKeyLength (CipherSuite::GetOpenSSLCipher (cipherName));
+                }
+            };
+
+            inline util::Serializer &operator << (
+                    util::Serializer &serializer,
+                    const RSAHeader &header) {
+                serializer << header.cipherName << header.keyLength;
+                serializer.Write (header.key, header.keyLength);
+                return serializer;
+            }
+
+            inline util::Serializer &operator >> (
+                    util::Serializer &serializer,
+                    RSAHeader &header) {
+                serializer >> header.cipherName >> header.keyLength;
+                serializer.Read (header.key, header.keyLength);
+                memset (&header.key[header.keyLength], 0, EVP_MAX_KEY_LENGTH - header.keyLength);
+                return serializer;
+            }
+
+            const EVP_CIPHER *GetCipher (
+                    std::size_t keyLength,
+                    util::i32 padding = RSA_PKCS1_OAEP_PADDING) {
+                static const std::vector<std::string> &ciphers = CipherSuite::GetCiphers ();
+                for (std::size_t i = 0, count = ciphers.size (); i < count; ++i) {
+                    if (RSAHeader::Size (ciphers[i]) <=
+                            RSA::GetMaxPlaintextLength (keyLength, padding)) {
+                        return CipherSuite::GetOpenSSLCipher (ciphers[i]);
+                    }
+                }
+                return 0;
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::UniquePtr _LIB_THEKOGANS_CRYPTO_API
+        RSAEncrypt (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                AsymmetricKey::Ptr publicKey,
+                util::i32 padding) {
+            if (plaintext != 0 && plaintextLength > 0 &&
+                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding)) {
+                std::size_t keyLength = publicKey->Length ();
+                const EVP_CIPHER *cipher = GetCipher (keyLength);
+                if (cipher != 0) {
+                    util::Buffer::UniquePtr buffer (
+                        new util::Buffer (
+                            util::NetworkEndian,
+                            GetMaxBufferLength (keyLength) +
+                            Cipher::GetMaxBufferLength (plaintextLength)));
+                    std::string cipherName = CipherSuite::GetOpenSSLCipherName (cipher);
+                    SymmetricKey::Ptr key =
+                        SymmetricKey::FromRandom (
+                            SymmetricKey::MIN_RANDOM_LENGTH,
+                            0,
+                            0,
+                            GetCipherKeyLength (cipher));
+                    util::SecureBuffer headerBuffer (
+                        util::NetworkEndian,
+                        RSAHeader::Size (cipherName));
+                    headerBuffer << RSAHeader (
+                        cipherName,
+                        key->Length (),
+                        key->Get ().GetReadPtr ());
+                    buffer->AdvanceWriteOffset (
+                        RSA::EncryptAndEnlengthen (
+                            headerBuffer.GetReadPtr (),
+                            headerBuffer.GetDataAvailableForReading (),
+                            publicKey,
+                            padding,
+                            buffer->GetWritePtr ()));
+                    Cipher cipher_ (key, cipher);
+                    buffer->AdvanceWriteOffset (
+                        cipher_.EncryptAndEnlengthen (
+                            plaintext,
+                            plaintextLength,
+                            0,
+                            0,
+                            buffer->GetWritePtr ()));
+                    return buffer;
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "No viable block cipher for RSA key length: %u",
+                        keyLength);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::UniquePtr _LIB_THEKOGANS_CRYPTO_API
+        RSADecrypt (
+                const void *ciphertext,
+                std::size_t ciphertextLength,
+                AsymmetricKey::Ptr privateKey,
+                util::i32 padding,
+                bool secure,
+                util::Endianness endianness) {
+            if (ciphertext != 0 && ciphertextLength > 0 &&
+                    privateKey.Get () != 0 && privateKey->IsPrivate () &&
+                    privateKey->GetType () == EVP_PKEY_RSA &&
+                    IsValidPadding (padding)) {
+                util::TenantReadBuffer buffer (
+                    util::NetworkEndian,
+                    (const util::ui8 *)ciphertext,
+                    (util::ui32)ciphertextLength);
+                util::ui32 headerLength;
+                buffer >> headerLength;
+                util::Buffer::UniquePtr headerBuffer =
+                    RSA::Decrypt (
+                        buffer.GetReadPtr (),
+                        headerLength,
+                        privateKey,
+                        padding,
+                        true,
+                        util::NetworkEndian);
+                buffer.AdvanceReadOffset (headerLength);
+                RSAHeader header;
+                *headerBuffer >> header;
+                const EVP_CIPHER *cipher = CipherSuite::GetOpenSSLCipher (header.cipherName);
+                if (cipher != 0) {
+                    util::ui32 ciphertextLength;
+                    buffer >> ciphertextLength;
+                    SymmetricKey::Ptr key (
+                        new SymmetricKey (
+                            ID (),
+                            std::string (),
+                            std::string (),
+                            header.key,
+                            header.key + header.keyLength));
+                    Cipher cipher_ (key, cipher);
+                    return cipher_.Decrypt (
+                        buffer.GetReadPtr (),
+                        ciphertextLength,
+                        0,
+                        0,
+                        secure,
+                        endianness);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unknown block cipher: %s",
+                        header.cipherName.c_str ());
                 }
             }
             else {
