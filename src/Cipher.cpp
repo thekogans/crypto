@@ -268,11 +268,11 @@ namespace thekogans {
             if (ciphertext != 0 && ciphertextLength > 0 &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
                     plaintext != 0) {
-                CiphertextHeader ciphertextHeader;
                 util::TenantReadBuffer buffer (
                     util::NetworkEndian,
                     (const util::ui8 *)ciphertext,
                     (util::ui32)ciphertextLength);
+                CiphertextHeader ciphertextHeader;
                 buffer >> ciphertextHeader;
                 // If we're in CBC mode, verify the MAC before attempting to
                 // decrypt, as per the Cryptographic Doom Principle:
