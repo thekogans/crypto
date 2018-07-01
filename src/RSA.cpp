@@ -380,10 +380,10 @@ namespace thekogans {
             const EVP_CIPHER *GetCipher (
                     std::size_t keyLength,
                     util::i32 padding = RSA_PKCS1_OAEP_PADDING) {
-                static const std::vector<std::string> &ciphers = CipherSuite::GetCiphers ();
+                std::size_t maxPlaintextLength = RSA::GetMaxPlaintextLength (keyLength, padding);
+                const std::vector<std::string> &ciphers = CipherSuite::GetCiphers ();
                 for (std::size_t i = 0, count = ciphers.size (); i < count; ++i) {
-                    if (RSAHeader::Size (ciphers[i]) <=
-                            RSA::GetMaxPlaintextLength (keyLength, padding)) {
+                    if (RSAHeader::Size (ciphers[i]) <= maxPlaintextLength) {
                         return CipherSuite::GetOpenSSLCipher (ciphers[i]);
                     }
                 }
