@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <CppUnitXLite/CppUnitXLite.cpp>
+#include "thekogans/util/Exception.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/DH.h"
 #include "thekogans/crypto/EC.h"
@@ -51,7 +52,7 @@ namespace {
             return result;
         }
         THEKOGANS_UTIL_CATCH (util::Exception) {
-            std::cout << "fail " << exception.what ();
+            std::cout << "fail " << exception.Report ();
             return false;
         }
     }
@@ -74,7 +75,7 @@ namespace {
             return result;
         }
         THEKOGANS_UTIL_CATCH (util::Exception) {
-            std::cout << "fail " << exception.what ();
+            std::cout << "fail " << exception.Report ();
             return false;
         }
     }
@@ -245,10 +246,10 @@ TEST (thekogans, EC) {
 
 TEST (thekogans, RSA) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey = crypto::RSA::CreateKey (1536);
+    crypto::AsymmetricKey::Ptr privateKey = crypto::RSA::CreateKey (1024);
     CHECK_EQUAL (
         TestRSA (
-            "crypto::RSA::CreateKey (1536)",
+            "crypto::RSA::CreateKey (1024)",
             privateKey->GetPublicKey (),
             privateKey),
         true);

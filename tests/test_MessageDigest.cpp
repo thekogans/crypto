@@ -63,7 +63,7 @@ namespace {
             return result;
         }
         THEKOGANS_UTIL_CATCH (util::Exception) {
-            std::cout << "fail " << exception.what ();
+            std::cout << "fail " << exception.Report ();
             return false;
         }
     }
