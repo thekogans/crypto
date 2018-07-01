@@ -397,7 +397,7 @@ namespace thekogans {
                 std::size_t maxPlaintextLength = RSA::GetMaxPlaintextLength (keyLength, padding);
                 for (std::size_t cipherIndex = 0, count = CipherSuite::GetCiphers ().size ();
                         cipherIndex < count; ++cipherIndex) {
-                    if (RSAHeader::Size (cipherIndex) <= maxPlaintextLength) {
+                    if (RSAHeader::Size ((util::ui8)cipherIndex) <= maxPlaintextLength) {
                         return cipherIndex;
                     }
                 }
@@ -427,14 +427,14 @@ namespace thekogans {
                 util::Buffer::UniquePtr buffer (
                     new util::Buffer (
                         util::NetworkEndian,
-                        GetMaxBufferLength (keyLength) +
-                        Cipher::GetMaxBufferLength (plaintextLength)));
+                        (util::ui32)(GetMaxBufferLength (keyLength) +
+                            Cipher::GetMaxBufferLength (plaintextLength))));
                 util::SecureBuffer headerBuffer (
                     util::NetworkEndian,
                     RSAHeader::Size (cipherIndex));
                 headerBuffer << RSAHeader (
-                    cipherIndex,
-                    key->Length (),
+                    (util::ui8)cipherIndex,
+                    (util::ui8)key->Length (),
                     key->Get ().GetReadPtr ());
                 buffer->AdvanceWriteOffset (
                     RSA::EncryptAndEnlengthen (
@@ -447,7 +447,7 @@ namespace thekogans {
                     key,
                     CipherSuite::GetOpenSSLCipherByIndex (cipherIndex));
                 buffer->AdvanceWriteOffset (
-                    cipher.EncryptAndEnlengthen (
+                    (util::ui32)cipher.EncryptAndEnlengthen (
                         plaintext,
                         plaintextLength,
                         0,
