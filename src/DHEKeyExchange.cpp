@@ -169,7 +169,7 @@ namespace thekogans {
                                 !dhParams->salt.empty () ? &dhParams->salt[0] : 0,
                                 dhParams->salt.size (),
                                 dhParams->keyLength,
-                                CipherSuite::GetOpenSSLMessageDigest (dhParams->messageDigest),
+                                CipherSuite::GetOpenSSLMessageDigestByName (dhParams->messageDigest),
                                 dhParams->count,
                                 dhParams->keyId,
                                 dhParams->name,

@@ -64,7 +64,7 @@ TEST (thekogans, HMAC) {
             TestMAC (
                 std::string ("HMAC-" + messageDigests[i]).c_str (),
                 key,
-                crypto::CipherSuite::GetOpenSSLMessageDigest (messageDigests[i])),
+                crypto::CipherSuite::GetOpenSSLMessageDigestByName (messageDigests[i])),
             true);
     }
 }
@@ -81,7 +81,7 @@ TEST (thekogans, CMAC) {
             TestMAC (
                 std::string ("CMAC-" + messageDigests[i]).c_str (),
                 key,
-                crypto::CipherSuite::GetOpenSSLMessageDigest (messageDigests[i])),
+                crypto::CipherSuite::GetOpenSSLMessageDigestByName (messageDigests[i])),
             true);
     }
 }

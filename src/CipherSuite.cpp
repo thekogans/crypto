@@ -241,13 +241,17 @@ namespace thekogans {
             return messageDigests;
         }
 
-        const EVP_CIPHER *CipherSuite::GetOpenSSLCipher (const std::string &cipher) {
+        const EVP_CIPHER *CipherSuite::GetOpenSSLCipherByName (const std::string &cipherName) {
             for (std::size_t i = 0; i < ciphersSize; ++i) {
-                if (ciphers[i].name == cipher) {
+                if (ciphers[i].name == cipherName) {
                     return ciphers[i].cipher;
                 }
             }
             return 0;
+        }
+
+        const EVP_CIPHER *CipherSuite::GetOpenSSLCipherByIndex (std::size_t cipherIndex) {
+            return cipherIndex < ciphersSize ? ciphers[cipherIndex].cipher : 0;
         }
 
         std::string CipherSuite::GetOpenSSLCipherName (const EVP_CIPHER *cipher) {
@@ -259,9 +263,9 @@ namespace thekogans {
             return std::string ();
         }
 
-        const EVP_MD *CipherSuite::GetOpenSSLMessageDigest (const std::string &messageDigest) {
+        const EVP_MD *CipherSuite::GetOpenSSLMessageDigestByName (const std::string &messageDigestName) {
             for (std::size_t i = 0; i < messageDigestsSize; ++i) {
-                if (messageDigests[i].name == messageDigest) {
+                if (messageDigests[i].name == messageDigestName) {
                     return messageDigests[i].md;
                 }
             }
@@ -355,7 +359,7 @@ namespace thekogans {
         }
 
         bool CipherSuite::VerifyCipherKey (const SymmetricKey &key) const {
-            return GetCipherKeyLength (GetOpenSSLCipher (cipher)) == key.Length ();
+            return GetCipherKeyLength (GetOpenSSLCipherByName (cipher)) == key.Length ();
         }
 
         bool CipherSuite::VerifyMACKey (const AsymmetricKey &key) const {
@@ -434,7 +438,7 @@ namespace thekogans {
                     new Authenticator (
                         op,
                         key,
-                        GetOpenSSLMessageDigest (messageDigest)));
+                        GetOpenSSLMessageDigestByName (messageDigest)));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -447,8 +451,8 @@ namespace thekogans {
                 return Cipher::Ptr (
                     new Cipher (
                         key,
-                        GetOpenSSLCipher (cipher),
-                        GetOpenSSLMessageDigest (messageDigest)));
+                        GetOpenSSLCipherByName (cipher),
+                        GetOpenSSLMessageDigestByName (messageDigest)));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -461,7 +465,7 @@ namespace thekogans {
                 return MAC::Ptr (
                     new MAC (
                         key,
-                        GetOpenSSLMessageDigest (messageDigest)));
+                        GetOpenSSLMessageDigestByName (messageDigest)));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -471,7 +475,7 @@ namespace thekogans {
 
         MessageDigest::Ptr CipherSuite::GetMessageDigest () const {
             return MessageDigest::Ptr (
-                new MessageDigest (GetOpenSSLMessageDigest (messageDigest)));
+                new MessageDigest (GetOpenSSLMessageDigestByName (messageDigest)));
         }
 
     } // namespace crypto

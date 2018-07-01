@@ -190,11 +190,10 @@ namespace thekogans {
         /// a random \see{SymmetricKey}, using it to encrypt plaintext, and then
         /// using the given publicKey to encrypt the random key.
         /// NOTE: The minimum amount of data that the given publicKey will need
-        /// to be able to encrypt is 32 bytes (util::UI32_SIZE + "AES-128-GCM" +
-        /// util::UI8_SIZE + 16). Since RSA_PKCS1_OAEP_PADDING padding needs 42
-        /// bytes, the smallest RSA key using it needs to be 1024 bits. If you
-        /// need to use smaller RSA keys (512), you will need to use different
-        /// form of padding (RSA_PKCS1_PADDING).
+        /// to be able to encrypt is 18 bytes (util::UI8_SIZE + util::UI8_SIZE + 16).
+        /// Since RSA_PKCS1_OAEP_PADDING padding needs 42 bytes, the smallest RSA
+        /// key using it needs to be 512 bits. If you need to use smaller RSA keys,
+        /// you will need to use different form of padding (RSA_PKCS1_PADDING).
         /// \param[in] plaintext Plaintext to encrypt.
         /// \param[in] plaintextLength Length of plaintext.
         /// \param[in] publicKey Public key used to encrypt the generated random

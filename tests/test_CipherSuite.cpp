@@ -95,7 +95,7 @@ namespace {
                                         0,
                                         0,
                                         crypto::GetCipherKeyLength (
-                                            cipherSuite.GetOpenSSLCipher (cipherSuite.cipher))));
+                                            cipherSuite.GetOpenSSLCipherByName (cipherSuite.cipher))));
                                 result = cipher.Get () != 0;
                                 if (result) {
                                     crypto::MessageDigest::Ptr messageDigest = cipherSuite.GetMessageDigest ();

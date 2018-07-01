@@ -77,7 +77,7 @@ TEST (thekogans, MessageDigest) {
         CHECK_EQUAL (
             TestMessageDigest (
                 messageDigests[i].c_str (),
-                crypto::CipherSuite::GetOpenSSLMessageDigest (messageDigests[i])),
+                crypto::CipherSuite::GetOpenSSLMessageDigestByName (messageDigests[i])),
             true);
     }
 }

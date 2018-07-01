@@ -246,10 +246,10 @@ TEST (thekogans, EC) {
 
 TEST (thekogans, RSA) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey = crypto::RSA::CreateKey (1024);
+    crypto::AsymmetricKey::Ptr privateKey = crypto::RSA::CreateKey (512);
     CHECK_EQUAL (
         TestRSA (
-            "crypto::RSA::CreateKey (1024)",
+            "crypto::RSA::CreateKey (512)",
             privateKey->GetPublicKey (),
             privateKey),
         true);

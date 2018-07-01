@@ -200,20 +200,25 @@ namespace thekogans {
             static const std::vector<std::string> &GetMessageDigests ();
 
             /// \brief
-            /// Return the OpenSSL EVP_CIPHER represented by the given cipher.
-            /// \param[in] cipher Cipher name to convert to OpenSSL EVP_CIPHER.
-            /// \return OpenSSL EVP_CIPHER represented by the given cipher.
-            static const EVP_CIPHER *GetOpenSSLCipher (const std::string &cipher);
+            /// Return the OpenSSL EVP_CIPHER represented by the given cipher name.
+            /// \param[in] cipherName Cipher name to convert to OpenSSL EVP_CIPHER.
+            /// \return OpenSSL EVP_CIPHER represented by the given cipher name.
+            static const EVP_CIPHER *GetOpenSSLCipherByName (const std::string &cipherName);
+            /// \brief
+            /// Return the OpenSSL EVP_CIPHER represented by the given cipher index.
+            /// \param[in] cipherIndex Cipher index to convert to OpenSSL EVP_CIPHER.
+            /// \return OpenSSL EVP_CIPHER represented by the given cipher index.
+            static const EVP_CIPHER *GetOpenSSLCipherByIndex (std::size_t cipherIndex);
             /// \brief
             /// Return the cipher name represented by the given OpenSSL EVP_CIPHER.
             /// \param[in] cipher OpenSSL EVP_CIPHER whose name to return.
             /// \return Cipher name represented by the given OpenSSL EVP_CIPHER.
             static std::string GetOpenSSLCipherName (const EVP_CIPHER *cipher);
             /// \brief
-            /// Return the OpenSSL EVP_MD represented by the given messageDigest.
-            /// \param[in] messageDigest Message digest name to convert to OpenSSL EVP_MD.
-            /// \return OpenSSL EVP_MD represented by the given messageDigest.
-            static const EVP_MD *GetOpenSSLMessageDigest (const std::string &messageDigest);
+            /// Return the OpenSSL EVP_MD represented by the given message digest name.
+            /// \param[in] messageDigestName Message digest name to convert to OpenSSL EVP_MD.
+            /// \return OpenSSL EVP_MD represented by the given message digest name.
+            static const EVP_MD *GetOpenSSLMessageDigestByName (const std::string &messageDigestName);
             /// \brief
             /// Return the message digest name represented by the given OpenSSL EVP_MD.
             /// \param[in] md OpenSSL EVP_MD whose name to return.
@@ -338,13 +343,13 @@ namespace thekogans {
             /// Return the OpenSSL EVP_CIPHER represented by cipher.
             /// \return OpenSSL EVP_CIPHER represented by cipher.
             inline const EVP_CIPHER *GetOpenSSLCipher () const {
-                return GetOpenSSLCipher (cipher);
+                return GetOpenSSLCipherByName (cipher);
             }
             /// \brief
             /// Return the OpenSSL EVP_MD represented by messageDigest.
             /// \return OpenSSL EVP_MD represented by messageDigest.
             inline const EVP_MD *GetOpenSSLMessageDigest () const {
-                return GetOpenSSLMessageDigest (messageDigest);
+                return GetOpenSSLMessageDigestByName (messageDigest);
             }
 
             /// \brief

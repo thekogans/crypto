@@ -18,6 +18,7 @@
 #if defined (TOOLCHAIN_OS_Windows)
     #include <winsock2.h>
 #endif // defined (TOOLCHAIN_OS_Windows)
+#include "thekogans/util/Constants.h"
 #include "thekogans/util/FixedArray.h"
 #include "thekogans/util/File.h"
 #include "thekogans/crypto/CipherSuite.h"
@@ -333,15 +334,15 @@ namespace thekogans {
 
         namespace {
             struct RSAHeader {
-                std::string cipherName;
+                util::ui8 cipherIndex;
                 util::ui8 keyLength;
                 util::ui8 key[EVP_MAX_KEY_LENGTH];
 
                 RSAHeader (
-                        const std::string &cipherName_ = std::string (),
+                        util::ui8 cipherIndex_ = 0,
                         util::ui8 keyLength_ = 0,
                         const util::ui8 *key_ = 0) :
-                        cipherName (cipherName_),
+                        cipherIndex (cipherIndex_),
                         keyLength (keyLength_) {
                     if (keyLength > 0 && key_ != 0) {
                         memcpy (key, key_, keyLength);
@@ -352,18 +353,18 @@ namespace thekogans {
                     memset (key, 0, EVP_MAX_KEY_LENGTH);
                 }
 
-                static std::size_t Size (const std::string &cipherName) {
+                static std::size_t Size (util::ui8 cipherIndex) {
                     return
-                        util::Serializer::Size (cipherName) +
                         util::UI8_SIZE +
-                        GetCipherKeyLength (CipherSuite::GetOpenSSLCipher (cipherName));
+                        util::UI8_SIZE +
+                        GetCipherKeyLength (CipherSuite::GetOpenSSLCipherByIndex (cipherIndex));
                 }
             };
 
             inline util::Serializer &operator << (
                     util::Serializer &serializer,
                     const RSAHeader &header) {
-                serializer << header.cipherName << header.keyLength;
+                serializer << header.cipherIndex << header.keyLength;
                 serializer.Write (header.key, header.keyLength);
                 return serializer;
             }
@@ -371,23 +372,22 @@ namespace thekogans {
             inline util::Serializer &operator >> (
                     util::Serializer &serializer,
                     RSAHeader &header) {
-                serializer >> header.cipherName >> header.keyLength;
+                serializer >> header.cipherIndex >> header.keyLength;
                 serializer.Read (header.key, header.keyLength);
                 memset (&header.key[header.keyLength], 0, EVP_MAX_KEY_LENGTH - header.keyLength);
                 return serializer;
             }
 
-            const EVP_CIPHER *GetCipher (
+            std::size_t GetCipherIndex (
                     std::size_t keyLength,
                     util::i32 padding = RSA_PKCS1_OAEP_PADDING) {
                 std::size_t maxPlaintextLength = RSA::GetMaxPlaintextLength (keyLength, padding);
-                const std::vector<std::string> &ciphers = CipherSuite::GetCiphers ();
-                for (std::size_t i = 0, count = ciphers.size (); i < count; ++i) {
-                    if (RSAHeader::Size (ciphers[i]) <= maxPlaintextLength) {
-                        return CipherSuite::GetOpenSSLCipher (ciphers[i]);
+                for (std::size_t i = 0, count = CipherSuite::GetCiphers ().size (); i < count; ++i) {
+                    if (RSAHeader::Size (i) <= maxPlaintextLength) {
+                        return i;
                     }
                 }
-                return 0;
+                return util::NIDX;
             }
         }
 
@@ -402,25 +402,25 @@ namespace thekogans {
                     publicKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 std::size_t keyLength = publicKey->Length ();
-                const EVP_CIPHER *cipher = GetCipher (keyLength);
-                if (cipher != 0) {
+                std::size_t cipherIndex = GetCipherIndex (keyLength);
+                if (cipherIndex != util::NIDX) {
                     util::Buffer::UniquePtr buffer (
                         new util::Buffer (
                             util::NetworkEndian,
                             GetMaxBufferLength (keyLength) +
                             Cipher::GetMaxBufferLength (plaintextLength)));
-                    std::string cipherName = CipherSuite::GetOpenSSLCipherName (cipher);
                     SymmetricKey::Ptr key =
                         SymmetricKey::FromRandom (
                             SymmetricKey::MIN_RANDOM_LENGTH,
                             0,
                             0,
-                            GetCipherKeyLength (cipher));
+                            GetCipherKeyLength (
+                                CipherSuite::GetOpenSSLCipherByIndex (cipherIndex)));
                     util::SecureBuffer headerBuffer (
                         util::NetworkEndian,
-                        RSAHeader::Size (cipherName));
+                        RSAHeader::Size (cipherIndex));
                     headerBuffer << RSAHeader (
-                        cipherName,
+                        cipherIndex,
                         key->Length (),
                         key->Get ().GetReadPtr ());
                     buffer->AdvanceWriteOffset (
@@ -430,9 +430,11 @@ namespace thekogans {
                             publicKey,
                             padding,
                             buffer->GetWritePtr ()));
-                    Cipher cipher_ (key, cipher);
+                    Cipher cipher (
+                        key,
+                        CipherSuite::GetOpenSSLCipherByIndex (cipherIndex));
                     buffer->AdvanceWriteOffset (
-                        cipher_.EncryptAndEnlengthen (
+                        cipher.EncryptAndEnlengthen (
                             plaintext,
                             plaintextLength,
                             0,
@@ -481,31 +483,24 @@ namespace thekogans {
                 buffer.AdvanceReadOffset (headerLength);
                 RSAHeader header;
                 *headerBuffer >> header;
-                const EVP_CIPHER *cipher = CipherSuite::GetOpenSSLCipher (header.cipherName);
-                if (cipher != 0) {
-                    util::ui32 ciphertextLength;
-                    buffer >> ciphertextLength;
-                    SymmetricKey::Ptr key (
+                Cipher cipher (
+                    SymmetricKey::Ptr (
                         new SymmetricKey (
                             ID (),
                             std::string (),
                             std::string (),
                             header.key,
-                            header.key + header.keyLength));
-                    Cipher cipher_ (key, cipher);
-                    return cipher_.Decrypt (
-                        buffer.GetReadPtr (),
-                        ciphertextLength,
-                        0,
-                        0,
-                        secure,
-                        endianness);
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unknown block cipher: %s",
-                        header.cipherName.c_str ());
-                }
+                            header.key + header.keyLength)),
+                    CipherSuite::GetOpenSSLCipherByIndex (header.cipherIndex));
+                util::ui32 ciphertextLength;
+                buffer >> ciphertextLength;
+                return cipher.Decrypt (
+                    buffer.GetReadPtr (),
+                    ciphertextLength,
+                    0,
+                    0,
+                    secure,
+                    endianness);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
