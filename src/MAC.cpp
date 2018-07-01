@@ -28,7 +28,9 @@ namespace thekogans {
                 const EVP_MD *md_) :
                 key (key_),
                 md (md_) {
-            if (key.Get () != 0 && md != 0) {
+            if (key.Get () != 0 &&
+                    (key->GetType () == EVP_PKEY_HMAC || key->GetType () == EVP_PKEY_CMAC) &&
+                    md != 0) {
                 if (EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine, key->Get ()) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
