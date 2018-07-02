@@ -26,6 +26,7 @@
     #include "thekogans/util/XMLUtils.h"
     #include "thekogans/util/StringUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/crypto/MessageDigest.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
@@ -56,47 +57,31 @@ namespace thekogans {
                 const std::string &description) {
             if (secret != 0 && secretLength > 0 &&
                     keyLength > 0 && md != 0 && count > 0) {
-                Ptr symmetricKey (new SymmetricKey (id, name, description));
+                util::SecureVector<util::ui8> key (keyLength);
+                keyLength = 0;
                 util::SecureVector<util::ui8> buffer (EVP_MAX_MD_SIZE);
                 util::ui32 bufferLength = 0;
-                MDContext context;
-                while (keyLength > 0) {
-                    if (EVP_DigestInit_ex (&context, md, OpenSSLInit::engine) != 1) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                MessageDigest messageDigest (md);
+                while (keyLength < key.size ()) {
+                    messageDigest.Init ();
                     if (bufferLength > 0) {
-                        if (EVP_DigestUpdate (&context, &buffer[0], bufferLength) != 1) {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
+                        messageDigest.Update (&buffer[0], bufferLength);
                     }
-                    if (EVP_DigestUpdate (&context, secret, secretLength) != 1) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                    messageDigest.Update (secret, secretLength);
                     if (salt != 0 && saltLength > 0) {
-                        if (EVP_DigestUpdate (&context, salt, saltLength) != 1) {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
+                        messageDigest.Update (salt, saltLength);
                     }
-                    if (EVP_DigestFinal_ex (&context, &buffer[0], &bufferLength) != 1) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                    bufferLength = messageDigest.Final (&buffer[0]);
                     for (util::ui32 i = 1; i < count; ++i) {
-                        if (EVP_DigestInit_ex (&context, 0, 0) != 1 ||
-                                EVP_DigestUpdate (&context, &buffer[0], bufferLength) != 1 ||
-                                EVP_DigestFinal_ex (&context, &buffer[0], &bufferLength) != 1) {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
+                        messageDigest.Init ();
+                        messageDigest.Update (&buffer[0], bufferLength);
+                        bufferLength = messageDigest.Final (&buffer[0]);
                     }
-                    std::size_t count = std::min (keyLength, (std::size_t)bufferLength);
-                    memcpy (symmetricKey->key.GetWritePtr (), &buffer[0], count);
-                    symmetricKey->key.AdvanceWriteOffset ((util::ui32)count);
-                    keyLength -= count;
+                    std::size_t count = std::min (key.size () - keyLength, (std::size_t)bufferLength);
+                    memcpy (&key[keyLength], &buffer[0], count);
+                    keyLength += count;
                 }
-                memset (
-                    symmetricKey->key.GetWritePtr (),
-                    0,
-                    symmetricKey->key.GetDataAvailableForWriting ());
-                return symmetricKey;
+                return Ptr (new SymmetricKey (&key[0], key.size (), id, name, description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

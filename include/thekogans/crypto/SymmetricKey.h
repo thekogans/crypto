@@ -57,14 +57,17 @@ namespace thekogans {
             /// \param[in] begin Option start of key.
             /// \param[in] end Option end of key.
             SymmetricKey (
+                    const void *buffer = 0,
+                    std::size_t length = 0,
                     const ID &id = ID (),
                     const std::string &name = std::string (),
-                    const std::string &description = std::string (),
-                    const util::ui8 *begin = 0,
-                    const util::ui8 *end = 0) :
+                    const std::string &description = std::string ()) :
                     Serializable (id, name, description),
-                    key (util::HostEndian, begin, end) {
+                    key (util::HostEndian, (const util::ui8 *)buffer, length) {
                 memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+            }
+            ~SymmetricKey () {
+                memset (key.data, 0, EVP_MAX_KEY_LENGTH);
             }
 
             /// \brief

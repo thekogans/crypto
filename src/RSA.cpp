@@ -494,12 +494,7 @@ namespace thekogans {
                 headerBuffer >> header;
                 Cipher cipher (
                     SymmetricKey::Ptr (
-                        new SymmetricKey (
-                            ID (),
-                            std::string (),
-                            std::string (),
-                            header.key,
-                            header.key + header.keyLength)),
+                        new SymmetricKey (header.key, header.keyLength)),
                     CipherSuite::GetOpenSSLCipherByIndex (header.cipherIndex));
                 util::ui32 ciphertextLength;
                 buffer >> ciphertextLength;
