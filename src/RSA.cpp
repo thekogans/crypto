@@ -336,37 +336,17 @@ namespace thekogans {
             struct RSAHeader {
                 util::ui8 cipherIndex;
                 util::ui8 keyLength;
-                util::ui8 key[EVP_MAX_KEY_LENGTH];
+                const util::ui8 *key;
 
                 RSAHeader (
-                        util::ui8 cipherIndex_ = 0,
-                        util::ui8 keyLength_ = 0,
-                        const util::ui8 *key_ = 0) :
-                        cipherIndex (cipherIndex_),
-                        keyLength (keyLength_) {
-                    if (keyLength <= EVP_MAX_KEY_LENGTH) {
-                        if (keyLength > 0 && key_ != 0) {
-                            memcpy (key, key_, keyLength);
-                        }
-                        memset (&key[keyLength], 0, EVP_MAX_KEY_LENGTH - keyLength);
-                    }
-                    else {
-                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                    }
-                }
-                ~RSAHeader () {
-                    memset (key, 0, EVP_MAX_KEY_LENGTH);
-                }
+                    util::ui8 cipherIndex_ = 0,
+                    util::ui8 keyLength_ = 0,
+                    const util::ui8 *key_ = 0) :
+                    cipherIndex (cipherIndex_),
+                    keyLength (keyLength_),
+                    key (key_) {}
 
-                inline std::size_t Size () const {
-                    return
-                        util::UI8_SIZE +
-                        util::UI8_SIZE +
-                        keyLength;
-                }
-
-                static std::size_t Size (util::ui8 cipherIndex) {
+                static std::size_t Size (std::size_t cipherIndex) {
                     return
                         util::UI8_SIZE +
                         util::UI8_SIZE +
@@ -382,13 +362,12 @@ namespace thekogans {
                 return serializer;
             }
 
-            inline util::Serializer &operator >> (
-                    util::Serializer &serializer,
+            inline util::Buffer &operator >> (
+                    util::Buffer &buffer,
                     RSAHeader &header) {
-                serializer >> header.cipherIndex >> header.keyLength;
-                serializer.Read (header.key, header.keyLength);
-                memset (&header.key[header.keyLength], 0, EVP_MAX_KEY_LENGTH - header.keyLength);
-                return serializer;
+                buffer >> header.cipherIndex >> header.keyLength;
+                header.key = buffer.GetReadPtr ();
+                return buffer;
             }
 
             std::size_t GetCipherIndex (
@@ -397,7 +376,7 @@ namespace thekogans {
                 std::size_t maxPlaintextLength = RSA::GetMaxPlaintextLength (keyLength, padding);
                 for (std::size_t cipherIndex = 0, count = CipherSuite::GetCiphers ().size ();
                         cipherIndex < count; ++cipherIndex) {
-                    if (RSAHeader::Size ((util::ui8)cipherIndex) <= maxPlaintextLength) {
+                    if (RSAHeader::Size (cipherIndex) <= maxPlaintextLength) {
                         return cipherIndex;
                     }
                 }
@@ -485,11 +464,10 @@ namespace thekogans {
                 headerBuffer.AdvanceWriteOffset (
                     RSA::Decrypt (
                         buffer.GetReadPtr (),
-                        headerLength,
+                        buffer.AdvanceReadOffset (headerLength),
                         privateKey,
                         padding,
                         headerBuffer.GetWritePtr ()));
-                buffer.AdvanceReadOffset (headerLength);
                 RSAHeader header;
                 headerBuffer >> header;
                 Cipher cipher (
