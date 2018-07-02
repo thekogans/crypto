@@ -358,7 +358,9 @@ namespace thekogans {
                     util::Serializer &serializer,
                     const RSAHeader &header) {
                 serializer << header.cipherIndex << header.keyLength;
-                serializer.Write (header.key, header.keyLength);
+                if (header.keyLength > 0 && header.key != 0){
+                    serializer.Write (header.key, header.keyLength);
+                }
                 return serializer;
             }
 
@@ -366,7 +368,8 @@ namespace thekogans {
                     util::Buffer &buffer,
                     RSAHeader &header) {
                 buffer >> header.cipherIndex >> header.keyLength;
-                header.key = buffer.GetReadPtr ();
+                header.key = header.keyLength > 0 ? buffer.GetReadPtr () : 0;
+                buffer.AdvanceReadOffset (header.keyLength);
                 return buffer;
             }
 
