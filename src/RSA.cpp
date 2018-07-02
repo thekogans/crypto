@@ -358,7 +358,7 @@ namespace thekogans {
                     util::Serializer &serializer,
                     const RSAHeader &header) {
                 serializer << header.cipherIndex << header.keyLength;
-                if (header.keyLength > 0 && header.key != 0){
+                if (header.keyLength > 0 && header.key != 0) {
                     serializer.Write (header.key, header.keyLength);
                 }
                 return serializer;
