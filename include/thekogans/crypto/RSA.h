@@ -199,6 +199,29 @@ namespace thekogans {
         /// \param[in] publicKey Public key used to encrypt the generated random
         /// \see{SymmetricKey} encryption.
         /// \param[in] padding RSA padding type.
+        /// \param[out] ciphertext Where to write the encrypted plaintext.
+        /// \return Number of bytes written to ciphertext.
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
+            RSAEncrypt (
+                const void *plaintext,
+                std::size_t plaintextLength,
+                AsymmetricKey::Ptr publicKey,
+                util::i32 padding,
+                util::ui8 *ciphertext);
+        /// \brief
+        /// Gets around the RSA::Encrypt plaintextLength limitation by creating
+        /// a random \see{SymmetricKey}, using it to encrypt plaintext, and then
+        /// using the given publicKey to encrypt the random key.
+        /// NOTE: The minimum amount of data that the given publicKey will need
+        /// to be able to encrypt is 18 bytes (util::UI8_SIZE + util::UI8_SIZE + 16).
+        /// Since RSA_PKCS1_OAEP_PADDING padding needs 42 bytes, the smallest RSA
+        /// key using it needs to be 512 bits. If you need to use smaller RSA keys,
+        /// you will need to use different form of padding (RSA_PKCS1_PADDING).
+        /// \param[in] plaintext Plaintext to encrypt.
+        /// \param[in] plaintextLength Length of plaintext.
+        /// \param[in] publicKey Public key used to encrypt the generated random
+        /// \see{SymmetricKey} encryption.
+        /// \param[in] padding RSA padding type.
         /// \return Encrypted plaintext.
         _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::UniquePtr _LIB_THEKOGANS_CRYPTO_API
             RSAEncrypt (
@@ -206,6 +229,22 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 AsymmetricKey::Ptr publicKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING);
+
+        /// \brief
+        /// Decrypts the ciphertext produced by RSAEncrypt above.
+        /// \param[in] ciphertext Ciphertext to decrypt.
+        /// \param[in] ciphertextLength Length of ciphertext.
+        /// \param[in] privateKey Private key used for decryption.
+        /// \param[in] padding RSA padding type.
+        /// \param[out] plaintext Where to write the decrypted ciphertext.
+        /// \return Number of bytes written to plaintext.
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
+            RSADecrypt (
+                const void *ciphertext,
+                std::size_t ciphertextLength,
+                AsymmetricKey::Ptr privateKey,
+                util::i32 padding,
+                util::ui8 *plaintext);
         /// \brief
         /// Decrypts the ciphertext produced by RSAEncrypt above.
         /// \param[in] ciphertext Ciphertext to decrypt.
