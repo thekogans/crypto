@@ -419,7 +419,7 @@ namespace thekogans {
                     (util::ui8)key->Length (),
                     key->Get ().GetReadPtr ());
                 buffer->AdvanceWriteOffset (
-                    RSA::EncryptAndEnlengthen (
+                    (util::ui32)RSA::EncryptAndEnlengthen (
                         headerBuffer.GetReadPtr (),
                         headerBuffer.GetDataAvailableForReading (),
                         publicKey,
@@ -465,7 +465,7 @@ namespace thekogans {
                     util::NetworkEndian,
                     headerLength);
                 headerBuffer.AdvanceWriteOffset (
-                    RSA::Decrypt (
+                    (util::ui32)RSA::Decrypt (
                         buffer.GetReadPtr (),
                         buffer.AdvanceReadOffset (headerLength),
                         privateKey,
