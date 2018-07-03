@@ -60,7 +60,7 @@ namespace thekogans {
                         type != EVP_PKEY_HMAC &&
                         type != EVP_PKEY_CMAC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid parameters type %d.", type);
+                        "Invalid key type %d.", type);
                 }
             }
             else {
