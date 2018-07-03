@@ -60,7 +60,7 @@ namespace thekogans {
                 util::SecureVector<util::ui8> key (keyLength);
                 keyLength = 0;
                 util::SecureVector<util::ui8> buffer (EVP_MAX_MD_SIZE);
-                util::ui32 bufferLength = 0;
+                std::size_t bufferLength = 0;
                 MessageDigest messageDigest (md);
                 while (keyLength < key.size ()) {
                     messageDigest.Init ();
@@ -77,7 +77,7 @@ namespace thekogans {
                         messageDigest.Update (&buffer[0], bufferLength);
                         bufferLength = messageDigest.Final (&buffer[0]);
                     }
-                    std::size_t count = std::min (key.size () - keyLength, (std::size_t)bufferLength);
+                    std::size_t count = std::min (key.size () - keyLength, bufferLength);
                     memcpy (&key[keyLength], &buffer[0], count);
                     keyLength += count;
                 }
