@@ -409,7 +409,7 @@ namespace thekogans {
                             CipherSuite::GetOpenSSLCipherByIndex (cipherIndex)));
                 util::SecureBuffer headerBuffer (
                     util::NetworkEndian,
-                    RSAHeader::Size (cipherIndex));
+                    (util::ui32)RSAHeader::Size (cipherIndex));
                 headerBuffer << RSAHeader (
                     (util::ui8)cipherIndex,
                     (util::ui8)key->Length (),
@@ -493,10 +493,11 @@ namespace thekogans {
                 headerBuffer.AdvanceWriteOffset (
                     (util::ui32)RSA::Decrypt (
                         buffer.GetReadPtr (),
-                        buffer.AdvanceReadOffset (headerLength),
+                        headerLength,
                         privateKey,
                         padding,
                         headerBuffer.GetWritePtr ()));
+                buffer.AdvanceReadOffset (headerLength);
                 RSAHeader header;
                 headerBuffer >> header;
                 Cipher cipher (
@@ -531,8 +532,8 @@ namespace thekogans {
                     privateKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::UniquePtr buffer (secure ?
-                    new util::SecureBuffer (endianness, ciphertextLength) :
-                    new util::Buffer (endianness, ciphertextLength));
+                    new util::SecureBuffer (endianness, (util::ui32)ciphertextLength) :
+                    new util::Buffer (endianness, (util::ui32)ciphertextLength));
                 buffer->AdvanceWriteOffset (
                     (util::ui32)RSADecrypt (
                         ciphertext,
