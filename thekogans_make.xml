@@ -43,7 +43,9 @@
   </if>
   <cpp_headers prefix = "include"
                install = "yes">
-    <cpp_header>$(organization)/$(project_directory)/Argon2Exception.h</cpp_header>
+    <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_ARGON2)">
+      <cpp_header>$(organization)/$(project_directory)/Argon2Exception.h</cpp_header>
+    </if>
     <cpp_header>$(organization)/$(project_directory)/AsymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Authenticator.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Cipher.h</cpp_header>

@@ -18,6 +18,8 @@
 #if !defined (__thekogans_crypto_Argon2Exception_h)
 #define __thekogans_crypto_Argon2Exception_h
 
+#if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
+
 #include <argon2.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/Exception.h"
@@ -76,5 +78,7 @@ namespace thekogans {
 
     } // namespace crypto
 } // namespace thekogans
+
+#endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
 #endif // !defined (__thekogans_crypto_Argon2Exception_h)

@@ -19,7 +19,9 @@
     #include <sstream>
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include <algorithm>
-#include <argon2.h>
+#if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
+    #include <argon2.h>
+#endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
@@ -46,6 +48,7 @@ namespace thekogans {
             1,
             THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 
+    #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
         SymmetricKey::Ptr SymmetricKey::FromArgon2 (
                 argon2_context &context,
                 std::size_t keyLength,
@@ -70,6 +73,7 @@ namespace thekogans {
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
         }
+    #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
         SymmetricKey::Ptr SymmetricKey::FromSecretAndSalt (
                 const void *secret,

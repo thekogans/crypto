@@ -16,7 +16,9 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
-#include <argon2.h>
+#if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
+    #include <argon2.h>
+#endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <CppUnitXLite/CppUnitXLite.cpp>
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/OpenSSLInit.h"
@@ -47,6 +49,7 @@ namespace {
 
 TEST (thekogans, SymmetricKey) {
     crypto::OpenSSLInit openSSLInit;
+#if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
     {
         std::cout << "SymmetricKey::FromArgon2...";
         argon2_context context = {
@@ -81,6 +84,7 @@ TEST (thekogans, SymmetricKey) {
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);
     }
+#endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
     {
         std::cout << "SymmetricKey::FromSecretAndSalt...";
         crypto::SymmetricKey::Ptr key1 =

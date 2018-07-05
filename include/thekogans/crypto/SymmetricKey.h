@@ -20,7 +20,9 @@
 
 #include <cstddef>
 #include <string>
-#include <argon2.h>
+#if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
+    #include <argon2.h>
+#endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
 #if defined (THEKOGANS_CRYPTO_TESTING)
     #include "thekogans/util/Types.h"
@@ -78,6 +80,7 @@ namespace thekogans {
                 return key.GetDataAvailableForReading ();
             }
 
+        #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
             /// \brief
             /// Convenient typedef int (*) (argon2_context *context).
             typedef int (*argon2_ctx_fptr) (argon2_context *context);
@@ -98,6 +101,7 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+        #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
             /// \brief
             /// Generate a key given secret (password) and length.
