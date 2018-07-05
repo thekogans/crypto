@@ -166,7 +166,7 @@ namespace thekogans {
                             return SymmetricKey::FromSecretAndSalt (
                                 &secret[0],
                                 secretLength,
-                                !dhParams->salt.empty () ? &dhParams->salt[0] : 0,
+                                dhParams->salt.data (),
                                 dhParams->salt.size (),
                                 dhParams->keyLength,
                                 CipherSuite::GetOpenSSLMessageDigestByName (dhParams->messageDigest),
