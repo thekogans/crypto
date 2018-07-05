@@ -16,6 +16,7 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <argon2.h>
 #include <CppUnitXLite/CppUnitXLite.cpp>
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/OpenSSLInit.h"
@@ -27,7 +28,7 @@ using namespace thekogans;
 
 namespace {
     std::string secret ("password");
-    std::string salt ("salt");
+    std::string salt ("saltsalt");
 
     bool operator == (
             const crypto::SymmetricKey &key1,
@@ -47,6 +48,40 @@ namespace {
 TEST (thekogans, SymmetricKey) {
     crypto::OpenSSLInit openSSLInit;
     {
+        std::cout << "SymmetricKey::FromArgon2...";
+        argon2_context context = {
+            0, 0,
+            (uint8_t *)secret.data (),
+            (uint32_t)secret.size (),
+            (uint8_t *)salt.data (),
+            (uint32_t)salt.size (),
+            0, 0,
+            0, 0,
+            2,
+            1 << 16,
+            1,
+            1,
+            ARGON2_VERSION_13,
+            0, 0,
+            ARGON2_DEFAULT_FLAGS
+        };
+        crypto::SymmetricKey::Ptr key1 =
+            crypto::SymmetricKey::FromArgon2 (
+                context,
+                crypto::GetCipherKeyLength (),
+                argon2i_ctx,
+                crypto::ID (),
+                "test",
+                "test key");
+        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        serializer << *key1;
+        crypto::SymmetricKey::Ptr key2;
+        serializer >> key2;
+        bool result = *key1 == *key2;
+        std::cout << (result ? "pass" : "fail") << std::endl;
+        CHECK_EQUAL (result, true);
+    }
+    {
         std::cout << "SymmetricKey::FromSecretAndSalt...";
         crypto::SymmetricKey::Ptr key1 =
             crypto::SymmetricKey::FromSecretAndSalt (
@@ -57,6 +92,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::GetCipherKeyLength (),
                 THEKOGANS_CRYPTO_DEFAULT_MD,
                 1,
+                crypto::ID (),
                 "test",
                 "test key");
         util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
@@ -77,6 +113,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::GetCipherKeyLength (),
                 THEKOGANS_CRYPTO_DEFAULT_MD,
                 1,
+                crypto::ID (),
                 "test",
                 "test key");
         util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));

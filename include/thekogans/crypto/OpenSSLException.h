@@ -74,7 +74,7 @@ namespace thekogans {
                 __FILE__, __FUNCTION__, __LINE__, __DATE__ " " __TIME__)
 
         /// \def THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION_EX(
-        ///          file, function, line, buildTime)
+        ///          file, function, line, buildTime, format, ...)
         /// Throw an Exception from OpenSSL error stack.
         #define THEKOGANS_CRYPTO_THROW_OPENSSL_AND_MESSAGE_EXCEPTION_EX(\
                 file, function, line, buildTime, format, ...)\

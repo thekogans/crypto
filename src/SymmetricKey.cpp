@@ -19,6 +19,7 @@
     #include <sstream>
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include <algorithm>
+#include <argon2.h>
 #include <openssl/evp.h>
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
@@ -27,6 +28,7 @@
     #include "thekogans/util/StringUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
 #include "thekogans/crypto/MessageDigest.h"
+#include "thekogans/crypto/Argon2Exception.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
@@ -43,6 +45,31 @@ namespace thekogans {
             SymmetricKey,
             1,
             THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
+
+        SymmetricKey::Ptr SymmetricKey::FromArgon2 (
+                argon2_context &context,
+                std::size_t keyLength,
+                argon2_ctx_fptr argon2_ctx,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            if (keyLength > 0 && argon2_ctx != 0) {
+                util::SecureVector<util::ui8> key (keyLength);
+                context.out = key.data ();
+                context.outlen = (uint32_t)key.size ();
+                int errorCode = argon2_ctx (&context);
+                if (errorCode == ARGON2_OK) {
+                    return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                }
+                else {
+                    THEKOGANS_CRYPTO_THROW_ARGON2_ERROR_CODE_EXCEPTION (errorCode);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
 
         SymmetricKey::Ptr SymmetricKey::FromSecretAndSalt (
                 const void *secret,
@@ -65,23 +92,23 @@ namespace thekogans {
                 while (keyLength < key.size ()) {
                     messageDigest.Init ();
                     if (bufferLength > 0) {
-                        messageDigest.Update (&buffer[0], bufferLength);
+                        messageDigest.Update (buffer.data (), bufferLength);
                     }
                     messageDigest.Update (secret, secretLength);
                     if (salt != 0 && saltLength > 0) {
                         messageDigest.Update (salt, saltLength);
                     }
-                    bufferLength = messageDigest.Final (&buffer[0]);
+                    bufferLength = messageDigest.Final (buffer.data ());
                     for (util::ui32 i = 1; i < count; ++i) {
                         messageDigest.Init ();
-                        messageDigest.Update (&buffer[0], bufferLength);
-                        bufferLength = messageDigest.Final (&buffer[0]);
+                        messageDigest.Update (buffer.data (), bufferLength);
+                        bufferLength = messageDigest.Final (buffer.data ());
                     }
                     std::size_t count = std::min (key.size () - keyLength, bufferLength);
-                    memcpy (&key[keyLength], &buffer[0], count);
+                    memcpy (&key[keyLength], buffer.data (), count);
                     keyLength += count;
                 }
-                return Ptr (new SymmetricKey (&key[0], key.size (), id, name, description));
+                return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

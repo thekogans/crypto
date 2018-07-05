@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <string>
+#include <argon2.h>
 #include <openssl/evp.h>
 #if defined (THEKOGANS_CRYPTO_TESTING)
     #include "thekogans/util/Types.h"
@@ -76,6 +77,27 @@ namespace thekogans {
             inline std::size_t Length () const {
                 return key.GetDataAvailableForReading ();
             }
+
+            /// \brief
+            /// Convenient typedef int (*) (argon2_context *context).
+            typedef int (*argon2_ctx_fptr) (argon2_context *context);
+
+            /// \brief
+            /// Use Argon2 password-hashing function to derive a key.
+            /// \param[in] context An initialized Argon2 context.
+            /// \param[in] keyLength Length of the resulting key (in bytes).
+            /// \param[in] argon2_ctx Argon2 function to use for key derivation.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return A new symmetric key.
+            static Ptr FromArgon2 (
+                argon2_context &context,
+                std::size_t keyLength = GetCipherKeyLength (),
+                argon2_ctx_fptr argon2_ctx = argon2id_ctx,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
 
             /// \brief
             /// Generate a key given secret (password) and length.
