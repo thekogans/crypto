@@ -57,10 +57,14 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             if (keyLength > 0 && argon2_ctx != 0) {
+                uint8_t *out = context.out;
+                uint32_t outlen = context.outlen;
                 util::SecureVector<util::ui8> key (keyLength);
                 context.out = key.data ();
                 context.outlen = (uint32_t)key.size ();
                 int errorCode = argon2_ctx (&context);
+                context.out = out;
+                context.outlen = outlen;
                 if (errorCode == ARGON2_OK) {
                     return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
                 }
