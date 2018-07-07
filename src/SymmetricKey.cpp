@@ -29,6 +29,7 @@
     #include "thekogans/util/XMLUtils.h"
     #include "thekogans/util/StringUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "fastpbkdf2.h"
 #include "thekogans/crypto/MessageDigest.h"
 #include "thekogans/crypto/Argon2Exception.h"
 #include "thekogans/crypto/OpenSSLInit.h"
@@ -78,6 +79,60 @@ namespace thekogans {
             }
         }
     #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
+
+        SymmetricKey::Ptr SymmetricKey::FromPBKDF2 (
+                const void *password,
+                std::size_t passwordLength,
+                const void *salt,
+                std::size_t saltLength,
+                std::size_t keyLength,
+                PBKDF2_HASH hash,
+                std::size_t count,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            if (password != 0 && passwordLength > 0 &&
+                    keyLength > 0 && count > 0) {
+                util::SecureVector<util::ui8> key (keyLength);
+                switch (hash) {
+                    case PBKDF2_HMAC_SHA1:
+                        fastpbkdf2_hmac_sha1 (
+                            (const uint8_t *)password,
+                            passwordLength,
+                            (const uint8_t *)salt,
+                            saltLength,
+                            count,
+                            key.data (),
+                            key.size ());
+                        break;
+                    case PBKDF2_HMAC_SHA256:
+                        fastpbkdf2_hmac_sha256 (
+                            (const uint8_t *)password,
+                            passwordLength,
+                            (const uint8_t *)salt,
+                            saltLength,
+                            count,
+                            key.data (),
+                            key.size ());
+                        break;
+                    case PBKDF2_HMAC_SHA512:
+                        fastpbkdf2_hmac_sha512 (
+                            (const uint8_t *)password,
+                            passwordLength,
+                            (const uint8_t *)salt,
+                            saltLength,
+                            count,
+                            key.data (),
+                            key.size ());
+                        break;
+                }
+                return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
 
         SymmetricKey::Ptr SymmetricKey::FromSecretAndSalt (
                 const void *secret,

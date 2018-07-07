@@ -41,6 +41,9 @@
       <cpp_preprocessor_definition>THEKOGANS_CRYPTO_TESTING</cpp_preprocessor_definition>
     </cpp_preprocessor_definitions>
   </if>
+  <c_headers prefix = "src">
+    <c_header>fastpbkdf2.h</c_header>
+  </c_headers>
   <cpp_headers prefix = "include"
                install = "yes">
     <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_ARGON2)">
@@ -81,6 +84,9 @@
     <cpp_header>$(organization)/$(project_directory)/Verifier.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
   </cpp_headers>
+  <c_sources prefix = "src">
+    <c_source>fastpbkdf2.c</c_source>
+  </c_sources>
   <cpp_sources prefix = "src">
     <cpp_source>AsymmetricKey.cpp</cpp_source>
     <cpp_source>Authenticator.cpp</cpp_source>

@@ -86,6 +86,28 @@ TEST (thekogans, SymmetricKey) {
     }
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
     {
+        std::cout << "SymmetricKey::FromPBKDF2...";
+        crypto::SymmetricKey::Ptr key1 =
+            crypto::SymmetricKey::FromPBKDF2 (
+                secret.c_str (),
+                secret.size (),
+                salt.c_str (),
+                salt.size (),
+                crypto::GetCipherKeyLength (),
+                crypto::SymmetricKey::PBKDF2_HMAC_SHA256,
+                1,
+                crypto::ID (),
+                "test",
+                "test key");
+        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        serializer << *key1;
+        crypto::SymmetricKey::Ptr key2;
+        serializer >> key2;
+        bool result = *key1 == *key2;
+        std::cout << (result ? "pass" : "fail") << std::endl;
+        CHECK_EQUAL (result, true);
+    }
+    {
         std::cout << "SymmetricKey::FromSecretAndSalt...";
         crypto::SymmetricKey::Ptr key1 =
             crypto::SymmetricKey::FromSecretAndSalt (
