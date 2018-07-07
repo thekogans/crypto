@@ -66,6 +66,7 @@ namespace thekogans {
                     const std::string &name = std::string (),
                     const std::string &description = std::string ()) :
                     Serializable (id, name, description),
+                    // FixedBuffer will throw if length > EVP_MAX_KEY_LENGTH.
                     key (util::HostEndian, (const util::ui8 *)buffer, (util::ui32)length) {
                 memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
             }
