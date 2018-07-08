@@ -98,32 +98,32 @@ namespace thekogans {
                     case PBKDF2_HMAC_SHA1:
                         fastpbkdf2_hmac_sha1 (
                             (const uint8_t *)password,
-                            passwordLength,
+                            (uint32_t)passwordLength,
                             (const uint8_t *)salt,
-                            saltLength,
-                            count,
+                            (uint32_t)saltLength,
+                            (uint32_t)count,
                             key.data (),
-                            key.size ());
+                            (uint32_t)key.size ());
                         break;
                     case PBKDF2_HMAC_SHA256:
                         fastpbkdf2_hmac_sha256 (
                             (const uint8_t *)password,
-                            passwordLength,
+                            (uint32_t)passwordLength,
                             (const uint8_t *)salt,
-                            saltLength,
-                            count,
+                            (uint32_t)saltLength,
+                            (uint32_t)count,
                             key.data (),
-                            key.size ());
+                            (uint32_t)key.size ());
                         break;
                     case PBKDF2_HMAC_SHA512:
                         fastpbkdf2_hmac_sha512 (
                             (const uint8_t *)password,
-                            passwordLength,
+                            (uint32_t)passwordLength,
                             (const uint8_t *)salt,
-                            saltLength,
-                            count,
+                            (uint32_t)saltLength,
+                            (uint32_t)count,
                             key.data (),
-                            key.size ());
+                            (uint32_t)key.size ());
                         break;
                 }
                 return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
