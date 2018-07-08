@@ -86,7 +86,7 @@ namespace thekogans {
                 const void *salt,
                 std::size_t saltLength,
                 std::size_t keyLength,
-                PBKDF2_HASH hash,
+                PBKDF2_HMAC hash,
                 std::size_t count,
                 const ID &id,
                 const std::string &name,
@@ -127,6 +127,41 @@ namespace thekogans {
                         break;
                 }
                 return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        SymmetricKey::Ptr SymmetricKey::FromOpenSSLPBKDF2 (
+                const void *password,
+                std::size_t passwordLength,
+                const void *salt,
+                std::size_t saltLength,
+                std::size_t keyLength,
+                const EVP_MD *md,
+                std::size_t count,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            if (password != 0 && passwordLength > 0 &&
+                    keyLength > 0 && md != 0 && count > 0) {
+                util::SecureVector<util::ui8> key (keyLength);
+                if (PKCS5_PBKDF2_HMAC (
+                        (const char *)password,
+                        (int)passwordLength,
+                        (const unsigned char *)salt,
+                        (int)saltLength,
+                        (int)count,
+                        md,
+                        (int)key.size (),
+                        key.data ()) == 1) {
+                    return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                }
+                else {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

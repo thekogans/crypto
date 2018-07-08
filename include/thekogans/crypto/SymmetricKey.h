@@ -89,6 +89,9 @@ namespace thekogans {
             /// \brief
             /// Use Argon2 password-hashing function to derive a key.
             /// \param[in] context An initialized Argon2 context.
+            /// NOTE: context.out and context.outlen should be initialized
+            /// to 0 as this method will set them internally before calling
+            /// argon2_ctx.
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] argon2_ctx Argon2 function to use for key derivation.
             /// \param[in] id Optional key id.
@@ -104,14 +107,14 @@ namespace thekogans {
                 const std::string &description = std::string ());
         #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
-            enum PBKDF2_HASH {
+            enum PBKDF2_HMAC {
                 PBKDF2_HMAC_SHA1,
                 PBKDF2_HMAC_SHA256,
                 PBKDF2_HMAC_SHA512
             };
 
             /// \brief
-            /// Generate a key using PBKDF2.
+            /// Generate a key using a fast internal implementation of PBKDF2.
             /// \param[in] password Password from which to derive the key.
             /// \param[in] passwordLength Password length.
             /// \param[in] salt An optional buffer containing salt.
@@ -130,7 +133,33 @@ namespace thekogans {
                 const void *salt = 0,
                 std::size_t saltLength = 0,
                 std::size_t keyLength = GetCipherKeyLength (),
-                PBKDF2_HASH hash = PBKDF2_HMAC_SHA256,
+                PBKDF2_HMAC hash = PBKDF2_HMAC_SHA256,
+                std::size_t count = 1,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
+
+            /// \brief
+            /// Generate a key using OpeSSL's implementation of PBKDF2.
+            /// \param[in] password Password from which to derive the key.
+            /// \param[in] passwordLength Password length.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
+            /// \param[in] keyLength Length of the resulting key (in bytes).
+            /// \param[in] md OpenSSL message digest to use for hashing.
+            /// \param[in] count A security counter. Increment the count to slow down
+            /// key derivation.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return A new symmetric key.
+            static Ptr FromOpenSSLPBKDF2 (
+                const void *password,
+                std::size_t passwordLength,
+                const void *salt = 0,
+                std::size_t saltLength = 0,
+                std::size_t keyLength = GetCipherKeyLength (),
+                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
                 const ID &id = ID (),
                 const std::string &name = std::string (),

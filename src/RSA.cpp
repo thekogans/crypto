@@ -357,20 +357,50 @@ namespace thekogans {
             inline util::Serializer &operator << (
                     util::Serializer &serializer,
                     const RSAHeader &header) {
-                serializer << header.cipherIndex << header.keyLength;
-                if (header.keyLength > 0 && header.key != 0) {
+                if (header.cipherIndex < CipherSuite::GetCiphers ().size () &&
+                        header.keyLength == GetCipherKeyLength (
+                            CipherSuite::GetOpenSSLCipherByIndex (header.cipherIndex)) &&
+                        header.key != 0) {
+                    serializer << header.cipherIndex << header.keyLength;
                     serializer.Write (header.key, header.keyLength);
+                    return serializer;
                 }
-                return serializer;
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
             }
 
             inline util::Buffer &operator >> (
                     util::Buffer &buffer,
                     RSAHeader &header) {
-                buffer >> header.cipherIndex >> header.keyLength;
-                header.key = header.keyLength > 0 ? buffer.GetReadPtr () : 0;
-                buffer.AdvanceReadOffset (header.keyLength);
-                return buffer;
+                buffer >> header.cipherIndex;
+                if (header.cipherIndex < CipherSuite::GetCiphers ().size ()) {
+                    buffer >> header.keyLength;
+                    if (header.keyLength == GetCipherKeyLength (
+                            CipherSuite::GetOpenSSLCipherByIndex (header.cipherIndex))) {
+                        header.key = buffer.GetReadPtr ();
+                        if (buffer.AdvanceReadOffset (header.keyLength) == header.keyLength) {
+                            return buffer;
+                        }
+                        else {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Invalid key: %u, %u",
+                                header.cipherIndex,
+                                header.keyLength);
+                        }
+                    }
+                    else {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Invalid keyLength: %u",
+                            header.keyLength);
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Invalid cipherIndex: %u",
+                        header.cipherIndex);
+                }
             }
 
             std::size_t GetCipherIndex (

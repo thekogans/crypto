@@ -108,6 +108,28 @@ TEST (thekogans, SymmetricKey) {
         CHECK_EQUAL (result, true);
     }
     {
+        std::cout << "SymmetricKey::FromOpenSSLPBKDF2...";
+        crypto::SymmetricKey::Ptr key1 =
+            crypto::SymmetricKey::FromOpenSSLPBKDF2 (
+                secret.c_str (),
+                secret.size (),
+                salt.c_str (),
+                salt.size (),
+                crypto::GetCipherKeyLength (),
+                THEKOGANS_CRYPTO_DEFAULT_MD,
+                1,
+                crypto::ID (),
+                "test",
+                "test key");
+        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        serializer << *key1;
+        crypto::SymmetricKey::Ptr key2;
+        serializer >> key2;
+        bool result = *key1 == *key2;
+        std::cout << (result ? "pass" : "fail") << std::endl;
+        CHECK_EQUAL (result, true);
+    }
+    {
         std::cout << "SymmetricKey::FromSecretAndSalt...";
         crypto::SymmetricKey::Ptr key1 =
             crypto::SymmetricKey::FromSecretAndSalt (
