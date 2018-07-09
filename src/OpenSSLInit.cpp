@@ -29,8 +29,10 @@
 #include "thekogans/util/Thread.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
+#if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
+    #include "thekogans/crypto/Blake2b.h"
+#endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 #include "thekogans/crypto/Serializable.h"
-#include "thekogans/crypto/Blake2b.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 
@@ -124,9 +126,11 @@ namespace thekogans {
             SSL_library_init ();
             SSL_load_error_strings ();
             OpenSSL_add_all_algorithms ();
+        #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             EVP_add_digest (EVP_blake2b512 ());
             EVP_add_digest (EVP_blake2b384 ());
             EVP_add_digest (EVP_blake2b256 ());
+        #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureBuffer entropy (util::HostEndian, entropyNeeded);
                 // Start by trying to get seed bytes.
@@ -174,7 +178,9 @@ namespace thekogans {
         #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
             ERR_free_strings ();
             EVP_cleanup ();
+        #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             OBJ_cleanup ();
+        #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
         }
 
     } // namespace crypto

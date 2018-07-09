@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if !defined (__thekogans_crypto_Blake2_h)
-#define __thekogans_crypto_Blake2_h
+#if !defined (__thekogans_crypto_Blake2b_h)
+#define __thekogans_crypto_Blake2b_h
 
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
@@ -24,6 +24,16 @@
 
 namespace thekogans {
     namespace crypto {
+
+        /// \brief
+        /// Object ID for BLAKE2 512 bit.
+        extern int NID_blake2b512;
+        /// \brief
+        /// Object ID for BLAKE2 384 bit.
+        extern int NID_blake2b384;
+        /// \brief
+        /// Object ID for BLAKE2 256 bit.
+        extern int NID_blake2b256;
 
         /// \brief
         /// Return the OpenSSL EVP_MD object representing blake2b 512 bit digest.
@@ -40,4 +50,4 @@ namespace thekogans {
 
 #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
-#endif // !defined (__thekogans_crypto_Blake2_h)
+#endif // !defined (__thekogans_crypto_Blake2b_h)

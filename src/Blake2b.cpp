@@ -26,6 +26,10 @@
 namespace thekogans {
     namespace crypto {
 
+        int NID_blake2b512 = -1;
+        int NID_blake2b384 = -1;
+        int NID_blake2b256 = -1;
+
         namespace {
             int init (EVP_MD_CTX *ctx) {
                 blake2b_param P;
@@ -61,7 +65,11 @@ namespace thekogans {
 
         const EVP_MD *EVP_blake2b512 () {
             static const EVP_MD blake2b512 = {
-                OBJ_create ("", "blake2b512", "blake2b512"),
+                NID_blake2b512 = OBJ_create (
+                    // https://tools.ietf.org/html/draft-saarinen-blake2-03#section-4
+                    "1.3.6.1.4.1.1722.12.2.1.64",
+                    "BLAKE2 Cryptographic Hash and MAC (512 bit)",
+                    "blake2b512"),
                 0,
                 64,
                 0,
@@ -82,7 +90,11 @@ namespace thekogans {
 
         const EVP_MD *EVP_blake2b384 () {
             static const EVP_MD blake2b384 = {
-                OBJ_create ("", "blake2b384", "blake2b384"),
+                NID_blake2b384 = OBJ_create (
+                    // https://tools.ietf.org/html/draft-saarinen-blake2-03#section-4
+                    "1.3.6.1.4.1.1722.12.2.1.48",
+                    "BLAKE2 Cryptographic Hash and MAC (384 bit)",
+                    "blake2b384"),
                 0,
                 48,
                 0,
@@ -103,7 +115,11 @@ namespace thekogans {
 
         const EVP_MD *EVP_blake2b256 () {
             static const EVP_MD blake2b256 = {
-                OBJ_create ("", "blake2b256", "blake2b256"),
+                NID_blake2b256 = OBJ_create (
+                    // https://tools.ietf.org/html/draft-saarinen-blake2-03#section-4
+                    "1.3.6.1.4.1.1722.12.2.1.32",
+                    "BLAKE2 Cryptographic Hash and MAC (256 bit)",
+                    "blake2b256"),
                 0,
                 32,
                 0,
