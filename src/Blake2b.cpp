@@ -31,6 +31,12 @@ namespace thekogans {
         int NID_blake2b256 = -1;
 
         namespace {
+        #if OPENSSL_VERSION_NUMBER < 0x10100000L
+            void *EVP_MD_CTX_md_data (const EVP_MD_CTX *ctx) {
+                return ctx->md_data;
+            }
+        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
+
             int init (EVP_MD_CTX *ctx) {
                 blake2b_param P;
                 P.digest_length = EVP_MD_CTX_size (ctx);
@@ -40,12 +46,12 @@ namespace thekogans {
                 P.leaf_length = 0;
                 P.node_offset = 0;
                 P.xof_length = 0;
-                P.node_depth    = 0;
-                P.inner_length  = 0;
+                P.node_depth = 0;
+                P.inner_length = 0;
                 memset (P.reserved, 0, sizeof (P.reserved));
                 memset (P.salt, 0, sizeof (P.salt));
                 memset (P.personal, 0, sizeof (P.personal));
-                blake2b_init_param ((blake2b_state *)ctx->md_data, &P);
+                blake2b_init_param ((blake2b_state *)EVP_MD_CTX_md_data (ctx), &P);
                 return 1;
             }
 
@@ -53,13 +59,19 @@ namespace thekogans {
                     EVP_MD_CTX *ctx,
                     const void *data,
                     size_t count) {
-                return blake2b_update ((blake2b_state *)ctx->md_data, data, count) == 0 ? 1 : 0;
+                return blake2b_update (
+                    (blake2b_state *)EVP_MD_CTX_md_data (ctx),
+                    data,
+                    count) == 0 ? 1 : 0;
             }
 
             int final (
                     EVP_MD_CTX *ctx,
                     unsigned char *md) {
-                return blake2b_final ((blake2b_state *)ctx->md_data, md, EVP_MD_CTX_size (ctx)) == 0 ? 1 : 0;
+                return blake2b_final (
+                    (blake2b_state *)EVP_MD_CTX_md_data (ctx),
+                    md,
+                    EVP_MD_CTX_size (ctx)) == 0 ? 1 : 0;
             }
         }
 

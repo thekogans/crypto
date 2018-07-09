@@ -179,7 +179,8 @@ namespace thekogans {
             ERR_free_strings ();
             EVP_cleanup ();
         #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
-            OBJ_cleanup ();
+            // WARNING: Do not uncomment!!!
+            //OBJ_cleanup ();
         #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
         }
 
