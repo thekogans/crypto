@@ -111,6 +111,18 @@ namespace thekogans {
             /// "AES-128-CBC"
             static const char * const CIPHER_AES_128_CBC;
 
+        #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
+            /// \brief
+            /// "BLAKE2B-512"
+            static const char * const MESSAGE_DIGEST_BLAKE2B_512;
+            /// \brief
+            /// "BLAKE2B-384"
+            static const char * const MESSAGE_DIGEST_BLAKE2B_384;
+            /// \brief
+            /// "BLAKE2B-256"
+            static const char * const MESSAGE_DIGEST_BLAKE2B_256;
+        #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
+
             /// \brief
             /// "SHA2-512"
             static const char * const MESSAGE_DIGEST_SHA2_512;

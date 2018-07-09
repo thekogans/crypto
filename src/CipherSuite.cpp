@@ -17,6 +17,7 @@
 
 #include "thekogans/crypto/DHEKeyExchange.h"
 #include "thekogans/crypto/RSAKeyExchange.h"
+#include "thekogans/crypto/Blake2b.h"
 #include "thekogans/crypto/CipherSuite.h"
 
 namespace thekogans {
@@ -36,6 +37,12 @@ namespace thekogans {
         const char * const CipherSuite::CIPHER_AES_256_CBC = "AES-256-CBC";
         const char * const CipherSuite::CIPHER_AES_192_CBC = "AES-192-CBC";
         const char * const CipherSuite::CIPHER_AES_128_CBC = "AES-128-CBC";
+
+    #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
+        const char * const CipherSuite::MESSAGE_DIGEST_BLAKE2B_512 = "BLAKE2B-512";
+        const char * const CipherSuite::MESSAGE_DIGEST_BLAKE2B_384 = "BLAKE2B-384";
+        const char * const CipherSuite::MESSAGE_DIGEST_BLAKE2B_256 = "BLAKE2B-256";
+    #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
         const char * const CipherSuite::MESSAGE_DIGEST_SHA2_512 = "SHA2-512";
         const char * const CipherSuite::MESSAGE_DIGEST_SHA2_384 = "SHA2-384";
@@ -145,10 +152,16 @@ namespace thekogans {
             struct MessageDigests {
                 const char *name;
                 const EVP_MD *md;
+                bool inCipherSuite;
             } const messageDigests[] = {
-                {CipherSuite::MESSAGE_DIGEST_SHA2_512, EVP_sha512 ()},
-                {CipherSuite::MESSAGE_DIGEST_SHA2_384, EVP_sha384 ()},
-                {CipherSuite::MESSAGE_DIGEST_SHA2_256, EVP_sha256 ()}
+            #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
+                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_512, EVP_blake2b512 (), false},
+                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_384, EVP_blake2b384 (), false},
+                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_256, EVP_blake2b256 (), false},
+            #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
+                {CipherSuite::MESSAGE_DIGEST_SHA2_512, EVP_sha512 (), true},
+                {CipherSuite::MESSAGE_DIGEST_SHA2_384, EVP_sha384 (), true},
+                {CipherSuite::MESSAGE_DIGEST_SHA2_256, EVP_sha256 (), true}
             };
             const std::size_t messageDigestsSize = THEKOGANS_UTIL_ARRAY_SIZE (messageDigests);
 
@@ -158,12 +171,14 @@ namespace thekogans {
                     for (std::size_t j = 0; j < authenticatorsSize; ++j) {
                         for (std::size_t k = 0; k < ciphersSize; ++k) {
                             for (std::size_t l = 0; l < messageDigestsSize; ++l) {
-                                cipherSuites.push_back (
-                                    CipherSuite (
-                                        keyExchanges[i],
-                                        authenticators[j],
-                                        ciphers[k].name,
-                                        messageDigests[l].name));
+                                if (messageDigests[l].inCipherSuite) {
+                                    cipherSuites.push_back (
+                                        CipherSuite (
+                                            keyExchanges[i],
+                                            authenticators[j],
+                                            ciphers[k].name,
+                                            messageDigests[l].name));
+                                }
                             }
                         }
                     }

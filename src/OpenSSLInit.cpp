@@ -22,6 +22,7 @@
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/objects.h>
 #include "thekogans/util/OwnerVector.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/util/SpinLock.h"
@@ -29,6 +30,7 @@
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/crypto/Serializable.h"
+#include "thekogans/crypto/Blake2b.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 
@@ -122,6 +124,9 @@ namespace thekogans {
             SSL_library_init ();
             SSL_load_error_strings ();
             OpenSSL_add_all_algorithms ();
+            EVP_add_digest (EVP_blake2b512 ());
+            EVP_add_digest (EVP_blake2b384 ());
+            EVP_add_digest (EVP_blake2b256 ());
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureBuffer entropy (util::HostEndian, entropyNeeded);
                 // Start by trying to get seed bytes.
@@ -169,6 +174,7 @@ namespace thekogans {
         #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
             ERR_free_strings ();
             EVP_cleanup ();
+            OBJ_cleanup ();
         }
 
     } // namespace crypto

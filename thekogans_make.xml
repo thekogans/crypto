@@ -8,7 +8,7 @@
                 schema_version = "2">
   <features>
     <feature>THEKOGANS_CRYPTO_HAVE_ARGON2</feature>
-    <!-- <feature>THEKOGANS_CRYPTO_HAVE_BLAKE2</feature> -->
+    <feature>THEKOGANS_CRYPTO_HAVE_BLAKE2</feature>
     <feature>THEKOGANS_CRYPTO_HAVE_TESTS</feature>
   </features>
   <dependencies>
@@ -51,6 +51,7 @@
     </if>
     <cpp_header>$(organization)/$(project_directory)/AsymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Authenticator.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Blake2b.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Cipher.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/CipherSuite.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/CiphertextHeader.h</cpp_header>
@@ -90,6 +91,7 @@
   <cpp_sources prefix = "src">
     <cpp_source>AsymmetricKey.cpp</cpp_source>
     <cpp_source>Authenticator.cpp</cpp_source>
+    <cpp_source>Blake2b.cpp</cpp_source>
     <cpp_source>Cipher.cpp</cpp_source>
     <cpp_source>CipherSuite.cpp</cpp_source>
     <cpp_source>CMAC.cpp</cpp_source>
