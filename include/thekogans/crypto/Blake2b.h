@@ -21,29 +21,31 @@
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
 #include <openssl/evp.h>
+#include "thekogans/util/Types.h"
+#include "thekogans/crypto/Config.h"
 
 namespace thekogans {
     namespace crypto {
 
         /// \brief
         /// Object ID for BLAKE2 512 bit.
-        extern int NID_blake2b512;
+        extern _LIB_THEKOGANS_CRYPTO_DECL const util::i32 NID_blake2b512;
         /// \brief
         /// Object ID for BLAKE2 384 bit.
-        extern int NID_blake2b384;
+        extern _LIB_THEKOGANS_CRYPTO_DECL const util::i32 NID_blake2b384;
         /// \brief
         /// Object ID for BLAKE2 256 bit.
-        extern int NID_blake2b256;
+        extern _LIB_THEKOGANS_CRYPTO_DECL const util::i32 NID_blake2b256;
 
         /// \brief
         /// Return the OpenSSL EVP_MD object representing blake2b 512 bit digest.
-        const EVP_MD *EVP_blake2b512 ();
+        _LIB_THEKOGANS_CRYPTO_DECL const EVP_MD * _LIB_THEKOGANS_CRYPTO_API EVP_blake2b512 ();
         /// \brief
         /// Return the OpenSSL EVP_MD object representing blake2b 384 bit digest.
-        const EVP_MD *EVP_blake2b384 ();
+        _LIB_THEKOGANS_CRYPTO_DECL const EVP_MD * _LIB_THEKOGANS_CRYPTO_API EVP_blake2b384 ();
         /// \brief
         /// Return the OpenSSL EVP_MD object representing blake2b 256 bit digest.
-        const EVP_MD *EVP_blake2b256 ();
+        _LIB_THEKOGANS_CRYPTO_DECL const EVP_MD * _LIB_THEKOGANS_CRYPTO_API EVP_blake2b256 ();
 
     } // namespace crypto
 } // namespace thekogans
