@@ -31,6 +31,7 @@
 #include "thekogans/util/Exception.h"
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
     #include "thekogans/crypto/Blake2b.h"
+    #include "thekogans/crypto/Blake2s.h"
 #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 #include "thekogans/crypto/Serializable.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
@@ -130,6 +131,7 @@ namespace thekogans {
             EVP_add_digest (EVP_blake2b512 ());
             EVP_add_digest (EVP_blake2b384 ());
             EVP_add_digest (EVP_blake2b256 ());
+            EVP_add_digest (EVP_blake2s256 ());
         #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureBuffer entropy (util::HostEndian, entropyNeeded);

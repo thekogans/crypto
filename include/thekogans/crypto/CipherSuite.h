@@ -121,6 +121,9 @@ namespace thekogans {
             /// \brief
             /// "BLAKE2B-256"
             static const char * const MESSAGE_DIGEST_BLAKE2B_256;
+            /// \brief
+            /// "BLAKE2S-256"
+            static const char * const MESSAGE_DIGEST_BLAKE2S_256;
         #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
             /// \brief
