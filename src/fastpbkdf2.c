@@ -29,7 +29,7 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#include "fastpbkdf2.h"
+#include "thekogans/crypto/fastpbkdf2.h"
 
 #include <assert.h>
 #include <string.h>

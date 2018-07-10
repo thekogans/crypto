@@ -41,8 +41,8 @@
       <cpp_preprocessor_definition>THEKOGANS_CRYPTO_TESTING</cpp_preprocessor_definition>
     </cpp_preprocessor_definitions>
   </if>
-  <c_headers prefix = "src">
-    <c_header>fastpbkdf2.h</c_header>
+  <c_headers prefix = "include">
+    <c_header>$(organization)/$(project_directory)/fastpbkdf2.h</c_header>
   </c_headers>
   <cpp_headers prefix = "include"
                install = "yes">

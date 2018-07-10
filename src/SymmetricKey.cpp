@@ -29,9 +29,9 @@
     #include "thekogans/util/XMLUtils.h"
     #include "thekogans/util/StringUtils.h"
 #endif // defined (THEKOGANS_CRYPTO_TESTING)
-#include "fastpbkdf2.h"
 #include "thekogans/crypto/MessageDigest.h"
 #include "thekogans/crypto/Argon2Exception.h"
+#include "thekogans/crypto/fastpbkdf2.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
