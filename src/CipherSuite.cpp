@@ -156,19 +156,37 @@ namespace thekogans {
             struct MessageDigests {
                 const char *name;
                 const EVP_MD *md;
-                bool inCipherSuite;
             } const messageDigests[] = {
             #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
-                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_512, EVP_blake2b512 (), false},
-                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_384, EVP_blake2b384 (), false},
-                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_256, EVP_blake2b256 (), false},
-                {CipherSuite::MESSAGE_DIGEST_BLAKE2S_256, EVP_blake2s256 (), false},
+                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_512, EVP_blake2b512 ()},
+                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_384, EVP_blake2b384 ()},
+                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_256, EVP_blake2b256 ()},
+                {CipherSuite::MESSAGE_DIGEST_BLAKE2S_256, EVP_blake2s256 ()},
             #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
-                {CipherSuite::MESSAGE_DIGEST_SHA2_512, EVP_sha512 (), true},
-                {CipherSuite::MESSAGE_DIGEST_SHA2_384, EVP_sha384 (), true},
-                {CipherSuite::MESSAGE_DIGEST_SHA2_256, EVP_sha256 (), true}
+                {CipherSuite::MESSAGE_DIGEST_SHA2_512, EVP_sha512 ()},
+                {CipherSuite::MESSAGE_DIGEST_SHA2_384, EVP_sha384 ()},
+                {CipherSuite::MESSAGE_DIGEST_SHA2_256, EVP_sha256 ()}
             };
             const std::size_t messageDigestsSize = THEKOGANS_UTIL_ARRAY_SIZE (messageDigests);
+
+            // Certain algorithms cannot be combined in to a cipher suite.
+            // This method will contain a never ending list of exceptions.
+            bool ValidateAlgorithms (
+                    const std::string &keyExchange,
+                    const std::string &authenticator,
+                    const std::string &cipher,
+                    const std::string &messageDigest) {
+                // [EC]DSA is only specified for SHA.
+                if ((authenticator == CipherSuite::AUTHENTICATOR_ECDSA ||
+                        authenticator == CipherSuite::AUTHENTICATOR_DSA) &&
+                        messageDigest != CipherSuite::MESSAGE_DIGEST_SHA2_512 &&
+                        messageDigest != CipherSuite::MESSAGE_DIGEST_SHA2_384 &&
+                        messageDigest != CipherSuite::MESSAGE_DIGEST_SHA2_256) {
+                    return false;
+                }
+                // FIXME: Add other exceptions above this comment.
+                return true;
+            }
 
             std::vector<CipherSuite> BuildCipherSuites () {
                 std::vector<CipherSuite> cipherSuites;
@@ -176,7 +194,11 @@ namespace thekogans {
                     for (std::size_t j = 0; j < authenticatorsSize; ++j) {
                         for (std::size_t k = 0; k < ciphersSize; ++k) {
                             for (std::size_t l = 0; l < messageDigestsSize; ++l) {
-                                if (messageDigests[l].inCipherSuite) {
+                                if (ValidateAlgorithms (
+                                        keyExchanges[i],
+                                        authenticators[j],
+                                        ciphers[k].name,
+                                        messageDigests[l].name)) {
                                     cipherSuites.push_back (
                                         CipherSuite (
                                             keyExchanges[i],
