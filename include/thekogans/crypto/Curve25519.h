@@ -48,32 +48,54 @@ namespace thekogans {
         // Ed25519 is a signature scheme using a twisted-Edwards curve that is
         // birationally equivalent to curve25519.
 
+        enum {
+            /// \brief
+            /// Public key length.
+            ED25519_PUBLIC_KEY_LENGTH = 32,
+            /// \brief
+            /// Private key length.
+            ED25519_PRIVATE_KEY_LENGTH = 64,
+            /// \brief
+            /// Signature length.
+            ED25519_SIGNATURE_LENGTH = 64
+        };
+
         /// \brief
-        /// Sets publicKey and privateKey to a freshly generated, public–private key pair.
+        /// ED25519CreateKeyPair sets publicKey and privateKey to a freshly generated,
+        /// public–private key pair.
         /// \param[out] publicKey New public key.
         /// \param[out] privateKey New private key.
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519_keypair (
-            util::ui8 publicKey[32],
-            util::ui8 privateKey[64]);
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519CreateKeyPair (
+            util::ui8 publicKey[ED25519_PUBLIC_KEY_LENGTH],
+            util::ui8 privateKey[ED25519_PRIVATE_KEY_LENGTH]);
 
         /// \brief
-        /// ED25519_sign sets signature to be a signature of messageLength bytes from
-        /// message using privateKey.
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519_sign (
-            util::ui8 signature[64],
-            const void *message,
-            std::size_t messageLength,
-            const util::ui8 privateKey[64]);
+        /// ED25519SignBuffer sets signature to be a signature of bufferLength bytes from
+        /// buffer using privateKey.
+        /// \param[in] buffer Buffer to sign.
+        /// \param[in] bufferLength Buffer length.
+        /// \param[in] privateKey Private key used for signing.
+        /// \param[out] signature Generated buffer signature.
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519SignBuffer (
+            const void *buffer,
+            std::size_t bufferLength,
+            const util::ui8 privateKey[ED25519_PRIVATE_KEY_LENGTH],
+            util::ui8 signature[ED25519_SIGNATURE_LENGTH]);
 
         /// \brief
-        /// ED25519_verify returns one iff signature is a valid signature, by
-        /// publicKey of messageLength bytes from message. It returns zero
+        /// ED25519VerifyBufferSignature returns true iff signature is a valid signature,
+        /// by publicKey of bufferLength bytes from buffer. It returns false
         /// otherwise.
-        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API ED25519_verify (
-            const void *message,
-            std::size_t messageLength,
-            const util::ui8 signature[64],
-            const util::ui8 publicKey[32]);
+        /// \param[in] signature Signature to verify.
+        /// \param[in] buffer Buffer whose signature to verify.
+        /// \param[in] bufferLength Buffer length.
+        /// \param[in] publicKey Public key used to verify the buffer signature.
+        /// \return true == signature is valid, false == signature is invalid.
+        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API ED25519VerifyBufferSignature (
+            const util::ui8 signature[ED25519_SIGNATURE_LENGTH],
+            const void *buffer,
+            std::size_t bufferLength,
+            const util::ui8 publicKey[ED25519_PUBLIC_KEY_LENGTH]);
 
         // X25519.
         //
@@ -82,37 +104,50 @@ namespace thekogans {
         // name for that, which is the one used here. See http://cr.yp.to/ecdh.html and
         // https://tools.ietf.org/html/draft-irtf-cfrg-curves-11.
 
+        enum {
+            /// \brief
+            /// Public key length.
+            X25519_PUBLIC_KEY_LENGTH = 32,
+            /// \brief
+            /// Private key length.
+            X25519_PRIVATE_KEY_LENGTH = 32,
+            /// \brief
+            /// Shared secret length.
+            X25519_SHARED_SECRET_LENGTH = 32
+        };
+
         /// \brief
-        /// X25519_keypair sets publicKey and privateKey to a freshly
+        /// X25519CreateKeyPair sets publicKey and privateKey to a freshly
         /// generated, public–private key pair.
         /// \param[out] publicKey New public key.
         /// \param[out] privateKey New private key.
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519_keypair (
-            util::ui8 publicKey[32],
-            util::ui8 privateKey[32]);
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519CreateKeyPair (
+            util::ui8 publicKey[X25519_PUBLIC_KEY_LENGTH],
+            util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH]);
 
         /// \brief
-        /// X25519 writes a shared secret to sharedSecret that is calculated from the
-        /// given private key and the peer's public key. It returns true on success and
-        /// false on error.
+        /// X25519ComputeSharedSecret writes a shared secret to sharedSecret that
+        /// is calculated from the given private key and the peer's public key.
         ///
         /// WARNING: Don't use the shared secret directly, rather use a KDF and also
         /// include the two public keys as inputs.
         /// \param[out] sharedSecret Shared secret computed from my private key and
         /// peer's public key.
-        /// \param[in] privateKey My provate key.
+        /// \param[in] privateKey My private key.
         /// \param[in] peersPublicKey Peer's public key.
-        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API X25519 (
-            util::ui8 sharedSecret[32],
-            const util::ui8 privateKey[32],
-            const util::ui8 peersPublicKey[32]);
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519ComputeSharedSecret (
+            util::ui8 sharedSecret[X25519_SHARED_SECRET_LENGTH],
+            const util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH],
+            const util::ui8 peersPublicKey[X25519_PUBLIC_KEY_LENGTH]);
 
         /// \brief
-        /// X25519_public_from_private calculates a Diffie-Hellman public value from the
+        /// X25519GetPublicFromPrivate calculates a Diffie-Hellman public value from the
         /// given private key and writes it to publicKey.
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519_public_from_private (
-            util::ui8 publicKey[32],
-            const util::ui8 privateKey[32]);
+        /// \param[out] publicKey Public key to return.
+        /// \param[in] privateKey Private key.
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519GetPublicFromPrivate (
+            util::ui8 publicKey[X25519_PUBLIC_KEY_LENGTH],
+            const util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH]);
 
     } // namespace crypto
 } // namespace thekogans

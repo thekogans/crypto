@@ -40,6 +40,7 @@
 #include <openssl/crypto.h>
 #include <openssl/sha.h>
 #include "thekogans/util/RandomSource.h"
+#include "thekogans/util/Exception.h"
 #include "thekogans/crypto/Curve25519.h"
 
 namespace thekogans {
@@ -3719,28 +3720,31 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519_keypair (
-                util::ui8 publicKey[32],
-                util::ui8 privateKey[64]) {
-            util::ui8 seed[32];
-            util::GlobalRandomSource::Instance ().GetBytes (seed, 32);
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519CreateKeyPair (
+                util::ui8 publicKey[ED25519_PUBLIC_KEY_LENGTH],
+                util::ui8 privateKey[ED25519_PRIVATE_KEY_LENGTH]) {
+            enum {
+                ED25519_SEED_LENGTH = 32
+            };
+            util::ui8 seed[ED25519_SEED_LENGTH];
+            util::GlobalRandomSource::Instance ().GetBytes (seed, ED25519_SEED_LENGTH);
             util::ui8 az[SHA512_DIGEST_LENGTH];
-            SHA512 (seed, 32, az);
+            SHA512 (seed, ED25519_SEED_LENGTH, az);
             az[0] &= 248;
             az[31] &= 63;
             az[31] |= 64;
             ge_p3 A;
             ge_scalarmult_base (&A, az);
             ge_p3_tobytes (publicKey, &A);
-            memcpy (privateKey, seed, 32);
-            memmove (privateKey + 32, publicKey, 32);
+            memcpy (privateKey, seed, ED25519_SEED_LENGTH);
+            memmove (privateKey + ED25519_SEED_LENGTH, publicKey, ED25519_PUBLIC_KEY_LENGTH);
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519_sign (
-                util::ui8 *signature,
-                const util::ui8 *message,
-                size_t messageLength,
-                const util::ui8 privateKey[64]) {
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519SignBuffer (
+                const void *buffer,
+                std::size_t bufferLength,
+                const util::ui8 privateKey[ED25519_PRIVATE_KEY_LENGTH],
+                util::ui8 signature[ED25519_SIGNATURE_LENGTH]) {
             util::ui8 az[SHA512_DIGEST_LENGTH];
             SHA512 (privateKey, 32, az);
             az[0] &= 248;
@@ -3749,7 +3753,7 @@ namespace thekogans {
             SHA512_CTX hash_ctx;
             SHA512_Init (&hash_ctx);
             SHA512_Update (&hash_ctx, az + 32, 32);
-            SHA512_Update (&hash_ctx, message, messageLength);
+            SHA512_Update (&hash_ctx, buffer, bufferLength);
             util::ui8 nonce[SHA512_DIGEST_LENGTH];
             SHA512_Final (nonce, &hash_ctx);
             sc_reduce (nonce);
@@ -3759,18 +3763,18 @@ namespace thekogans {
             SHA512_Init (&hash_ctx);
             SHA512_Update (&hash_ctx, signature, 32);
             SHA512_Update (&hash_ctx, privateKey + 32, 32);
-            SHA512_Update(&hash_ctx, message, messageLength);
+            SHA512_Update(&hash_ctx, buffer, bufferLength);
             util::ui8 hram[SHA512_DIGEST_LENGTH];
             SHA512_Final (hram, &hash_ctx);
             sc_reduce (hram);
             sc_muladd (signature + 32, hram, az, nonce);
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API ED25519_verify (
-                const util::ui8 *message,
-                size_t messageLength,
-                const util::ui8 signature[64],
-                const util::ui8 publicKey[32]) {
+        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API ED25519VerifyBufferSignature (
+                const util::ui8 signature[ED25519_SIGNATURE_LENGTH],
+                const void *buffer,
+                std::size_t bufferLength,
+                const util::ui8 publicKey[ED25519_PUBLIC_KEY_LENGTH]) {
             ge_p3 A;
             if ((signature[63] & 224) != 0 ||
                     ge_frombytes_negate_vartime (&A, publicKey) != 0) {
@@ -3786,7 +3790,7 @@ namespace thekogans {
             SHA512_Init (&hash_ctx);
             SHA512_Update (&hash_ctx, signature, 32);
             SHA512_Update (&hash_ctx, publicKey, 32);
-            SHA512_Update (&hash_ctx, message, messageLength);
+            SHA512_Update (&hash_ctx, buffer, bufferLength);
             util::ui8 h[SHA512_DIGEST_LENGTH];
             SHA512_Final (h, &hash_ctx);
             sc_reduce (h);
@@ -3848,28 +3852,31 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519_keypair (
-                util::ui8 publicKey[32],
-                util::ui8 privateKey[32]) {
-            util::GlobalRandomSource::Instance ().GetBytes (privateKey, 32);
-            X25519_public_from_private (publicKey, privateKey);
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519CreateKeyPair (
+                util::ui8 publicKey[X25519_PUBLIC_KEY_LENGTH],
+                util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH]) {
+            util::GlobalRandomSource::Instance ().GetBytes (privateKey, X25519_PRIVATE_KEY_LENGTH);
+            X25519_get_public_from_private (publicKey, privateKey);
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API X25519 (
-                util::ui8 sharedSecret[32],
-                const util::ui8 privateKey[32],
-                const util::ui8 peerPublicKey[32]) {
-            static const util::ui8 kZeros[32] = {0};
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519ComputeSharedSecret (
+                util::ui8 sharedSecret[X25519_SHARED_SECRET_LENGTH],
+                const util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH],
+                const util::ui8 peerPublicKey[X25519_PUBLIC_KEY_LENGTH]) {
+            static const util::ui8 kZeros[X25519_SHARED_SECRET_LENGTH] = {0};
             x25519_scalar_mult (sharedSecret, privateKey, peerPublicKey);
             // The all-zero output results when the input is a point of small order.
-            return CRYPTO_memcmp (kZeros, sharedSecret, 32) != 0;
+            if (CRYPTO_memcmp (kZeros, sharedSecret, X25519_SHARED_SECRET_LENGTH) == 0) {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519_public_from_private (
-                util::ui8 publicKey[32],
-                const util::ui8 privateKey[32]) {
+        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519GetPublicFromPrivate (
+                util::ui8 publicKey[X25519_PUBLIC_KEY_LENGTH],
+                const util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH]) {
             util::ui8 e[32];
-            memcpy (e, privateKey, 32);
+            memcpy (e, privateKey, X25519_PRIVATE_KEY_LENGTH);
             e[0] &= 248;
             e[31] &= 127;
             e[31] |= 64;
