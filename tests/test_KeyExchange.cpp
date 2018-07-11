@@ -32,7 +32,15 @@ namespace {
     bool operator == (
             const crypto::SymmetricKey &key1,
             const crypto::SymmetricKey &key2) {
-        return memcmp (key1.Get ().data, key2.Get ().data, EVP_MAX_KEY_LENGTH) == 0;
+        util::Buffer key1Buffer (util::HostEndian, util::Serializable::Size (key1));
+        key1Buffer << key1;
+        util::Buffer key2Buffer (util::HostEndian, util::Serializable::Size (key2));
+        key2Buffer << key2;
+        return key1Buffer.GetDataAvailableForReading () == key2Buffer.GetDataAvailableForReading () &&
+            memcmp (
+                key1Buffer.GetReadPtr (),
+                key2Buffer.GetReadPtr (),
+                key1Buffer.GetDataAvailableForReading ()) == 0;
     }
 
     bool TestDHE (

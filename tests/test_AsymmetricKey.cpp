@@ -29,10 +29,15 @@ namespace {
     bool operator == (
             const crypto::AsymmetricKey &key1,
             const crypto::AsymmetricKey &key2) {
-        return
-            key1.GetId () == key2.GetId () &&
-            key1.GetName () == key2.GetName () &&
-            key1.GetDescription () == key2.GetDescription ();
+        util::Buffer key1Buffer (util::HostEndian, util::Serializable::Size (key1));
+        key1Buffer << key1;
+        util::Buffer key2Buffer (util::HostEndian, util::Serializable::Size (key2));
+        key2Buffer << key2;
+        return key1Buffer.GetDataAvailableForReading () == key2Buffer.GetDataAvailableForReading () &&
+            memcmp (
+                key1Buffer.GetReadPtr (),
+                key2Buffer.GetReadPtr (),
+                key1Buffer.GetDataAvailableForReading ()) == 0;
     }
 }
 
