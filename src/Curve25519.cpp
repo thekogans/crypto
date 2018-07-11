@@ -104,16 +104,16 @@ namespace thekogans {
                 carry4 = (h4 + (util::i64)(1 << 25)) >> 26; h5 += carry4; h4 -= carry4 << 26;
                 carry6 = (h6 + (util::i64)(1 << 25)) >> 26; h7 += carry6; h6 -= carry6 << 26;
                 carry8 = (h8 + (util::i64)(1 << 25)) >> 26; h9 += carry8; h8 -= carry8 << 26;
-                h[0] = h0;
-                h[1] = h1;
-                h[2] = h2;
-                h[3] = h3;
-                h[4] = h4;
-                h[5] = h5;
-                h[6] = h6;
-                h[7] = h7;
-                h[8] = h8;
-                h[9] = h9;
+                h[0] = (util::i32)h0;
+                h[1] = (util::i32)h1;
+                h[2] = (util::i32)h2;
+                h[3] = (util::i32)h3;
+                h[4] = (util::i32)h4;
+                h[5] = (util::i32)h5;
+                h[6] = (util::i32)h6;
+                h[7] = (util::i32)h7;
+                h[8] = (util::i32)h8;
+                h[9] = (util::i32)h9;
             }
 
             // Preconditions:
@@ -243,17 +243,16 @@ namespace thekogans {
                 h[0] = 1;
             }
 
-            // Replace (f,g) with (g,f) if b == 1;
-            // replace (f,g) with (f,g) if b == 0.
+            // Replace (f, g) with (g, f) if b == 1;
+            // replace (f, g) with (f, g) if b == 0.
             //
             // Preconditions: b in {0,1}.
             void fe_cswap (
                     fe f,
                     fe g,
-                    unsigned int b) {
+                    util::ui32 b) {
                 b = -b;
-                unsigned i;
-                for (i = 0; i < 10; i++) {
+                for (std::size_t i = 0; i < 10; ++i) {
                     util::i32 x = f[i] ^ g[i];
                     x &= b;
                     f[i] ^= x;
@@ -274,8 +273,7 @@ namespace thekogans {
                     fe h,
                     const fe f,
                     const fe g) {
-                unsigned i;
-                for (i = 0; i < 10; i++) {
+                for (std::size_t i = 0; i < 10; ++i) {
                     h[i] = f[i] + g[i];
                 }
             }
@@ -293,8 +291,7 @@ namespace thekogans {
                     fe h,
                     const fe f,
                     const fe g) {
-                unsigned i;
-                for (i = 0; i < 10; i++) {
+                for (std::size_t i = 0; i < 10; ++i) {
                     h[i] = f[i] - g[i];
                 }
             }
@@ -524,16 +521,16 @@ namespace thekogans {
                 carry0 = (h0 + (util::i64)(1<<25)) >> 26; h1 += carry0; h0 -= carry0 << 26;
                 // |h0| <= 2^25; from now on fits into int32 unchanged
                 // |h1| <= 1.01*2^24
-                h[0] = h0;
-                h[1] = h1;
-                h[2] = h2;
-                h[3] = h3;
-                h[4] = h4;
-                h[5] = h5;
-                h[6] = h6;
-                h[7] = h7;
-                h[8] = h8;
-                h[9] = h9;
+                h[0] = (util::i32)h0;
+                h[1] = (util::i32)h1;
+                h[2] = (util::i32)h2;
+                h[3] = (util::i32)h3;
+                h[4] = (util::i32)h4;
+                h[5] = (util::i32)h5;
+                h[6] = (util::i32)h6;
+                h[7] = (util::i32)h7;
+                h[8] = (util::i32)h8;
+                h[9] = (util::i32)h9;
             }
 
             // h = f * f
@@ -659,16 +656,16 @@ namespace thekogans {
                 carry8 = (h8 + (util::i64)(1 << 25)) >> 26; h9 += carry8; h8 -= carry8 << 26;
                 carry9 = (h9 + (util::i64)(1 << 24)) >> 25; h0 += carry9 * 19; h9 -= carry9 << 25;
                 carry0 = (h0 + (util::i64)(1 << 25)) >> 26; h1 += carry0; h0 -= carry0 << 26;
-                h[0] = h0;
-                h[1] = h1;
-                h[2] = h2;
-                h[3] = h3;
-                h[4] = h4;
-                h[5] = h5;
-                h[6] = h6;
-                h[7] = h7;
-                h[8] = h8;
-                h[9] = h9;
+                h[0] = (util::i32)h0;
+                h[1] = (util::i32)h1;
+                h[2] = (util::i32)h2;
+                h[3] = (util::i32)h3;
+                h[4] = (util::i32)h4;
+                h[5] = (util::i32)h5;
+                h[6] = (util::i32)h6;
+                h[7] = (util::i32)h7;
+                h[8] = (util::i32)h8;
+                h[9] = (util::i32)h9;
             }
 
             void fe_invert (
@@ -787,16 +784,16 @@ namespace thekogans {
                 carry4 = (h4 + (util::i64)(1 << 25)) >> 26; h5 += carry4; h4 -= carry4 << 26;
                 carry6 = (h6 + (util::i64)(1 << 25)) >> 26; h7 += carry6; h6 -= carry6 << 26;
                 carry8 = (h8 + (util::i64)(1 << 25)) >> 26; h9 += carry8; h8 -= carry8 << 26;
-                h[0] = h0;
-                h[1] = h1;
-                h[2] = h2;
-                h[3] = h3;
-                h[4] = h4;
-                h[5] = h5;
-                h[6] = h6;
-                h[7] = h7;
-                h[8] = h8;
-                h[9] = h9;
+                h[0] = (util::i32)h0;
+                h[1] = (util::i32)h1;
+                h[2] = (util::i32)h2;
+                h[3] = (util::i32)h3;
+                h[4] = (util::i32)h4;
+                h[5] = (util::i32)h5;
+                h[6] = (util::i32)h6;
+                h[7] = (util::i32)h7;
+                h[8] = (util::i32)h8;
+                h[9] = (util::i32)h9;
             }
 
             // h = -f
@@ -809,8 +806,7 @@ namespace thekogans {
             void fe_neg (
                     fe h,
                     const fe f) {
-                unsigned i;
-                for (i = 0; i < 10; i++) {
+                for (std::size_t i = 0; i < 10; ++i) {
                     h[i] = -f[i];
                 }
             }
@@ -822,10 +818,9 @@ namespace thekogans {
             void fe_cmov (
                     fe f,
                     const fe g,
-                    unsigned b) {
+                    util::ui32 b) {
                 b = -b;
-                unsigned i;
-                for (i = 0; i < 10; i++) {
+                for (std::size_t i = 0; i < 10; ++i) {
                     util::i32 x = f[i] ^ g[i];
                     x &= b;
                     f[i] ^= x;
@@ -988,16 +983,16 @@ namespace thekogans {
                 carry8 = (h8 + (util::i64)(1 << 25)) >> 26; h9 += carry8; h8 -= carry8 << 26;
                 carry9 = (h9 + (util::i64)(1 << 24)) >> 25; h0 += carry9 * 19; h9 -= carry9 << 25;
                 carry0 = (h0 + (util::i64)(1 << 25)) >> 26; h1 += carry0; h0 -= carry0 << 26;
-                h[0] = h0;
-                h[1] = h1;
-                h[2] = h2;
-                h[3] = h3;
-                h[4] = h4;
-                h[5] = h5;
-                h[6] = h6;
-                h[7] = h7;
-                h[8] = h8;
-                h[9] = h9;
+                h[0] = (util::i32)h0;
+                h[1] = (util::i32)h1;
+                h[2] = (util::i32)h2;
+                h[3] = (util::i32)h3;
+                h[4] = (util::i32)h4;
+                h[5] = (util::i32)h5;
+                h[6] = (util::i32)h6;
+                h[7] = (util::i32)h7;
+                h[8] = (util::i32)h8;
+                h[9] = (util::i32)h9;
             }
 
             void fe_pow22523 (
@@ -1343,8 +1338,8 @@ namespace thekogans {
             }
 
             util::ui8 equal (
-                    signed char b,
-                    signed char c) {
+                    util::i8 b,
+                    util::i8 c) {
                 util::ui8 ub = b;
                 util::ui8 uc = c;
                 util::ui8 x = ub ^ uc; // 0: yes; 1..255: no
@@ -2711,7 +2706,7 @@ namespace thekogans {
                 },
             };
 
-            util::ui8 negative (signed char b) {
+            util::ui8 negative (util::i8 b) {
                 util::ui32 x = b;
                 x >>= 31; // 1: yes; 0: no
                 return x;
@@ -2720,7 +2715,7 @@ namespace thekogans {
             void table_select (
                     ge_precomp *t,
                     int pos,
-                    signed char b) {
+                    util::i8 b) {
                 ge_precomp minust;
                 util::ui8 bnegative = negative(b);
                 util::ui8 babs = b - (((-bnegative) & b) << 1);
@@ -2748,8 +2743,8 @@ namespace thekogans {
             void ge_scalarmult_base (
                     ge_p3 *h,
                     const util::ui8 *a) {
-                signed char e[64];
-                signed char carry;
+                util::i8 e[64];
+                util::i8 carry;
                 ge_p1p1 r;
                 ge_p2 s;
                 ge_precomp t;
@@ -2791,7 +2786,7 @@ namespace thekogans {
             }
 
             void slide (
-                    signed char *r,
+                    util::i8 *r,
                     const util::ui8 *a) {
                 int i;
                 int b;
@@ -2878,8 +2873,8 @@ namespace thekogans {
                     const util::ui8 *a,
                     const ge_p3 *A,
                     const util::ui8 *b) {
-                signed char aslide[256];
-                signed char bslide[256];
+                util::i8 aslide[256];
+                util::i8 bslide[256];
                 ge_cached Ai[8]; // A,3A,5A,7A,9A,11A,13A,15A
                 ge_p1p1 t;
                 ge_p3 u;
@@ -3228,38 +3223,38 @@ namespace thekogans {
                 carry10 = s10 >> 21;
                 s11 += carry10;
                 s10 -= carry10 << 21;
-                s[0] = s0 >> 0;
-                s[1] = s0 >> 8;
-                s[2] = (s0 >> 16) | (s1 << 5);
-                s[3] = s1 >> 3;
-                s[4] = s1 >> 11;
-                s[5] = (s1 >> 19) | (s2 << 2);
-                s[6] = s2 >> 6;
-                s[7] = (s2 >> 14) | (s3 << 7);
-                s[8] = s3 >> 1;
-                s[9] = s3 >> 9;
-                s[10] = (s3 >> 17) | (s4 << 4);
-                s[11] = s4 >> 4;
-                s[12] = s4 >> 12;
-                s[13] = (s4 >> 20) | (s5 << 1);
-                s[14] = s5 >> 7;
-                s[15] = (s5 >> 15) | (s6 << 6);
-                s[16] = s6 >> 2;
-                s[17] = s6 >> 10;
-                s[18] = (s6 >> 18) | (s7 << 3);
-                s[19] = s7 >> 5;
-                s[20] = s7 >> 13;
-                s[21] = s8 >> 0;
-                s[22] = s8 >> 8;
-                s[23] = (s8 >> 16) | (s9 << 5);
-                s[24] = s9 >> 3;
-                s[25] = s9 >> 11;
-                s[26] = (s9 >> 19) | (s10 << 2);
-                s[27] = s10 >> 6;
-                s[28] = (s10 >> 14) | (s11 << 7);
-                s[29] = s11 >> 1;
-                s[30] = s11 >> 9;
-                s[31] = s11 >> 17;
+                s[0] = (util::ui8)(s0 >> 0);
+                s[1] = (util::ui8)(s0 >> 8);
+                s[2] = (util::ui8)((s0 >> 16) | (s1 << 5));
+                s[3] = (util::ui8)(s1 >> 3);
+                s[4] = (util::ui8)(s1 >> 11);
+                s[5] = (util::ui8)((s1 >> 19) | (s2 << 2));
+                s[6] = (util::ui8)(s2 >> 6);
+                s[7] = (util::ui8)((s2 >> 14) | (s3 << 7));
+                s[8] = (util::ui8)(s3 >> 1);
+                s[9] = (util::ui8)(s3 >> 9);
+                s[10] = (util::ui8)((s3 >> 17) | (s4 << 4));
+                s[11] = (util::ui8)(s4 >> 4);
+                s[12] = (util::ui8)(s4 >> 12);
+                s[13] = (util::ui8)((s4 >> 20) | (s5 << 1));
+                s[14] = (util::ui8)(s5 >> 7);
+                s[15] = (util::ui8)((s5 >> 15) | (s6 << 6));
+                s[16] = (util::ui8)(s6 >> 2);
+                s[17] = (util::ui8)(s6 >> 10);
+                s[18] = (util::ui8)((s6 >> 18) | (s7 << 3));
+                s[19] = (util::ui8)(s7 >> 5);
+                s[20] = (util::ui8)(s7 >> 13);
+                s[21] = (util::ui8)(s8 >> 0);
+                s[22] = (util::ui8)(s8 >> 8);
+                s[23] = (util::ui8)((s8 >> 16) | (s9 << 5));
+                s[24] = (util::ui8)(s9 >> 3);
+                s[25] = (util::ui8)(s9 >> 11);
+                s[26] = (util::ui8)((s9 >> 19) | (s10 << 2));
+                s[27] = (util::ui8)(s10 >> 6);
+                s[28] = (util::ui8)((s10 >> 14) | (s11 << 7));
+                s[29] = (util::ui8)(s11 >> 1);
+                s[30] = (util::ui8)(s11 >> 9);
+                s[31] = (util::ui8)(s11 >> 17);
             }
 
             // Input:
@@ -3687,38 +3682,38 @@ namespace thekogans {
                 carry10 = s10 >> 21;
                 s11 += carry10;
                 s10 -= carry10 << 21;
-                s[0] = s0 >> 0;
-                s[1] = s0 >> 8;
-                s[2] = (s0 >> 16) | (s1 << 5);
-                s[3] = s1 >> 3;
-                s[4] = s1 >> 11;
-                s[5] = (s1 >> 19) | (s2 << 2);
-                s[6] = s2 >> 6;
-                s[7] = (s2 >> 14) | (s3 << 7);
-                s[8] = s3 >> 1;
-                s[9] = s3 >> 9;
-                s[10] = (s3 >> 17) | (s4 << 4);
-                s[11] = s4 >> 4;
-                s[12] = s4 >> 12;
-                s[13] = (s4 >> 20) | (s5 << 1);
-                s[14] = s5 >> 7;
-                s[15] = (s5 >> 15) | (s6 << 6);
-                s[16] = s6 >> 2;
-                s[17] = s6 >> 10;
-                s[18] = (s6 >> 18) | (s7 << 3);
-                s[19] = s7 >> 5;
-                s[20] = s7 >> 13;
-                s[21] = s8 >> 0;
-                s[22] = s8 >> 8;
-                s[23] = (s8 >> 16) | (s9 << 5);
-                s[24] = s9 >> 3;
-                s[25] = s9 >> 11;
-                s[26] = (s9 >> 19) | (s10 << 2);
-                s[27] = s10 >> 6;
-                s[28] = (s10 >> 14) | (s11 << 7);
-                s[29] = s11 >> 1;
-                s[30] = s11 >> 9;
-                s[31] = s11 >> 17;
+                s[0] = (util::ui8)(s0 >> 0);
+                s[1] = (util::ui8)(s0 >> 8);
+                s[2] = (util::ui8)((s0 >> 16) | (s1 << 5));
+                s[3] = (util::ui8)(s1 >> 3);
+                s[4] = (util::ui8)(s1 >> 11);
+                s[5] = (util::ui8)((s1 >> 19) | (s2 << 2));
+                s[6] = (util::ui8)(s2 >> 6);
+                s[7] = (util::ui8)((s2 >> 14) | (s3 << 7));
+                s[8] = (util::ui8)(s3 >> 1);
+                s[9] = (util::ui8)(s3 >> 9);
+                s[10] = (util::ui8)((s3 >> 17) | (s4 << 4));
+                s[11] = (util::ui8)(s4 >> 4);
+                s[12] = (util::ui8)(s4 >> 12);
+                s[13] = (util::ui8)((s4 >> 20) | (s5 << 1));
+                s[14] = (util::ui8)(s5 >> 7);
+                s[15] = (util::ui8)((s5 >> 15) | (s6 << 6));
+                s[16] = (util::ui8)(s6 >> 2);
+                s[17] = (util::ui8)(s6 >> 10);
+                s[18] = (util::ui8)((s6 >> 18) | (s7 << 3));
+                s[19] = (util::ui8)(s7 >> 5);
+                s[20] = (util::ui8)(s7 >> 13);
+                s[21] = (util::ui8)(s8 >> 0);
+                s[22] = (util::ui8)(s8 >> 8);
+                s[23] = (util::ui8)((s8 >> 16) | (s9 << 5));
+                s[24] = (util::ui8)(s9 >> 3);
+                s[25] = (util::ui8)(s9 >> 11);
+                s[26] = (util::ui8)((s9 >> 19) | (s10 << 2));
+                s[27] = (util::ui8)(s10 >> 6);
+                s[28] = (util::ui8)((s10 >> 14) | (s11 << 7));
+                s[29] = (util::ui8)(s11 >> 1);
+                s[30] = (util::ui8)(s11 >> 9);
+                s[31] = (util::ui8)(s11 >> 17);
             }
         }
 
@@ -3782,8 +3777,8 @@ namespace thekogans {
                     ge_frombytes_negate_vartime (&A, publicKey) != 0) {
                 return false;
             }
-            util::ui8 pkcopy[32];
-            memcpy (pkcopy, publicKey, 32);
+            util::ui8 pkcopy[ED25519_PUBLIC_KEY_LENGTH];
+            memcpy (pkcopy, publicKey, ED25519_PUBLIC_KEY_LENGTH);
             util::ui8 rcopy[32];
             memcpy (rcopy, signature, 32);
             util::ui8 scopy[32];
@@ -3805,12 +3800,12 @@ namespace thekogans {
 
         namespace {
             void x25519_scalar_mult (
-                    util::ui8 out[32],
-                    const util::ui8 scalar[32],
-                    const util::ui8 point[32]) {
+                    util::ui8 out[X25519_SHARED_SECRET_LENGTH],
+                    const util::ui8 scalar[X25519_PRIVATE_KEY_LENGTH],
+                    const util::ui8 point[X25519_PUBLIC_KEY_LENGTH]) {
                 fe x1, x2, z2, x3, z3, tmp0, tmp1;
-                util::ui8 e[32];
-                memcpy (e, scalar, 32);
+                util::ui8 e[X25519_PRIVATE_KEY_LENGTH];
+                memcpy (e, scalar, X25519_PRIVATE_KEY_LENGTH);
                 e[0] &= 248;
                 e[31] &= 127;
                 e[31] |= 64;
@@ -3819,10 +3814,10 @@ namespace thekogans {
                 fe_0 (z2);
                 fe_copy (x3, x1);
                 fe_1 (z3);
-                unsigned swap = 0;
+                util::ui32 swap = 0;
                 int pos;
                 for (pos = 254; pos >= 0; --pos) {
-                    unsigned b = 1 & (e[pos / 8] >> (pos & 7));
+                    util::ui32 b = 1 & (e[pos / 8] >> (pos & 7));
                     swap ^= b;
                     fe_cswap (x2, x3, swap);
                     fe_cswap (z2, z3, swap);
@@ -3877,7 +3872,7 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519GetPublicFromPrivate (
                 util::ui8 publicKey[X25519_PUBLIC_KEY_LENGTH],
                 const util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH]) {
-            util::ui8 e[32];
+            util::ui8 e[X25519_PRIVATE_KEY_LENGTH];
             memcpy (e, privateKey, X25519_PRIVATE_KEY_LENGTH);
             e[0] &= 248;
             e[31] &= 127;
