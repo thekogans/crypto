@@ -60,6 +60,7 @@
     <cpp_header>$(organization)/$(project_directory)/CiphertextHeader.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Config.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/CMAC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Curve25519.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Decryptor.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/DH.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/DHEKeyExchange.h</cpp_header>
@@ -101,6 +102,7 @@
     <cpp_source>Cipher.cpp</cpp_source>
     <cpp_source>CipherSuite.cpp</cpp_source>
     <cpp_source>CMAC.cpp</cpp_source>
+    <cpp_source>Curve25519.cpp</cpp_source>
     <cpp_source>Decryptor.cpp</cpp_source>
     <cpp_source>DH.cpp</cpp_source>
     <cpp_source>DHEKeyExchange.cpp</cpp_source>
