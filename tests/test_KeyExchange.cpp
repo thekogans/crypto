@@ -32,9 +32,9 @@ namespace {
     bool operator == (
             const crypto::SymmetricKey &key1,
             const crypto::SymmetricKey &key2) {
-        util::Buffer key1Buffer (util::HostEndian, util::Serializable::Size (key1));
+        util::Buffer key1Buffer (util::HostEndian, (util::ui32)util::Serializable::Size (key1));
         key1Buffer << key1;
-        util::Buffer key2Buffer (util::HostEndian, util::Serializable::Size (key2));
+        util::Buffer key2Buffer (util::HostEndian, (util::ui32)util::Serializable::Size (key2));
         key2Buffer << key2;
         return key1Buffer.GetDataAvailableForReading () == key2Buffer.GetDataAvailableForReading () &&
             memcmp (
