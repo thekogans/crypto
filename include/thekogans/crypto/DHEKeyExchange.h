@@ -147,6 +147,9 @@ namespace thekogans {
             friend struct KeyRing;
 
             /// \brief
+            /// true == Initiator of key exchange, false == Receiver of key exchange.
+            const bool initiator;
+            /// \brief
             /// \see{DH}/\see{EC} \see{Params} used for DHE \see{SymmetricKey} derivation.
             crypto::Params::Ptr params;
             /// \brief
@@ -173,7 +176,10 @@ namespace thekogans {
             std::string description;
             /// \brief
             /// Private \see{DH}/\see{EC} \see{AsymmetricKey} used for key exchange.
-            AsymmetricKey::Ptr key;
+            AsymmetricKey::Ptr privateKey;
+            /// \brief
+            /// Public \see{DH}/\see{EC} \see{AsymmetricKey} used for key exchange.
+            AsymmetricKey::Ptr publicKey;
 
         public:
             /// \brief

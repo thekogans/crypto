@@ -91,6 +91,7 @@ namespace thekogans {
                 const std::string &name_,
                 const std::string &description_) :
                 KeyExchange (id),
+                initiator (true),
                 params (params_),
                 salt (
                     salt_ != 0 && saltLength_ > 0 ?
@@ -106,7 +107,8 @@ namespace thekogans {
                 description (description_) {
             util::i32 type = params->GetType ();
             if (type == EVP_PKEY_DH || type == EVP_PKEY_EC) {
-                key = params->CreateKey ();
+                privateKey = params->CreateKey ();
+                publicKey = privateKey->GetPublicKey ();
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -115,7 +117,8 @@ namespace thekogans {
         }
 
         DHEKeyExchange::DHEKeyExchange (Params::Ptr params) :
-                KeyExchange (ID::Empty) {
+                KeyExchange (ID::Empty),
+                initiator (false) {
             DHParams::Ptr dhParams =
                 util::dynamic_refcounted_pointer_cast<DHParams> (params);
             if (dhParams.Get () != 0) {
@@ -128,7 +131,8 @@ namespace thekogans {
                 keyId = dhParams->keyId;
                 name = dhParams->name;
                 description = dhParams->description;
-                key = this->params->CreateKey ();
+                privateKey = this->params->CreateKey ();
+                publicKey = privateKey->GetPublicKey ();
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -148,14 +152,29 @@ namespace thekogans {
                     keyId,
                     name,
                     description,
-                    key->GetPublicKey ()));
+                    publicKey));
+        }
+
+        namespace {
+            util::Buffer GetSalt (
+                    const std::vector<util::ui8> &salt,
+                    const AsymmetricKey &publicKey1,
+                    const AsymmetricKey &publicKey2) {
+                util::Buffer buffer (
+                    util::NetworkEndian,
+                    util::Serializer::Size (salt) +
+                    util::Serializable::Size (publicKey1) +
+                    util::Serializable::Size (publicKey2));
+                buffer << salt << publicKey1 << publicKey2;
+                return buffer;
+            }
         }
 
         SymmetricKey::Ptr DHEKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
             DHParams::Ptr dhParams =
                 util::dynamic_refcounted_pointer_cast<DHParams> (params);
             if (dhParams.Get () != 0) {
-                EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new (key->Get (), OpenSSLInit::engine));
+                EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new (privateKey->Get (), OpenSSLInit::engine));
                 if (ctx.get () != 0) {
                     std::size_t secretLength = 0;
                     if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
@@ -163,11 +182,14 @@ namespace thekogans {
                             EVP_PKEY_derive (ctx.get (), 0, &secretLength) == 1) {
                         util::SecureVector<util::ui8> secret (secretLength);
                         if (EVP_PKEY_derive (ctx.get (), &secret[0], &secretLength) == 1) {
+                            util::Buffer salt = initiator ?
+                                GetSalt (dhParams->salt, *publicKey, *dhParams->publicKey) :
+                                GetSalt (dhParams->salt, *dhParams->publicKey, *publicKey);
                             return SymmetricKey::FromSecretAndSalt (
                                 &secret[0],
                                 secretLength,
-                                dhParams->salt.data (),
-                                dhParams->salt.size (),
+                                salt.GetReadPtr (),
+                                salt.GetDataAvailableForReading (),
                                 dhParams->keyLength,
                                 CipherSuite::GetOpenSSLMessageDigestByName (dhParams->messageDigest),
                                 dhParams->count,
