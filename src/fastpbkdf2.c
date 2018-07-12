@@ -43,6 +43,9 @@
 #ifdef _MSC_VER
 #define restrict
 #define _Pragma __pragma
+#if _MSC_VER < 1900
+#define inline _inline
+#endif
 #endif
 
 /* --- Common useful things --- */
