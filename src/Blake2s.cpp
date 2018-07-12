@@ -79,7 +79,7 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL const EVP_MD * _LIB_THEKOGANS_CRYPTO_API EVP_blake2s256 () {
             static const EVP_MD blake2s256 = {
                 NID_blake2s256,
-                0,
+                NID_undef,
                 32,
                 0,
                 init,
@@ -89,7 +89,7 @@ namespace thekogans {
                 0,
                 0,
                 0,
-                {0, 0, 0, 0, 0},
+                {NID_undef, NID_undef, 0, 0, 0},
                 BLAKE2S_BLOCKBYTES,
                 sizeof (blake2sp_state),
                 0

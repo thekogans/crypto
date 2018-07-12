@@ -88,7 +88,7 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL const EVP_MD * _LIB_THEKOGANS_CRYPTO_API EVP_blake2b512 () {
             static const EVP_MD blake2b512 = {
                 NID_blake2b512,
-                0,
+                NID_undef,
                 64,
                 0,
                 init,
@@ -98,7 +98,7 @@ namespace thekogans {
                 0,
                 0,
                 0,
-                {0, 0, 0, 0, 0},
+                {NID_undef, NID_undef, 0, 0, 0},
                 BLAKE2B_BLOCKBYTES,
                 sizeof (blake2bp_state),
                 0
@@ -109,7 +109,7 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL const EVP_MD * _LIB_THEKOGANS_CRYPTO_API EVP_blake2b384 () {
             static const EVP_MD blake2b384 = {
                 NID_blake2b384,
-                0,
+                NID_undef,
                 48,
                 0,
                 init,
@@ -119,7 +119,7 @@ namespace thekogans {
                 0,
                 0,
                 0,
-                {0, 0, 0, 0, 0},
+                {NID_undef, NID_undef, 0, 0, 0},
                 BLAKE2B_BLOCKBYTES,
                 sizeof (blake2bp_state),
                 0
@@ -130,7 +130,7 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL const EVP_MD * _LIB_THEKOGANS_CRYPTO_API EVP_blake2b256 () {
             static const EVP_MD blake2b256 = {
                 NID_blake2b256,
-                0,
+                NID_undef,
                 32,
                 0,
                 init,
@@ -140,7 +140,7 @@ namespace thekogans {
                 0,
                 0,
                 0,
-                {0, 0, 0, 0, 0},
+                {NID_undef, NID_undef, 0, 0, 0},
                 BLAKE2B_BLOCKBYTES,
                 sizeof (blake2bp_state),
                 0
