@@ -49,7 +49,7 @@ namespace {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
             crypto::DHEKeyExchange keyExchange1 (crypto::ID (), params);
-            crypto::RSAKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
+            crypto::DHEKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
             crypto::DHEKeyExchange keyExchange2 (params1);
             crypto::SymmetricKey::Ptr key1 =
                 keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
