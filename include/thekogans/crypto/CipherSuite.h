@@ -324,7 +324,7 @@ namespace thekogans {
             KeyExchange::Ptr GetRSAKeyExchange (
                 const ID &keyExchangeId,
                 AsymmetricKey::Ptr key,
-                util::ui32 secretLength = RSAKeyExchange::DEFAULT_SECRET_LENGTH,
+                std::size_t secretLength = RSAKeyExchange::DEFAULT_SECRET_LENGTH,
                 const void *salt = 0,
                 std::size_t saltLength = 0,
                 std::size_t count = 1,

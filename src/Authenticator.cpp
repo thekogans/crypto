@@ -74,7 +74,7 @@ namespace thekogans {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 util::FixedArray<util::ui8, 4096> buffer;
-                for (util::ui32 count = file.Read (buffer, 4096);
+                for (std::size_t count = file.Read (buffer, 4096);
                         count != 0;
                         count = file.Read (buffer, 4096)) {
                     signer->Update (buffer, count);
@@ -96,7 +96,7 @@ namespace thekogans {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;
-                    for (util::ui32 count = file.Read (buffer, 4096);
+                    for (std::size_t count = file.Read (buffer, 4096);
                             count != 0;
                             count = file.Read (buffer, 4096)) {
                         verifier->Update (buffer, count);

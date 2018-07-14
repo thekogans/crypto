@@ -23,6 +23,7 @@
     #include <argon2.h>
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
+#include "thekogans/util/SizeT.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
 #if defined (THEKOGANS_CRYPTO_TESTING)
@@ -197,7 +198,7 @@ namespace thekogans {
                         messageDigest.Update (salt, saltLength);
                     }
                     bufferLength = messageDigest.Final (buffer.data ());
-                    for (util::ui32 i = 1; i < count; ++i) {
+                    for (std::size_t i = 1; i < count; ++i) {
                         messageDigest.Init ();
                         messageDigest.Update (buffer.data (), bufferLength);
                         bufferLength = messageDigest.Final (buffer.data ());
@@ -250,27 +251,45 @@ namespace thekogans {
         std::size_t SymmetricKey::Size () const {
             return
                 Serializable::Size () +
-                util::UI32_SIZE + key.GetDataAvailableForReading ();
+                util::SizeT (key.GetDataAvailableForReading ()).Size () +
+                key.GetDataAvailableForReading ();
         }
 
         void SymmetricKey::Read (
                 const Header &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
-            serializer >> key.writeOffset;
-            serializer.Read (key.data, key.GetDataAvailableForReading ());
-            memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+            util::SizeT length;
+            serializer >> length;
+            if (length > 0 && length <= EVP_MAX_KEY_LENGTH) {
+                key.Rewind ();
+                if (key.AdvanceWriteOffset (serializer.Read (key.GetWritePtr (), length)) == length) {
+                    memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to read %u bytes for key.", length);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid key size %u.", length);
+            }
         }
 
         void SymmetricKey::Write (util::Serializer &serializer) const {
             Serializable::Write (serializer);
-            serializer << key.GetDataAvailableForReading ();
-            serializer.Write (key.GetReadPtr (), key.GetDataAvailableForReading ());
+            serializer << util::SizeT (key.GetDataAvailableForReading ());
+            if (serializer.Write (
+                    key.GetReadPtr (), key.GetDataAvailableForReading ()) != key.GetDataAvailableForReading ()) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unable to write %u bytes for key.", key.GetDataAvailableForReading ());
+            }
         }
 
     #if defined (THEKOGANS_CRYPTO_TESTING)
         std::string SymmetricKey::ToString (
-                util::ui32 indentationLevel,
+                std::size_t indentationLevel,
                 const char *tagName) const {
             std::stringstream stream;
             util::Attributes attributes;

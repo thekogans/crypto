@@ -83,7 +83,7 @@ namespace thekogans {
                 Update (buffer, bufferLength);
                 util::Buffer::UniquePtr hash (
                     new util::Buffer (util::HostEndian, GetMDLength (md)));
-                hash->AdvanceWriteOffset ((util::ui32)Final (hash->GetWritePtr ()));
+                hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
                 assert (hash->GetDataAvailableForWriting () == 0);
                 return hash;
             }
@@ -97,14 +97,14 @@ namespace thekogans {
             util::ReadOnlyFile file (util::HostEndian, path);
             Init ();
             util::FixedArray<util::ui8, 4096> buffer;
-            for (util::ui32 count = file.Read (buffer, 4096);
+            for (std::size_t count = file.Read (buffer, 4096);
                     count != 0;
                     count = file.Read (buffer, 4096)) {
                 Update (buffer, count);
             }
             util::Buffer::UniquePtr hash (
                 new util::Buffer (util::HostEndian, GetMDLength (md)));
-            hash->AdvanceWriteOffset ((util::ui32)Final (hash->GetWritePtr ()));
+            hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
             assert (hash->GetDataAvailableForWriting () == 0);
             return hash;
         }

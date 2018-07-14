@@ -210,23 +210,30 @@ namespace thekogans {
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             util::i32 type;
-            util::i32 keyLength;
+            util::SizeT keyLength;
             serializer >> isPrivate >> type >> keyLength;
             util::SecureVector<util::ui8> keyBuffer (keyLength);
-            serializer.Read (&keyBuffer[0], keyLength);
-            BIOPtr bio (BIO_new (BIO_s_mem ()));
-            if (bio.get () != 0) {
-                if (BIO_write (bio.get (), &keyBuffer[0], keyLength) == keyLength) {
-                    key.reset (isPrivate ?
-                        PEM_read_bio_PrivateKey (bio.get (), 0, 0, 0) :
-                        PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
+            if (serializer.Read (&keyBuffer[0], keyLength) == keyLength) {
+                BIOPtr bio (BIO_new (BIO_s_mem ()));
+                if (bio.get () != 0) {
+                    if (BIO_write (bio.get (), &keyBuffer[0], keyLength) == keyLength) {
+                        key.reset (isPrivate ?
+                            PEM_read_bio_PrivateKey (bio.get (), 0, 0, 0) :
+                            PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
             else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Read (&keyBuffer[0], %u) != %u",
+                    keyBuffer.size (),
+                    keyBuffer.size ());
             }
         }
 
@@ -255,8 +262,14 @@ namespace thekogans {
             Serializable::Write (serializer);
             util::SecureVector<util::ui8> keyBuffer;
             WriteKey (isPrivate, *key, keyBuffer);
-            serializer << isPrivate << GetType () << (util::i32)keyBuffer.size ();
-            serializer.Write (&keyBuffer[0], (util::ui32)keyBuffer.size ());
+            serializer << isPrivate << GetType () << util::SizeT (keyBuffer.size ());
+            if (serializer.Write (&keyBuffer[0], keyBuffer.size ()) !=
+                    keyBuffer.size ()) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Write (&keyBuffer[0], %u) != %u",
+                    keyBuffer.size (),
+                    keyBuffer.size ());
+            }
         }
 
     #if defined (THEKOGANS_CRYPTO_TESTING)
@@ -264,7 +277,7 @@ namespace thekogans {
         const char * const AsymmetricKey::ATTR_KEY_TYPE = "KeyType";
 
         std::string AsymmetricKey::ToString (
-                util::ui32 indentationLevel,
+                std::size_t indentationLevel,
                 const char *tagName) const {
             util::SecureVector<util::ui8> keyBuffer;
             WriteKey (isPrivate, *key, keyBuffer);

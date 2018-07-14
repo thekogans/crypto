@@ -48,7 +48,7 @@ namespace thekogans {
         const char * const Stats::ATTR_TOTAL_BYTE_COUNT = "TotalByteCount";
 
         std::string Stats::ToString (
-                util::ui32 indentationLevel,
+                std::size_t indentationLevel,
                 const char *tagName) const {
             util::Attributes attributes;
             attributes.push_back (

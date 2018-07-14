@@ -146,9 +146,9 @@ namespace thekogans {
                     id,
                     params,
                     salt,
-                    (util::ui32)keyLength,
+                    keyLength,
                     messageDigest,
-                    (util::ui32)count,
+                    count,
                     keyId,
                     name,
                     description,
@@ -162,10 +162,9 @@ namespace thekogans {
                     const AsymmetricKey &publicKey2) {
                 util::Buffer buffer (
                     util::NetworkEndian,
-                    (util::ui32)(
-                        util::Serializer::Size (salt) +
-                        util::Serializable::Size (publicKey1) +
-                        util::Serializable::Size (publicKey2)));
+                    util::Serializer::Size (salt) +
+                    util::Serializable::Size (publicKey1) +
+                    util::Serializable::Size (publicKey2));
                 buffer << salt << publicKey1 << publicKey2;
                 return buffer;
             }

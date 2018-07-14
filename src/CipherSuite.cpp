@@ -441,7 +441,7 @@ namespace thekogans {
         KeyExchange::Ptr CipherSuite::GetRSAKeyExchange (
                 const ID &keyExchangeId,
                 AsymmetricKey::Ptr key,
-                util::ui32 secretLength,
+                std::size_t secretLength,
                 const void *salt,
                 std::size_t saltLength,
                 std::size_t count,

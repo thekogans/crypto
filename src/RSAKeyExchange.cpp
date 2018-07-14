@@ -127,7 +127,7 @@ namespace thekogans {
         KeyExchange::Params::Ptr RSAKeyExchange::GetParams () const {
             util::SecureBuffer symmetricKeyBuffer (
                 util::NetworkEndian,
-                (util::ui32)util::Serializable::Size (*symmetricKey));
+                util::Serializable::Size (*symmetricKey));
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
                 Authenticator authenticator (Authenticator::Sign, key);
@@ -157,7 +157,7 @@ namespace thekogans {
                 if (rsaParams.Get () != 0) {
                     util::SecureBuffer symmetricKeyBuffer (
                         util::NetworkEndian,
-                        (util::ui32)util::Serializable::Size (*symmetricKey));
+                        util::Serializable::Size (*symmetricKey));
                     symmetricKeyBuffer << *symmetricKey;
                     Authenticator authenticator (Authenticator::Verify, key);
                     if (!authenticator.VerifyBufferSignature (

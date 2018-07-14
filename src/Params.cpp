@@ -401,7 +401,7 @@ namespace thekogans {
         const char * const Params::ATTR_PARAMS_TYPE = "ParamsType";
 
         std::string Params::ToString (
-                util::ui32 indentationLevel,
+                std::size_t indentationLevel,
                 const char *tagName) const {
             util::SecureVector<util::ui8> paramsBuffer;
             WriteParams (*params, paramsBuffer);

@@ -63,14 +63,14 @@ namespace thekogans {
                 std::vector<util::ui8> salt;
                 /// \brief
                 /// Length of the resulting \see{SymmetricKey} (in bytes).
-                util::ui32 keyLength;
+                util::SizeT keyLength;
                 /// \brief
                 /// OpenSSL message digest to use for hashing.
                 std::string messageDigest;
                 /// \brief
                 /// A security counter. Increment the count to slow down
                 /// \see{SymmetricKey} derivation.
-                util::ui32 count;
+                util::SizeT count;
                 /// \brief
                 /// \see{SymmetricKey} id.
                 ID keyId;
@@ -101,9 +101,9 @@ namespace thekogans {
                     const ID &id,
                     crypto::Params::Ptr params_,
                     const std::vector<util::ui8> &salt_,
-                    util::ui32 keyLength_,
+                    std::size_t keyLength_,
                     const std::string &messageDigest_,
-                    util::ui32 count_,
+                    std::size_t count_,
                     const ID &keyId_,
                     const std::string &name_,
                     const std::string &description_,

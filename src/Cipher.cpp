@@ -135,9 +135,9 @@ namespace thekogans {
                 util::Buffer::UniquePtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
-                        (util::ui32)GetMaxBufferLength (plaintextLength)));
+                        GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
-                    (util::ui32)Encrypt (
+                    Encrypt (
                         plaintext,
                         plaintextLength,
                         associatedData,
@@ -189,9 +189,9 @@ namespace thekogans {
                 util::Buffer::UniquePtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
-                        (util::ui32)(GetMaxBufferLength (plaintextLength))));
+                        GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
-                    (util::ui32)EncryptAndEnlengthen (
+                    EncryptAndEnlengthen (
                         plaintext,
                         plaintextLength,
                         associatedData,
@@ -243,9 +243,9 @@ namespace thekogans {
                 util::Buffer::UniquePtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
-                        (util::ui32)(GetMaxBufferLength (plaintextLength))));
+                        GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
-                    (util::ui32)EncryptAndFrame (
+                    EncryptAndFrame (
                         plaintext,
                         plaintextLength,
                         associatedData,
@@ -271,7 +271,7 @@ namespace thekogans {
                 util::TenantReadBuffer buffer (
                     util::NetworkEndian,
                     (const util::ui8 *)ciphertext,
-                    (util::ui32)ciphertextLength);
+                    ciphertextLength);
                 CiphertextHeader ciphertextHeader;
                 buffer >> ciphertextHeader;
                 // If we're in CBC mode, verify the MAC before attempting to
@@ -322,10 +322,10 @@ namespace thekogans {
             if (ciphertext != 0 && ciphertextLength > 0 &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::UniquePtr plaintext (secure ?
-                    new util::SecureBuffer (endianness, (util::ui32)ciphertextLength) :
-                    new util::Buffer (endianness, (util::ui32)ciphertextLength));
+                    new util::SecureBuffer (endianness, ciphertextLength) :
+                    new util::Buffer (endianness, ciphertextLength));
                 plaintext->AdvanceWriteOffset (
-                    (util::ui32)Decrypt (
+                    Decrypt (
                         ciphertext,
                         ciphertextLength,
                         associatedData,

@@ -384,7 +384,7 @@ namespace thekogans {
             if (key != 0 && keyLength > 0 &&
                     passwordLength <= 8 && md != 0) {
                 util::ui8 buffer[8];
-                for (util::ui32 i = 8; i-- > 0;) {
+                for (std::size_t i = 8; i-- > 0;) {
                     buffer[i] = (util::ui8)(value & 0xff);
                     value >>= 8;
                 }

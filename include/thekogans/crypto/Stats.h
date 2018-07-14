@@ -84,7 +84,7 @@ namespace thekogans {
             /// \param[in] tagName The name of the leading tag.
             /// \return XML representation of stats.
             std::string ToString (
-                util::ui32 indentationLevel,
+                std::size_t indentationLevel,
                 const char *tagName) const;
         #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };

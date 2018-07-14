@@ -52,7 +52,7 @@ namespace thekogans {
             util::Buffer::UniquePtr buffer (
                 new util::Buffer (
                     util::NetworkEndian,
-                    (util::ui32)file.GetSize ()));
+                    file.GetSize ()));
             buffer->AdvanceWriteOffset (
                 file.Read (
                     buffer->GetWritePtr (),
@@ -78,7 +78,7 @@ namespace thekogans {
             util::Buffer::UniquePtr buffer (
                 new util::SecureBuffer (
                     util::NetworkEndian,
-                    (util::ui32)util::Serializable::Size (*this)));
+                    util::Serializable::Size (*this)));
             *buffer << *this;
             if (cipher != 0) {
                 buffer = cipher->Encrypt (
@@ -1241,7 +1241,7 @@ namespace thekogans {
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             serializer >> cipherSuite;
-            util::ui32 keyExchangeParamsCount;
+            util::SizeT keyExchangeParamsCount;
             serializer >> keyExchangeParamsCount;
             keyExchangeParamsMap.clear ();
             while (keyExchangeParamsCount-- > 0) {
@@ -1256,7 +1256,7 @@ namespace thekogans {
                         params->GetName ().c_str ());
                 }
             }
-            util::ui32 keyExchangeKeyCount;
+            util::SizeT keyExchangeKeyCount;
             serializer >> keyExchangeKeyCount;
             keyExchangeKeyMap.clear ();
             while (keyExchangeKeyCount-- > 0) {
@@ -1271,7 +1271,7 @@ namespace thekogans {
                         key->GetName ().c_str ());
                 }
             }
-            util::ui32 authenticatorParamsCount;
+            util::SizeT authenticatorParamsCount;
             serializer >> authenticatorParamsCount;
             authenticatorParamsMap.clear ();
             while (authenticatorParamsCount-- > 0) {
@@ -1286,7 +1286,7 @@ namespace thekogans {
                         params->GetName ().c_str ());
                 }
             }
-            util::ui32 authenticatorKeyCount;
+            util::SizeT authenticatorKeyCount;
             serializer >> authenticatorKeyCount;
             authenticatorKeyMap.clear ();
             while (authenticatorKeyCount-- > 0) {
@@ -1301,7 +1301,7 @@ namespace thekogans {
                         key->GetName ().c_str ());
                 }
             }
-            util::ui32 cipherKeyCount;
+            util::SizeT cipherKeyCount;
             serializer >> cipherKeyCount;
             cipherKeyMap.clear ();
             while (cipherKeyCount-- > 0) {
@@ -1316,7 +1316,7 @@ namespace thekogans {
                         key->GetName ().c_str ());
                 }
             }
-            util::ui32 macKeyCount;
+            util::SizeT macKeyCount;
             serializer >> macKeyCount;
             macKeyMap.clear ();
             while (macKeyCount-- > 0) {
@@ -1331,7 +1331,7 @@ namespace thekogans {
                         key->GetName ().c_str ());
                 }
             }
-            util::ui32 userDataCount;
+            util::SizeT userDataCount;
             serializer >> userDataCount;
             userDataMap.clear ();
             while (userDataCount-- > 0) {
@@ -1346,7 +1346,7 @@ namespace thekogans {
                         userData->GetName ().c_str ());
                 }
             }
-            util::ui32 subringCount;
+            util::SizeT subringCount;
             serializer >> subringCount;
             subringMap.clear ();
             while (subringCount-- > 0) {
@@ -1366,49 +1366,49 @@ namespace thekogans {
         void KeyRing::Write (util::Serializer &serializer) const {
             Serializable::Write (serializer);
             serializer << cipherSuite;
-            serializer << (util::ui32)keyExchangeParamsMap.size ();
+            serializer << util::SizeT (keyExchangeParamsMap.size ());
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
                     end = keyExchangeParamsMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)keyExchangeKeyMap.size ();
+            serializer << util::SizeT (keyExchangeKeyMap.size ());
             for (AsymmetricKeyMap::const_iterator
                     it = keyExchangeKeyMap.begin (),
                     end = keyExchangeKeyMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)authenticatorParamsMap.size ();
+            serializer << util::SizeT (authenticatorParamsMap.size ());
             for (ParamsMap::const_iterator
                     it = authenticatorParamsMap.begin (),
                     end = authenticatorParamsMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)authenticatorKeyMap.size ();
+            serializer << util::SizeT (authenticatorKeyMap.size ());
             for (AsymmetricKeyMap::const_iterator
                     it = authenticatorKeyMap.begin (),
                     end = authenticatorKeyMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)cipherKeyMap.size ();
+            serializer << util::SizeT (cipherKeyMap.size ());
             for (SymmetricKeyMap::const_iterator
                     it = cipherKeyMap.begin (),
                     end = cipherKeyMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)macKeyMap.size ();
+            serializer << util::SizeT (macKeyMap.size ());
             for (AsymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)userDataMap.size ();
+            serializer << util::SizeT (userDataMap.size ());
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
                 serializer << *it->second;
             }
-            serializer << (util::ui32)subringMap.size ();
+            serializer << util::SizeT (subringMap.size ());
             for (KeyRingMap::const_iterator
                     it = subringMap.begin (),
                     end = subringMap.end (); it != end; ++it) {
@@ -1444,7 +1444,7 @@ namespace thekogans {
         const char * const KeyRing::TAG_SUB_RING = "SubRing";
 
         std::string KeyRing::ToString (
-                util::ui32 indentationLevel,
+                std::size_t indentationLevel,
                 const char *tagName) const {
             std::stringstream stream;
             util::Attributes attributes;

@@ -72,10 +72,10 @@ namespace thekogans {
             std::size_t signatureLength = 0;
             if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1 && signatureLength > 0) {
                 util::Buffer::UniquePtr signature (
-                    new util::Buffer (util::HostEndian, (util::ui32)signatureLength));
+                    new util::Buffer (util::HostEndian, signatureLength));
                 if (EVP_DigestSignFinal (&ctx,
                         signature->GetWritePtr (), &signatureLength) == 1) {
-                    signature->AdvanceWriteOffset ((util::ui32)signatureLength);
+                    signature->AdvanceWriteOffset (signatureLength);
                     return signature;
                 }
                 else {

@@ -144,10 +144,10 @@ int main (
         toFile << blockSize;
         util::Array<util::ui8> plaintext (blockSize);
         util::Array<util::ui8> ciphertext (crypto::Cipher::GetMaxBufferLength (blockSize));
-        for (util::ui32 plaintextLength = fromFile.Read (plaintext.array, blockSize);
+        for (std::size_t plaintextLength = fromFile.Read (plaintext.array, blockSize);
                 plaintextLength != 0;
                 plaintextLength = fromFile.Read (plaintext.array, blockSize)) {
-            util::ui32 ciphertextLength;
+            std::size_t ciphertextLength;
             if (keyRing.Get () != 0) {
                 crypto::SymmetricKey::Ptr key =
                     crypto::SymmetricKey::FromRandom (
@@ -159,12 +159,12 @@ int main (
                 keyRing->AddCipherKey (key);
                 cipher = keyRing->GetCipherSuite ().GetCipher (key);
                 ciphertextLength =
-                    (util::ui32)cipher->EncryptAndFrame (
+                    cipher->EncryptAndFrame (
                         plaintext.array, plaintextLength, 0, 0, ciphertext.array);
             }
             else {
                 ciphertextLength =
-                    (util::ui32)cipher->EncryptAndEnlengthen (
+                    cipher->EncryptAndEnlengthen (
                         plaintext.array, plaintextLength, 0, 0, ciphertext.array);
             }
             if (toFile.Write (ciphertext.array, ciphertextLength) == ciphertextLength) {

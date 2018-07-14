@@ -67,7 +67,7 @@ namespace thekogans {
                     const std::string &description = std::string ()) :
                     Serializable (id, name, description),
                     // FixedBuffer will throw if length > EVP_MAX_KEY_LENGTH.
-                    key (util::HostEndian, (const util::ui8 *)buffer, (util::ui32)length) {
+                    key (util::HostEndian, (const util::ui8 *)buffer, length) {
                 memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
             }
             ~SymmetricKey () {
@@ -261,7 +261,7 @@ namespace thekogans {
             /// \param[in] tagName The name of the leading tag.
             /// \return XML representation of a key.
             virtual std::string ToString (
-                util::ui32 indentationLevel = 0,
+                std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const;
         #endif // defined (THEKOGANS_CRYPTO_TESTING)
 

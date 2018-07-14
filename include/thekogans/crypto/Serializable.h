@@ -160,7 +160,7 @@ namespace thekogans {
             /// \param[in] tagName The name of the leading tag.
             /// \return XML representation of a serializable.
             virtual std::string ToString (
-                util::ui32 indentationLevel = 0,
+                std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const = 0;
         #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
