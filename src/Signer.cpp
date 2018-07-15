@@ -68,14 +68,13 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr Signer::Final () {
+        util::Buffer Signer::Final () {
             std::size_t signatureLength = 0;
             if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1 && signatureLength > 0) {
-                util::Buffer::UniquePtr signature (
-                    new util::Buffer (util::HostEndian, signatureLength));
+                util::Buffer signature (util::HostEndian, signatureLength);
                 if (EVP_DigestSignFinal (&ctx,
-                        signature->GetWritePtr (), &signatureLength) == 1) {
-                    signature->AdvanceWriteOffset (signatureLength);
+                        signature.GetWritePtr (), &signatureLength) == 1) {
+                    signature.AdvanceWriteOffset (signatureLength);
                     return signature;
                 }
                 else {

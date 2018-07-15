@@ -118,7 +118,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr RSA::Encrypt (
+        util::Buffer RSA::Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 AsymmetricKey::Ptr publicKey,
@@ -127,17 +127,14 @@ namespace thekogans {
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
                     publicKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
-                util::Buffer::UniquePtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        publicKey->Length ()));
-                ciphertext->AdvanceWriteOffset (
+                util::Buffer ciphertext (util::NetworkEndian, publicKey->Length ());
+                ciphertext.AdvanceWriteOffset (
                     Encrypt (
                         plaintext,
                         plaintextLength,
                         publicKey,
                         padding,
-                        ciphertext->GetWritePtr ()));
+                        ciphertext.GetWritePtr ()));
                 return ciphertext;
             }
             else {
@@ -182,7 +179,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr RSA::EncryptAndEnlengthen (
+        util::Buffer RSA::EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 AsymmetricKey::Ptr publicKey,
@@ -191,17 +188,16 @@ namespace thekogans {
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
                     publicKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
-                util::Buffer::UniquePtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
-                ciphertext->AdvanceWriteOffset (
+                util::Buffer ciphertext (
+                    util::NetworkEndian,
+                    GetMaxBufferLength (plaintextLength));
+                ciphertext.AdvanceWriteOffset (
                     EncryptAndEnlengthen (
                         plaintext,
                         plaintextLength,
                         publicKey,
                         padding,
-                        ciphertext->GetWritePtr ()));
+                        ciphertext.GetWritePtr ()));
                 return ciphertext;
             }
             else {
@@ -240,7 +236,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr RSA::EncryptAndFrame (
+        util::Buffer RSA::EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 AsymmetricKey::Ptr publicKey,
@@ -249,17 +245,16 @@ namespace thekogans {
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
                     publicKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
-                util::Buffer::UniquePtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
-                ciphertext->AdvanceWriteOffset (
+                util::Buffer ciphertext (
+                    util::NetworkEndian,
+                    GetMaxBufferLength (plaintextLength));
+                ciphertext.AdvanceWriteOffset (
                     EncryptAndFrame (
                         plaintext,
                         plaintextLength,
                         publicKey,
                         padding,
-                        ciphertext->GetWritePtr ()));
+                        ciphertext.GetWritePtr ()));
                 return ciphertext;
             }
             else {
@@ -303,7 +298,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr RSA::Decrypt (
+        util::Buffer RSA::Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
                 AsymmetricKey::Ptr privateKey,
@@ -314,16 +309,16 @@ namespace thekogans {
                     privateKey.Get () != 0 && privateKey->IsPrivate () &&
                     privateKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
-                util::Buffer::UniquePtr plaintext (secure ?
-                    new util::SecureBuffer (endianness, privateKey->Length ()) :
-                    new util::Buffer (endianness, privateKey->Length ()));
-                plaintext->AdvanceWriteOffset (
+                util::Buffer plaintext = secure ?
+                    util::SecureBuffer (endianness, privateKey->Length ()) :
+                    util::Buffer (endianness, privateKey->Length ());
+                plaintext.AdvanceWriteOffset (
                     Decrypt (
                         ciphertext,
                         ciphertextLength,
                         privateKey,
                         padding,
-                        plaintext->GetWritePtr ()));
+                        plaintext.GetWritePtr ()));
                 return plaintext;
             }
             else {
@@ -469,7 +464,7 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::UniquePtr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer _LIB_THEKOGANS_CRYPTO_API
         RSAEncrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
@@ -479,18 +474,17 @@ namespace thekogans {
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
                     publicKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
-                util::Buffer::UniquePtr buffer (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (publicKey->Length ()) +
-                        Cipher::GetMaxBufferLength (plaintextLength)));
-                buffer->AdvanceWriteOffset (
+                util::Buffer buffer (
+                    util::NetworkEndian,
+                    GetMaxBufferLength (publicKey->Length ()) +
+                    Cipher::GetMaxBufferLength (plaintextLength));
+                buffer.AdvanceWriteOffset (
                     RSAEncrypt (
                         plaintext,
                         plaintextLength,
                         publicKey,
                         padding,
-                        buffer->GetWritePtr ()));
+                        buffer.GetWritePtr ()));
                 return buffer;
             }
             else {
@@ -549,7 +543,7 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::UniquePtr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer _LIB_THEKOGANS_CRYPTO_API
         RSADecrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
@@ -561,16 +555,16 @@ namespace thekogans {
                     privateKey.Get () != 0 && privateKey->IsPrivate () &&
                     privateKey->GetType () == EVP_PKEY_RSA &&
                     IsValidPadding (padding)) {
-                util::Buffer::UniquePtr buffer (secure ?
-                    new util::SecureBuffer (endianness, ciphertextLength) :
-                    new util::Buffer (endianness, ciphertextLength));
-                buffer->AdvanceWriteOffset (
+                util::Buffer buffer = secure ?
+                    util::SecureBuffer (endianness, ciphertextLength) :
+                    util::Buffer (endianness, ciphertextLength);
+                buffer.AdvanceWriteOffset (
                     RSADecrypt (
                         ciphertext,
                         ciphertextLength,
                         privateKey,
                         padding,
-                        buffer->GetWritePtr ()));
+                        buffer.GetWritePtr ()));
                 return buffer;
             }
             else {

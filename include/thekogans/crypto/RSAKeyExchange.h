@@ -57,7 +57,7 @@ namespace thekogans {
                 ID keyId;
                 /// \brief
                 /// Encrypted \see{SymmetricKey} (client). \see{SymmetricKey} signature (server).
-                util::Buffer::UniquePtr buffer;
+                util::Buffer buffer;
 
                 /// \brief
                 /// ctor.
@@ -68,7 +68,7 @@ namespace thekogans {
                 RSAParams (
                     const ID &id,
                     const ID &keyId_,
-                    util::Buffer::UniquePtr buffer_) :
+                    util::Buffer buffer_) :
                     Params (id),
                     keyId (keyId_),
                     buffer (std::move (buffer_)) {}

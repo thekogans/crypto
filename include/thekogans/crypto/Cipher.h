@@ -158,7 +158,7 @@ namespace thekogans {
             /// \param[in] associatedData Optional associated data (GCM mode only).
             /// \param[in] associatedDataLength Length of optional associated data.
             /// \return An encrypted and mac'ed buffer.
-            util::Buffer::UniquePtr Encrypt (
+            util::Buffer Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 const void *associatedData = 0,
@@ -196,7 +196,7 @@ namespace thekogans {
             /// \param[in] associatedData Optional associated data (GCM mode only).
             /// \param[in] associatedDataLength Length of optional associated data.
             /// \return An encrypted, mac'ed and framed buffer.
-            util::Buffer::UniquePtr EncryptAndEnlengthen (
+            util::Buffer EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 const void *associatedData,
@@ -234,7 +234,7 @@ namespace thekogans {
             /// \param[in] associatedData Optional associated data (GCM mode only).
             /// \param[in] associatedDataLength Length of optional associated data.
             /// \return An encrypted, mac'ed and framed buffer.
-            util::Buffer::UniquePtr EncryptAndFrame (
+            util::Buffer EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 const void *associatedData = 0,
@@ -265,7 +265,7 @@ namespace thekogans {
             /// \param[in] secure true == return util::SecureBuffer.
             /// \param[in] endianness Resulting plaintext buffer endianness.
             /// \return Plaintext.
-            util::Buffer::UniquePtr Decrypt (
+            util::Buffer Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
                 const void *associatedData = 0,

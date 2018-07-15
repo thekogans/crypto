@@ -40,8 +40,12 @@ namespace {
             crypto::MAC mac (key, md);
             util::ui8 buffer[1024];
             util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
-            util::Buffer::UniquePtr signature = mac.SignBuffer (buffer, 1024);
-            bool result = mac.VerifyBufferSignature (buffer, 1024, signature->GetReadPtr (), signature->GetDataAvailableForReading ());
+            util::Buffer signature = mac.SignBuffer (buffer, 1024);
+            bool result = mac.VerifyBufferSignature (
+                buffer,
+                1024,
+                signature.GetReadPtr (),
+                signature.GetDataAvailableForReading ());
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }

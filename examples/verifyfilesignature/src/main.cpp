@@ -80,14 +80,14 @@ int main (
             signatureFile.Read (
                 encodedSignature.GetWritePtr (),
                 encodedSignature.GetDataAvailableForWriting ()));
-        util::Buffer::UniquePtr signature =
+        util::Buffer signature =
             util::Base64::Decode (
                 encodedSignature.GetReadPtr (),
                 encodedSignature.GetDataAvailableForReading ());
         bool result = authenticator.VerifyFileSignature (
             options.path,
-            signature->GetReadPtr (),
-            signature->GetDataAvailableForReading ());
+            signature.GetReadPtr (),
+            signature.GetDataAvailableForReading ());
         std::cout << (result ? "Passed" : "Failed") << std::endl;
     }
     THEKOGANS_UTIL_CATCH_AND_LOG

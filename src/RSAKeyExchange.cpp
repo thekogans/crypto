@@ -41,7 +41,7 @@ namespace thekogans {
             return
                 Params::Size () +
                 util::Serializer::Size (keyId) +
-                util::Serializer::Size (*buffer);
+                util::Serializer::Size (buffer);
         }
 
         void RSAKeyExchange::RSAParams::Read (
@@ -53,7 +53,7 @@ namespace thekogans {
 
         void RSAKeyExchange::RSAParams::Write (util::Serializer &serializer) const {
             Params::Write (serializer);
-            serializer << keyId << *buffer;
+            serializer << keyId << buffer;
         }
 
         RSAKeyExchange::RSAKeyExchange (
@@ -109,14 +109,14 @@ namespace thekogans {
             if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && key->IsPrivate () &&
                     rsaParams.Get () != 0) {
                 id = rsaParams->id;
-                util::Buffer::UniquePtr symmetricKeyBuffer =
+                util::Buffer symmetricKeyBuffer =
                     RSADecrypt (
-                        rsaParams->buffer->GetReadPtr (),
-                        rsaParams->buffer->GetDataAvailableForReading (),
+                        rsaParams->buffer.GetReadPtr (),
+                        rsaParams->buffer.GetDataAvailableForReading (),
                         key,
                         RSA_PKCS1_OAEP_PADDING,
                         true);
-                *symmetricKeyBuffer >> symmetricKey;
+                symmetricKeyBuffer >> symmetricKey;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -163,8 +163,8 @@ namespace thekogans {
                     if (!authenticator.VerifyBufferSignature (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),
-                            rsaParams->buffer->GetReadPtr (),
-                            rsaParams->buffer->GetDataAvailableForReading ())) {
+                            rsaParams->buffer.GetReadPtr (),
+                            rsaParams->buffer.GetDataAvailableForReading ())) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Key (%s) failed signature verification.",
                             symmetricKey->GetId ().ToString ().c_str ());

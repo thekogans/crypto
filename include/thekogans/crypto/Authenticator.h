@@ -97,7 +97,7 @@ namespace thekogans {
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
             /// \return Buffer signature.
-            util::Buffer::UniquePtr SignBuffer (
+            util::Buffer SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength);
             /// \brief
@@ -117,7 +117,7 @@ namespace thekogans {
             /// Create a file signature.
             /// \param[in] path File whose signature to create.
             /// \return File signature.
-            util::Buffer::UniquePtr SignFile (const std::string &path);
+            util::Buffer SignFile (const std::string &path);
             /// \brief
             /// Verify a file signature.
             /// \param[in] path File whose signature to verify.

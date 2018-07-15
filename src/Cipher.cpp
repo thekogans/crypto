@@ -125,24 +125,21 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr Cipher::Encrypt (
+        util::Buffer Cipher::Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
-                util::Buffer::UniquePtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
-                ciphertext->AdvanceWriteOffset (
+                util::Buffer ciphertext (util::NetworkEndian, GetMaxBufferLength (plaintextLength));
+                ciphertext.AdvanceWriteOffset (
                     Encrypt (
                         plaintext,
                         plaintextLength,
                         associatedData,
                         associatedDataLength,
-                        ciphertext->GetWritePtr ()));
+                        ciphertext.GetWritePtr ()));
                 return ciphertext;
             }
             else {
@@ -179,24 +176,21 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr Cipher::EncryptAndEnlengthen (
+        util::Buffer Cipher::EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
-                util::Buffer::UniquePtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
-                ciphertext->AdvanceWriteOffset (
+                util::Buffer ciphertext (util::NetworkEndian, GetMaxBufferLength (plaintextLength));
+                ciphertext.AdvanceWriteOffset (
                     EncryptAndEnlengthen (
                         plaintext,
                         plaintextLength,
                         associatedData,
                         associatedDataLength,
-                        ciphertext->GetWritePtr ()));
+                        ciphertext.GetWritePtr ()));
                 return ciphertext;
             }
             else {
@@ -233,24 +227,21 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr Cipher::EncryptAndFrame (
+        util::Buffer Cipher::EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
-                util::Buffer::UniquePtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
-                ciphertext->AdvanceWriteOffset (
+                util::Buffer ciphertext (util::NetworkEndian, GetMaxBufferLength (plaintextLength));
+                ciphertext.AdvanceWriteOffset (
                     EncryptAndFrame (
                         plaintext,
                         plaintextLength,
                         associatedData,
                         associatedDataLength,
-                        ciphertext->GetWritePtr ()));
+                        ciphertext.GetWritePtr ()));
                 return ciphertext;
             }
             else {
@@ -312,7 +303,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr Cipher::Decrypt (
+        util::Buffer Cipher::Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
                 const void *associatedData,
@@ -321,16 +312,16 @@ namespace thekogans {
                 util::Endianness endianness) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
-                util::Buffer::UniquePtr plaintext (secure ?
-                    new util::SecureBuffer (endianness, ciphertextLength) :
-                    new util::Buffer (endianness, ciphertextLength));
-                plaintext->AdvanceWriteOffset (
+                util::Buffer plaintext = secure ?
+                    util::SecureBuffer (endianness, ciphertextLength) :
+                    util::Buffer (endianness, ciphertextLength);
+                plaintext.AdvanceWriteOffset (
                     Decrypt (
                         ciphertext,
                         ciphertextLength,
                         associatedData,
                         associatedDataLength,
-                        plaintext->GetWritePtr ()));
+                        plaintext.GetWritePtr ()));
                 return plaintext;
             }
             else {

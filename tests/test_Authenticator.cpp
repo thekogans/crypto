@@ -38,13 +38,13 @@ namespace {
             crypto::Authenticator signer (crypto::Authenticator::Sign, privateKey);
             util::ui8 buffer[1024];
             util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
-            util::Buffer::UniquePtr signature = signer.SignBuffer (buffer, 1024);
+            util::Buffer signature = signer.SignBuffer (buffer, 1024);
             crypto::Authenticator verifier (crypto::Authenticator::Verify, privateKey->GetPublicKey ());
             bool result = verifier.VerifyBufferSignature (
                 buffer,
                 1024,
-                signature->GetReadPtr (),
-                signature->GetDataAvailableForReading ());
+                signature.GetReadPtr (),
+                signature.GetDataAvailableForReading ());
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }

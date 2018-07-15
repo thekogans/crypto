@@ -117,7 +117,7 @@ namespace thekogans {
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
             /// \return Buffer signature.
-            util::Buffer::UniquePtr SignBuffer (
+            util::Buffer SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength);
             /// \brief

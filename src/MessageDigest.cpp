@@ -75,16 +75,15 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr MessageDigest::HashBuffer (
+        util::Buffer MessageDigest::HashBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
                 Init ();
                 Update (buffer, bufferLength);
-                util::Buffer::UniquePtr hash (
-                    new util::Buffer (util::HostEndian, GetMDLength (md)));
-                hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
-                assert (hash->GetDataAvailableForWriting () == 0);
+                util::Buffer hash (util::HostEndian, GetMDLength (md));
+                hash.AdvanceWriteOffset (Final (hash.GetWritePtr ()));
+                assert (hash.GetDataAvailableForWriting () == 0);
                 return hash;
             }
             else {
@@ -93,7 +92,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr MessageDigest::HashFile (const std::string &path) {
+        util::Buffer MessageDigest::HashFile (const std::string &path) {
             util::ReadOnlyFile file (util::HostEndian, path);
             Init ();
             util::FixedArray<util::ui8, 4096> buffer;
@@ -102,10 +101,9 @@ namespace thekogans {
                     count = file.Read (buffer, 4096)) {
                 Update (buffer, count);
             }
-            util::Buffer::UniquePtr hash (
-                new util::Buffer (util::HostEndian, GetMDLength (md)));
-            hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
-            assert (hash->GetDataAvailableForWriting () == 0);
+            util::Buffer hash (util::HostEndian, GetMDLength (md));
+            hash.AdvanceWriteOffset (Final (hash.GetWritePtr ()));
+            assert (hash.GetDataAvailableForWriting () == 0);
             return hash;
         }
 

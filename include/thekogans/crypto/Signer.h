@@ -84,7 +84,7 @@ namespace thekogans {
             /// \brief
             /// Finalize the signing operation and return the signature.
             /// \return Signature.
-            util::Buffer::UniquePtr Final ();
+            util::Buffer Final ();
 
             /// \brief
             /// Signer is neither copy constructable, nor assignable.

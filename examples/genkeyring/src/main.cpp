@@ -147,17 +147,17 @@ int main (
                         0,
                         crypto::GetCipherKeyLength (
                             keyRing->GetCipherSuite ().GetOpenSSLCipher ())));
-                util::Buffer::UniquePtr ciphertext = cipher.Encrypt (
+                util::Buffer ciphertext = cipher.Encrypt (
                     originalPlaintext.GetReadPtr (),
                     originalPlaintext.GetDataAvailableForReading ());
-                util::Buffer::UniquePtr decryptedPlaintext = cipher.Decrypt (
-                    ciphertext->GetReadPtr (),
-                    ciphertext->GetDataAvailableForReading ());
+                util::Buffer decryptedPlaintext = cipher.Decrypt (
+                    ciphertext.GetReadPtr (),
+                    ciphertext.GetDataAvailableForReading ());
                 if (originalPlaintext.GetDataAvailableForReading () ==
-                        decryptedPlaintext->GetDataAvailableForReading () &&
+                        decryptedPlaintext.GetDataAvailableForReading () &&
                         memcmp (
                             originalPlaintext.GetReadPtr (),
-                            decryptedPlaintext->GetReadPtr (),
+                            decryptedPlaintext.GetReadPtr (),
                             originalPlaintext.GetDataAvailableForReading ()) == 0) {
                     std::cout << "Passed" << std::endl;
                 }

@@ -92,7 +92,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr MAC::SignBuffer (
+        util::Buffer MAC::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
@@ -100,9 +100,10 @@ namespace thekogans {
                 Update (buffer, bufferLength);
                 util::ui8 signature[EVP_MAX_MD_SIZE];
                 std::size_t signatureLength = Final (signature);
-                return util::Buffer::UniquePtr (
-                    new util::Buffer (
-                        util::HostEndian, signature, signature + signatureLength));
+                return util::Buffer (
+                    util::HostEndian,
+                    signature,
+                    signature + signatureLength);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

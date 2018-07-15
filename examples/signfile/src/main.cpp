@@ -81,11 +81,11 @@ int main (
             crypto::Authenticator signer (
                 crypto::Authenticator::Sign,
                 crypto::AsymmetricKey::LoadPrivateKeyFromFile (options.prefix + "private_key.pem"));
-            util::Buffer::UniquePtr signature = signer.SignFile (options.path);
-            util::Buffer::UniquePtr encodedSignature =
+            util::Buffer signature = signer.SignFile (options.path);
+            util::Buffer encodedSignature =
                 util::Base64::Encode (
-                    signature->GetReadPtr (),
-                    signature->GetDataAvailableForReading (),
+                    signature.GetReadPtr (),
+                    signature.GetDataAvailableForReading (),
                     64);
             util::SimpleFile signatureFile (
                 util::NetworkEndian,
@@ -94,8 +94,8 @@ int main (
                 util::SimpleFile::Create |
                 util::SimpleFile::Truncate);
             signatureFile.Write (
-                encodedSignature->GetReadPtr (),
-                encodedSignature->GetDataAvailableForReading ());
+                encodedSignature.GetReadPtr (),
+                encodedSignature.GetDataAvailableForReading ());
             std::cout << "Done" << std::endl;
         }
         if (options.verify) {
@@ -109,14 +109,14 @@ int main (
                 signatureFile.Read (
                     encodedSignature.GetWritePtr (),
                     encodedSignature.GetDataAvailableForWriting ()));
-            util::Buffer::UniquePtr signature =
+            util::Buffer signature =
                 util::Base64::Decode (
                     encodedSignature.GetReadPtr (),
                     encodedSignature.GetDataAvailableForReading ());
             bool result = verifier.VerifyFileSignature (
                 options.path,
-                signature->GetReadPtr (),
-                signature->GetDataAvailableForReading ());
+                signature.GetReadPtr (),
+                signature.GetDataAvailableForReading ());
             std::cout << (result ? "Passed" : "Failed") << std::endl;
         }
     }

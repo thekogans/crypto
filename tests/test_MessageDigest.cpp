@@ -38,10 +38,10 @@ namespace {
         THEKOGANS_UTIL_TRY {
             std::cout << name << "...";
             crypto::MessageDigest messageDigest (md);
-            util::Buffer::UniquePtr buffer1 = messageDigest.HashBuffer (message.c_str (), message.size ());
-            util::Buffer::UniquePtr buffer2 = messageDigest.HashBuffer (message.c_str (), message.size ());
-            bool result = buffer1->GetDataAvailableForReading () == buffer2->GetDataAvailableForReading () &&
-                memcmp (buffer1->GetReadPtr (), buffer2->GetReadPtr (), buffer1->GetDataAvailableForReading ()) == 0;
+            util::Buffer buffer1 = messageDigest.HashBuffer (message.c_str (), message.size ());
+            util::Buffer buffer2 = messageDigest.HashBuffer (message.c_str (), message.size ());
+            bool result = buffer1.GetDataAvailableForReading () == buffer2.GetDataAvailableForReading () &&
+                memcmp (buffer1.GetReadPtr (), buffer2.GetReadPtr (), buffer1.GetDataAvailableForReading ()) == 0;
             if (result) {
                 std::string path = name + std::string (".test");
                 {
@@ -53,11 +53,11 @@ namespace {
                         util::SimpleFile::Truncate);
                     file.Write (message.c_str (), (util::ui32)message.size ());
                 }
-                util::Buffer::UniquePtr buffer1 = messageDigest.HashFile (path);
-                util::Buffer::UniquePtr buffer2 = messageDigest.HashFile (path);
+                util::Buffer buffer1 = messageDigest.HashFile (path);
+                util::Buffer buffer2 = messageDigest.HashFile (path);
                 unlink (path.c_str ());
-                result = buffer1->GetDataAvailableForReading () == buffer2->GetDataAvailableForReading () &&
-                    memcmp (buffer1->GetReadPtr (), buffer2->GetReadPtr (), buffer1->GetDataAvailableForReading ()) == 0;
+                result = buffer1.GetDataAvailableForReading () == buffer2.GetDataAvailableForReading () &&
+                    memcmp (buffer1.GetReadPtr (), buffer2.GetReadPtr (), buffer1.GetDataAvailableForReading ()) == 0;
             }
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;

@@ -26,7 +26,7 @@
 namespace thekogans {
     namespace crypto {
 
-        util::Buffer::UniquePtr Authenticator::SignBuffer (
+        util::Buffer Authenticator::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
@@ -69,7 +69,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer::UniquePtr Authenticator::SignFile (const std::string &path) {
+        util::Buffer Authenticator::SignFile (const std::string &path) {
             if (op == Sign) {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
