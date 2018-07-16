@@ -251,7 +251,7 @@ namespace thekogans {
                     fe f,
                     fe g,
                     util::ui32 b) {
-                b = -b;
+                b = ~b + 1;
                 for (std::size_t i = 0; i < 10; ++i) {
                     util::i32 x = f[i] ^ g[i];
                     x &= b;
@@ -819,7 +819,7 @@ namespace thekogans {
                     fe f,
                     const fe g,
                     util::ui32 b) {
-                b = -b;
+                b = ~b + 1;
                 for (std::size_t i = 0; i < 10; ++i) {
                     util::i32 x = f[i] ^ g[i];
                     x &= b;
