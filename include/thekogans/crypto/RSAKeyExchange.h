@@ -115,16 +115,13 @@ namespace thekogans {
             /// \brief
             /// ctor. Used by the initiator of the key exchange request (client).
             /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
-            /// \param[in] key_ Public \see{AsymmetricKey used for
-            /// RSA \see{SymmetricKey} derivation.
-            /// \param[in] secretLength Length of random data to use for
-            /// \see{SymmetricKey} derivation.
+            /// \param[in] key_ Public \see{AsymmetricKey used for RSA \see{SymmetricKey} derivation.
+            /// \param[in] secretLength Length of random data to use for \see{SymmetricKey} derivation.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] md OpenSSL message digest to use for the signing operation.
-            /// \param[in] count A security counter. Increment the count to slow down
-            /// key derivation.
+            /// \param[in] count A security counter. Increment the count to slow down key derivation.
             /// \param[in] keyId Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
@@ -160,8 +157,7 @@ namespace thekogans {
             /// \brief
             /// Given the peer's \see{RSAParams}, derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{RSAParams} parameters.
-            /// \param[in] publicKey Optional peer's public key used
-            /// to verify parameters signature.
+            /// \param[in] publicKey Optional peer's public key used to verify parameters signature.
             /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return Shared \see{SymmetricKey}.
             virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (

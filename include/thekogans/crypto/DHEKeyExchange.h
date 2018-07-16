@@ -97,8 +97,7 @@ namespace thekogans {
                 /// \param[in] salt_ Salt for \see{SymmetricKey} derivation.
                 /// \param[in] keyLength_ Length of the resulting \see{SymmetricKey} (in bytes).
                 /// \param[in] messageDigest_ OpenSSL message digest to use for hashing.
-                /// \param[in] count_ A security counter. Increment the count to slow down
-                /// \see{SymmetricKey} derivation.
+                /// \param[in] count_ A security counter. Increment the count to slow down \see{SymmetricKey} derivation.
                 /// \param[in] keyId_ \see{SymmetricKey} id.
                 /// \param[in] name_ \see{SymmetricKey} name.
                 /// \param[in] description_ \see{SymmetricKey} description.
@@ -199,8 +198,7 @@ namespace thekogans {
             /// \param[in] saltLength Salt length.
             /// \param[in] keyLength Length of the resulting \see{SymmetricKey} (in bytes).
             /// \param[in] md OpenSSL message digest to use for hashing.
-            /// \param[in] count A security counter. Increment the count to slow down
-            /// \see{SymmetricKey} derivation.
+            /// \param[in] count A security counter. Increment the count to slow down \see{SymmetricKey} derivation.
             /// \param[in] keyId Optional \see{SymmetricKey} id.
             /// \param[in] name Optional \see{SymmetricKey} name.
             /// \param[in] description Optional \see{SymmetricKey} description.
