@@ -56,7 +56,7 @@ namespace thekogans {
             /// \brief
             /// Return the max plaintextLength that can be passed to EncryptBuffer below.
             /// \param[in] keyLength Length of key (in bits).
-            /// \param[in] paddin OpenSSL RSA padding type.
+            /// \param[in] padding OpenSSL RSA padding type.
             /// \return Max plaintextLength that can be passed to EncryptBuffer below.
             static std::size_t GetMaxPlaintextLength (
                 std::size_t keyLength,

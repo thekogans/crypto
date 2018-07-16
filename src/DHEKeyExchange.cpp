@@ -64,9 +64,9 @@ namespace thekogans {
                     util::Serializer::Size (id) +
                     util::Serializable::Size (*params) +
                     util::Serializer::Size (salt) +
-                    util::Serializer::Size (util::SizeT (keyLength)) +
+                    util::Serializer::Size (keyLength) +
                     util::Serializer::Size (messageDigest) +
-                    util::Serializer::Size (util::SizeT (count)) +
+                    util::Serializer::Size (count) +
                     util::Serializer::Size (keyId) +
                     util::Serializer::Size (name) +
                     util::Serializer::Size (description) +
@@ -152,7 +152,8 @@ namespace thekogans {
                 util::Serializer::Size (keyId) +
                 util::Serializer::Size (name) +
                 util::Serializer::Size (description) +
-                util::Serializable::Size (*publicKey);
+                util::Serializable::Size (*publicKey) +
+                util::Serializer::Size (signature);
         }
 
         void DHEKeyExchange::DHEParams::Read (
@@ -168,7 +169,8 @@ namespace thekogans {
                 keyId >>
                 name >>
                 description >>
-                publicKey;
+                publicKey >>
+                signature;
         }
 
         void DHEKeyExchange::DHEParams::Write (util::Serializer &serializer) const {
@@ -182,7 +184,8 @@ namespace thekogans {
                 keyId <<
                 name <<
                 description <<
-                *publicKey;
+                *publicKey <<
+                signature;
         }
 
         DHEKeyExchange::DHEKeyExchange (
