@@ -29,13 +29,13 @@ namespace thekogans {
     namespace crypto {
 
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
-            DHEKeyExchange::DHParams,
+            DHEKeyExchange::DHEParams,
             1,
             util::SpinLock,
             16,
             util::DefaultAllocator::Global)
 
-        std::size_t DHEKeyExchange::DHParams::Size () const {
+        std::size_t DHEKeyExchange::DHEParams::Size () const {
             return
                 Params::Size () +
                 util::Serializable::Size (*params) +
@@ -49,7 +49,7 @@ namespace thekogans {
                 util::Serializable::Size (*publicKey);
         }
 
-        void DHEKeyExchange::DHParams::Read (
+        void DHEKeyExchange::DHEParams::Read (
                 const Header &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
@@ -65,7 +65,7 @@ namespace thekogans {
                 publicKey;
         }
 
-        void DHEKeyExchange::DHParams::Write (util::Serializer &serializer) const {
+        void DHEKeyExchange::DHEParams::Write (util::Serializer &serializer) const {
             Params::Write (serializer);
             serializer <<
                 *params <<
@@ -116,23 +116,73 @@ namespace thekogans {
             }
         }
 
-        DHEKeyExchange::DHEKeyExchange (Params::Ptr params) :
+        DHEKeyExchange::DHEKeyExchange (
+                Params::Ptr params,
+                AsymmetricKey::Ptr publicKey,
+                const EVP_MD *md) :
                 KeyExchange (ID::Empty),
                 initiator (false) {
-            DHParams::Ptr dhParams =
-                util::dynamic_refcounted_pointer_cast<DHParams> (params);
-            if (dhParams.Get () != 0) {
-                id = dhParams->id;
-                this->params = dhParams->params;
-                salt = dhParams->salt;
-                keyLength = dhParams->keyLength;
-                messageDigest = dhParams->messageDigest;
-                count = dhParams->count;
-                keyId = dhParams->keyId;
-                name = dhParams->name;
-                description = dhParams->description;
+            DHEParams::Ptr dheParams =
+                util::dynamic_refcounted_pointer_cast<DHEParams> (params);
+            if (dheParams.Get () != 0) {
+                if (publicKey.Get () != 0 && md != 0) {
+                    if (!dheParams->signature.IsEmpty ()) {
+                        util::Buffer paramsBuffer (
+                            util::NetworkEndian,
+                            util::Serializer::Size (dheParams->id) +
+                            util::Serializable::Size (*dheParams->params) +
+                            util::Serializer::Size (dheParams->salt) +
+                            util::Serializer::Size (dheParams->keyLength) +
+                            util::Serializer::Size (dheParams->messageDigest) +
+                            util::Serializer::Size (dheParams->count) +
+                            util::Serializer::Size (dheParams->keyId) +
+                            util::Serializer::Size (dheParams->name) +
+                            util::Serializer::Size (dheParams->description) +
+                            util::Serializable::Size (*dheParams->publicKey));
+                        paramsBuffer <<
+                            dheParams->id <<
+                            *dheParams->params <<
+                            dheParams->salt <<
+                            dheParams->keyLength <<
+                            dheParams->messageDigest <<
+                            dheParams->count <<
+                            dheParams->keyId <<
+                            dheParams->name <<
+                            dheParams->description <<
+                            *dheParams->publicKey;
+                        Authenticator authenticator (Authenticator::Verify, publicKey, md);
+                        if (!authenticator.VerifyBufferSignature (
+                                paramsBuffer.GetReadPtr (),
+                                paramsBuffer.GetDataAvailableForReading (),
+                                dheParams->signature.GetReadPtr (),
+                                dheParams->signature.GetDataAvailableForReading ())) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Params (%s) failed signature verification.",
+                                dheParams->id.ToString ().c_str ());
+                        }
+                    }
+                    else {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Params (%s) are not signed.",
+                            dheParams->id.ToString ().c_str ());
+                    }
+                }
+                else if (!dheParams->signature.IsEmpty ()) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Params (%s) are signed (must provide a public key for verification).",
+                        dheParams->id.ToString ().c_str ());
+                }
+                id = dheParams->id;
+                this->params = dheParams->params;
+                salt = dheParams->salt;
+                keyLength = dheParams->keyLength;
+                messageDigest = dheParams->messageDigest;
+                count = dheParams->count;
+                keyId = dheParams->keyId;
+                name = dheParams->name;
+                description = dheParams->description;
                 privateKey = this->params->CreateKey ();
-                publicKey = privateKey->GetPublicKey ();
+                this->publicKey = privateKey->GetPublicKey ();
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -140,9 +190,41 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Params::Ptr DHEKeyExchange::GetParams () const {
+        KeyExchange::Params::Ptr DHEKeyExchange::GetParams (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md) const {
+            util::Buffer signature;
+            if (privateKey.Get () != 0 && md != 0) {
+                util::Buffer paramsBuffer (
+                    util::NetworkEndian,
+                    util::Serializer::Size (id) +
+                    util::Serializable::Size (*params) +
+                    util::Serializer::Size (salt) +
+                    util::Serializer::Size (util::SizeT (keyLength)) +
+                    util::Serializer::Size (messageDigest) +
+                    util::Serializer::Size (util::SizeT (count)) +
+                    util::Serializer::Size (keyId) +
+                    util::Serializer::Size (name) +
+                    util::Serializer::Size (description) +
+                    util::Serializable::Size (*publicKey));
+                paramsBuffer <<
+                    id <<
+                    *params <<
+                    salt <<
+                    util::SizeT (keyLength) <<
+                    messageDigest <<
+                    util::SizeT (count) <<
+                    keyId <<
+                    name <<
+                    description <<
+                    *publicKey;
+                Authenticator authenticator (Authenticator::Sign, privateKey, md);
+                signature = authenticator.SignBuffer (
+                    paramsBuffer.GetReadPtr (),
+                    paramsBuffer.GetDataAvailableForReading ());
+            }
             return Params::Ptr (
-                new DHParams (
+                new DHEParams (
                     id,
                     params,
                     salt,
@@ -152,7 +234,8 @@ namespace thekogans {
                     keyId,
                     name,
                     description,
-                    publicKey));
+                    publicKey,
+                    std::move (signature)));
         }
 
         namespace {
@@ -170,32 +253,82 @@ namespace thekogans {
             }
         }
 
-        SymmetricKey::Ptr DHEKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
-            DHParams::Ptr dhParams =
-                util::dynamic_refcounted_pointer_cast<DHParams> (params);
-            if (dhParams.Get () != 0) {
+        SymmetricKey::Ptr DHEKeyExchange::DeriveSharedSymmetricKey (
+                Params::Ptr params,
+                AsymmetricKey::Ptr publicKey,
+                const EVP_MD *md) const {
+            DHEParams::Ptr dheParams =
+                util::dynamic_refcounted_pointer_cast<DHEParams> (params);
+            if (dheParams.Get () != 0) {
+                if (publicKey.Get () != 0 && md != 0) {
+                    if (!dheParams->signature.IsEmpty ()) {
+                        util::Buffer paramsBuffer (
+                            util::NetworkEndian,
+                            util::Serializer::Size (dheParams->id) +
+                            util::Serializable::Size (*dheParams->params) +
+                            util::Serializer::Size (dheParams->salt) +
+                            util::Serializer::Size (dheParams->keyLength) +
+                            util::Serializer::Size (dheParams->messageDigest) +
+                            util::Serializer::Size (dheParams->count) +
+                            util::Serializer::Size (dheParams->keyId) +
+                            util::Serializer::Size (dheParams->name) +
+                            util::Serializer::Size (dheParams->description) +
+                            util::Serializable::Size (*dheParams->publicKey));
+                        paramsBuffer <<
+                            dheParams->id <<
+                            *dheParams->params <<
+                            dheParams->salt <<
+                            dheParams->keyLength <<
+                            dheParams->messageDigest <<
+                            dheParams->count <<
+                            dheParams->keyId <<
+                            dheParams->name <<
+                            dheParams->description <<
+                            *dheParams->publicKey;
+                        Authenticator authenticator (Authenticator::Verify, publicKey, md);
+                        if (!authenticator.VerifyBufferSignature (
+                                paramsBuffer.GetReadPtr (),
+                                paramsBuffer.GetDataAvailableForReading (),
+                                dheParams->signature.GetReadPtr (),
+                                dheParams->signature.GetDataAvailableForReading ())) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Params (%s) failed signature verification.",
+                                dheParams->id.ToString ().c_str ());
+                        }
+                    }
+                    else {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Params (%s) are not signed.",
+                            dheParams->id.ToString ().c_str ());
+                    }
+                }
+                else if (!dheParams->signature.IsEmpty ()) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Params (%s) are signed (must provide a public key for verification).",
+                        dheParams->id.ToString ().c_str ());
+                }
                 EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new (privateKey->Get (), OpenSSLInit::engine));
                 if (ctx.get () != 0) {
                     std::size_t secretLength = 0;
                     if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
-                            EVP_PKEY_derive_set_peer (ctx.get (), dhParams->publicKey->Get ()) == 1 &&
+                            EVP_PKEY_derive_set_peer (ctx.get (), dheParams->publicKey->Get ()) == 1 &&
                             EVP_PKEY_derive (ctx.get (), 0, &secretLength) == 1) {
                         util::SecureVector<util::ui8> secret (secretLength);
                         if (EVP_PKEY_derive (ctx.get (), &secret[0], &secretLength) == 1) {
                             util::Buffer salt = initiator ?
-                                GetSalt (dhParams->salt, *publicKey, *dhParams->publicKey) :
-                                GetSalt (dhParams->salt, *dhParams->publicKey, *publicKey);
+                                GetSalt (dheParams->salt, *this->publicKey, *dheParams->publicKey) :
+                                GetSalt (dheParams->salt, *dheParams->publicKey, *this->publicKey);
                             return SymmetricKey::FromSecretAndSalt (
                                 &secret[0],
                                 secretLength,
                                 salt.GetReadPtr (),
                                 salt.GetDataAvailableForReading (),
-                                dhParams->keyLength,
-                                CipherSuite::GetOpenSSLMessageDigestByName (dhParams->messageDigest),
-                                dhParams->count,
-                                dhParams->keyId,
-                                dhParams->name,
-                                dhParams->description);
+                                dheParams->keyLength,
+                                CipherSuite::GetOpenSSLMessageDigestByName (dheParams->messageDigest),
+                                dheParams->count,
+                                dheParams->keyId,
+                                dheParams->name,
+                                dheParams->description);
                         }
                         else {
                             THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

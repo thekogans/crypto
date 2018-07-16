@@ -24,6 +24,7 @@
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/ID.h"
 #include "thekogans/crypto/SymmetricKey.h"
+#include "thekogans/crypto/AsymmetricKey.h"
 
 namespace thekogans {
     namespace crypto {
@@ -103,16 +104,25 @@ namespace thekogans {
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
-            /// \param[in] id KeyExchange id (see \see{KeyRing::AddKeyExchange}).
-            /// \return Parameters (\see{DHParams} or \see{RSAParams}) to send to the key exchange peer.
-            virtual Params::Ptr GetParams () const = 0;
+            /// \param[in] privateKey Optional private key used to sign parameters.
+            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
+            /// \return Parameters (\see{DHEParams} or \see{RSAParams}) to send to the key exchange peer.
+            virtual Params::Ptr GetParams (
+                AsymmetricKey::Ptr /*privateKey*/ = AsymmetricKey::Ptr (),
+                const EVP_MD * /*md*/ = THEKOGANS_CRYPTO_DEFAULT_MD) const = 0;
 
             /// \brief
-            /// Given the peer's (see \see{DHParams} and \see{RSAParams}), use my private key
+            /// Given the peer's (see \see{DHEParams} and \see{RSAParams}), use my private key
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's parameters.
+            /// \param[in] publicKey Optional peer's public key used
+            /// to verify parameters signature.
+            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (Params::Ptr /*params*/) const = 0;
+            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (
+                Params::Ptr /*params*/,
+                AsymmetricKey::Ptr /*publicKey*/ = AsymmetricKey::Ptr (),
+                const EVP_MD * /*md*/ = THEKOGANS_CRYPTO_DEFAULT_MD) const = 0;
 
             /// \brief
             /// KeyExchange is neither copy constructable, nor assignable.

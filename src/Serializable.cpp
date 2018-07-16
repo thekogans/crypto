@@ -38,7 +38,7 @@ namespace thekogans {
                 Params::StaticInit ();
                 SymmetricKey::StaticInit ();
                 AsymmetricKey::StaticInit ();
-                DHEKeyExchange::DHParams::StaticInit ();
+                DHEKeyExchange::DHEParams::StaticInit ();
                 RSAKeyExchange::RSAParams::StaticInit ();
                 registered = true;
             }

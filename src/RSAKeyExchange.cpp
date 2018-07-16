@@ -124,7 +124,9 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Params::Ptr RSAKeyExchange::GetParams () const {
+        KeyExchange::Params::Ptr RSAKeyExchange::GetParams (
+                AsymmetricKey::Ptr /*privateKey*/,
+                const EVP_MD * /*md*/) const {
             util::SecureBuffer symmetricKeyBuffer (
                 util::NetworkEndian,
                 util::Serializable::Size (*symmetricKey));
@@ -149,7 +151,10 @@ namespace thekogans {
                         key)));
         }
 
-        SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
+        SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (
+                Params::Ptr params,
+                AsymmetricKey::Ptr /*privateKey*/,
+                const EVP_MD * /*md*/) const {
             assert (symmetricKey.Get () != 0);
             if (!key->IsPrivate ()) {
                 RSAParams::Ptr rsaParams =

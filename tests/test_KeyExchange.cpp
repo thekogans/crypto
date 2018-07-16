@@ -45,16 +45,22 @@ namespace {
 
     bool TestDHE (
             const char *paramsName,
-            crypto::Params::Ptr params) {
+            crypto::Params::Ptr params,
+            crypto::AsymmetricKey::Ptr privateKey1,
+            crypto::AsymmetricKey::Ptr privateKey2) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
             crypto::DHEKeyExchange keyExchange1 (crypto::ID (), params);
-            crypto::DHEKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
-            crypto::DHEKeyExchange keyExchange2 (params1);
+            crypto::DHEKeyExchange::Params::Ptr params1 = keyExchange1.GetParams (privateKey1);
+            crypto::DHEKeyExchange keyExchange2 (params1, privateKey1->GetPublicKey ());
             crypto::SymmetricKey::Ptr key1 =
-                keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
+                keyExchange1.DeriveSharedSymmetricKey (
+                    keyExchange2.GetParams (privateKey2),
+                    privateKey2->GetPublicKey ());
             crypto::SymmetricKey::Ptr key2 =
-                keyExchange2.DeriveSharedSymmetricKey (keyExchange1.GetParams ());
+                keyExchange2.DeriveSharedSymmetricKey (
+                    params1,
+                    privateKey1->GetPublicKey ());
             bool result = *key1 == *key2;
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
@@ -91,164 +97,228 @@ namespace {
 
 TEST (thekogans, DH) {
     crypto::OpenSSLInit openSSLInit;
+    crypto::AsymmetricKey::Ptr privateKey1 = crypto::RSA::CreateKey (512);
+    crypto::AsymmetricKey::Ptr privateKey2 = crypto::RSA::CreateKey (512);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromPrimeLengthAndGenerator (512)",
-            crypto::DH::ParamsFromPrimeLengthAndGenerator (512)),
+            crypto::DH::ParamsFromPrimeLengthAndGenerator (512),
+            privateKey1,
+            privateKey2),
         true);
     // crypto::DH::RFC3526Prime
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_1536)",
-            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_1536)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_1536),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_2048)",
-            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_2048)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_2048),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_3072)",
-            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_3072)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_3072),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_4096)",
-            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_4096)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_4096),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_6144)",
-            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_6144)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_6144),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_8192)",
-            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_8192)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_8192),
+            privateKey1,
+            privateKey2),
         true);
     // crypto::DH::RFC5114Prime
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_1024)",
-            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_1024)),
+            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_1024),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_224)",
-            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_224)),
+            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_224),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_256)",
-            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_256)),
+            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_256),
+            privateKey1,
+            privateKey2),
         true);
 }
 
 TEST (thekogans, EC) {
     crypto::OpenSSLInit openSSLInit;
+    crypto::AsymmetricKey::Ptr privateKey1 = crypto::RSA::CreateKey (512);
+    crypto::AsymmetricKey::Ptr privateKey2 = crypto::RSA::CreateKey (512);
     // Named curves
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1)",
-            crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1)),
+            crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1),
+            privateKey1,
+            privateKey2),
         true);
     // RFC5114Curve
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192)",
-            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224)",
-            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256)",
-            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384)",
-            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521)",
-            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521),
+            privateKey1,
+            privateKey2),
         true);
     // RFC5639Curve
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512),
+            privateKey1,
+            privateKey2),
         true);
     CHECK_EQUAL (
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)",
-            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T),
+            privateKey1,
+            privateKey2),
         true);
 }
 
