@@ -115,8 +115,7 @@ namespace thekogans {
             /// Given the peer's (see \see{DHEParams} and \see{RSAParams}), use my private key
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's parameters.
-            /// \param[in] publicKey Optional peer's public key used
-            /// to verify parameters signature.
+            /// \param[in] publicKey Optional peer's public key used to verify parameters signature.
             /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return Shared \see{SymmetricKey}.
             virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (

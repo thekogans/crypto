@@ -38,7 +38,7 @@ namespace thekogans {
         /// VERY IMPORTANT: The initiator (client) used the public \see{RSA} key to encrypt
         /// a random \see{SymmetricKey}. The size of the \see{SymmetricKey} + \see{RSA} padding
         /// used to encrypt it puts a lower bound on the size of \see{RSA} keys that can be used
-        /// for key exchange (1536 bits). Given that today's (2018) best practice is to use
+        /// for key exchange (512 bits). Given that today's (2018) best practice is to use
         /// \see{RSA} keys no smaller than 2048 bits, this limitation shouldn't be an issue.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL RSAKeyExchange : public KeyExchange {
