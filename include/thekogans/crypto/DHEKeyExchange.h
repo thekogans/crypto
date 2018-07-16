@@ -102,7 +102,8 @@ namespace thekogans {
                 /// \param[in] name_ \see{SymmetricKey} name.
                 /// \param[in] description_ \see{SymmetricKey} description.
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
-                /// \param[in] signature_ Signature over all parameter data.
+                /// \param[in] privateKey Optional private key used to sign parameters.
+                /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
                 DHEParams (
                     const ID &id,
                     crypto::Params::Ptr params_,
@@ -114,18 +115,16 @@ namespace thekogans {
                     const std::string &name_,
                     const std::string &description_,
                     AsymmetricKey::Ptr publicKey_,
-                    util::Buffer signature_) :
-                    Params (id),
-                    params (params_),
-                    salt (salt_),
-                    keyLength (keyLength_),
-                    messageDigest (messageDigest_),
-                    count (count_),
-                    keyId (keyId_),
-                    name (name_),
-                    description (description_),
-                    publicKey (publicKey_),
-                    signature (std::move (signature_)) {}
+                    AsymmetricKey::Ptr privateKey,
+                    const EVP_MD *md);
+
+                /// \brief
+                /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
+                /// \param[in] publicKey Optional peer's public key used to verify parameters signature.
+                /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
+                void ValidateSignature (
+                    AsymmetricKey::Ptr publicKey,
+                    const EVP_MD *md);
 
             protected:
                 // util::Serializable
