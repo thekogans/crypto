@@ -68,6 +68,7 @@ int main (
         util::LoggerMgr::Debug,
         util::LoggerMgr::All);
     THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
+    THEKOGANS_UTIL_IMPLEMENT_LOG_FLUSHER;
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
         std::cout << "Verifying '" << options.path << "'...";
@@ -91,6 +92,5 @@ int main (
         std::cout << (result ? "Passed" : "Failed") << std::endl;
     }
     THEKOGANS_UTIL_CATCH_AND_LOG
-    THEKOGANS_UTIL_LOG_FLUSH
     return 0;
 }
