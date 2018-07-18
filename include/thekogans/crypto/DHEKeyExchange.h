@@ -40,12 +40,11 @@ namespace thekogans {
         /// If you need to do key exchange using a precomputed private key, use
         /// \see{RSAKeyExchange}.
         /// WARNING: Unlike \see{RSAKeyExchange}, DHEKeyExchange cannot be used to
-        /// exchange \see{SymmetricKey} keys in the clear securely. An authenticetion
+        /// exchange \see{SymmetricKey} keys in the clear securely. An authentication
         /// mechanism is needed to make sure you're exchanging keys with the intended
-        /// peer and not a man-in-the-middle (MITM). This is why DHEParams take an
-        /// optional signature. Pass a private \see{AsymmetricKey} to GetParams to
-        /// generate it. Pass a peer's public \see{AsymmetricKey} to server ctor and
-        /// DeriveSharedSymmetricKey to validate it.
+        /// peer and not a man-in-the-middle (MITM). This is why \see{KeyExchange::Params}
+        /// exposes CreateSignature and ValidateSignature. Use it to sign and validate
+        /// the parameters before exchanging keys with an unknown peer.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL DHEKeyExchange : public KeyExchange {
         private:
@@ -86,15 +85,6 @@ namespace thekogans {
                 /// \brief
                 /// Public \see{AsymmetricKey} used for key exchange.
                 AsymmetricKey::Ptr publicKey;
-                /// \brief
-                /// Signature over all parameter data.
-                util::Buffer signature;
-                /// \brief
-                /// Signature \see{AsymmetricKey} id.
-                ID signatureKeyId;
-                /// \brief
-                /// OpenSSL message digest to use for signature hashing.
-                std::string signatureMessageDigest;
 
                 /// \brief
                 /// ctor.
@@ -108,8 +98,6 @@ namespace thekogans {
                 /// \param[in] name_ \see{SymmetricKey} name.
                 /// \param[in] description_ \see{SymmetricKey} description.
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
-                /// \param[in] privateKey Optional private key used to sign parameters.
-                /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
                 DHEParams (
                     const ID &id,
                     crypto::Params::Ptr params_,
@@ -120,15 +108,32 @@ namespace thekogans {
                     const ID &keyId_,
                     const std::string &name_,
                     const std::string &description_,
-                    AsymmetricKey::Ptr publicKey_,
-                    AsymmetricKey::Ptr privateKey,
-                    const EVP_MD *md);
+                    AsymmetricKey::Ptr publicKey_) :
+                    Params (id),
+                    params (params_),
+                    salt (salt_),
+                    keyLength (keyLength_),
+                    messageDigest (messageDigest_),
+                    count (count_),
+                    keyId (keyId_),
+                    name (name_),
+                    description (description_),
+                    publicKey (publicKey_) {}
 
                 /// \brief
+                /// Given my private \see{AsymmetricKey}, create a signature over the parameters.
+                /// \param[in] privateKey My private \see{AsymmetricKey} used to create a signature
+                /// over the parameters.
+                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                virtual void CreateSignature (
+                    AsymmetricKey::Ptr privateKey,
+                    const EVP_MD *md);
+                /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
-                /// \param[in] publicKey Optional peer's public key used to verify parameters signature.
-                /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
-                void ValidateSignature (
+                /// \param[in] publicKey Peer's public key used to verify parameters signature.
+                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \return true == signature is valid, false == signature is invalid.
+                virtual bool ValidateSignature (
                     AsymmetricKey::Ptr publicKey,
                     const EVP_MD *md);
 
@@ -221,33 +226,19 @@ namespace thekogans {
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
             /// \param[in] params \see{DHEParams} containing info to create a shared \see{SymmetricKey}.
-            /// \param[in] publicKey Optional peer's public key used to verify parameters signature.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
-            explicit DHEKeyExchange (
-                Params::Ptr params,
-                AsymmetricKey::Ptr publicKey = AsymmetricKey::Ptr (),
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD);
+            explicit DHEKeyExchange (Params::Ptr params);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
-            /// \param[in] privateKey Optional private key used to sign parameters.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return \see{DHEParams} to send to the key exchange peer.
-            virtual Params::Ptr GetParams (
-                AsymmetricKey::Ptr privateKey = AsymmetricKey::Ptr (),
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) const;
+            virtual Params::Ptr GetParams () const;
 
             /// \brief
             /// Given the peer's \see{DHEParams}, use my private key
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{DHEParams} parameters.
-            /// \param[in] publicKey Optional peer's public key used to verify parameters signature.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (
-                Params::Ptr params,
-                AsymmetricKey::Ptr publicKey = AsymmetricKey::Ptr (),
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) const;
+            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (Params::Ptr params) const;
 
             /// \brief
             /// DHEKeyExchange is neither copy constructable, nor assignable.

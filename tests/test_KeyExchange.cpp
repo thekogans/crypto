@@ -46,21 +46,17 @@ namespace {
     bool TestDHE (
             const char *paramsName,
             crypto::Params::Ptr params,
-            crypto::AsymmetricKey::Ptr privateKey1,
-            crypto::AsymmetricKey::Ptr privateKey2) {
+            crypto::AsymmetricKey::Ptr /*privateKey1*/,
+            crypto::AsymmetricKey::Ptr /*privateKey2*/) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
             crypto::DHEKeyExchange keyExchange1 (crypto::ID (), params);
-            crypto::DHEKeyExchange::Params::Ptr params1 = keyExchange1.GetParams (privateKey1);
-            crypto::DHEKeyExchange keyExchange2 (params1, privateKey1->GetPublicKey ());
+            crypto::DHEKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
+            crypto::DHEKeyExchange keyExchange2 (params1);
             crypto::SymmetricKey::Ptr key1 =
-                keyExchange1.DeriveSharedSymmetricKey (
-                    keyExchange2.GetParams (privateKey2),
-                    privateKey2->GetPublicKey ());
+                keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
             crypto::SymmetricKey::Ptr key2 =
-                keyExchange2.DeriveSharedSymmetricKey (
-                    params1,
-                    privateKey1->GetPublicKey ());
+                keyExchange2.DeriveSharedSymmetricKey (params1);
             bool result = *key1 == *key2;
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
@@ -79,7 +75,7 @@ namespace {
             std::cout << keyName << "...";
             crypto::RSAKeyExchange keyExchange1 (crypto::ID (), publicKey);
             crypto::RSAKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
-            crypto::RSAKeyExchange keyExchange2 (params1, privateKey);
+            crypto::RSAKeyExchange keyExchange2 (privateKey, params1);
             crypto::SymmetricKey::Ptr key1 =
                 keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
             crypto::SymmetricKey::Ptr key2 =

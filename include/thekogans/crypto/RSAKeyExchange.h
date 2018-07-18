@@ -73,6 +73,23 @@ namespace thekogans {
                     keyId (keyId_),
                     buffer (std::move (buffer_)) {}
 
+                /// \brief
+                /// Given my private \see{AsymmetricKey}, create a signature over the parameters.
+                /// \param[in] privateKey My private \see{AsymmetricKey} used to create a signature
+                /// over the parameters.
+                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                virtual void CreateSignature (
+                    AsymmetricKey::Ptr privateKey,
+                    const EVP_MD *md);
+                /// \brief
+                /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
+                /// \param[in] publicKey Peer's public key used to verify parameters signature.
+                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \return true == signature is valid, false == signature is invalid.
+                virtual bool ValidateSignature (
+                    AsymmetricKey::Ptr publicKey,
+                    const EVP_MD *md);
+
             protected:
                 // util::Serializable
                 /// \brief
@@ -139,31 +156,22 @@ namespace thekogans {
                 const std::string &description = std::string ());
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
-            /// \param[in] params \see{RSAParams} containing the encrypted \see{SymmetricKey}.
             /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
+            /// \param[in] params \see{RSAParams} containing the encrypted \see{SymmetricKey}.
             RSAKeyExchange (
-                Params::Ptr params,
-                AsymmetricKey::Ptr key_);
+                AsymmetricKey::Ptr key_,
+                Params::Ptr params);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
-            /// \param[in] privateKey Optional private key used to sign parameters.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return \see{RSAParams} to send to the key exchange peer.
-            virtual Params::Ptr GetParams (
-                AsymmetricKey::Ptr /*privateKey*/ = AsymmetricKey::Ptr (),
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) const;
+            virtual Params::Ptr GetParams () const;
 
             /// \brief
             /// Given the peer's \see{RSAParams}, derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{RSAParams} parameters.
-            /// \param[in] publicKey Optional peer's public key used to verify parameters signature.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (
-                Params::Ptr params,
-                AsymmetricKey::Ptr /*publicKey*/ = AsymmetricKey::Ptr (),
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) const;
+            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (Params::Ptr params) const;
 
             /// \brief
             /// RSAKeyExchange is neither copy constructable, nor assignable.

@@ -23,6 +23,7 @@
 #include "thekogans/util/Buffer.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/RSA.h"
+#include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/Authenticator.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/RSAKeyExchange.h"
@@ -36,6 +37,57 @@ namespace thekogans {
             util::SpinLock,
             16,
             util::DefaultAllocator::Global)
+
+        void RSAKeyExchange::RSAParams::CreateSignature (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md) {
+            if (privateKey.Get () != 0 && md != 0) {
+                util::Buffer paramsBuffer (
+                    util::NetworkEndian,
+                    util::Serializer::Size (id) +
+                    util::Serializer::Size (keyId) +
+                    util::Serializer::Size (buffer));
+                paramsBuffer << id << keyId << buffer;
+                Authenticator authenticator (Authenticator::Sign, privateKey, md);
+                signature = authenticator.SignBuffer (
+                    paramsBuffer.GetReadPtr (),
+                    paramsBuffer.GetDataAvailableForReading ());
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        bool RSAKeyExchange::RSAParams::ValidateSignature (
+                AsymmetricKey::Ptr publicKey,
+                const EVP_MD *md) {
+            if (publicKey.Get () != 0 && md != 0) {
+                if (!signature.IsEmpty ()) {
+                    util::Buffer paramsBuffer (
+                        util::NetworkEndian,
+                        util::Serializer::Size (id) +
+                        util::Serializer::Size (keyId) +
+                        util::Serializer::Size (buffer));
+                    paramsBuffer << id << keyId << buffer;
+                    Authenticator authenticator (Authenticator::Verify, publicKey, md);
+                    return authenticator.VerifyBufferSignature (
+                        paramsBuffer.GetReadPtr (),
+                        paramsBuffer.GetDataAvailableForReading (),
+                        signature.GetReadPtr (),
+                        signature.GetDataAvailableForReading ());
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Params (%s) are not signed.",
+                        id.ToString ().c_str ());
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
 
         std::size_t RSAKeyExchange::RSAParams::Size () const {
             return
@@ -100,8 +152,8 @@ namespace thekogans {
         }
 
         RSAKeyExchange::RSAKeyExchange (
-                Params::Ptr params,
-                AsymmetricKey::Ptr key_) :
+                AsymmetricKey::Ptr key_,
+                Params::Ptr params) :
                 KeyExchange (ID::Empty),
                 key (key_) {
             RSAParams::Ptr rsaParams =
@@ -124,15 +176,13 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Params::Ptr RSAKeyExchange::GetParams (
-                AsymmetricKey::Ptr /*privateKey*/,
-                const EVP_MD *md) const {
+        KeyExchange::Params::Ptr RSAKeyExchange::GetParams () const {
             util::SecureBuffer symmetricKeyBuffer (
                 util::NetworkEndian,
                 util::Serializable::Size (*symmetricKey));
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
-                Authenticator authenticator (Authenticator::Sign, key, md);
+                Authenticator authenticator (Authenticator::Sign, key);
                 return Params::Ptr (
                     new RSAParams (
                         id,
@@ -151,10 +201,7 @@ namespace thekogans {
                         key)));
         }
 
-        SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (
-                Params::Ptr params,
-                AsymmetricKey::Ptr /*publicKey*/,
-                const EVP_MD *md) const {
+        SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
             assert (symmetricKey.Get () != 0);
             if (!key->IsPrivate ()) {
                 RSAParams::Ptr rsaParams =
@@ -164,7 +211,7 @@ namespace thekogans {
                         util::NetworkEndian,
                         util::Serializable::Size (*symmetricKey));
                     symmetricKeyBuffer << *symmetricKey;
-                    Authenticator authenticator (Authenticator::Verify, key, md);
+                    Authenticator authenticator (Authenticator::Verify, key);
                     if (!authenticator.VerifyBufferSignature (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),

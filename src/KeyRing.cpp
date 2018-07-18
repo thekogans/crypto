@@ -390,35 +390,7 @@ namespace thekogans {
             if (params.Get () != 0) {
                 if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
                         cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
-                    DHEKeyExchange::DHEParams::Ptr dheParams =
-                        util::dynamic_refcounted_pointer_cast<DHEKeyExchange::DHEParams> (params);
-                    if (dheParams.Get () != 0) {
-                        AsymmetricKey::Ptr key;
-                        if (dheParams->signatureKeyId != ID::Empty) {
-                            key = GetAuthenticatorKey (dheParams->signatureKeyId, recursive);
-                            if (key.Get () == 0) {
-                                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                                    "Unable to get key for id: %s",
-                                    dheParams->signatureKeyId.ToString ().c_str ());
-                            }
-                        }
-                        const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD;
-                        if (!dheParams->signatureMessageDigest.empty ()) {
-                            md = CipherSuite::GetOpenSSLMessageDigestByName (dheParams->signatureMessageDigest);
-                            if (md == 0) {
-                                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                                    "Unable to get message digest for name: %s",
-                                    dheParams->signatureMessageDigest.c_str ());
-                            }
-                        }
-                        return KeyExchange::Ptr (new DHEKeyExchange (params, key, md));
-                    }
-                    else {
-                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                            "Incorrect key exchange parameters type: %s, "
-                            "expected DHEKeyExchange::DHEParams.",
-                            params->GetType ().c_str ());
-                    }
+                    return KeyExchange::Ptr (new DHEKeyExchange (params));
                 }
                 else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
                     RSAKeyExchange::RSAParams::Ptr rsaParams =
@@ -426,7 +398,7 @@ namespace thekogans {
                     if (rsaParams.Get () != 0) {
                         AsymmetricKey::Ptr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
                         if (key.Get () != 0) {
-                            return KeyExchange::Ptr (new RSAKeyExchange (params, key));
+                            return KeyExchange::Ptr (new RSAKeyExchange (key, params));
                         }
                         else {
                             THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
