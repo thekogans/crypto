@@ -139,11 +139,11 @@ namespace thekogans {
                 const std::string &description = std::string ());
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
-            /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
             /// \param[in] params \see{RSAParams} containing the encrypted \see{SymmetricKey}.
+            /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
             RSAKeyExchange (
-                AsymmetricKey::Ptr key_,
-                Params::Ptr params);
+                Params::Ptr params,
+                AsymmetricKey::Ptr key_);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
@@ -152,7 +152,7 @@ namespace thekogans {
             /// \return \see{RSAParams} to send to the key exchange peer.
             virtual Params::Ptr GetParams (
                 AsymmetricKey::Ptr /*privateKey*/ = AsymmetricKey::Ptr (),
-                const EVP_MD * /*md*/ = THEKOGANS_CRYPTO_DEFAULT_MD) const;
+                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) const;
 
             /// \brief
             /// Given the peer's \see{RSAParams}, derive the shared \see{SymmetricKey}.
@@ -163,7 +163,7 @@ namespace thekogans {
             virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (
                 Params::Ptr params,
                 AsymmetricKey::Ptr /*publicKey*/ = AsymmetricKey::Ptr (),
-                const EVP_MD * /*md*/ = THEKOGANS_CRYPTO_DEFAULT_MD) const;
+                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) const;
 
             /// \brief
             /// RSAKeyExchange is neither copy constructable, nor assignable.

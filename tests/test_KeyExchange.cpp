@@ -79,7 +79,7 @@ namespace {
             std::cout << keyName << "...";
             crypto::RSAKeyExchange keyExchange1 (crypto::ID (), publicKey);
             crypto::RSAKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
-            crypto::RSAKeyExchange keyExchange2 (privateKey, params1);
+            crypto::RSAKeyExchange keyExchange2 (params1, privateKey);
             crypto::SymmetricKey::Ptr key1 =
                 keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
             crypto::SymmetricKey::Ptr key2 =

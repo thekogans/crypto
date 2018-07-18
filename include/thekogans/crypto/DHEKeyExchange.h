@@ -89,6 +89,12 @@ namespace thekogans {
                 /// \brief
                 /// Signature over all parameter data.
                 util::Buffer signature;
+                /// \brief
+                /// Signature \see{AsymmetricKey} id.
+                ID signatureKeyId;
+                /// \brief
+                /// OpenSSL message digest to use for signature hashing.
+                std::string signatureMessageDigest;
 
                 /// \brief
                 /// ctor.

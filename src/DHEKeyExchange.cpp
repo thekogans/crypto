@@ -57,7 +57,8 @@ namespace thekogans {
                 keyId (keyId_),
                 name (name_),
                 description (description_),
-                publicKey (publicKey_) {
+                publicKey (publicKey_),
+                signatureKeyId (ID::Empty) {
             if (privateKey.Get () != 0 && md != 0) {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
@@ -86,6 +87,8 @@ namespace thekogans {
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
                     paramsBuffer.GetDataAvailableForReading ());
+                signatureKeyId = privateKey->GetId ();
+                signatureMessageDigest = CipherSuite::GetOpenSSLMessageDigestName (md);
             }
         }
 
@@ -153,7 +156,9 @@ namespace thekogans {
                 util::Serializer::Size (name) +
                 util::Serializer::Size (description) +
                 util::Serializable::Size (*publicKey) +
-                util::Serializer::Size (signature);
+                util::Serializer::Size (signature) +
+                util::Serializer::Size (signatureKeyId) +
+                util::Serializer::Size (signatureMessageDigest);
         }
 
         void DHEKeyExchange::DHEParams::Read (
@@ -170,7 +175,9 @@ namespace thekogans {
                 name >>
                 description >>
                 publicKey >>
-                signature;
+                signature >>
+                signatureKeyId >>
+                signatureMessageDigest;
         }
 
         void DHEKeyExchange::DHEParams::Write (util::Serializer &serializer) const {
@@ -185,7 +192,9 @@ namespace thekogans {
                 name <<
                 description <<
                 *publicKey <<
-                signature;
+                signature <<
+                signatureKeyId <<
+                signatureMessageDigest;
         }
 
         DHEKeyExchange::DHEKeyExchange (

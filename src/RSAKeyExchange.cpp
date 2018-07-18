@@ -100,8 +100,8 @@ namespace thekogans {
         }
 
         RSAKeyExchange::RSAKeyExchange (
-                AsymmetricKey::Ptr key_,
-                Params::Ptr params) :
+                Params::Ptr params,
+                AsymmetricKey::Ptr key_) :
                 KeyExchange (ID::Empty),
                 key (key_) {
             RSAParams::Ptr rsaParams =
@@ -126,13 +126,13 @@ namespace thekogans {
 
         KeyExchange::Params::Ptr RSAKeyExchange::GetParams (
                 AsymmetricKey::Ptr /*privateKey*/,
-                const EVP_MD * /*md*/) const {
+                const EVP_MD *md) const {
             util::SecureBuffer symmetricKeyBuffer (
                 util::NetworkEndian,
                 util::Serializable::Size (*symmetricKey));
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
-                Authenticator authenticator (Authenticator::Sign, key);
+                Authenticator authenticator (Authenticator::Sign, key, md);
                 return Params::Ptr (
                     new RSAParams (
                         id,
@@ -153,8 +153,8 @@ namespace thekogans {
 
         SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (
                 Params::Ptr params,
-                AsymmetricKey::Ptr /*privateKey*/,
-                const EVP_MD * /*md*/) const {
+                AsymmetricKey::Ptr /*publicKey*/,
+                const EVP_MD *md) const {
             assert (symmetricKey.Get () != 0);
             if (!key->IsPrivate ()) {
                 RSAParams::Ptr rsaParams =
@@ -164,7 +164,7 @@ namespace thekogans {
                         util::NetworkEndian,
                         util::Serializable::Size (*symmetricKey));
                     symmetricKeyBuffer << *symmetricKey;
-                    Authenticator authenticator (Authenticator::Verify, key);
+                    Authenticator authenticator (Authenticator::Verify, key, md);
                     if (!authenticator.VerifyBufferSignature (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),
