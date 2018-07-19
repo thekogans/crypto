@@ -59,12 +59,19 @@ namespace thekogans {
                 /// \brief
                 /// Signature over the parameter data.
                 util::Buffer signature;
+                /// \brief
+                /// Signature \see{AsymmetricKey} id.
+                ID signatureKeyId;
+                /// \brief
+                /// OpenSSL message digest to use for parameter hashing.
+                std::string signatureMessageDigest;
 
                 /// \brief
                 /// ctor.
                 /// \param[in] id_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
                 Params (const ID &id_ = ID ()) :
-                    id (id_) {}
+                    id (id_),
+                    signatureKeyId (ID::Empty) {}
 
                 /// \brief
                 /// Given my private \see{AsymmetricKey}, create a signature over the parameters.

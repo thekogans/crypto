@@ -52,6 +52,8 @@ namespace thekogans {
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
                     paramsBuffer.GetDataAvailableForReading ());
+                signatureKeyId = privateKey->GetId ();
+                signatureMessageDigest = CipherSuite::GetOpenSSLMessageDigestName (md);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -62,7 +64,9 @@ namespace thekogans {
         bool RSAKeyExchange::RSAParams::ValidateSignature (
                 AsymmetricKey::Ptr publicKey,
                 const EVP_MD *md) {
-            if (publicKey.Get () != 0 && md != 0) {
+            if (publicKey.Get () != 0 && md != 0&&
+                    publicKey->GetId () == signatureKeyId &&
+                    CipherSuite::GetOpenSSLMessageDigestName (md) == signatureMessageDigest) {
                 if (!signature.IsEmpty ()) {
                     util::Buffer paramsBuffer (
                         util::NetworkEndian,

@@ -388,6 +388,31 @@ namespace thekogans {
                 KeyExchange::Params::Ptr params,
                 bool recursive) {
             if (params.Get () != 0) {
+                if (params->signatureKeyId != ID::Empty) {
+                    AsymmetricKey::Ptr publicKey =
+                        GetAuthenticatorKey (params->signatureKeyId, recursive);
+                    if (publicKey.Get () != 0 && !publicKey->IsPrivate ()) {
+                        const EVP_MD *md =
+                            CipherSuite::GetOpenSSLMessageDigestByName (params->signatureMessageDigest);
+                        if (md != 0) {
+                            if (!params->ValidateSignature (publicKey, md)) {
+                                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                    "Params failed signature validation: %s",
+                                    params->id.ToString ().c_str ());
+                            }
+                        }
+                        else {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to get message digest for name: %s",
+                                params->signatureMessageDigest.c_str ());
+                        }
+                    }
+                    else {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to get public key for id: %s",
+                            params->signatureKeyId.ToString ().c_str ());
+                    }
+                }
                 if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
                         cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
                     return KeyExchange::Ptr (new DHEKeyExchange (params));
