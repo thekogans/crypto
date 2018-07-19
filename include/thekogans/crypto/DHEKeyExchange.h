@@ -230,8 +230,13 @@ namespace thekogans {
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
+            /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to create a signature
+            /// over the parameters.
+            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
             /// \return \see{DHEParams} to send to the key exchange peer.
-            virtual Params::Ptr GetParams () const;
+            virtual Params::Ptr GetParams (
+                AsymmetricKey::Ptr privateKey = AsymmetricKey::Ptr (),
+                const EVP_MD *md = 0) const;
 
             /// \brief
             /// Given the peer's \see{DHEParams}, use my private key

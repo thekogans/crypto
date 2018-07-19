@@ -388,7 +388,8 @@ namespace thekogans {
                 KeyExchange::Params::Ptr params,
                 bool recursive) {
             if (params.Get () != 0) {
-                if (params->signatureKeyId != ID::Empty) {
+                // Validate the parameters signature (if one was provided).
+                if (!params->signature.IsEmpty ()) {
                     AsymmetricKey::Ptr publicKey =
                         GetAuthenticatorKey (params->signatureKeyId, recursive);
                     if (publicKey.Get () != 0 && !publicKey->IsPrivate ()) {

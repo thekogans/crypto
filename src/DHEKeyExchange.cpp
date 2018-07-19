@@ -229,8 +229,10 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Params::Ptr DHEKeyExchange::GetParams () const {
-            return Params::Ptr (
+        KeyExchange::Params::Ptr DHEKeyExchange::GetParams (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md) const {
+            Params::Ptr dheParams (
                 new DHEParams (
                     id,
                     params,
@@ -242,6 +244,10 @@ namespace thekogans {
                     name,
                     description,
                     publicKey));
+            if (privateKey.Get () != 0 && md != 0) {
+                dheParams->CreateSignature (privateKey, md);
+            }
+            return dheParams;
         }
 
         namespace {
