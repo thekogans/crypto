@@ -18,15 +18,10 @@
 #if !defined (__thekogans_crypto_Ed25519Params_h)
 #define __thekogans_crypto_Ed25519Params_h
 
-#include <cstddef>
 #include <string>
-#include <openssl/evp.h>
-#include <openssl/pem.h>
-#include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
-#include "thekogans/crypto/Serializable.h"
-#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/Params.h"
+#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 
 namespace thekogans {
     namespace crypto {

@@ -18,7 +18,6 @@
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLAsymmetricKey.h"
-#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/Signer.h"
 
 namespace thekogans {

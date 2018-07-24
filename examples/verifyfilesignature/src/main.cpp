@@ -25,7 +25,7 @@
 #include "thekogans/util/File.h"
 #include "thekogans/util/Base64.h"
 #include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
 #include "thekogans/crypto/Authenticator.h"
 
 using namespace thekogans;
@@ -73,8 +73,7 @@ int main (
         crypto::OpenSSLInit openSSLInit;
         std::cout << "Verifying '" << options.path << "'...";
         crypto::Authenticator authenticator (
-            crypto::Authenticator::Verify,
-            crypto::AsymmetricKey::LoadPublicKeyFromFile (options.publicKey));
+            crypto::OpenSSLAsymmetricKey::LoadPublicKeyFromFile (options.publicKey));
         util::ReadOnlyFile signatureFile (util::NetworkEndian, options.path + ".sig");
         util::Buffer encodedSignature (util::NetworkEndian, signatureFile.GetSize ());
         encodedSignature.AdvanceWriteOffset (
