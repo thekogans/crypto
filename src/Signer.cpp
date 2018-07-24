@@ -17,6 +17,8 @@
 
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
+#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
+#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/Signer.h"
 
 namespace thekogans {
@@ -27,8 +29,12 @@ namespace thekogans {
                 const EVP_MD *md_) :
                 key (key_),
                 md (md_) {
-            if (key.Get () != 0 && md != 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine, key->Get ()) != 1) {
+            if (key.Get () != 0 &&
+                    (key->GetKeyType () == OPENSSL_PKEY_RSA ||
+                        key->GetKeyType () == OPENSSL_PKEY_DSA ||
+                        key->GetKeyType () == OPENSSL_PKEY_EC) &&
+                    md != 0) {
+                if (EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine, (EVP_PKEY *)key->GetKey ()) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }

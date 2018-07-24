@@ -107,9 +107,17 @@ namespace thekogans {
                 const std::string &description = std::string ());
         #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
+            /// \enum
+            /// FromPBKDF2 hmac types.
             enum PBKDF2_HMAC {
+                /// \brief
+                /// SHA1
                 PBKDF2_HMAC_SHA1,
+                /// \brief
+                /// SHA256
                 PBKDF2_HMAC_SHA256,
+                /// \brief
+                /// SHA512
                 PBKDF2_HMAC_SHA512
             };
 

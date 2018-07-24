@@ -333,12 +333,9 @@ namespace thekogans {
                 const std::string &description = std::string ()) const;
             /// \brief
             /// Return the \see{Authenticator} instance represented by authenticator.
-            /// \param[in] op Operation (Sign/Verify) to perform.
             /// \param[in] key Private (Sign)/Public (Verify) key.
             /// \return \see{Authenticator} instance represented by authenticator.
-            Authenticator::Ptr GetAuthenticator (
-                Authenticator::Op op,
-                AsymmetricKey::Ptr key) const;
+            Authenticator::Ptr GetAuthenticator (AsymmetricKey::Ptr key) const;
             /// \brief
             /// Return the \see{Cipher} instance represented by cipher.
             /// \param[in] key \see{SymmetricKey} used to encrypt/decrypt.

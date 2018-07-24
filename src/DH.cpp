@@ -16,6 +16,7 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include <openssl/opensslv.h>
+#include "thekogans/crypto/OpenSSLParams.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/DH.h"
@@ -37,7 +38,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_set_dh_paramgen_prime_len (ctx.get (), (util::i32)primeLength) == 1 &&
                     EVP_PKEY_CTX_set_dh_paramgen_generator (ctx.get (), (util::i32)generator) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return Params::Ptr (new Params (EVP_PKEYPtr (params), id, name, description));
+                return Params::Ptr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -78,7 +79,7 @@ namespace thekogans {
                     if (params.get () != 0 &&
                             EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                         dhParams.release ();
-                        return Params::Ptr (new Params (std::move (params), id, name, description));
+                        return Params::Ptr (new OpenSSLParams (std::move (params), id, name, description));
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

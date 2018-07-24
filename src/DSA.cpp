@@ -17,6 +17,7 @@
 
 #include <openssl/evp.h>
 #include <openssl/dsa.h>
+#include "thekogans/crypto/OpenSSLParams.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/DSA.h"
@@ -37,7 +38,7 @@ namespace thekogans {
                         EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_dsa_paramgen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
                         EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                    return Params::Ptr (new Params (EVP_PKEYPtr (params), id, name, description));
+                    return Params::Ptr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

@@ -30,7 +30,7 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                if (op == Sign) {
+                if (signer.get () != 0) {
                     signer->Init ();
                     signer->Update (buffer, bufferLength);
                     return signer->Final ();
@@ -53,7 +53,7 @@ namespace thekogans {
                 std::size_t signatureLength) {
             if (buffer != 0 && bufferLength > 0 &&
                     signature != 0 && signatureLength > 0) {
-                if (op == Verify) {
+                if (verifier.get () != 0) {
                     verifier->Init ();
                     verifier->Update (buffer, bufferLength);
                     return verifier->Final (signature, signatureLength);
@@ -70,7 +70,7 @@ namespace thekogans {
         }
 
         util::Buffer Authenticator::SignFile (const std::string &path) {
-            if (op == Sign) {
+            if (signer.get () != 0) {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 util::FixedArray<util::ui8, 4096> buffer;
@@ -92,7 +92,7 @@ namespace thekogans {
                 const void *signature,
                 std::size_t signatureLength) {
             if (signature != 0 && signatureLength > 0) {
-                if (op == Verify) {
+                if (verifier.get () != 0) {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;

@@ -180,23 +180,32 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL std::string _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const OPENSSL_PKEY_RSA = "RSA";
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const OPENSSL_PKEY_DSA = "DSA";
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const OPENSSL_PKEY_DH = "DH";
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const OPENSSL_PKEY_EC = "EC";
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const OPENSSL_PKEY_HMAC = "HMAC";
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const OPENSSL_PKEY_CMAC = "CMAC";
+
+        _LIB_THEKOGANS_CRYPTO_DECL const char * _LIB_THEKOGANS_CRYPTO_API
         EVP_PKEYtypeTostring (util::i32 type) {
-            switch (type) {
-                case EVP_PKEY_RSA:
-                    return "RSA";
-                case EVP_PKEY_DSA:
-                    return "DSA";
-                case EVP_PKEY_DH:
-                    return "DH";
-                case EVP_PKEY_EC:
-                    return "EC";
-                case EVP_PKEY_HMAC:
-                    return "HMAC";
-                case EVP_PKEY_CMAC:
-                    return "CMAC";
-            }
-            return "unknown";
+            return type == EVP_PKEY_RSA ? OPENSSL_PKEY_RSA :
+                type == EVP_PKEY_DSA ? OPENSSL_PKEY_DSA :
+                type == EVP_PKEY_DH ? OPENSSL_PKEY_DH :
+                type == EVP_PKEY_EC ? OPENSSL_PKEY_EC :
+                type == EVP_PKEY_HMAC ? OPENSSL_PKEY_HMAC :
+                type == EVP_PKEY_CMAC ? OPENSSL_PKEY_CMAC : "unknown";
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API
+        stringToEVP_PKEYtype (const char *type) {
+            std::string strType (type);
+            return strType == OPENSSL_PKEY_RSA ? EVP_PKEY_RSA :
+                strType == OPENSSL_PKEY_DSA ? EVP_PKEY_DSA :
+                strType == OPENSSL_PKEY_DH ? EVP_PKEY_DH:
+                strType == OPENSSL_PKEY_EC ? EVP_PKEY_EC :
+                strType == OPENSSL_PKEY_HMAC ? EVP_PKEY_HMAC :
+                strType == OPENSSL_PKEY_CMAC ? EVP_PKEY_CMAC : EVP_PKEY_NONE;
         }
 
         _LIB_THEKOGANS_CRYPTO_DECL BIGNUMPtr _LIB_THEKOGANS_CRYPTO_API

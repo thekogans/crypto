@@ -44,52 +44,30 @@ namespace thekogans {
             /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Authenticator>.
             typedef util::ThreadSafeRefCounted::Ptr<Authenticator> Ptr;
 
-            enum Op {
-                /// \brief
-                /// Perform the signing operation.
-                Sign,
-                /// \brief
-                /// Perform the verify operation.
-                Verify
-            };
-
         private:
             /// \brief
-            /// Operation (Sign/Verify) to perform.
-            Op op;
-            /// \brief
-            /// Used if op == Sign.
+            /// Used if key->IsPrivate ().
             Signer::Ptr signer;
             /// \brief
-            /// Used if op == Verify.
+            /// Used if !key->IsPrivate ().
             Verifier::Ptr verifier;
 
         public:
             /// \brief
             /// ctor.
-            /// \param[in] op_ Operation (Sign/Verify) to perform.
             /// \param[in] key Private (Sign)/Public (Verify) key.
             /// \param[in] md OpenSSL message digest to use.
             Authenticator (
-                Op op_,
                 AsymmetricKey::Ptr key,
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) :
-                op (op_),
-                signer (op == Sign ? new Signer (key, md) : 0),
-                verifier (op == Verify ? new Verifier (key, md) : 0) {}
-
-            /// \break
-            /// Return the operation (Op) this authenticator performs.
-            /// \return Operation (Op) this authenticator performs.
-            inline Op GetOp () const {
-                return op;
-            }
+                signer (key->IsPrivate () ? new Signer (key, md) : 0),
+                verifier (!key->IsPrivate () ? new Verifier (key, md) : 0) {}
 
             /// \brief
             /// Return the key associated with this authenticator.
             /// \return \see{Signer} or \see{Verifier} key (depending on op).
             inline AsymmetricKey::Ptr GetKey () const {
-                return op == Sign ? signer->GetKey () : verifier->GetKey ();
+                return signer.get () != 0 ? signer->GetKey () : verifier->GetKey ();
             }
 
             /// \brief

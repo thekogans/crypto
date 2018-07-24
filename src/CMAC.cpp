@@ -19,6 +19,7 @@
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
+#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/CMAC.h"
 
@@ -60,7 +61,7 @@ namespace thekogans {
                             (void *)symmetricKey->Get ().GetReadPtr ()) == 1 &&
                         EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                     return AsymmetricKey::Ptr (
-                        new AsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
+                        new OpenSSLAsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

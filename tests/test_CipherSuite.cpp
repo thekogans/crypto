@@ -74,7 +74,7 @@ namespace {
             if (result) {
                 result = crypto::CipherSuite (cipherSuite.ToString ()) == cipherSuite;
                 if (result) {
-                    util::Buffer buffer (util::HostEndian, (util::ui32)cipherSuite.Size ());
+                    util::Buffer buffer (util::HostEndian, cipherSuite.Size ());
                     buffer << cipherSuite;
                     crypto::CipherSuite cipherSuite_;
                     buffer >> cipherSuite_;
@@ -85,7 +85,6 @@ namespace {
                         if (result) {
                             crypto::Authenticator::Ptr authenticator =
                                 cipherSuite.GetAuthenticator (
-                                    crypto::Authenticator::Sign,
                                     GetKeyForAlgorithm (cipherSuite.authenticator));
                             result = authenticator.Get () != 0;
                             if (result) {

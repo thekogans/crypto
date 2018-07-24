@@ -66,6 +66,8 @@
     <cpp_header>$(organization)/$(project_directory)/DHEKeyExchange.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/DSA.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/EC.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Ed25519AsymmetricKey.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Ed25519Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Encryptor.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/FrameHeader.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/HMAC.h</cpp_header>
@@ -75,8 +77,10 @@
     <cpp_header>$(organization)/$(project_directory)/MAC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/MessageDigest.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLAllocator.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLAsymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLException.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLInit.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLParams.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLUtils.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
@@ -88,6 +92,8 @@
     <cpp_header>$(organization)/$(project_directory)/SystemCACertificates.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Verifier.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/X25519AsymmetricKey.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/X25519Params.h</cpp_header>
   </cpp_headers>
   <c_sources prefix = "src">
     <c_source>fastpbkdf2.c</c_source>
@@ -108,6 +114,8 @@
     <cpp_source>DHEKeyExchange.cpp</cpp_source>
     <cpp_source>DSA.cpp</cpp_source>
     <cpp_source>EC.cpp</cpp_source>
+    <cpp_source>Ed25519AsymmetricKey.cpp</cpp_source>
+    <cpp_source>Ed25519Params.cpp</cpp_source>
     <cpp_source>Encryptor.cpp</cpp_source>
     <cpp_source>HMAC.cpp</cpp_source>
     <cpp_source>ID.cpp</cpp_source>
@@ -116,8 +124,10 @@
     <cpp_source>MAC.cpp</cpp_source>
     <cpp_source>MessageDigest.cpp</cpp_source>
     <cpp_source>OpenSSLAllocator.cpp</cpp_source>
+    <cpp_source>OpenSSLAsymmetricKey.cpp</cpp_source>
     <cpp_source>OpenSSLException.cpp</cpp_source>
     <cpp_source>OpenSSLInit.cpp</cpp_source>
+    <cpp_source>OpenSSLParams.cpp</cpp_source>
     <cpp_source>OpenSSLUtils.cpp</cpp_source>
     <cpp_source>Params.cpp</cpp_source>
     <cpp_source>RSA.cpp</cpp_source>
@@ -129,6 +139,8 @@
     <cpp_source>SystemCACertificates.cpp</cpp_source>
     <cpp_source>Verifier.cpp</cpp_source>
     <cpp_source>Version.cpp</cpp_source>
+    <cpp_source>X25519AsymmetricKey.cpp</cpp_source>
+    <cpp_source>X25519Params.cpp</cpp_source>
   </cpp_sources>
   <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_TESTS)">
     <cpp_tests prefix = "tests">

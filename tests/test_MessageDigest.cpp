@@ -51,7 +51,7 @@ namespace {
                         util::SimpleFile::ReadWrite |
                         util::SimpleFile::Create |
                         util::SimpleFile::Truncate);
-                    file.Write (message.c_str (), (util::ui32)message.size ());
+                    file.Write (message.c_str (), message.size ());
                 }
                 util::Buffer buffer1 = messageDigest.HashFile (path);
                 util::Buffer buffer2 = messageDigest.HashFile (path);

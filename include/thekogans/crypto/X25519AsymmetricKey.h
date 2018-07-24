@@ -15,72 +15,74 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if !defined (__thekogans_crypto_AsymmetricKey_h)
-#define __thekogans_crypto_AsymmetricKey_h
+#if !defined (__thekogans_crypto_X25519AsymmetricKey_h)
+#define __thekogans_crypto_X25519AsymmetricKey_h
 
 #include <cstddef>
 #include <string>
 #include "thekogans/util/Types.h"
+#include "thekogans/util/FixedBuffer.h"
 #include "thekogans/crypto/Config.h"
-#include "thekogans/crypto/Serializable.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
+#include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/Curve25519.h"
 
 namespace thekogans {
     namespace crypto {
 
-        /// \struct AsymmetricKey AsymmetricKey.h thekogans/crypto/AsymmetricKey.h
+        /// \struct X25519AsymmetricKey X25519AsymmetricKey.h thekogans/crypto/X25519AsymmetricKey.h
         ///
         /// \brief
-        /// AsymmetricKey is the base for all PKI keys. It defines the base API
-        /// that all concrete keys must implement.
+        /// X25519AsymmetricKey keys are used in ECDHE key exchange (\see{DHEKeyExchange}).
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
+        struct _LIB_THEKOGANS_CRYPTO_DECL X25519AsymmetricKey : public AsymmetricKey {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<AsymmetricKey>.
-            typedef util::ThreadSafeRefCounted::Ptr<AsymmetricKey> Ptr;
+            /// X25519AsymmetricKey is a \see{Serializable}.
+            THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (X25519AsymmetricKey)
 
         private:
             /// \brief
-            /// true = contains both private and public keys.
-            /// false = contains only the public key.
-            bool isPrivate;
+            /// Private/Public \see{X25519} key.
+            util::FixedBuffer<X25519::KEY_LENGTH> key;
 
         public:
             /// \brief
             /// ctor.
-            /// \param[in] isPrivate_ true = contains both private and public keys.
+            /// \param[in] key_ Private/Public \see{X25519} key.
+            /// \param[in] isPrivate true = contains both private and public keys.
             /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
-            AsymmetricKey (
-                bool isPrivate_ = false,
+            X25519AsymmetricKey (
+                const util::ui8 *key_,
+                bool isPrivate,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
-                const std::string &description = std::string ()) :
-                Serializable (id, name, description),
-                isPrivate (isPrivate_) {}
-
-            /// \brief
-            /// Return true if it's a private key.
-            /// \return true if it's a private key.
-            inline bool IsPrivate () const {
-                return isPrivate;
-            }
+                const std::string &description = std::string ());
 
             /// \brief
             /// Return the const void * representing the key bits.
             /// \return const void * representing the key bits.
-            virtual const void *GetKey () const = 0;
+            virtual const void *GetKey () const {
+                return key.GetReadPtr ();
+            }
+
+            /// \brief
+            /// "KeyType"
+            static const char * const KEY_TYPE;
 
             /// \brief
             /// Return the key type.
             /// \return Key type.
-            virtual const char *GetKeyType () const = 0;
+            virtual const char *GetKeyType () const {
+                return KEY_TYPE;
+            }
 
             /// \brief
             /// Return the key length (in bits).
             /// \return Key length (in bits).
-            virtual std::size_t GetKeyLength () const = 0;
+            virtual std::size_t GetKeyLength () const {
+                return X25519::KEY_LENGTH * 8;
+            }
 
             /// \brief
             /// Return the public key associated with this private key.
@@ -89,10 +91,10 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public part of the privateKey (or duplicate of the pubilc key).
-            virtual Ptr GetPublicKey (
+            virtual AsymmetricKey::Ptr GetPublicKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
-                const std::string &description = std::string ()) const = 0;
+                const std::string &description = std::string ()) const;
 
         protected:
             // Serializable
@@ -116,19 +118,34 @@ namespace thekogans {
         public:
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
-            /// "Private"
-            static const char * const ATTR_PRIVATE;
+            /// "Key"
+            static const char * const ATTR_KEY;
+
             /// \brief
-            /// "KeyType"
-            static const char * const ATTR_KEY_TYPE;
+            /// Return the XML representation of a key.
+            /// ********************** WARNING **********************
+            /// This is antithetical to security which is precisely
+            /// why it should be used only for testing and turned off
+            /// when building for production.
+            /// *****************************************************
+            /// \param[in] indentationLevel How far to indent the leading tag.
+            /// \param[in] tagName The name of the leading tag.
+            /// \return XML representation of a key.
+            virtual std::string ToString (
+                std::size_t indentationLevel = 0,
+                const char *tagName = TAG_SERIALIZABLE) const;
         #endif // defined (THEKOGANS_CRYPTO_TESTING)
+
+            /// \brief
+            /// X25519AsymmetricKey is neither copy constructable, nor assignable.
+            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (X25519AsymmetricKey)
         };
 
         /// \brief
-        /// Implement AsymmetricKey extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (AsymmetricKey)
+        /// Implement X25519AsymmetricKey extraction operator.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (X25519AsymmetricKey)
 
     } // namespace crypto
 } // namespace thekogans
 
-#endif // !defined (__thekogans_crypto_AsymmetricKey_h)
+#endif // !defined (__thekogans_crypto_X25519AsymmetricKey_h)

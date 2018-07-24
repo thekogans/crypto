@@ -41,6 +41,7 @@
 #include <openssl/sha.h>
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/Curve25519.h"
 
 namespace thekogans {
@@ -119,8 +120,8 @@ namespace thekogans {
             // Preconditions:
             //  |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
             //
-            // Write p=2^255-19; q=floor(h/p).
-            // Basic claim: q = floor(2^(-255)(h + 19 2^(-25)h9 + 2^(-1))).
+            // Write p = 2 ^ 255 - 19; q = floor (h / p).
+            // Basic claim: q = floor2^-55)(h + 19 2^(-5h9 + 2^(-1))
             //
             // Proof:
             //   Have |h|<=p so |q|<=1 so |19^2 2^(-255) q|<1/4.
@@ -2945,7 +2946,7 @@ namespace thekogans {
             //   s[0]+256*s[1]+...+256^31*s[31] = s mod l
             //   where l = 2^252 + 27742317777372353535851937790883648493.
             //   Overwrites s in place.
-            void sc_reduce(util::ui8 *s) {
+            void sc_reduce (util::ui8 *s) {
                 util::i64 s0 = 2097151 & load_3 (s);
                 util::i64 s1 = 2097151 & (load_4 (s + 2) >> 5);
                 util::i64 s2 = 2097151 & (load_3 (s + 5) >> 2);
@@ -3717,95 +3718,113 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519CreateKeyPair (
-                util::ui8 publicKey[ED25519_PUBLIC_KEY_LENGTH],
-                util::ui8 privateKey[ED25519_PRIVATE_KEY_LENGTH]) {
-            enum {
-                ED25519_SEED_LENGTH = 32
-            };
-            util::ui8 seed[ED25519_SEED_LENGTH];
-            util::GlobalRandomSource::Instance ().GetBytes (seed, ED25519_SEED_LENGTH);
-            util::ui8 az[SHA512_DIGEST_LENGTH];
-            SHA512 (seed, ED25519_SEED_LENGTH, az);
-            az[0] &= 248;
-            az[31] &= 63;
-            az[31] |= 64;
+        void Ed25519::CreateKey (
+                util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
+            util::GlobalRandomSource::Instance ().GetBytes (privateKey, PRIVATE_KEY_LENGTH / 2);
+            util::ui8 *publicKey = privateKey + PRIVATE_KEY_LENGTH / 2;
+            SHA512 (privateKey, PRIVATE_KEY_LENGTH / 2, publicKey);
+            publicKey[0] &= 248;
+            publicKey[31] &= 63;
+            publicKey[31] |= 64;
             ge_p3 A;
-            ge_scalarmult_base (&A, az);
+            ge_scalarmult_base (&A, publicKey);
             ge_p3_tobytes (publicKey, &A);
-            memcpy (privateKey, seed, ED25519_SEED_LENGTH);
-            memmove (privateKey + ED25519_SEED_LENGTH, publicKey, ED25519_PUBLIC_KEY_LENGTH);
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API ED25519SignBuffer (
+        void Ed25519::GetPublicKey (
+                const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
+                util::ui8 publicKey[PUBLIC_KEY_LENGTH]) {
+            memcpy (publicKey, privateKey + PRIVATE_KEY_LENGTH / 2, PUBLIC_KEY_LENGTH);
+        }
+
+        void Ed25519::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength,
-                const util::ui8 privateKey[ED25519_PRIVATE_KEY_LENGTH],
-                util::ui8 signature[ED25519_SIGNATURE_LENGTH]) {
+                const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
+                util::ui8 signature[SIGNATURE_LENGTH]) {
             util::ui8 az[SHA512_DIGEST_LENGTH];
             SHA512 (privateKey, 32, az);
             az[0] &= 248;
             az[31] &= 63;
             az[31] |= 64;
-            SHA512_CTX hash_ctx;
-            SHA512_Init (&hash_ctx);
-            SHA512_Update (&hash_ctx, az + 32, 32);
-            SHA512_Update (&hash_ctx, buffer, bufferLength);
+            SHA512_CTX ctx;
+            SHA512_Init (&ctx);
+            SHA512_Update (&ctx, az + 32, 32);
+            SHA512_Update (&ctx, buffer, bufferLength);
             util::ui8 nonce[SHA512_DIGEST_LENGTH];
-            SHA512_Final (nonce, &hash_ctx);
+            SHA512_Final (nonce, &ctx);
             sc_reduce (nonce);
             ge_p3 R;
             ge_scalarmult_base (&R, nonce);
             ge_p3_tobytes (signature, &R);
-            SHA512_Init (&hash_ctx);
-            SHA512_Update (&hash_ctx, signature, 32);
-            SHA512_Update (&hash_ctx, privateKey + 32, 32);
-            SHA512_Update(&hash_ctx, buffer, bufferLength);
+            SHA512_Init (&ctx);
+            SHA512_Update (&ctx, signature, 32);
+            SHA512_Update (&ctx, privateKey + 32, 32);
+            SHA512_Update (&ctx, buffer, bufferLength);
             util::ui8 hram[SHA512_DIGEST_LENGTH];
-            SHA512_Final (hram, &hash_ctx);
+            SHA512_Final (hram, &ctx);
             sc_reduce (hram);
             sc_muladd (signature + 32, hram, az, nonce);
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API ED25519VerifyBufferSignature (
-                const util::ui8 signature[ED25519_SIGNATURE_LENGTH],
+        bool Ed25519::VerifyBufferSignature (
                 const void *buffer,
                 std::size_t bufferLength,
-                const util::ui8 publicKey[ED25519_PUBLIC_KEY_LENGTH]) {
+                const util::ui8 publicKey[PUBLIC_KEY_LENGTH],
+                const util::ui8 signature[SIGNATURE_LENGTH]) {
             ge_p3 A;
             if ((signature[63] & 224) != 0 ||
                     ge_frombytes_negate_vartime (&A, publicKey) != 0) {
                 return false;
             }
-            util::ui8 pkcopy[ED25519_PUBLIC_KEY_LENGTH];
-            memcpy (pkcopy, publicKey, ED25519_PUBLIC_KEY_LENGTH);
-            util::ui8 rcopy[32];
-            memcpy (rcopy, signature, 32);
-            util::ui8 scopy[32];
-            memcpy (scopy, signature + 32, 32);
-            SHA512_CTX hash_ctx;
-            SHA512_Init (&hash_ctx);
-            SHA512_Update (&hash_ctx, signature, 32);
-            SHA512_Update (&hash_ctx, publicKey, 32);
-            SHA512_Update (&hash_ctx, buffer, bufferLength);
-            util::ui8 h[SHA512_DIGEST_LENGTH];
-            SHA512_Final (h, &hash_ctx);
-            sc_reduce (h);
+            SHA512_CTX ctx;
+            SHA512_Init (&ctx);
+            SHA512_Update (&ctx, signature, SIGNATURE_LENGTH / 2);
+            SHA512_Update (&ctx, publicKey, PUBLIC_KEY_LENGTH);
+            SHA512_Update (&ctx, buffer, bufferLength);
+            util::ui8 hash[SHA512_DIGEST_LENGTH];
+            SHA512_Final (hash, &ctx);
+            sc_reduce (hash);
             ge_p2 R;
-            ge_double_scalarmult_vartime (&R, h, &A, scopy);
+            ge_double_scalarmult_vartime (&R, hash, &A, signature + SIGNATURE_LENGTH / 2);
             util::ui8 rcheck[32];
-            ge_tobytes(rcheck, &R);
-            return CRYPTO_memcmp (rcheck, rcopy, sizeof (rcheck)) == 0;
+            ge_tobytes (rcheck, &R);
+            return CRYPTO_memcmp (rcheck, signature, sizeof (rcheck)) == 0;
+        }
+
+        void X25519::CreateKey (
+                util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
+            util::GlobalRandomSource::Instance ().GetBytes (privateKey, PRIVATE_KEY_LENGTH);
+        }
+
+        void X25519::GetPublicKey (
+                const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
+                util::ui8 publicKey[PUBLIC_KEY_LENGTH]) {
+            util::ui8 e[PRIVATE_KEY_LENGTH];
+            memcpy (e, privateKey, PRIVATE_KEY_LENGTH);
+            e[0] &= 248;
+            e[31] &= 127;
+            e[31] |= 64;
+            ge_p3 A;
+            ge_scalarmult_base (&A, e);
+            // We only need the u-coordinate of the curve25519 point. The map is
+            // u = (y + 1) / (1 - y). Since y = Y / Z, this gives u = (Z + Y) / (Z - Y).
+            fe zplusy, zminusy, zminusy_inv;
+            fe_add (zplusy, A.Z, A.Y);
+            fe_sub (zminusy, A.Z, A.Y);
+            fe_invert (zminusy_inv, zminusy);
+            fe_mul (zplusy, zplusy, zminusy_inv);
+            fe_tobytes (publicKey, zplusy);
         }
 
         namespace {
             void x25519_scalar_mult (
-                    util::ui8 out[X25519_SHARED_SECRET_LENGTH],
-                    const util::ui8 scalar[X25519_PRIVATE_KEY_LENGTH],
-                    const util::ui8 point[X25519_PUBLIC_KEY_LENGTH]) {
+                    util::ui8 out[X25519::SHARED_SECRET_LENGTH],
+                    const util::ui8 scalar[X25519::PRIVATE_KEY_LENGTH],
+                    const util::ui8 point[X25519::PUBLIC_KEY_LENGTH]) {
                 fe x1, x2, z2, x3, z3, tmp0, tmp1;
-                util::ui8 e[X25519_PRIVATE_KEY_LENGTH];
-                memcpy (e, scalar, X25519_PRIVATE_KEY_LENGTH);
+                util::ui8 e[X25519::PRIVATE_KEY_LENGTH];
+                memcpy (e, scalar, X25519::PRIVATE_KEY_LENGTH);
                 e[0] &= 248;
                 e[31] &= 127;
                 e[31] |= 64;
@@ -3849,44 +3868,17 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519CreateKeyPair (
-                util::ui8 publicKey[X25519_PUBLIC_KEY_LENGTH],
-                util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH]) {
-            util::GlobalRandomSource::Instance ().GetBytes (privateKey, X25519_PRIVATE_KEY_LENGTH);
-            X25519GetPublicFromPrivate (publicKey, privateKey);
-        }
-
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519ComputeSharedSecret (
-                util::ui8 sharedSecret[X25519_SHARED_SECRET_LENGTH],
-                const util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH],
-                const util::ui8 peerPublicKey[X25519_PUBLIC_KEY_LENGTH]) {
-            static const util::ui8 kZeros[X25519_SHARED_SECRET_LENGTH] = {0};
+        void X25519::ComputeSharedSecret (
+                const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
+                const util::ui8 peerPublicKey[PUBLIC_KEY_LENGTH],
+                util::ui8 sharedSecret[SHARED_SECRET_LENGTH]) {
+            static const util::ui8 zero[SHARED_SECRET_LENGTH] = {0};
             x25519_scalar_mult (sharedSecret, privateKey, peerPublicKey);
             // The all-zero output results when the input is a point of small order.
-            if (CRYPTO_memcmp (kZeros, sharedSecret, X25519_SHARED_SECRET_LENGTH) == 0) {
+            if (TimeInsensitiveCompare (zero, sharedSecret, SHARED_SECRET_LENGTH)) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
-        }
-
-        _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API X25519GetPublicFromPrivate (
-                util::ui8 publicKey[X25519_PUBLIC_KEY_LENGTH],
-                const util::ui8 privateKey[X25519_PRIVATE_KEY_LENGTH]) {
-            util::ui8 e[X25519_PRIVATE_KEY_LENGTH];
-            memcpy (e, privateKey, X25519_PRIVATE_KEY_LENGTH);
-            e[0] &= 248;
-            e[31] &= 127;
-            e[31] |= 64;
-            ge_p3 A;
-            ge_scalarmult_base (&A, e);
-            // We only need the u-coordinate of the curve25519 point. The map is
-            // u = (y + 1) / (1 - y). Since y = Y / Z, this gives u = (Z + Y) / (Z - Y).
-            fe zplusy, zminusy, zminusy_inv;
-            fe_add (zplusy, A.Z, A.Y);
-            fe_sub (zminusy, A.Z, A.Y);
-            fe_invert (zminusy_inv, zminusy);
-            fe_mul (zplusy, zplusy, zminusy_inv);
-            fe_tobytes (publicKey, zplusy);
         }
 
     } // namespace crypto

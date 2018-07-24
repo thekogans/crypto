@@ -388,13 +388,41 @@ namespace thekogans {
             const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD);
 
         /// \brief
+        /// "RSA"
+        _LIB_THEKOGANS_CRYPTO_DECL extern const char * const OPENSSL_PKEY_RSA;
+        /// \brief
+        /// "DSA"
+        _LIB_THEKOGANS_CRYPTO_DECL extern const char * const OPENSSL_PKEY_DSA;
+        /// \brief
+        /// "DH"
+        _LIB_THEKOGANS_CRYPTO_DECL extern const char * const OPENSSL_PKEY_DH;
+        /// \brief
+        /// "EC"
+        _LIB_THEKOGANS_CRYPTO_DECL extern const char * const OPENSSL_PKEY_EC;
+        /// \brief
+        /// "HMAC"
+        _LIB_THEKOGANS_CRYPTO_DECL extern const char * const OPENSSL_PKEY_HMAC;
+        /// \brief
+        /// "CMAC"
+        _LIB_THEKOGANS_CRYPTO_DECL extern const char * const OPENSSL_PKEY_CMAC;
+
+        /// \brief
         /// Convert OpenSSL EVP_PKEY key type to string.
         /// \param[in] type One of EVP_PKEY_RSA, EVP_PKEY_DSA, EVP_PKEY_DH,
         /// EVP_PKEY_EC, EVP_PKEY_HMAC or EVP_PKEY_CMAC to "RSA", "DSA", "DH",
         /// "EC", "HMAC" or "CMAC".
         /// \return "RSA", "DSA", "DH", "EC", "HMAC" or "CMAC".
-        _LIB_THEKOGANS_CRYPTO_DECL std::string _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL const char * _LIB_THEKOGANS_CRYPTO_API
             EVP_PKEYtypeTostring (util::i32 type);
+        /// \brief
+        /// Convert string to OpenSSL EVP_PKEY key type.
+        /// \param[in] type One of "RSA", "DSA", "DH",
+        /// "EC", "HMAC" or "CMAC" to EVP_PKEY_RSA, EVP_PKEY_DSA, EVP_PKEY_DH,
+        /// EVP_PKEY_EC, EVP_PKEY_HMAC or EVP_PKEY_CMAC.
+        /// \return EVP_PKEY_RSA, EVP_PKEY_DSA, EVP_PKEY_DH,
+        /// EVP_PKEY_EC, EVP_PKEY_HMAC or EVP_PKEY_CMAC.
+        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API
+            stringToEVP_PKEYtype (const char *type);
 
         /// \brief
         /// Create a BIGNUMPtr and initialize it to a given value.

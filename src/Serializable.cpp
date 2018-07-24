@@ -18,9 +18,13 @@
 #include "thekogans/util/SpinLock.h"
 #include "thekogans/util/LockGuard.h"
 #include "thekogans/crypto/KeyRing.h"
-#include "thekogans/crypto/Params.h"
+#include "thekogans/crypto/OpenSSLParams.h"
+#include "thekogans/crypto/Ed25519Params.h"
+#include "thekogans/crypto/X25519Params.h"
 #include "thekogans/crypto/SymmetricKey.h"
-#include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
+#include "thekogans/crypto/Ed25519AsymmetricKey.h"
+#include "thekogans/crypto/X25519AsymmetricKey.h"
 #include "thekogans/crypto/DHEKeyExchange.h"
 #include "thekogans/crypto/RSAKeyExchange.h"
 #include "thekogans/crypto/Serializable.h"
@@ -35,9 +39,13 @@ namespace thekogans {
             util::LockGuard<util::SpinLock> guard (spinLock);
             if (!registered) {
                 KeyRing::StaticInit ();
-                Params::StaticInit ();
+                OpenSSLParams::StaticInit ();
+                Ed25519Params::StaticInit ();
+                X25519Params::StaticInit ();
                 SymmetricKey::StaticInit ();
-                AsymmetricKey::StaticInit ();
+                OpenSSLAsymmetricKey::StaticInit ();
+                Ed25519AsymmetricKey::StaticInit ();
+                X25519AsymmetricKey::StaticInit ();
                 DHEKeyExchange::DHEParams::StaticInit ();
                 RSAKeyExchange::RSAParams::StaticInit ();
                 registered = true;

@@ -22,6 +22,8 @@
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
+#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
+#include "thekogans/crypto/X25519AsymmetricKey.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/DHEKeyExchange.h"
 
@@ -62,7 +64,7 @@ namespace thekogans {
                     name <<
                     description <<
                     *publicKey;
-                Authenticator authenticator (Authenticator::Sign, privateKey, md);
+                Authenticator authenticator (privateKey, md);
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
                     paramsBuffer.GetDataAvailableForReading ());
@@ -105,7 +107,7 @@ namespace thekogans {
                         name <<
                         description <<
                         *this->publicKey;
-                    Authenticator authenticator (Authenticator::Verify, publicKey, md);
+                    Authenticator authenticator (publicKey, md);
                     return authenticator.VerifyBufferSignature (
                         paramsBuffer.GetReadPtr (),
                         paramsBuffer.GetDataAvailableForReading (),
@@ -194,8 +196,10 @@ namespace thekogans {
                 keyId (keyId_),
                 name (name_),
                 description (description_) {
-            util::i32 type = params->GetType ();
-            if (type == EVP_PKEY_DH || type == EVP_PKEY_EC) {
+            const char *keyType = params->GetKeyType ();
+            if (keyType == OPENSSL_PKEY_DH ||
+                    keyType == OPENSSL_PKEY_EC ||
+                    keyType == X25519AsymmetricKey::KEY_TYPE) {
                 privateKey = params->CreateKey ();
                 publicKey = privateKey->GetPublicKey ();
             }
@@ -221,7 +225,7 @@ namespace thekogans {
                 name = dheParams->name;
                 description = dheParams->description;
                 privateKey = this->params->CreateKey ();
-                this->publicKey = privateKey->GetPublicKey ();
+                publicKey = privateKey->GetPublicKey ();
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -269,28 +273,22 @@ namespace thekogans {
             DHEParams::Ptr dheParams =
                 util::dynamic_refcounted_pointer_cast<DHEParams> (params);
             if (dheParams.Get () != 0) {
-                EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new (privateKey->Get (), OpenSSLInit::engine));
-                if (ctx.get () != 0) {
-                    std::size_t secretLength = 0;
-                    if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
-                            EVP_PKEY_derive_set_peer (ctx.get (), dheParams->publicKey->Get ()) == 1 &&
-                            EVP_PKEY_derive (ctx.get (), 0, &secretLength) == 1) {
-                        util::SecureVector<util::ui8> secret (secretLength);
-                        if (EVP_PKEY_derive (ctx.get (), &secret[0], &secretLength) == 1) {
-                            util::Buffer salt = initiator ?
-                                GetSalt (dheParams->salt, *publicKey, *dheParams->publicKey) :
-                                GetSalt (dheParams->salt, *dheParams->publicKey, *publicKey);
-                            return SymmetricKey::FromSecretAndSalt (
-                                &secret[0],
-                                secretLength,
-                                salt.GetReadPtr (),
-                                salt.GetDataAvailableForReading (),
-                                dheParams->keyLength,
-                                CipherSuite::GetOpenSSLMessageDigestByName (dheParams->messageDigest),
-                                dheParams->count,
-                                dheParams->keyId,
-                                dheParams->name,
-                                dheParams->description);
+                util::SecureVector<util::ui8> secret;
+                const char *keyType = privateKey->GetKeyType ();
+                if (keyType == OPENSSL_PKEY_DH || keyType == OPENSSL_PKEY_EC) {
+                    EVP_PKEY_CTXPtr ctx (
+                        EVP_PKEY_CTX_new (
+                            (EVP_PKEY *)privateKey->GetKey (),
+                            OpenSSLInit::engine));
+                    if (ctx.get () != 0) {
+                        std::size_t secretLength = 0;
+                        if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
+                                EVP_PKEY_derive_set_peer (
+                                    ctx.get (),
+                                    (EVP_PKEY *)dheParams->publicKey->GetKey ()) == 1 &&
+                                EVP_PKEY_derive (ctx.get (), 0, &secretLength) == 1) {
+                            secret.resize (secretLength);
+                            EVP_PKEY_derive (ctx.get (), secret.data (), &secretLength);
                         }
                         else {
                             THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -300,9 +298,27 @@ namespace thekogans {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                else if (keyType == X25519AsymmetricKey::KEY_TYPE) {
+                    secret.resize (X25519::SHARED_SECRET_LENGTH);
+                    X25519::ComputeSharedSecret (
+                        (const util::ui8 *)privateKey->GetKey (),
+                        (const util::ui8 *)dheParams->publicKey->GetKey (),
+                        secret.data ());
                 }
+                util::Buffer salt = initiator ?
+                    GetSalt (dheParams->salt, *publicKey, *dheParams->publicKey) :
+                    GetSalt (dheParams->salt, *dheParams->publicKey, *publicKey);
+                return SymmetricKey::FromSecretAndSalt (
+                    secret.data (),
+                    secret.size (),
+                    salt.GetReadPtr (),
+                    salt.GetDataAvailableForReading (),
+                    dheParams->keyLength,
+                    CipherSuite::GetOpenSSLMessageDigestByName (dheParams->messageDigest),
+                    dheParams->count,
+                    dheParams->keyId,
+                    dheParams->name,
+                    dheParams->description);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

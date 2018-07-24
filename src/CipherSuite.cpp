@@ -17,6 +17,8 @@
 
 #include "thekogans/crypto/DHEKeyExchange.h"
 #include "thekogans/crypto/RSAKeyExchange.h"
+#include "thekogans/crypto/X25519AsymmetricKey.h"
+#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
     #include "thekogans/crypto/Blake2b.h"
     #include "thekogans/crypto/Blake2s.h"
@@ -374,30 +376,33 @@ namespace thekogans {
         }
 
         bool CipherSuite::VerifyKeyExchangeParams (const Params &params) const {
-            util::i32 type = params.GetType ();
+            const char *type = params.GetKeyType ();
             return
-                (keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE && type == EVP_PKEY_EC) ||
-                (keyExchange == CipherSuite::KEY_EXCHANGE_DHE && type == EVP_PKEY_DH);
+                (keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE &&
+                    (type == OPENSSL_PKEY_EC || type == X25519AsymmetricKey::KEY_TYPE)) ||
+                (keyExchange == CipherSuite::KEY_EXCHANGE_DHE && type == OPENSSL_PKEY_DH);
         }
 
         bool CipherSuite::VerifyKeyExchangeKey (const AsymmetricKey &key) const {
-            util::i32 type = key.GetType ();
-            return keyExchange == CipherSuite::KEY_EXCHANGE_RSA && type == EVP_PKEY_RSA;
+            const char *type = key.GetKeyType ();
+            return keyExchange == CipherSuite::KEY_EXCHANGE_RSA && type == OPENSSL_PKEY_RSA;
         }
 
         bool CipherSuite::VerifyAuthenticatorParams (const Params &params) const {
-            util::i32 type = params.GetType ();
+            const char *type = params.GetKeyType ();
             return
-                (authenticator == CipherSuite::AUTHENTICATOR_ECDSA && type == EVP_PKEY_EC) ||
-                (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == EVP_PKEY_DSA);
+                (authenticator == CipherSuite::AUTHENTICATOR_ECDSA &&
+                    (type == OPENSSL_PKEY_EC || type == Ed25519AsymmetricKey::KEY_TYPE)) ||
+                (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == OPENSSL_PKEY_DSA);
         }
 
         bool CipherSuite::VerifyAuthenticatorKey (const AsymmetricKey &key) const {
-            util::i32 type = key.GetType ();
+            const char *type = key.GetKeyType ();
             return
-                (authenticator == CipherSuite::AUTHENTICATOR_ECDSA && type == EVP_PKEY_EC) ||
-                (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == EVP_PKEY_DSA) ||
-                (authenticator == CipherSuite::AUTHENTICATOR_RSA && type == EVP_PKEY_RSA);
+                (authenticator == CipherSuite::AUTHENTICATOR_ECDSA &&
+                    (type == OPENSSL_PKEY_EC || type == Ed25519AsymmetricKey::KEY_TYPE)) ||
+                (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == OPENSSL_PKEY_DSA) ||
+                (authenticator == CipherSuite::AUTHENTICATOR_RSA && type == OPENSSL_PKEY_RSA);
         }
 
         bool CipherSuite::VerifyCipherKey (const SymmetricKey &key) const {
@@ -405,8 +410,8 @@ namespace thekogans {
         }
 
         bool CipherSuite::VerifyMACKey (const AsymmetricKey &key) const {
-            util::i32 type = key.GetType ();
-            return type == EVP_PKEY_HMAC || type == EVP_PKEY_CMAC;
+            const char *type = key.GetKeyType ();
+            return type == OPENSSL_PKEY_HMAC || type == OPENSSL_PKEY_CMAC;
         }
 
         KeyExchange::Ptr CipherSuite::GetDHEKeyExchange (
@@ -469,16 +474,10 @@ namespace thekogans {
             }
         }
 
-        Authenticator::Ptr CipherSuite::GetAuthenticator (
-                Authenticator::Op op,
-                AsymmetricKey::Ptr key) const {
-            if (key.Get () != 0 &&
-                    ((op == Authenticator::Sign && key->IsPrivate ()) ||
-                        (op == Authenticator::Verify && !key->IsPrivate ())) &&
-                    VerifyAuthenticatorKey (*key)) {
+        Authenticator::Ptr CipherSuite::GetAuthenticator (AsymmetricKey::Ptr key) const {
+            if (key.Get () != 0 && VerifyAuthenticatorKey (*key)) {
                 return Authenticator::Ptr (
                     new Authenticator (
-                        op,
                         key,
                         GetOpenSSLMessageDigestByName (messageDigest)));
             }

@@ -26,18 +26,32 @@
 using namespace thekogans;
 
 namespace {
+    bool operator == (
+            const crypto::Params &params1,
+            const crypto::Params &params2) {
+        util::Buffer params1Buffer (util::HostEndian, util::Serializable::Size (params1));
+        params1Buffer << params1;
+        util::Buffer params2Buffer (util::HostEndian, util::Serializable::Size (params2));
+        params2Buffer << params2;
+        return params1Buffer.GetDataAvailableForReading () == params2Buffer.GetDataAvailableForReading () &&
+            memcmp (
+                params1Buffer.GetReadPtr (),
+                params2Buffer.GetReadPtr (),
+                params1Buffer.GetDataAvailableForReading ()) == 0;
+    }
+
     bool TestParams (
             const char *paramsName,
-            crypto::Params &params) {
+            crypto::Params::Ptr params1) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
             util::Buffer buffer (
                 util::NetworkEndian,
-                (util::ui32)util::Serializable::Size (params));
-            buffer << params;
+                util::Serializable::Size (*params1));
+            buffer << *params1;
             crypto::Params::Ptr params2;
             buffer >> params2;
-            bool result = EVP_PKEY_cmp_parameters (params.Get (), params2->Get ()) == 1;
+            bool result = *params1 == *params2;
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }
@@ -53,54 +67,54 @@ TEST (thekogans, DH) {
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromPrimeLengthAndGenerator (512)",
-            *crypto::DH::ParamsFromPrimeLengthAndGenerator (512)),
+            crypto::DH::ParamsFromPrimeLengthAndGenerator (512)),
         true);
     // crypto::DH::RFC3526Prime
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_1536)",
-            *crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_1536)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_1536)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_2048)",
-            *crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_2048)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_2048)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_3072)",
-            *crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_3072)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_3072)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_4096)",
-            *crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_4096)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_4096)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_6144)",
-            *crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_6144)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_6144)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_8192)",
-            *crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_8192)),
+            crypto::DH::ParamsFromRFC3526Prime (crypto::DH::RFC3526_PRIME_8192)),
         true);
     // crypto::DH::RFC5114Prime
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_1024)",
-            *crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_1024)),
+            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_1024)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_224)",
-            *crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_224)),
+            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_224)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_256)",
-            *crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_256)),
+            crypto::DH::ParamsFromRFC5114Prime (crypto::DH::RFC5114_PRIME_2048_256)),
         true);
 }
 
@@ -109,7 +123,7 @@ TEST (thekogans, DSA) {
     CHECK_EQUAL (
         TestParams (
             "crypto::DSA::ParamsFromKeyLength (512)",
-            *crypto::DSA::ParamsFromKeyLength (512)),
+            crypto::DSA::ParamsFromKeyLength (512)),
         true);
 }
 
@@ -119,104 +133,114 @@ TEST (thekogans, EC) {
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1)",
-            *crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1)),
+            crypto::EC::ParamsFromNamedCurve (NID_X9_62_prime256v1)),
         true);
     // RFC5114Curve
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192)",
-            *crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_192)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224)",
-            *crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_224)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256)",
-            *crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_256)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384)",
-            *crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_384)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521)",
-            *crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521)),
+            crypto::EC::ParamsFromRFC5114Curve (crypto::EC::RFC5114_CURVE_521)),
         true);
     // RFC5639Curve
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_160_T)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_192_T)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_224_T)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_256_T)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_320_T)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_384_T)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512)),
         true);
     CHECK_EQUAL (
         TestParams (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)",
-            *crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)),
+            crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)),
+        true);
+    CHECK_EQUAL (
+        TestParams (
+            "crypto::EC::ParamsFromEd25519Curve ()",
+            crypto::EC::ParamsFromEd25519Curve ()),
+        true);
+    CHECK_EQUAL (
+        TestParams (
+            "crypto::EC::ParamsFromX25519Curve ()",
+            crypto::EC::ParamsFromX25519Curve ()),
         true);
 }
 

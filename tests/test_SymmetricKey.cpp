@@ -76,7 +76,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
         crypto::SymmetricKey::Ptr key2;
         serializer >> key2;
@@ -99,7 +99,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
         crypto::SymmetricKey::Ptr key2;
         serializer >> key2;
@@ -121,7 +121,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
         crypto::SymmetricKey::Ptr key2;
         serializer >> key2;
@@ -143,7 +143,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
         crypto::SymmetricKey::Ptr key2;
         serializer >> key2;
@@ -164,7 +164,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, (util::ui32)util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
         crypto::SymmetricKey::Ptr key2;
         serializer >> key2;

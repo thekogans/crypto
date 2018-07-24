@@ -32,9 +32,9 @@ namespace {
     bool operator == (
             const crypto::SymmetricKey &key1,
             const crypto::SymmetricKey &key2) {
-        util::Buffer key1Buffer (util::HostEndian, (util::ui32)util::Serializable::Size (key1));
+        util::Buffer key1Buffer (util::HostEndian, util::Serializable::Size (key1));
         key1Buffer << key1;
-        util::Buffer key2Buffer (util::HostEndian, (util::ui32)util::Serializable::Size (key2));
+        util::Buffer key2Buffer (util::HostEndian, util::Serializable::Size (key2));
         key2Buffer << key2;
         return key1Buffer.GetDataAvailableForReading () == key2Buffer.GetDataAvailableForReading () &&
             memcmp (
@@ -313,6 +313,13 @@ TEST (thekogans, EC) {
         TestDHE (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)",
             crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T),
+            privateKey1,
+            privateKey2),
+        true);
+    CHECK_EQUAL (
+        TestDHE (
+            "crypto::EC::ParamsFromX25519Curve ()",
+            crypto::EC::ParamsFromX25519Curve (),
             privateKey1,
             privateKey2),
         true);

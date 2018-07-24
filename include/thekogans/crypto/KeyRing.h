@@ -89,11 +89,8 @@ namespace thekogans {
             /// \see{Authenticator} \see{AsymmetricKey} map.
             AsymmetricKeyMap authenticatorKeyMap;
             /// \brief
-            /// Convenient typedef for std::pair<Authenticator::Op, ID>.
-            typedef std::pair<Authenticator::Op, ID> AuthenticatorMapKey;
-            /// \brief
-            /// Convenient typedef for std::map<AuthenticatorMapKey, Authenticator::Ptr>.
-            typedef std::map<AuthenticatorMapKey, Authenticator::Ptr> AuthenticatorMap;
+            /// Convenient typedef for std::map<ID, Authenticator::Ptr>.
+            typedef std::map<ID, Authenticator::Ptr> AuthenticatorMap;
             /// \brief
             /// \see{Authenticator} map.
             AuthenticatorMap authenticatorMap;
@@ -390,14 +387,12 @@ namespace thekogans {
                 const EqualityTest<AsymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
-            /// Return the \see{Authenticator} with the given \see{Authenticator::Op} and \see{ID}.
-            /// \param[in] op \see{Authenticator::Op}.
+            /// Return the \see{Authenticator} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey}.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Authenticator} corresponding to the given op and keyId
             /// (Authenticator::Ptr () if not found).
             Authenticator::Ptr GetAuthenticator (
-                Authenticator::Op op,
                 const ID &keyId,
                 bool recursive);
             /// \brief

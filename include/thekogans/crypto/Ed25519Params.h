@@ -15,45 +15,50 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if !defined (__thekogans_crypto_Params_h)
-#define __thekogans_crypto_Params_h
+#if !defined (__thekogans_crypto_Ed25519Params_h)
+#define __thekogans_crypto_Ed25519Params_h
 
+#include <cstddef>
 #include <string>
-#include "thekogans/util/Serializer.h"
+#include <openssl/evp.h>
+#include <openssl/pem.h>
+#include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Serializable.h"
-#include "thekogans/crypto/AsymmetricKey.h"
-#include "thekogans/crypto/ID.h"
+#include "thekogans/crypto/Ed25519AsymmetricKey.h"
+#include "thekogans/crypto/Params.h"
 
 namespace thekogans {
     namespace crypto {
 
-        /// \struct Params Params.h thekogans/crypto/Params.h
+        /// \struct Ed25519Params Ed25519Params.h thekogans/crypto/Ed25519Params.h
         ///
         /// \brief
-        /// AsymmetricKey is the base for all PKI key parameters. It defines the base API
-        /// that all concrete parameters must implement.
+        /// Ed25519Params are used to create \see{Ed25519AsymmetricKey} used in
+        /// Sign/Verify operations (See \see{Authenticator}).
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Params : public Serializable {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Params : public Params {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Params>.
-            typedef util::ThreadSafeRefCounted::Ptr<Params> Ptr;
+            /// Ed25519Params is a \see{Serializable}.
+            THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (Ed25519Params)
 
             /// \brief
             /// ctor.
             /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
-            Params (
+            Ed25519Params (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
-                Serializable (id, name, description) {}
+                Params (id, name, description) {}
 
             /// \brief
             /// Return the key type.
             /// \return Key type.
-            virtual const char *GetKeyType () const = 0;
+            virtual const char *GetKeyType () const {
+                return Ed25519AsymmetricKey::KEY_TYPE;
+            }
 
             /// \brief
             /// Create an \see{AsymmetricKey} based on parameters.
@@ -64,40 +69,49 @@ namespace thekogans {
             virtual AsymmetricKey::Ptr CreateKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
-                const std::string &description = std::string ()) const = 0;
+                const std::string &description = std::string ()) const;
 
         protected:
             // Serializable
             /// \brief
-            /// Return the serialized key size.
-            /// \return Serialized key size.
+            /// Return the serialized params size.
+            /// \return Serialized params size.
             virtual std::size_t Size () const;
 
             /// \brief
-            /// Read the key from the given serializer.
+            /// Read the parameters from the given serializer.
             /// \param[in] header \see{util::Serializable::Header}.
-            /// \param[in] serializer \see{util::Serializer} to read the key from.
+            /// \param[in] serializer \see{util::Serializer} to read the parameters from.
             virtual void Read (
                 const Header &header,
                 util::Serializer &serializer);
             /// \brief
-            /// Serialize the key to the given serializer.
-            /// \param[out] serializer \see{util::Serializer} to serialize the key to.
+            /// Write the parameters to the given serializer.
+            /// \param[out] serializer \see{util::Serializer} to write the parameters to.
             virtual void Write (util::Serializer &serializer) const;
 
         public:
         #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
-            /// "ParamsType"
-            static const char * const ATTR_PARAMS_TYPE;
+            /// Return the XML representation of parameters.
+            /// \param[in] indentationLevel How far to indent the leading tag.
+            /// \param[in] tagName The name of the leading tag.
+            /// \return XML representation of parameters.
+            virtual std::string ToString (
+                std::size_t indentationLevel = 0,
+                const char *tagName = TAG_SERIALIZABLE) const;
         #endif // defined (THEKOGANS_CRYPTO_TESTING)
+
+            /// \brief
+            /// Ed25519Params is neither copy constructable, nor assignable.
+            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Ed25519Params)
         };
 
         /// \brief
-        /// Implement Params extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (Params)
+        /// Implement Ed25519Params extraction operator.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (Ed25519Params)
 
     } // namespace crypto
 } // namespace thekogans
 
-#endif // !defined (__thekogans_crypto_Params_h)
+#endif // !defined (__thekogans_crypto_Ed25519Params_h)

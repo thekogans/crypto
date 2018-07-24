@@ -611,22 +611,19 @@ namespace thekogans {
         }
 
         Authenticator::Ptr KeyRing::GetAuthenticator (
-                Authenticator::Op op,
                 const ID &keyId,
                 bool recursive) {
-            AuthenticatorMap::const_iterator it =
-                authenticatorMap.find (AuthenticatorMapKey (op, keyId));
+            AuthenticatorMap::const_iterator it = authenticatorMap.find (keyId);
             if (it != authenticatorMap.end ()) {
                 return it->second;
             }
             AsymmetricKey::Ptr key = GetAuthenticatorKey (keyId, false);
             if (key.Get () != 0) {
                 Authenticator::Ptr authenticator =
-                    cipherSuite.GetAuthenticator (op, key);
+                    cipherSuite.GetAuthenticator (key);
                 std::pair<AuthenticatorMap::iterator, bool> result =
                     authenticatorMap.insert (
-                        AuthenticatorMap::value_type (
-                            AuthenticatorMapKey (op, keyId), authenticator));
+                        AuthenticatorMap::value_type (keyId, authenticator));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Unable to add an Authenticator: %s.",
@@ -639,7 +636,7 @@ namespace thekogans {
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
                     Authenticator::Ptr authenticator =
-                        it->second->GetAuthenticator (op, keyId, recursive);
+                        it->second->GetAuthenticator (keyId, recursive);
                     if (authenticator.Get () != 0) {
                         return authenticator;
                     }
@@ -659,7 +656,7 @@ namespace thekogans {
                     std::pair<AuthenticatorMap::iterator, bool> result =
                         authenticatorMap.insert (
                             AuthenticatorMap::value_type (
-                                AuthenticatorMapKey (authenticator->GetOp (), key->GetId ()),
+                                key->GetId (),
                                 authenticator));
                     if (!result.second) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -681,14 +678,7 @@ namespace thekogans {
             AsymmetricKeyMap::iterator it = authenticatorKeyMap.find (keyId);
             if (it != authenticatorKeyMap.end ()) {
                 authenticatorKeyMap.erase (it);
-                AuthenticatorMap::iterator it =
-                    authenticatorMap.find (
-                        AuthenticatorMapKey (Authenticator::Sign, keyId));
-                if (it != authenticatorMap.end ()) {
-                    authenticatorMap.erase (it);
-                }
-                it = authenticatorMap.find (
-                    AuthenticatorMapKey (Authenticator::Verify, keyId));
+                AuthenticatorMap::iterator it = authenticatorMap.find (keyId);
                 if (it != authenticatorMap.end ()) {
                     authenticatorMap.erase (it);
                 }

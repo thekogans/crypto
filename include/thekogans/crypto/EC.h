@@ -165,6 +165,27 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+
+            /// \brief
+            /// Generate \see{Ed255219} elliptic curve parameters.
+            /// \param[in] id Optional parameters id.
+            /// \param[in] name Optional parameters name.
+            /// \param[in] description Optional parameters description.
+            /// \return \see{Ed255219} elliptic curve parameters.
+            static Params::Ptr ParamsFromEd25519Curve (
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
+            /// \brief
+            /// Generate \see{X255219} elliptic curve parameters.
+            /// \param[in] id Optional parameters id.
+            /// \param[in] name Optional parameters name.
+            /// \param[in] description Optional parameters description.
+            /// \return \see{X255219} elliptic curve parameters.
+            static Params::Ptr ParamsFromX25519Curve (
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
         };
 
     } // namespace crypto

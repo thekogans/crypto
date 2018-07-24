@@ -48,7 +48,7 @@ namespace thekogans {
                     util::Serializer::Size (keyId) +
                     util::Serializer::Size (buffer));
                 paramsBuffer << id << keyId << buffer;
-                Authenticator authenticator (Authenticator::Sign, privateKey, md);
+                Authenticator authenticator (privateKey, md);
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
                     paramsBuffer.GetDataAvailableForReading ());
@@ -74,7 +74,7 @@ namespace thekogans {
                         util::Serializer::Size (keyId) +
                         util::Serializer::Size (buffer));
                     paramsBuffer << id << keyId << buffer;
-                    Authenticator authenticator (Authenticator::Verify, publicKey, md);
+                    Authenticator authenticator (publicKey, md);
                     return authenticator.VerifyBufferSignature (
                         paramsBuffer.GetReadPtr (),
                         paramsBuffer.GetDataAvailableForReading (),
@@ -126,7 +126,7 @@ namespace thekogans {
                 const std::string &description) :
                 KeyExchange (id),
                 key (key_) {
-            if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && !key->IsPrivate () &&
+            if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && !key->IsPrivate () &&
                     secretLength > 0 && md != 0 && count > 0) {
                 util::SecureVector<util::ui8> secret (secretLength);
                 if (util::GlobalRandomSource::Instance ().GetBytes (
@@ -162,7 +162,7 @@ namespace thekogans {
                 key (key_) {
             RSAParams::Ptr rsaParams =
                 util::dynamic_refcounted_pointer_cast<RSAParams> (params);
-            if (key.Get () != 0 && key->GetType () == EVP_PKEY_RSA && key->IsPrivate () &&
+            if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && key->IsPrivate () &&
                     rsaParams.Get () != 0) {
                 id = rsaParams->id;
                 util::Buffer symmetricKeyBuffer =
@@ -189,7 +189,7 @@ namespace thekogans {
                 util::Serializable::Size (*symmetricKey));
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
-                Authenticator authenticator (Authenticator::Sign, key);
+                Authenticator authenticator (key);
                 rsaParams.Reset (
                     new RSAParams (
                         id,
@@ -224,7 +224,7 @@ namespace thekogans {
                         util::NetworkEndian,
                         util::Serializable::Size (*symmetricKey));
                     symmetricKeyBuffer << *symmetricKey;
-                    Authenticator authenticator (Authenticator::Verify, key);
+                    Authenticator authenticator (key);
                     if (!authenticator.VerifyBufferSignature (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),

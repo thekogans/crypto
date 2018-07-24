@@ -17,6 +17,9 @@
 
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
+#include "thekogans/crypto/OpenSSLParams.h"
+#include "thekogans/crypto/Ed25519Params.h"
+#include "thekogans/crypto/X25519Params.h"
 #include "thekogans/crypto/EC.h"
 
 namespace thekogans {
@@ -54,7 +57,8 @@ namespace thekogans {
                             if (params.get () != 0 &&
                                     EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                 ecParams.release ();
-                                return Params::Ptr (new Params (std::move (params), id, name, description));
+                                return Params::Ptr (
+                                    new OpenSSLParams (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -83,14 +87,13 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             EVP_PKEY *params = 0;
-            EVP_PKEY_CTXPtr ctx (
-                EVP_PKEY_CTX_new_id (EVP_PKEY_EC, OpenSSLInit::engine));
+            EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new_id (EVP_PKEY_EC, OpenSSLInit::engine));
             if (ctx.get () != 0 &&
                     EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
                     EVP_PKEY_CTX_set_ec_paramgen_curve_nid (ctx.get (), nid) == 1 &&
                     EVP_PKEY_CTX_set_ec_param_enc (ctx.get (), OPENSSL_EC_NAMED_CURVE) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return Params::Ptr (new Params (EVP_PKEYPtr (params), id, name, description));
+                return Params::Ptr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -1249,6 +1252,20 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             return ParamsFromEllipticCurve (rfc5639curves[curve], id, name, description);
+        }
+
+        Params::Ptr EC::ParamsFromEd25519Curve (
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            return Params::Ptr (new Ed25519Params (id, name, description));
+        }
+
+        Params::Ptr EC::ParamsFromX25519Curve (
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            return Params::Ptr (new X25519Params (id, name, description));
         }
 
     } // namespace crypto
