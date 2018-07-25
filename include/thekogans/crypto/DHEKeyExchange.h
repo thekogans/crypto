@@ -30,7 +30,7 @@
 namespace thekogans {
     namespace crypto {
 
-        /// \struct KeyExchange KeyExchange.h thekogans/crypto/KeyExchange.h
+        /// \struct DHEKeyExchange DHEKeyExchange.h thekogans/crypto/DHEKeyExchange.h
         ///
         /// \brief
         /// A class for computing and exchanging shared \see{SymmetricKey}s using DHE.

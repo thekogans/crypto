@@ -27,7 +27,7 @@
 namespace thekogans {
     namespace crypto {
 
-        /// \struct Signer Signer.h thekogans/crypto/Signer.h
+        /// \struct OpenSSLSigner OpenSSLSigner.h thekogans/crypto/OpenSSLSigner.h
         ///
         /// \brief
         /// Signer implements the public key sign operation using

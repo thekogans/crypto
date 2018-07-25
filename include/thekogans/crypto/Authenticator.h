@@ -33,9 +33,9 @@ namespace thekogans {
         /// \struct Authenticator Authenticator.h thekogans/crypto/Authenticator.h
         ///
         /// \brief
-        /// Authenticator implements a one shot public key signing and verifying operations.
-        /// If you need to sign/verify multiple disjoint buffers, use \see{Signer} and
-        /// \see{Verifier} directly.
+        /// Authenticator implements a one shot public key signing and signature
+        /// verification operations. If you need to sign/verify multiple disjoint
+        /// buffers, use \see{Signer} and \see{Verifier} directly.
         /// NOTE: You can call Sign[Buffer | File] and Verify[Buffer | File]Signature
         /// as many times as you need and in any order. Authenticator is designed to
         /// be reused. It will reset it's internal state after every sign/verify

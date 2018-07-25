@@ -190,8 +190,8 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
+    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
-        #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// Return the XML representation of a key.
             /// ********************** WARNING **********************
@@ -205,7 +205,7 @@ namespace thekogans {
             virtual std::string ToString (
                 std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const;
-        #endif // defined (THEKOGANS_CRYPTO_TESTING)
+    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
             /// \brief
             /// OpenSSLAsymmetricKey is neither copy constructable, nor assignable.

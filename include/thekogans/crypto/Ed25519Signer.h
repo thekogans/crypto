@@ -27,7 +27,7 @@
 namespace thekogans {
     namespace crypto {
 
-        /// \struct Signer Signer.h thekogans/crypto/Signer.h
+        /// \struct Ed25519Signer Ed25519Signer.h thekogans/crypto/Ed25519Signer.h
         ///
         /// \brief
         /// Signer implements the public key sign operation using \see{Ed25519} keys.

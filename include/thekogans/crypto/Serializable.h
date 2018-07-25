@@ -131,8 +131,8 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to write the serializable to.
             virtual void Write (util::Serializer &serializer) const;
 
+    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
-        #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// "Serializable"
             static const char * const TAG_SERIALIZABLE;
@@ -162,7 +162,7 @@ namespace thekogans {
             virtual std::string ToString (
                 std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const = 0;
-        #endif // defined (THEKOGANS_CRYPTO_TESTING)
+    #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
 
         /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)

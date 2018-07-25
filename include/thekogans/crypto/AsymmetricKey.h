@@ -88,7 +88,7 @@ namespace thekogans {
             /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
-            /// \return Public part of the privateKey (or duplicate of the pubilc key).
+            /// \return Public part of the private key (or duplicate of the pubilc key).
             virtual Ptr GetPublicKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
@@ -113,15 +113,15 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
+    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
-        #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// "Private"
             static const char * const ATTR_PRIVATE;
             /// \brief
             /// "KeyType"
             static const char * const ATTR_KEY_TYPE;
-        #endif // defined (THEKOGANS_CRYPTO_TESTING)
+    #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
 
         /// \brief
