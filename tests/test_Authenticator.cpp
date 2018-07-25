@@ -68,7 +68,7 @@ TEST (thekogans, DSA) {
     crypto::OpenSSLInit openSSLInit;
     CHECK_EQUAL (
         TestAuthenticator (
-            "crypto::DSA::ParamsFromKeyLength (512)->CreateAsymmetricKey ()",
+            "crypto::DSA::ParamsFromKeyLength (512)->CreateKey ()",
             crypto::DSA::ParamsFromKeyLength (512)->CreateKey ()),
         true);
 }
@@ -177,6 +177,11 @@ TEST (thekogans, EC) {
         TestAuthenticator (
             "crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)->CreateKey ())",
             crypto::EC::ParamsFromRFC5639Curve (crypto::EC::RFC5639_CURVE_512_T)->CreateKey ()),
+        true);
+    CHECK_EQUAL (
+        TestAuthenticator (
+            "crypto::EC::ParamsFromEd25519Curve ()",
+            crypto::EC::ParamsFromEd25519Curve ()->CreateKey ()),
         true);
 }
 

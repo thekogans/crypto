@@ -169,10 +169,10 @@ namespace thekogans {
             }
         }
 
-        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
         GetMDLength (const EVP_MD *md) {
             if (md != 0) {
-                return EVP_MD_size (md);
+                return (std::size_t)EVP_MD_size (md);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

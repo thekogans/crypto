@@ -68,6 +68,8 @@
     <cpp_header>$(organization)/$(project_directory)/EC.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Ed25519AsymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Ed25519Params.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Ed25519Signer.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/Ed25519Verifier.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Encryptor.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/FrameHeader.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/HMAC.h</cpp_header>
@@ -81,7 +83,9 @@
     <cpp_header>$(organization)/$(project_directory)/OpenSSLException.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLInit.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLParams.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLSigner.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/OpenSSLUtils.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/OpenSSLVerifier.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSA.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/RSAKeyExchange.h</cpp_header>
@@ -116,6 +120,8 @@
     <cpp_source>EC.cpp</cpp_source>
     <cpp_source>Ed25519AsymmetricKey.cpp</cpp_source>
     <cpp_source>Ed25519Params.cpp</cpp_source>
+    <cpp_source>Ed25519Signer.cpp</cpp_source>
+    <cpp_source>Ed25519Verifier.cpp</cpp_source>
     <cpp_source>Encryptor.cpp</cpp_source>
     <cpp_source>HMAC.cpp</cpp_source>
     <cpp_source>ID.cpp</cpp_source>
@@ -128,7 +134,9 @@
     <cpp_source>OpenSSLException.cpp</cpp_source>
     <cpp_source>OpenSSLInit.cpp</cpp_source>
     <cpp_source>OpenSSLParams.cpp</cpp_source>
+    <cpp_source>OpenSSLSigner.cpp</cpp_source>
     <cpp_source>OpenSSLUtils.cpp</cpp_source>
+    <cpp_source>OpenSSLVerifier.cpp</cpp_source>
     <cpp_source>Params.cpp</cpp_source>
     <cpp_source>RSA.cpp</cpp_source>
     <cpp_source>RSAKeyExchange.cpp</cpp_source>

@@ -384,7 +384,7 @@ namespace thekogans {
         /// Return the length of the digest given an OpenSSL message digest object.
         /// \param[in] md OpenSSL message digest object.
         /// \return Length of the digest for the given OpenSSL message digest object.
-        _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API GetMDLength (
+        _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API GetMDLength (
             const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD);
 
         /// \brief

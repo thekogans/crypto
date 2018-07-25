@@ -15,66 +15,57 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/OpenSSLException.h"
-#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
+#if defined (TOOLCHAIN_TYPE_Static)
+    #include "thekogans/util/SpinLock.h"
+    #include "thekogans/util/LockGuard.h"
+#endif // defined (TOOLCHAIN_TYPE_Static)
+#include "thekogans/crypto/OpenSSLVerifier.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
+#include "thekogans/crypto/Ed25519Verifier.h"
+#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/Verifier.h"
 
 namespace thekogans {
     namespace crypto {
 
-        Verifier::Verifier (
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md_) :
-                key (key_),
-                md (md_) {
-            if (key.Get () != 0 &&
-                    (key->GetKeyType () == OPENSSL_PKEY_RSA ||
-                        key->GetKeyType () == OPENSSL_PKEY_DSA ||
-                        key->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    md != 0) {
-                if (EVP_DigestVerifyInit (&ctx, 0, md, OpenSSLInit::engine, (EVP_PKEY *)key->GetKey ()) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+        Verifier::Map &Verifier::GetMap () {
+            static Verifier::Map map;
+            return map;
+        }
+
+        Verifier::MapInitializer::MapInitializer (
+                const std::string &keyType,
+                Factory factory) {
+            std::pair<Map::iterator, bool> result =
+                GetMap ().insert (Map::value_type (keyType, factory));
+            assert (result.second);
+            if (!result.second) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "%s is already registered.", keyType.c_str ());
             }
         }
 
-        void Verifier::Init () {
-            if (EVP_DigestVerifyInit (&ctx, 0, md, 0, 0) != 1) {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
+        Verifier::Ptr Verifier::Get (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md) {
+            Map::iterator it = GetMap ().find (privateKey->GetKeyType ());
+            return it != GetMap ().end () ? it->second (privateKey, md) : Verifier::Ptr ();
         }
 
-        void Verifier::Update (
-                const void *buffer,
-                std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestVerifyUpdate (&ctx, buffer, bufferLength) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        bool Verifier::Final (
-                const void *signature,
-                std::size_t signatureLength) {
-            if (signature != 0 && signatureLength > 0) {
-                return EVP_DigestVerifyFinal (&ctx,
-                    (const util::ui8 *)signature, signatureLength) == 1;
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+    #if defined (TOOLCHAIN_TYPE_Static)
+        void Verifier::StaticInit () {
+            static volatile bool registered = false;
+            static util::SpinLock spinLock;
+            util::LockGuard<util::SpinLock> guard (spinLock);
+            if (!registered) {
+                OpenSSLVerifier::StaticInit (OPENSSL_PKEY_RSA);
+                OpenSSLVerifier::StaticInit (OPENSSL_PKEY_DSA);
+                OpenSSLVerifier::StaticInit (OPENSSL_PKEY_EC);
+                Ed25519Verifier::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
+                registered = true;
             }
         }
+    #endif // defined (TOOLCHAIN_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans

@@ -32,6 +32,7 @@
 #if !defined (__thekogans_crypto_Curve25519_h)
 #define __thekogans_crypto_Curve25519_h
 
+#include <cstddef>
 #include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
 
@@ -82,7 +83,8 @@ namespace thekogans {
             /// \param[in] bufferLength Buffer length.
             /// \param[in] privateKey Private key used for signing.
             /// \param[out] signature Generated buffer signature.
-            static void SignBuffer (
+            /// \return The number of bytes written to signature (SIGNATURE_LENGTH).
+            static std::size_t SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength,
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
@@ -152,7 +154,8 @@ namespace thekogans {
             /// \param[in] peersPublicKey Peer's public key.
             /// \param[out] sharedSecret Shared secret computed from my private key and
             /// peer's public key.
-            static void ComputeSharedSecret (
+            /// \return The number of bytes written to sharedSecret (SHARED_SECRET_LENGTH).
+            static std::size_t ComputeSharedSecret (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 const util::ui8 peersPublicKey[PUBLIC_KEY_LENGTH],
                 util::ui8 sharedSecret[SHARED_SECRET_LENGTH]);

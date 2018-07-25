@@ -3737,7 +3737,7 @@ namespace thekogans {
             memcpy (publicKey, privateKey + PRIVATE_KEY_LENGTH / 2, PUBLIC_KEY_LENGTH);
         }
 
-        void Ed25519::SignBuffer (
+        std::size_t Ed25519::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength,
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
@@ -3765,6 +3765,7 @@ namespace thekogans {
             SHA512_Final (hram, &ctx);
             sc_reduce (hram);
             sc_muladd (signature + 32, hram, az, nonce);
+            return SIGNATURE_LENGTH;
         }
 
         bool Ed25519::VerifyBufferSignature (
@@ -3868,7 +3869,7 @@ namespace thekogans {
             }
         }
 
-        void X25519::ComputeSharedSecret (
+        std::size_t X25519::ComputeSharedSecret (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 const util::ui8 peerPublicKey[PUBLIC_KEY_LENGTH],
                 util::ui8 sharedSecret[SHARED_SECRET_LENGTH]) {
@@ -3879,6 +3880,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return SHARED_SECRET_LENGTH;
         }
 
     } // namespace crypto

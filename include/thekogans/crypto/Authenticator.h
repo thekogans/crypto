@@ -33,7 +33,9 @@ namespace thekogans {
         /// \struct Authenticator Authenticator.h thekogans/crypto/Authenticator.h
         ///
         /// \brief
-        /// Authenticator implements public key signing and verifying operations.
+        /// Authenticator implements a one shot public key signing and verifying operations.
+        /// If you need to sign/verify multiple disjoint buffers, use \see{Signer} and
+        /// \see{Verifier} directly.
         /// NOTE: You can call Sign[Buffer | File] and Verify[Buffer | File]Signature
         /// as many times as you need and in any order. Authenticator is designed to
         /// be reused. It will reset it's internal state after every sign/verify
@@ -60,8 +62,8 @@ namespace thekogans {
             Authenticator (
                 AsymmetricKey::Ptr key,
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) :
-                signer (key->IsPrivate () ? new Signer (key, md) : 0),
-                verifier (!key->IsPrivate () ? new Verifier (key, md) : 0) {}
+                signer (key->IsPrivate () ? Signer::Get (key, md) : Signer::Ptr ()),
+                verifier (!key->IsPrivate () ? Verifier::Get (key, md) : Verifier::Ptr ()) {}
 
             /// \brief
             /// Return the key associated with this authenticator.

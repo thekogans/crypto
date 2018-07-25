@@ -57,6 +57,13 @@ namespace thekogans {
             /// \param[in] md_ OpenSSL message digest to use.
             MessageDigest (const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
+            /// \brief
+            /// Return the length of the resulting digest.
+            /// \return Length of the resulting digest.
+            inline std::size_t GetDigestLength () const {
+                return GetMDLength (md);
+            }
+
             // NOTE: This is the low level API used by HashBuffer/HashFile below.
             // It exists so that you can compute a message digest over multiple
             // disjoint buffers.

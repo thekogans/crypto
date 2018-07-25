@@ -24,7 +24,6 @@
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {
@@ -32,64 +31,165 @@ namespace thekogans {
         /// \struct Signer Signer.h thekogans/crypto/Signer.h
         ///
         /// \brief
-        /// Signer implements the public key sign operation.
+        /// Signer is a base for public key sign operation. It defines the API
+        /// a concrete signer needs to implement.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Signer {
             /// \brief
             /// Convenient typedef for std::unique_ptr<Signer>.
             typedef std::unique_ptr<Signer> Ptr;
 
-        private:
+        protected:
             /// \brief
-            /// Private key.
-            AsymmetricKey::Ptr key;
+            /// typedef for the Signer factory method.
+            typedef Ptr (*Factory) (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md);
             /// \brief
-            /// OpenSSL message digest object.
-            const EVP_MD *md;
+            /// typedef for the Signer map.
+            typedef std::map<std::string, Factory> Map;
             /// \brief
-            /// Message digest context.
-            MDContext ctx;
+            /// Controls Map's lifetime.
+            /// \return Signer map.
+            static Map &GetMap ();
+            /// \struct Signer::MapInitializer Signer.h thekogans/crypto/Signer.h
+            ///
+            /// \brief
+            /// MapInitializer is used to initialize the Signer::map.
+            /// It should not be used directly, and instead is included
+            /// in THEKOGANS_CRYPTO_DECLARE_SIGNER/THEKOGANS_CRYPTO_IMPLEMENT_SIGNER.
+            /// If you are deriving a signerer from Signer, and you want
+            /// it to be dynamically discoverable/creatable, add
+            /// THEKOGANS_CRYPTO_DECLARE_SIGNER to it's declaration,
+            /// and one or more THEKOGANS_CRYPTO_IMPLEMENT_SIGNER to
+            /// it's definition.
+            struct _LIB_THEKOGANS_CRYPTO_DECL MapInitializer {
+                /// \brief
+                /// ctor. Add signer of type, and factory for creating it
+                /// to the Signer::map
+                /// \param[in] keyType Signer key type.
+                /// \param[in] factory Signer creation factory.
+                MapInitializer (
+                    const std::string &keyType,
+                    Factory factory);
+            };
 
         public:
             /// \brief
-            /// ctor.
-            /// \param[in] key_ Private key.
-            /// \param[in] md_ OpenSSL message digest to use.
-            Signer (
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
+            /// dtor.
+            virtual ~Signer () {}
+
+            /// \brief
+            /// Used for Signer dynamic discovery and creation.
+            /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
+            /// \param[in] md OpenSSL message digest to use.
+            /// \return A Signer based on the passed in privateKey type.
+            static Ptr Get (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md);
+        #if defined (TOOLCHAIN_TYPE_Static)
+            /// \brief
+            /// Because Signer uses dynamic initialization, when using
+            /// it in static builds call this method to have the Signer
+            /// explicitly include all internal signer types. Without
+            /// calling this api, the only signers that will be available
+            /// to your application are the ones you explicitly link to.
+            static void StaticInit ();
+        #endif // defined (TOOLCHAIN_TYPE_Static)
 
             /// \brief
             /// Return the signer key.
             /// \return \see{AsymmetricKey} key used for signing.
-            inline AsymmetricKey::Ptr GetKey () const {
-                return key;
-            }
+            virtual AsymmetricKey::Ptr GetKey () const = 0;
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.
-            void Init ();
+            virtual void Init () = 0;
             /// \brief
             /// Call this method 1 or more time to sign the buffers.
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
-            void Update (
+            virtual void Update (
                 const void *buffer,
-                std::size_t bufferLength);
+                std::size_t bufferLength) = 0;
             /// \brief
             /// Finalize the signing operation and return the signature.
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
-            std::size_t Final (util::ui8 *signature);
+            virtual std::size_t Final (util::ui8 *signature) = 0;
             /// \brief
             /// Finalize the signing operation and return the signature.
             /// \return Signature.
-            util::Buffer Final ();
-
-            /// \brief
-            /// Signer is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Signer)
+            virtual util::Buffer Final () = 0;
         };
+
+        /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON(type)
+        /// Common code used by both Static and Shared builds.
+        #define THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON(type)\
+        public:\
+            static thekogans::crypto::Signer::Ptr Create (\
+                    thekogans::crypto::AsymmetricKey::Ptr privateKey,\
+                    const EVP_MD *md) {\
+                return thekogans::crypto::Signer::Ptr (new type (privateKey, md));\
+            }
+
+    #if defined (TOOLCHAIN_TYPE_Static)
+        /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER(type)
+        /// Dynamic discovery macro. Add this to your class declaration.
+        /// Example:
+        /// \code{.cpp}
+        /// struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLSigner : public Signer {
+        ///     THEKOGANS_CRYPTO_DECLARE_SIGNER (OpenSSLSigner)
+        ///     ...
+        /// };
+        /// \endcode
+        #define THEKOGANS_CRYPTO_DECLARE_SIGNER(type)\
+            THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON (type)\
+            static void StaticInit (const char *keyType) {\
+                std::pair<Map::iterator, bool> result =\
+                    GetMap ().insert (Map::value_type (keyType, type::Create));\
+                if (!result.second) {\
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (\
+                        "'%s' is already registered.", keyType);\
+                }\
+            }
+
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)
+        /// Dynamic discovery macro. Instantiate one or more of these in the class cpp file.
+        /// Example:
+        /// \code{.cpp}
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_RSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_DSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
+        /// \endcode
+        #define THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)
+    #else // defined (TOOLCHAIN_TYPE_Static)
+        /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER(type)
+        /// Dynamic discovery macro. Add this to your class declaration.
+        /// Example:
+        /// \code{.cpp}
+        /// struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLSigner : public Signer {
+        ///     THEKOGANS_CRYPTO_DECLARE_SIGNER (OpenSSLSigner)
+        ///     ...
+        /// };
+        /// \endcode
+        #define THEKOGANS_CRYPTO_DECLARE_SIGNER(type)\
+            THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON (type)
+
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)
+        /// Dynamic discovery macro. Instantiate one or more of these in the class cpp file.
+        /// Example:
+        /// \code{.cpp}
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_RSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_DSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
+        /// \endcode
+        #define THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)\
+        namespace {\
+            thekogans::crypto::Signer::MapInitializer THEKOGANS_UTIL_UNIQUE_NAME (mapInitializer) (\
+                keyType, type::Create);\
+        }
+    #endif // defined (TOOLCHAIN_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans

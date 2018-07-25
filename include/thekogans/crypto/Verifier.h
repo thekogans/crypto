@@ -23,7 +23,6 @@
 #include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {
@@ -31,61 +30,162 @@ namespace thekogans {
         /// \struct Verifier Verifier.h thekogans/crypto/Verifier.h
         ///
         /// \brief
-        /// Verifier implements the public key signature verification operation.
+        /// Verifier is a base for public key signature verification operation. It defines the API
+        /// a concrete verifier needs to implement.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Verifier {
             /// \brief
             /// Convenient typedef for std::unique_ptr<Verifier>.
             typedef std::unique_ptr<Verifier> Ptr;
 
-        private:
+        protected:
             /// \brief
-            /// Public key.
-            AsymmetricKey::Ptr key;
+            /// typedef for the Verifier factory function.
+            typedef Ptr (*Factory) (
+                AsymmetricKey::Ptr publicKey,
+                const EVP_MD *md);
             /// \brief
-            /// OpenSSL message digest object.
-            const EVP_MD *md;
+            /// typedef for the Verifier map.
+            typedef std::map<std::string, Factory> Map;
             /// \brief
-            /// Message digest context.
-            MDContext ctx;
+            /// Controls Map's lifetime.
+            /// \return Verifier map.
+            static Map &GetMap ();
+            /// \struct Verifier::MapInitializer Verifier.h thekogans/crypto/Verifier.h
+            ///
+            /// \brief
+            /// MapInitializer is used to initialize the Verifier::map.
+            /// It should not be used directly, and instead is included
+            /// in THEKOGANS_CRYPTO_DECLARE_VERIFIER/THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER.
+            /// If you are deriving a verifierer from Verifier, and you want
+            /// it to be dynamically discoverable/creatable, add
+            /// THEKOGANS_CRYPTO_DECLARE_VERIFIER to it's declaration,
+            /// and one or more THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER to
+            /// it's definition.
+            struct _LIB_THEKOGANS_CRYPTO_DECL MapInitializer {
+                /// \brief
+                /// ctor. Add verifier of type, and factory for creating it
+                /// to the Verifier::map
+                /// \param[in] keyType Verifier key type.
+                /// \param[in] factory Verifier creation factory.
+                MapInitializer (
+                    const std::string &keyType,
+                    Factory factory);
+            };
 
         public:
             /// \brief
-            /// ctor.
-            /// \param[in] key_ Public key.
-            /// \param[in] md_ OpenSSL message digest to use.
-            Verifier (
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
+            /// dtor.
+            virtual ~Verifier () {}
+
+            /// \brief
+            /// Used for Verifier dynamic discovery and creation.
+            /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
+            /// \param[in] md OpenSSL message digest to use.
+            /// \return A Verifier based on the passed in privateKey type.
+            static Ptr Get (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md);
+        #if defined (TOOLCHAIN_TYPE_Static)
+            /// \brief
+            /// Because Verifier uses dynamic initialization, when using
+            /// it in static builds call this method to have the Verifier
+            /// explicitly include all internal verifier types. Without
+            /// calling this api, the only verifiers that will be available
+            /// to your application are the ones you explicitly link to.
+            static void StaticInit ();
+        #endif // defined (TOOLCHAIN_TYPE_Static)
 
             /// \brief
             /// Return the verifier key.
-            /// \return \see{AsymmetricKey} key used for verification.
-            inline AsymmetricKey::Ptr GetKey () const {
-                return key;
-            }
+            /// \return \see{AsymmetricKey} key used for signature verification.
+            virtual AsymmetricKey::Ptr GetKey () const = 0;
 
             /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.
-            void Init ();
+            virtual void Init () = 0;
             /// \brief
             /// Call this method 1 or more time to verify the buffers.
             /// \param[in] buffer Buffer whose signature to verify.
             /// \param[in] bufferLength Buffer length.
-            void Update (
+            virtual void Update (
                 const void *buffer,
-                std::size_t bufferLength);
+                std::size_t bufferLength) = 0;
             /// \brief
             /// Finalize the verification operation.
             /// \return true == signature matches, false == signature does not match..
-            bool Final (
+            virtual bool Final (
                 const void *signature,
-                std::size_t signatureLength);
-
-            /// \brief
-            /// Verifier is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Verifier)
+                std::size_t signatureLength) = 0;
         };
+
+        /// \def THEKOGANS_CRYPTO_DECLARE_VERIFIER_COMMON(type)
+        /// Common code used by both Static and Shared builds.
+        #define THEKOGANS_CRYPTO_DECLARE_VERIFIER_COMMON(type)\
+        public:\
+            static thekogans::crypto::Verifier::Ptr Create (\
+                    thekogans::crypto::AsymmetricKey::Ptr publicKey,\
+                    const EVP_MD *md) {\
+                return thekogans::crypto::Verifier::Ptr (new type (publicKey, md));\
+            }
+
+    #if defined (TOOLCHAIN_TYPE_Static)
+        /// \def THEKOGANS_CRYPTO_DECLARE_VERIFIER(type)
+        /// Dynamic discovery macro. Add this to your class declaration.
+        /// Example:
+        /// \code{.cpp}
+        /// struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLVerifier : public Verifier {
+        ///     THEKOGANS_CRYPTO_DECLARE_VERIFIER (OpenSSLVerifier)
+        ///     ...
+        /// };
+        /// \endcode
+        #define THEKOGANS_CRYPTO_DECLARE_VERIFIER(type)\
+            THEKOGANS_CRYPTO_DECLARE_VERIFIER_COMMON (type)\
+            static void StaticInit (const char *keyType) {\
+                std::pair<Map::iterator, bool> result =\
+                    GetMap ().insert (Map::value_type (keyType, type::Create));\
+                if (!result.second) {\
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (\
+                        "'%s' is already registered.", keyType);\
+                }\
+            }
+
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER(type, keyType)
+        /// Dynamic discovery macro. Instantiate one or more of these in the class cpp file.
+        /// Example:
+        /// \code{.cpp}
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_RSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_DSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
+        /// \endcode
+        #define THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER(type, keyType)
+    #else // defined (TOOLCHAIN_TYPE_Static)
+        /// \def THEKOGANS_CRYPTO_DECLARE_VERIFIER(type)
+        /// Dynamic discovery macro. Add this to your class declaration.
+        /// Example:
+        /// \code{.cpp}
+        /// struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLVerifier : public Verifier {
+        ///     THEKOGANS_CRYPTO_DECLARE_VERIFIER (OpenSSLVerifier)
+        ///     ...
+        /// };
+        /// \endcode
+        #define THEKOGANS_CRYPTO_DECLARE_VERIFIER(type)\
+            THEKOGANS_CRYPTO_DECLARE_VERIFIER_COMMON (type)
+
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER(type, keyType)
+        /// Dynamic discovery macro. Instantiate one or more of these in the class cpp file.
+        /// Example:
+        /// \code{.cpp}
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_RSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_DSA)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
+        /// \endcode
+        #define THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER(type, keyType)\
+        namespace {\
+            thekogans::crypto::Verifier::MapInitializer THEKOGANS_UTIL_UNIQUE_NAME (mapInitializer) (\
+                keyType, type::Create);\
+        }
+    #endif // defined (TOOLCHAIN_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans

@@ -33,7 +33,11 @@
     #include "thekogans/crypto/Blake2b.h"
     #include "thekogans/crypto/Blake2s.h"
 #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
-#include "thekogans/crypto/Serializable.h"
+#if defined (TOOLCHAIN_TYPE_Static)
+    #include "thekogans/crypto/Serializable.h"
+    #include "thekogans/crypto/Signer.h"
+    #include "thekogans/crypto/Verifier.h"
+#endif // defined (TOOLCHAIN_TYPE_Static)
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 
@@ -104,6 +108,8 @@ namespace thekogans {
                 util::ui64 workingSetSize) {
         #if defined (TOOLCHAIN_TYPE_Static)
             Serializable::StaticInit ();
+            Signer::StaticInit ();
+            Verifier::StaticInit ();
         #endif // defined (TOOLCHAIN_TYPE_Static)
             util::SecureAllocator::ReservePages (workingSetSize, workingSetSize);
         #if OPENSSL_VERSION_NUMBER < 0x10100000L

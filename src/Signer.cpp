@@ -15,81 +15,57 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/OpenSSLException.h"
-#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
+#if defined (TOOLCHAIN_TYPE_Static)
+    #include "thekogans/util/SpinLock.h"
+    #include "thekogans/util/LockGuard.h"
+#endif // defined (TOOLCHAIN_TYPE_Static)
+#include "thekogans/crypto/OpenSSLSigner.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
+#include "thekogans/crypto/Ed25519Signer.h"
+#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/Signer.h"
 
 namespace thekogans {
     namespace crypto {
 
-        Signer::Signer (
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md_) :
-                key (key_),
-                md (md_) {
-            if (key.Get () != 0 &&
-                    (key->GetKeyType () == OPENSSL_PKEY_RSA ||
-                        key->GetKeyType () == OPENSSL_PKEY_DSA ||
-                        key->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    md != 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine, (EVP_PKEY *)key->GetKey ()) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+        Signer::Map &Signer::GetMap () {
+            static Signer::Map map;
+            return map;
+        }
+
+        Signer::MapInitializer::MapInitializer (
+                const std::string &keyType,
+                Factory factory) {
+            std::pair<Map::iterator, bool> result =
+                GetMap ().insert (Map::value_type (keyType, factory));
+            assert (result.second);
+            if (!result.second) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "%s is already registered.", keyType.c_str ());
             }
         }
 
-        void Signer::Init () {
-            if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) != 1) {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
+        Signer::Ptr Signer::Get (
+                AsymmetricKey::Ptr privateKey,
+                const EVP_MD *md) {
+            Map::iterator it = GetMap ().find (privateKey->GetKeyType ());
+            return it != GetMap ().end () ? it->second (privateKey, md) : Signer::Ptr ();
         }
 
-        void Signer::Update (
-                const void *buffer,
-                std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestSignUpdate (&ctx, buffer, bufferLength) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        std::size_t Signer::Final (util::ui8 *signature) {
-            std::size_t signatureLength = 0;
-            if (EVP_DigestSignFinal (&ctx, signature, &signatureLength) == 1) {
-                return signatureLength;
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+    #if defined (TOOLCHAIN_TYPE_Static)
+        void Signer::StaticInit () {
+            static volatile bool registered = false;
+            static util::SpinLock spinLock;
+            util::LockGuard<util::SpinLock> guard (spinLock);
+            if (!registered) {
+                OpenSSLSigner::StaticInit (OPENSSL_PKEY_RSA);
+                OpenSSLSigner::StaticInit (OPENSSL_PKEY_DSA);
+                OpenSSLSigner::StaticInit (OPENSSL_PKEY_EC);
+                Ed25519Signer::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
+                registered = true;
             }
         }
-
-        util::Buffer Signer::Final () {
-            std::size_t signatureLength = 0;
-            if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1 && signatureLength > 0) {
-                util::Buffer signature (util::HostEndian, signatureLength);
-                if (EVP_DigestSignFinal (&ctx,
-                        signature.GetWritePtr (), &signatureLength) == 1) {
-                    signature.AdvanceWriteOffset (signatureLength);
-                    return signature;
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
+    #endif // defined (TOOLCHAIN_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans
