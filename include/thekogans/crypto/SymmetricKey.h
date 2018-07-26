@@ -24,9 +24,7 @@
     #include <argon2.h>
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include "thekogans/util/Types.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/util/Types.h"
 #include "thekogans/util/FixedBuffer.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
@@ -110,7 +108,7 @@ namespace thekogans {
         #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
             /// \brief
-            /// Generate a key using a fast internal implementation of PBKDF1.
+            /// Generate a key using PBKDF1.
             /// WARNING: As per spec, PBKDF1 does not do key stretching. Keep
             /// that in mind when choosing an md for a particular keyLength.
             /// \param[in] password Password from which to derive the key.
@@ -156,7 +154,7 @@ namespace thekogans {
             };
 
             /// \brief
-            /// Generate a key using a fast internal implementation of PBKDF2.
+            /// Generate a key using PBKDF2.
             /// \param[in] password Password from which to derive the key.
             /// \param[in] passwordLength Password length.
             /// \param[in] salt An optional buffer containing salt.
@@ -222,7 +220,7 @@ namespace thekogans {
             };
 
             /// \brief
-            /// Generate a key using the HKDF (RFC 5869).
+            /// Generate a key using HKDF (RFC 5869).
             /// \param[in] hmacKey HMAC key.
             /// \param[in] hmacKeyLength HMAC key length.
             /// \param[in] salt An optional buffer containing salt.
