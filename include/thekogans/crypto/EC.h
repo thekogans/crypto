@@ -95,7 +95,7 @@ namespace thekogans {
                 RFC5114_CURVE_521
             };
             /// \brief
-            /// Generate GFp elliptic curve parameters from the values found in RFC5114.
+            /// Generate GFp elliptic curve parameters from the values found in RFC 5114.
             /// \param[in] curve One of the RFC5114_CURVE_* values from above.
             /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
@@ -154,7 +154,7 @@ namespace thekogans {
                 RFC5639_CURVE_512_T
             };
             /// \brief
-            /// Generate GFp elliptic curve parameters from the values found in RFC5639.
+            /// Generate GFp elliptic curve parameters from the values found in RFC 5639.
             /// \param[in] curve One of the RFC5639_CURVE_* values from above.
             /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.

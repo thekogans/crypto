@@ -25,6 +25,7 @@
 #include <openssl/bn.h>
 #include <openssl/evp.h>
 #include <openssl/ec.h>
+#include <openssl/hmac.h>
 #include <openssl/bio.h>
 #include <openssl/x509v3.h>
 #include <openssl/dh.h>
@@ -295,6 +296,23 @@ namespace thekogans {
                 EVP_MD_CTX_cleanup (this);
             }
         };
+
+        /// \struct HMACContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
+        ///
+        /// \brief
+        /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
+        struct HMACContext : public HMAC_CTX {
+            /// \brief
+            /// ctor.
+            HMACContext () {
+                HMAC_CTX_init (this);
+            }
+            /// \brief
+            /// dtor.
+            ~HMACContext () {
+                HMAC_CTX_cleanup (this);
+            }
+        };
     #else // OPENSSL_VERSION_NUMBER < 0x10100000L
         /// \struct CipherContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -346,6 +364,33 @@ namespace thekogans {
             /// Address of operator.
             /// \return EVP_MD_CTX *.
             EVP_MD_CTX *operator & () const {
+                return ctx;
+            }
+        };
+
+        /// \struct HMACContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
+        ///
+        /// \brief
+        /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
+        struct HMACContext {
+            /// \brief
+            /// OpenSSL message digest context.
+            HMAC_CTX *ctx;
+
+            /// \brief
+            /// ctor.
+            HMACContext () :
+                ctx (HMAC_CTX_new ()) {}
+            /// \brief
+            /// dtor.
+            ~HMACContext () {
+                HMAC_CTX_free (ctx);
+            }
+
+            /// \brief
+            /// Address of operator.
+            /// \return HMAC_CTX *.
+            HMAC_CTX *operator & () const {
                 return ctx;
             }
         };

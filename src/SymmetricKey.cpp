@@ -23,9 +23,11 @@
     #include <argon2.h>
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
+#include <openssl/hmac.h>
 #include "thekogans/util/SizeT.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
+#include "thekogans/util/HRTimer.h"
 #if defined (THEKOGANS_CRYPTO_TESTING)
     #include "thekogans/util/XMLUtils.h"
     #include "thekogans/util/StringUtils.h"
@@ -80,6 +82,48 @@ namespace thekogans {
             }
         }
     #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
+
+        SymmetricKey::Ptr SymmetricKey::FromPBKDF1 (
+                const void *password,
+                std::size_t passwordLength,
+                const void *salt,
+                std::size_t saltLength,
+                std::size_t keyLength,
+                const EVP_MD *md,
+                std::size_t count,
+                util::f64 timeInSeconds,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            if (password != 0 && passwordLength > 0 &&
+                    (salt == 0 || saltLength == 8) &&
+                    keyLength > 0 && keyLength <= GetMDLength (md) &&
+                    md != 0 && count > 0) {
+                MessageDigest messageDigest (md);
+                messageDigest.Update (password, passwordLength);
+                if (salt != 0 && saltLength > 0) {
+                    messageDigest.Update (salt, saltLength);
+                }
+                util::SecureVector<util::ui8> buffer (EVP_MAX_MD_SIZE);
+                std::size_t bufferLength = messageDigest.Final (buffer.data ());
+                util::ui64 start = util::HRTimer::Click ();
+                util::f64 elapsedSeconds = 0.0;
+                for (std::size_t i = 1;
+                        i < count || (timeInSeconds != 0.0 && (i % 128 != 0 || elapsedSeconds < timeInSeconds));
+                        ++i) {
+                    messageDigest.Init ();
+                    messageDigest.Update (buffer.data (), bufferLength);
+                    bufferLength = messageDigest.Final (buffer.data ());
+                    elapsedSeconds = util::HRTimer::ToSeconds (
+                        util::HRTimer::ComputeElapsedTime (start, util::HRTimer::Click ()));
+                }
+                return Ptr (new SymmetricKey (buffer.data (), keyLength, id, name, description));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
 
         SymmetricKey::Ptr SymmetricKey::FromPBKDF2 (
                 const void *password,
@@ -163,6 +207,149 @@ namespace thekogans {
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        namespace {
+            void HKDF_Extract (
+                    const void *hmacKey,
+                    std::size_t hmacKeyLength,
+                    const void *salt,
+                    std::size_t saltLength,
+                    const EVP_MD *md,
+                    util::SecureVector<util::ui8> &prk) {
+                util::ui32 length;
+                if (HMAC (md, salt, saltLength, (const util::ui8 *)hmacKey, hmacKeyLength, prk.data (), &length) != 0) {
+                    prk.resize (length);
+                }
+                else {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+
+            void HKDF_Expand (
+                    const void *prk,
+                    std::size_t prkLength,
+                    const void *info,
+                    std::size_t infoLength,
+                    const EVP_MD *md,
+                    util::SecureVector<util::ui8> &key) {
+                HMACContext ctx;
+                if (HMAC_Init_ex (&ctx, (const util::ui8 *)prk, prkLength, md, OpenSSLInit::engine) == 1) {
+                    std::vector<util::ui8> digest (GetMDLength (md));
+                    std::size_t count = key.size () / digest.size ();
+                    if ((key.size () % digest.size ()) != 0) {
+                        ++count;
+                    }
+                    for (std::size_t i = 1, offset = 0; i <= count; ++i) {
+                        if (i > 1) {
+                            if (HMAC_Init_ex (&ctx, 0, 0, 0, 0) != 1 ||
+                                    HMAC_Update (&ctx, digest.data (), digest.size ()) != 1) {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                        const util::ui8 counter = i;
+                        if (HMAC_Update (&ctx, (const util::ui8 *)info, infoLength) == 1 &&
+                                HMAC_Update (&ctx, &counter, 1) == 1 &&
+                                HMAC_Final (&ctx, digest.data (), 0) == 1) {
+                            std::size_t length = offset + digest.size () > key.size () ?
+                                key.size () - offset :
+                                offset;
+                            memcpy (&key[offset], digest.data (), length);
+                            offset += length;
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                }
+            }
+
+            void HKDF (
+                    const void *hmacKey,
+                    std::size_t hmacKeyLength,
+                    const void *salt,
+                    std::size_t saltLength,
+                    const void *info,
+                    std::size_t infoLength,
+                    const EVP_MD *md,
+                    util::SecureVector<util::ui8> &key) {
+                util::SecureVector<util::ui8> prk (EVP_MAX_MD_SIZE);
+                HKDF_Extract (hmacKey, hmacKeyLength, salt, saltLength, md, prk);
+                HKDF_Expand (prk.data (), prk.size (), info, infoLength, md, key);
+            }
+        }
+
+        SymmetricKey::Ptr SymmetricKey::FromHKDF (
+                const void *hmacKey,
+                std::size_t hmacKeyLength,
+                const void *salt,
+                std::size_t saltLength,
+                const void *info,
+                std::size_t infoLength,
+                std::size_t keyLength,
+                HKDF_MODE mode,
+                const EVP_MD *md,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            if (hmacKey != 0 && hmacKeyLength > 0 &&
+                    keyLength > 0 && md != 0) {
+                util::SecureVector<util::ui8> key (keyLength);
+                switch (mode) {
+                    case HKDF_MODE_EXTRACT_AND_EXPAND:
+                        if (salt != 0 && saltLength > 0 && info != 0 && infoLength > 0) {
+                            HKDF (
+                                hmacKey,
+                                hmacKeyLength,
+                                salt,
+                                saltLength,
+                                info,
+                                infoLength,
+                                md,
+                                key);
+                        }
+                        else {
+                            THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                                THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                        }
+                        break;
+                    case HKDF_MODE_EXTRACT_ONLY:
+                        if (salt != 0 && saltLength > 0) {
+                            HKDF_Extract (
+                                hmacKey,
+                                hmacKeyLength,
+                                salt,
+                                saltLength,
+                                md,
+                                key);
+                        }
+                        else {
+                            THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                                THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                        }
+                        break;
+                    case HKDF_MODE_EXPAND_ONLY:
+                        if (info != 0 && infoLength > 0) {
+                            HKDF_Expand (
+                                hmacKey,
+                                hmacKeyLength,
+                                info,
+                                infoLength,
+                                md,
+                                key);
+                        }
+                        else {
+                            THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                                THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                        }
+                        break;
+                }
+                return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

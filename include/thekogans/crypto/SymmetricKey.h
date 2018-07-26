@@ -92,6 +92,8 @@ namespace thekogans {
             /// NOTE: context.out and context.outlen should be initialized
             /// to 0 as this method will set them internally before calling
             /// argon2_ctx.
+            /// NOTE: Not only is salt NOT optional, but it must be at least
+            /// 8 bytes long.
             /// \param[in] keyLength Length of the resulting key (in bytes).
             /// \param[in] argon2_ctx Argon2 function to use for key derivation.
             /// \param[in] id Optional key id.
@@ -122,6 +124,37 @@ namespace thekogans {
             };
 
             /// \brief
+            /// Generate a key using a fast internal implementation of PBKDF1.
+            /// WARNING: As per spec, PBKDF1 does not do key stretching. Keep
+            /// that in mind when choosing an md for a particular keyLength.
+            /// \param[in] password Password from which to derive the key.
+            /// \param[in] passwordLength Password length.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
+            /// WARNING: PBKDF1 salt is limited to 8 bytes.
+            /// \param[in] keyLength Length of the resulting key (in bytes).
+            /// \param[in] md OpenSSL message digest to use for hashing.
+            /// \param[in] count A security counter. Increment the count to slow down
+            /// key derivation.
+            /// \param[in] timeInSeconds A security measure. Provide a value > 0 to
+            /// slow down key derivation.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return A new symmetric key.
+            static Ptr FromPBKDF1 (
+                const void *password,
+                std::size_t passwordLength,
+                const void *salt = 0,
+                std::size_t saltLength = 0,
+                std::size_t keyLength = GetCipherKeyLength (),
+                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
+                std::size_t count = 1,
+                util::f64 timeInSeconds = 0,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
+            /// \brief
             /// Generate a key using a fast internal implementation of PBKDF2.
             /// \param[in] password Password from which to derive the key.
             /// \param[in] passwordLength Password length.
@@ -146,7 +179,6 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
-
             /// \brief
             /// Generate a key using OpeSSL's implementation of PBKDF2.
             /// \param[in] password Password from which to derive the key.
@@ -169,6 +201,50 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
+
+            /// \enum
+            /// FromHKDF mode types.
+            enum HKDF_MODE {
+                /// \brief
+                /// Both salt and info are provided.
+                HKDF_MODE_EXTRACT_AND_EXPAND,
+                /// \brief
+                /// Only salt is provided.
+                HKDF_MODE_EXTRACT_ONLY,
+                /// \brief
+                /// Only info is provided.
+                HKDF_MODE_EXPAND_ONLY
+            };
+
+            /// \brief
+            /// Generate a key using the HKDF (RFC 5869).
+            /// \param[in] hmacKey HMAC key.
+            /// \param[in] hmacKeyLength HMAC key length.
+            /// \param[in] salt An optional buffer containing salt.
+            /// \param[in] saltLength Salt length.
+            /// \param[in] info An optional buffer containing info.
+            /// \param[in] infoLength Info length.
+            /// \param[in] keyLength Length of the resulting key (in bytes).
+            /// \param[in] mode One of HKDF_MODE_EXTRACT_AND_EXPAND,
+            /// HKDF_MODE_EXTRACT_ONLY or HKDF_MODE_EXPAND_ONLY.
+            /// \param[in] md OpenSSL message digest to use for hashing.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return A new symmetric key.
+            static Ptr FromHKDF (
+                const void *hmacKey,
+                std::size_t hmacKeyLength,
+                const void *salt,
+                std::size_t saltLength,
+                const void *info,
+                std::size_t infoLength,
+                std::size_t keyLength = GetCipherKeyLength (),
+                HKDF_MODE mode = HKDF_MODE_EXTRACT_AND_EXPAND,
+                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
