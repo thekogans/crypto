@@ -109,20 +109,6 @@ namespace thekogans {
                 const std::string &description = std::string ());
         #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
-            /// \enum
-            /// FromPBKDF2 hmac types.
-            enum PBKDF2_HMAC {
-                /// \brief
-                /// SHA1
-                PBKDF2_HMAC_SHA1,
-                /// \brief
-                /// SHA256
-                PBKDF2_HMAC_SHA256,
-                /// \brief
-                /// SHA512
-                PBKDF2_HMAC_SHA512
-            };
-
             /// \brief
             /// Generate a key using a fast internal implementation of PBKDF1.
             /// WARNING: As per spec, PBKDF1 does not do key stretching. Keep
@@ -150,10 +136,25 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
-                util::f64 timeInSeconds = 0,
+                util::f64 timeInSeconds = 0.0,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+
+            /// \enum
+            /// FromPBKDF2 hmac types.
+            enum PBKDF2_HMAC {
+                /// \brief
+                /// SHA1
+                PBKDF2_HMAC_SHA1,
+                /// \brief
+                /// SHA256
+                PBKDF2_HMAC_SHA256,
+                /// \brief
+                /// SHA512
+                PBKDF2_HMAC_SHA512
+            };
+
             /// \brief
             /// Generate a key using a fast internal implementation of PBKDF2.
             /// \param[in] password Password from which to derive the key.
@@ -179,6 +180,7 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+
             /// \brief
             /// Generate a key using OpeSSL's implementation of PBKDF2.
             /// \param[in] password Password from which to derive the key.
