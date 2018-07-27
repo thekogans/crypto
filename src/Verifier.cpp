@@ -45,11 +45,22 @@ namespace thekogans {
             }
         }
 
+        Verifier::Verifier (
+                AsymmetricKey::Ptr publicKey_,
+                MessageDigest::Ptr messageDigest_) :
+                publicKey (publicKey_),
+                messageDigest (messageDigest_) {
+            if (publicKey.Get () == 0 || messageDigest.Get () == 0) {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
         Verifier::Ptr Verifier::Get (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md) {
+                MessageDigest::Ptr messageDigest) {
             Map::iterator it = GetMap ().find (privateKey->GetKeyType ());
-            return it != GetMap ().end () ? it->second (privateKey, md) : Verifier::Ptr ();
+            return it != GetMap ().end () ? it->second (privateKey, messageDigest) : Verifier::Ptr ();
         }
 
     #if defined (TOOLCHAIN_TYPE_Static)

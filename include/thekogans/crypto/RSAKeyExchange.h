@@ -77,18 +77,18 @@ namespace thekogans {
                 /// Given my private \see{AsymmetricKey}, create a signature over the parameters.
                 /// \param[in] privateKey My private \see{AsymmetricKey} used to create a signature
                 /// over the parameters.
-                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \param[in] messageDigest Message digest object.
                 virtual void CreateSignature (
                     AsymmetricKey::Ptr privateKey,
-                    const EVP_MD *md);
+                    MessageDigest::Ptr messageDigest);
                 /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
                 /// \param[in] publicKey Peer's public key used to verify parameters signature.
-                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \param[in] messageDigest Message digest object.
                 /// \return true == signature is valid, false == signature is invalid.
                 virtual bool ValidateSignature (
                     AsymmetricKey::Ptr publicKey,
-                    const EVP_MD *md);
+                    MessageDigest::Ptr messageDigest);
 
             protected:
                 // util::Serializable
@@ -166,11 +166,11 @@ namespace thekogans {
             /// Get the parameters to send to the key exchange peer.
             /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to create a signature
             /// over the parameters.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
+            /// \param[in] messageDigest Optional message digest used to hash the parameters.
             /// \return \see{RSAParams} to send to the key exchange peer.
             virtual Params::Ptr GetParams (
                 AsymmetricKey::Ptr privateKey = AsymmetricKey::Ptr (),
-                const EVP_MD *md = 0) const;
+                MessageDigest::Ptr messageDigest = MessageDigest::Ptr ()) const;
 
             /// \brief
             /// Given the peer's \see{RSAParams}, derive the shared \see{SymmetricKey}.

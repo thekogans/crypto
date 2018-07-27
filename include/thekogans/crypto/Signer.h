@@ -20,10 +20,10 @@
 
 #include <cstddef>
 #include <memory>
-#include <openssl/evp.h>
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/MessageDigest.h"
 
 namespace thekogans {
     namespace crypto {
@@ -44,7 +44,7 @@ namespace thekogans {
             /// typedef for the Signer factory method.
             typedef Ptr (*Factory) (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md);
+                MessageDigest::Ptr messageDigest);
             /// \brief
             /// typedef for the Signer map.
             typedef std::map<std::string, Factory> Map;
@@ -74,7 +74,21 @@ namespace thekogans {
                     Factory factory);
             };
 
+            /// \brief
+            /// Private key.
+            AsymmetricKey::Ptr privateKey;
+            /// \brief
+            /// Message digest object.
+            MessageDigest::Ptr messageDigest;
+
         public:
+            /// \brief
+            /// ctor.
+            /// \param[in] privateKey_ Private key.
+            /// \param[in] messageDigest_ Message digest object.
+            Signer (
+                AsymmetricKey::Ptr privateKey_,
+                MessageDigest::Ptr messageDigest_);
             /// \brief
             /// dtor.
             virtual ~Signer () {}
@@ -82,11 +96,11 @@ namespace thekogans {
             /// \brief
             /// Used for Signer dynamic discovery and creation.
             /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
-            /// \param[in] md OpenSSL message digest to use.
+            /// \param[in] messageDigest Message digest object.
             /// \return A Signer based on the passed in privateKey type.
             static Ptr Get (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md);
+                MessageDigest::Ptr messageDigest);
         #if defined (TOOLCHAIN_TYPE_Static)
             /// \brief
             /// Because Signer uses dynamic initialization, when using
@@ -98,9 +112,17 @@ namespace thekogans {
         #endif // defined (TOOLCHAIN_TYPE_Static)
 
             /// \brief
-            /// Return the signer key.
-            /// \return \see{AsymmetricKey} key used for signing.
-            virtual AsymmetricKey::Ptr GetKey () const = 0;
+            /// Return the signer private key.
+            /// \return \see{AsymmetricKey} private key used for signing.
+            inline AsymmetricKey::Ptr GetPrivateKey () const {
+                return privateKey;
+            }
+            /// \brief
+            /// Return the signer message digest.
+            /// \return \see{AsymmetricKey} message digest used for hashing.
+            inline MessageDigest::Ptr GetMessageDigest () const {
+                return messageDigest;
+            }
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.
@@ -129,8 +151,8 @@ namespace thekogans {
         public:\
             static thekogans::crypto::Signer::Ptr Create (\
                     thekogans::crypto::AsymmetricKey::Ptr privateKey,\
-                    const EVP_MD *md) {\
-                return thekogans::crypto::Signer::Ptr (new type (privateKey, md));\
+                    thekogans::crypto::MessageDigest::Ptr messageDigest) {\
+                return thekogans::crypto::Signer::Ptr (new type (privateKey, messageDigest));\
             }
 
     #if defined (TOOLCHAIN_TYPE_Static)

@@ -39,15 +39,15 @@ namespace thekogans {
 
         void DHEKeyExchange::DHEParams::CreateSignature (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md) {
-            if (privateKey.Get () != 0 && md != 0) {
+                MessageDigest::Ptr messageDigest) {
+            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
                     util::Serializer::Size (id) +
                     util::Serializable::Size (*params) +
                     util::Serializer::Size (salt) +
                     util::Serializer::Size (keyLength) +
-                    util::Serializer::Size (messageDigest) +
+                    util::Serializer::Size (messageDigestName) +
                     util::Serializer::Size (count) +
                     util::Serializer::Size (keyId) +
                     util::Serializer::Size (name) +
@@ -58,18 +58,18 @@ namespace thekogans {
                     *params <<
                     salt <<
                     keyLength <<
-                    messageDigest <<
+                    messageDigestName <<
                     count <<
                     keyId <<
                     name <<
                     description <<
                     *publicKey;
-                Authenticator authenticator (privateKey, md);
+                Authenticator authenticator (privateKey, messageDigest);
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
                     paramsBuffer.GetDataAvailableForReading ());
                 signatureKeyId = privateKey->GetId ();
-                signatureMessageDigest = CipherSuite::GetOpenSSLMessageDigestName (md);
+                signatureMessageDigestName = messageDigest->GetName ();
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -79,10 +79,10 @@ namespace thekogans {
 
         bool DHEKeyExchange::DHEParams::ValidateSignature (
                 AsymmetricKey::Ptr publicKey,
-                const EVP_MD *md) {
-            if (publicKey.Get () != 0 && md != 0 &&
+                MessageDigest::Ptr messageDigest) {
+            if (publicKey.Get () != 0 && messageDigest.Get () != 0 &&
                     publicKey->GetId () == signatureKeyId &&
-                    CipherSuite::GetOpenSSLMessageDigestName (md) == signatureMessageDigest) {
+                    messageDigest->GetName () == signatureMessageDigestName) {
                 if (!signature.IsEmpty ()) {
                     util::Buffer paramsBuffer (
                         util::NetworkEndian,
@@ -90,7 +90,7 @@ namespace thekogans {
                         util::Serializable::Size (*params) +
                         util::Serializer::Size (salt) +
                         util::Serializer::Size (keyLength) +
-                        util::Serializer::Size (messageDigest) +
+                        util::Serializer::Size (messageDigestName) +
                         util::Serializer::Size (count) +
                         util::Serializer::Size (keyId) +
                         util::Serializer::Size (name) +
@@ -101,13 +101,13 @@ namespace thekogans {
                         *params <<
                         salt <<
                         keyLength <<
-                        messageDigest <<
+                        messageDigestName <<
                         count <<
                         keyId <<
                         name <<
                         description <<
                         *this->publicKey;
-                    Authenticator authenticator (publicKey, md);
+                    Authenticator authenticator (publicKey, messageDigest);
                     return authenticator.VerifyBufferSignature (
                         paramsBuffer.GetReadPtr (),
                         paramsBuffer.GetDataAvailableForReading (),
@@ -132,7 +132,7 @@ namespace thekogans {
                 util::Serializable::Size (*params) +
                 util::Serializer::Size (salt) +
                 util::Serializer::Size (keyLength) +
-                util::Serializer::Size (messageDigest) +
+                util::Serializer::Size (messageDigestName) +
                 util::Serializer::Size (count) +
                 util::Serializer::Size (keyId) +
                 util::Serializer::Size (name) +
@@ -148,7 +148,7 @@ namespace thekogans {
                 params >>
                 salt >>
                 keyLength >>
-                messageDigest >>
+                messageDigestName >>
                 count >>
                 keyId >>
                 name >>
@@ -162,12 +162,21 @@ namespace thekogans {
                 *params <<
                 salt <<
                 keyLength <<
-                messageDigest <<
+                messageDigestName <<
                 count <<
                 keyId <<
                 name <<
                 description <<
                 *publicKey;
+        }
+
+        namespace {
+            inline bool ValidateParamsKeyType (const char *keyType) {
+                return
+                    keyType == OPENSSL_PKEY_DH ||
+                    keyType == OPENSSL_PKEY_EC ||
+                    keyType == X25519AsymmetricKey::KEY_TYPE;
+            }
         }
 
         DHEKeyExchange::DHEKeyExchange (
@@ -191,15 +200,12 @@ namespace thekogans {
                             (const util::ui8 *)salt_ + saltLength_) :
                     std::vector<util::ui8> ()),
                 keyLength (keyLength_),
-                messageDigest (CipherSuite::GetOpenSSLMessageDigestName (md_)),
+                messageDigestName (CipherSuite::GetOpenSSLMessageDigestName (md_)),
                 count (count_),
                 keyId (keyId_),
                 name (name_),
                 description (description_) {
-            const char *keyType = params->GetKeyType ();
-            if (keyType == OPENSSL_PKEY_DH ||
-                    keyType == OPENSSL_PKEY_EC ||
-                    keyType == X25519AsymmetricKey::KEY_TYPE) {
+            if (params.Get () != 0 && ValidateParamsKeyType (params->GetKeyType ())) {
                 privateKey = params->CreateKey ();
                 publicKey = privateKey->GetPublicKey ();
             }
@@ -214,12 +220,13 @@ namespace thekogans {
                 initiator (false) {
             DHEParams::Ptr dheParams =
                 util::dynamic_refcounted_pointer_cast<DHEParams> (params);
-            if (dheParams.Get () != 0) {
+            if (dheParams.Get () != 0 &&
+                    ValidateParamsKeyType (dheParams->params->GetKeyType ())) {
                 id = dheParams->id;
                 this->params = dheParams->params;
                 salt = dheParams->salt;
                 keyLength = dheParams->keyLength;
-                messageDigest = dheParams->messageDigest;
+                messageDigestName = dheParams->messageDigestName;
                 count = dheParams->count;
                 keyId = dheParams->keyId;
                 name = dheParams->name;
@@ -235,21 +242,21 @@ namespace thekogans {
 
         KeyExchange::Params::Ptr DHEKeyExchange::GetParams (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md) const {
+                MessageDigest::Ptr messageDigest) const {
             Params::Ptr dheParams (
                 new DHEParams (
                     id,
                     params,
                     salt,
                     keyLength,
-                    messageDigest,
+                    messageDigestName,
                     count,
                     keyId,
                     name,
                     description,
                     publicKey));
-            if (privateKey.Get () != 0 && md != 0) {
-                dheParams->CreateSignature (privateKey, md);
+            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
+                dheParams->CreateSignature (privateKey, messageDigest);
             }
             return dheParams;
         }
@@ -314,7 +321,7 @@ namespace thekogans {
                     salt.GetReadPtr (),
                     salt.GetDataAvailableForReading (),
                     dheParams->keyLength,
-                    CipherSuite::GetOpenSSLMessageDigestByName (dheParams->messageDigest),
+                    CipherSuite::GetOpenSSLMessageDigestByName (dheParams->messageDigestName),
                     dheParams->count,
                     dheParams->keyId,
                     dheParams->name,

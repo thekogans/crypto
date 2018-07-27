@@ -18,7 +18,6 @@
 #if !defined (__thekogans_crypto_Ed25519Verifier_h)
 #define __thekogans_crypto_Ed25519Verifier_h
 
-#include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Verifier.h"
 #include "thekogans/crypto/AsymmetricKey.h"
@@ -38,29 +37,14 @@ namespace thekogans {
             /// Ed25519Verifier is a \see{Verifier}.
             THEKOGANS_CRYPTO_DECLARE_VERIFIER (Ed25519Verifier)
 
-        private:
-            /// \brief
-            /// Public key.
-            AsymmetricKey::Ptr publicKey;
-            /// \brief
-            /// Message digest object.
-            MessageDigest messageDigest;
-
-        public:
             /// \brief
             /// ctor.
-            /// \param[in] key_ Public key.
+            /// \param[in] publicKey Public key.
             /// \param[in] md OpenSSL message digest to use.
+            /// \param[in] messageDigest Message digest object.
             Ed25519Verifier (
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD);
-
-            /// \brief
-            /// Return the verifier key.
-            /// \return \see{AsymmetricKey} key used for signature verification.
-            virtual AsymmetricKey::Ptr GetKey () const {
-                return publicKey;
-            }
+                AsymmetricKey::Ptr publicKey,
+                MessageDigest::Ptr messageDigest);
 
             /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.

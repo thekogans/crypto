@@ -58,6 +58,23 @@ namespace thekogans {
             MessageDigest (const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
             /// \brief
+            /// Return the OpenSSL EVP_MD * associated with this message digest.
+            /// \return OpenSSL EVP_MD * associated with this message digest.
+            inline const EVP_MD *GetMD () const {
+                return md;
+            }
+            /// \brief
+            /// Return the OpenSSL EVP_MD_CTX * associated with this message digest.
+            /// \return OpenSSL EVP_MD_CTX * associated with this message digest.
+            inline EVP_MD_CTX *GetMD_CTX () {
+                return &ctx;
+            }
+
+            /// \brief
+            /// Return the message digest name.
+            /// \return Message digest name.
+            std::string GetName () const;
+            /// \brief
             /// Return the length of the resulting digest.
             /// \return Length of the resulting digest.
             inline std::size_t GetDigestLength () const {

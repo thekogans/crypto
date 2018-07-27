@@ -18,7 +18,6 @@
 #if !defined (__thekogans_crypto_Ed25519Signer_h)
 #define __thekogans_crypto_Ed25519Signer_h
 
-#include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Signer.h"
 #include "thekogans/crypto/AsymmetricKey.h"
@@ -37,29 +36,13 @@ namespace thekogans {
             /// Ed25519Signer is a \see{Signer}.
             THEKOGANS_CRYPTO_DECLARE_SIGNER (Ed25519Signer)
 
-        private:
-            /// \brief
-            /// Private key.
-            AsymmetricKey::Ptr privateKey;
-            /// \brief
-            /// Message digest object.
-            MessageDigest messageDigest;
-
-        public:
             /// \brief
             /// ctor.
-            /// \param[in] privateKey_ Private key.
+            /// \param[in] privateKey Private key.
             /// \param[in] md OpenSSL message digest to use.
             Ed25519Signer (
-                AsymmetricKey::Ptr privateKey_,
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD);
-
-            /// \brief
-            /// Return the signer key.
-            /// \return \see{AsymmetricKey} key used for signing.
-            virtual AsymmetricKey::Ptr GetKey () const {
-                return privateKey;
-            }
+                AsymmetricKey::Ptr privateKey,
+                MessageDigest::Ptr messageDigest);
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.

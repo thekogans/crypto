@@ -18,11 +18,8 @@
 #if !defined (__thekogans_crypto_OpenSSLSigner_h)
 #define __thekogans_crypto_OpenSSLSigner_h
 
-#include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Signer.h"
-#include "thekogans/crypto/AsymmetricKey.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {
@@ -38,32 +35,13 @@ namespace thekogans {
             /// OpenSSLSigner is a \see{Signer}.
             THEKOGANS_CRYPTO_DECLARE_SIGNER (OpenSSLSigner)
 
-        private:
-            /// \brief
-            /// Private key.
-            AsymmetricKey::Ptr privateKey;
-            /// \brief
-            /// OpenSSL message digest object.
-            const EVP_MD *md;
-            /// \brief
-            /// Message digest context.
-            MDContext ctx;
-
-        public:
             /// \brief
             /// ctor.
-            /// \param[in] privateKey_ Private key.
-            /// \param[in] md_ OpenSSL message digest to use.
+            /// \param[in] privateKey Private key.
+            /// \param[in] messageDigest Message digest object.
             OpenSSLSigner (
-                AsymmetricKey::Ptr privateKey_,
-                const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
-
-            /// \brief
-            /// Return the signer key.
-            /// \return \see{AsymmetricKey} key used for signing.
-            virtual AsymmetricKey::Ptr GetKey () const {
-                return privateKey;
-            }
+                AsymmetricKey::Ptr privateKey,
+                MessageDigest::Ptr messageDigest);
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.

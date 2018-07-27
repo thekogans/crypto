@@ -18,11 +18,11 @@
 #if !defined (__thekogans_crypto_HMAC_h)
 #define __thekogans_crypto_HMAC_h
 
-#include <cstddef>
-#include <string>
 #include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
-#include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/MAC.h"
+#include "thekogans/crypto/SymmetricKey.h"
+#include "thekogans/crypto/OpenSSLUtils.h"
 
 namespace thekogans {
     namespace crypto {
@@ -30,35 +30,64 @@ namespace thekogans {
         /// \struct HMAC HMAC.h thekogans/crypto/HMAC.h
         ///
         /// \brief
-        /// Pass HMAC keys to \see{MAC} to create Message Authentication Codes (MACs)
-        /// over ciphertext. See \see{Cipher} for more information.
+        /// Implements the HMAC (Hash-based Message Authentication Code).
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL HMAC {
+        struct _LIB_THEKOGANS_CRYPTO_DECL HMAC : public MAC {
+        private:
             /// \brief
-            /// Create an HMAC key for signing and verifying.
-            /// \param[in] secret Secret to derive key from.
-            /// NOTE: This can be a password derived from \see{OTP} or a
-            /// shared secret derived from \see{DH::DeriveSharedSecret}.
-            /// \param[in] secretLength Secret length.
-            /// \param[in] salt An optional buffer containing salt.
-            /// \param[in] saltLength Salt length.
-            /// \param[in] md OpenSSL message digest to use for the signing operation.
-            /// \param[in] count A security counter. Increment the count to slow down
-            /// key derivation.
-            /// \param[in] id Optional key id.
-            /// \param[in] name Optional key name.
-            /// \param[in] description Optional key description.
-            /// \return A new HMAC key.
-            static AsymmetricKey::Ptr CreateKey (
-                const void *secret,
-                std::size_t secretLength,
-                const void *salt = 0,
-                std::size_t saltLength = 0,
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
-                std::size_t count = 1,
-                const ID &id = ID (),
-                const std::string &name = std::string (),
-                const std::string &description = std::string ());
+            /// Key used in the MAC operation.
+            SymmetricKey::Ptr key;
+            /// \brief
+            /// Message digest object.
+            const EVP_MD *md;
+            /// \brief
+            /// OpenSSL HMAC context.
+            HMACContext ctx;
+
+        public:
+            /// \brief
+            /// ctor.
+            /// \param[in] key_ Key used in the MAC operation.
+            /// \param[in] md_ OpenSSL message digest object.
+            HMAC (
+                SymmetricKey::Ptr key_,
+                const EVP_MD *md_);
+
+            /// \brief
+            /// Return the mac key.
+            /// \return MAC \see{SymmetricKey}.
+            inline SymmetricKey::Ptr GetKey () const {
+                return key;
+            }
+            /// \brief
+            /// Return the OpenSSL message digest object.
+            /// \return OpenSSL message digest object.
+            inline const EVP_MD *GetMD () const {
+                return md;
+            }
+
+            /// \brief
+            /// Return the length of the mac.
+            /// \return Length of the mac.
+            virtual std::size_t GetMACLength () const {
+                return GetMDLength (md);
+            }
+
+            /// \brief
+            /// Initialize the context (ctx) and get it ready for MAC generation.
+            virtual void Init ();
+            /// \brief
+            /// Call this method 1 or more times to generate a MAC.
+            /// \param[in] buffer Buffer whose signature to create.
+            /// \param[in] bufferLength Buffer length.
+            virtual void Update (
+                const void *buffer,
+                std::size_t bufferLength);
+            /// \brief
+            /// Finalize the MAC and return the signature.
+            /// \param[out] signature Where to write the signature.
+            /// \return Number of bytes written to signature.
+            virtual std::size_t Final (util::ui8 *signature);
         };
 
     } // namespace crypto

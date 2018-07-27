@@ -26,42 +26,52 @@
 namespace thekogans {
     namespace crypto {
 
-        AsymmetricKey::Ptr CMAC::CreateKey (
-                const void *secret,
-                std::size_t secretLength,
-                const void *salt,
-                std::size_t saltLength,
-                const EVP_CIPHER *cipher,
-                std::size_t count,
-                const ID &id,
-                const std::string &name,
-                const std::string &description) {
-            if (secret != 0 && secretLength > 0 &&
-                    GetCipherMode (cipher) == EVP_CIPH_CBC_MODE) {
-                SymmetricKey::Ptr symmetricKey = SymmetricKey::FromSecretAndSalt (
-                    secret,
-                    secretLength,
-                    salt,
-                    saltLength,
-                    GetCipherKeyLength (cipher),
-                    THEKOGANS_CRYPTO_DEFAULT_MD,
-                    count,
-                    id,
-                    name,
-                    description);
-                EVP_PKEY *key = 0;
-                EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new_id (EVP_PKEY_CMAC, OpenSSLInit::engine));
-                if (ctx.get () != 0 &&
-                        EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
-                        EVP_PKEY_CTX_ctrl (ctx.get (), -1, EVP_PKEY_OP_KEYGEN,
-                            EVP_PKEY_CTRL_CIPHER, 0, (void *)cipher) == 1 &&
-                        EVP_PKEY_CTX_ctrl (ctx.get (), -1, EVP_PKEY_OP_KEYGEN,
-                            EVP_PKEY_CTRL_SET_MAC_KEY,
-                            (util::i32)symmetricKey->Get ().GetDataAvailableForReading (),
-                            (void *)symmetricKey->Get ().GetReadPtr ()) == 1 &&
-                        EVP_PKEY_keygen (ctx.get (), &key) == 1) {
-                    return AsymmetricKey::Ptr (
-                        new OpenSSLAsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
+        CMAC::CMAC (
+                SymmetricKey::Ptr key_,
+                const EVP_CIPHER *cipher_) :
+                key (key_),
+                cipher (cipher_) {
+            if (key.Get () != 0 && cipher != 0) {
+                if (CMAC_Init (
+                        &ctx,
+                        key->Get ().GetReadPtr (),
+                        key->Get ().GetDataAvailableForReading (),
+                        cipher,
+                        OpenSSLInit::engine) != 1) {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        void CMAC::Init () {
+            if (CMAC_Init (&ctx, 0, 0, 0, 0) != 1) {
+                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+            }
+        }
+
+        void CMAC::Update (
+                const void *buffer,
+                std::size_t bufferLength) {
+            if (buffer != 0 && bufferLength > 0) {
+                if (CMAC_Update (&ctx, buffer, bufferLength) != 1) {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        std::size_t CMAC::Final (util::ui8 *signature) {
+            if (signature != 0) {
+                std::size_t signatureLength = 0;
+                if (CMAC_Final (&ctx, signature, &signatureLength) == 1) {
+                    return signatureLength;
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

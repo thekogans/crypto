@@ -19,11 +19,11 @@
 #define __thekogans_crypto_Authenticator_h
 
 #include <cstddef>
-#include <openssl/evp.h>
 #include "thekogans/util/RefCounted.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/MessageDigest.h"
 #include "thekogans/crypto/Signer.h"
 #include "thekogans/crypto/Verifier.h"
 
@@ -61,15 +61,21 @@ namespace thekogans {
             /// \param[in] md OpenSSL message digest to use.
             Authenticator (
                 AsymmetricKey::Ptr key,
-                const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD) :
-                signer (key->IsPrivate () ? Signer::Get (key, md) : Signer::Ptr ()),
-                verifier (!key->IsPrivate () ? Verifier::Get (key, md) : Verifier::Ptr ()) {}
+                MessageDigest::Ptr messageDigest) :
+                signer (key->IsPrivate () ? Signer::Get (key, messageDigest) : Signer::Ptr ()),
+                verifier (!key->IsPrivate () ? Verifier::Get (key, messageDigest) : Verifier::Ptr ()) {}
 
             /// \brief
             /// Return the key associated with this authenticator.
             /// \return \see{Signer} or \see{Verifier} key (depending on op).
             inline AsymmetricKey::Ptr GetKey () const {
-                return signer.get () != 0 ? signer->GetKey () : verifier->GetKey ();
+                return signer.get () != 0 ? signer->GetPrivateKey () : verifier->GetPublicKey ();
+            }
+            /// \brief
+            /// Return the message digest associated with this authenticator.
+            /// \return \see{AsymmetricKey} message digest used for hashing.
+            inline MessageDigest::Ptr GetMessageDigest () const {
+                return signer.get () != 0 ? signer->GetMessageDigest () : verifier->GetMessageDigest ();
             }
 
             /// \brief

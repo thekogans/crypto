@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include <openssl/evp.h>
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
-#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
 #include "thekogans/crypto/OpenSSLSigner.h"
 
 namespace thekogans {
@@ -28,17 +28,20 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
 
         OpenSSLSigner::OpenSSLSigner (
-                AsymmetricKey::Ptr privateKey_,
-                const EVP_MD *md_) :
-                privateKey (privateKey_),
-                md (md_) {
+                AsymmetricKey::Ptr privateKey,
+                MessageDigest::Ptr messageDigest) :
+                Signer (privateKey, messageDigest) {
             if (privateKey.Get () != 0 &&
                     privateKey->IsPrivate () &&
                     (privateKey->GetKeyType () == OPENSSL_PKEY_RSA ||
                         privateKey->GetKeyType () == OPENSSL_PKEY_DSA ||
                         privateKey->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    md != 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine,
+                    messageDigest.Get () != 0) {
+                if (EVP_DigestSignInit (
+                        messageDigest->GetMD_CTX (),
+                        0,
+                        messageDigest->GetMD (),
+                        OpenSSLInit::engine,
                         (EVP_PKEY *)privateKey->GetKey ()) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -50,7 +53,12 @@ namespace thekogans {
         }
 
         void OpenSSLSigner::Init () {
-            if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) != 1) {
+            if (EVP_DigestSignInit (
+                    messageDigest->GetMD_CTX (),
+                    0,
+                    messageDigest->GetMD (),
+                    0,
+                    0) != 1) {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
         }
@@ -59,7 +67,10 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestSignUpdate (&ctx, buffer, bufferLength) != 1) {
+                if (EVP_DigestSignUpdate (
+                        messageDigest->GetMD_CTX (),
+                        buffer,
+                        bufferLength) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
@@ -71,7 +82,10 @@ namespace thekogans {
 
         std::size_t OpenSSLSigner::Final (util::ui8 *signature) {
             std::size_t signatureLength = 0;
-            if (EVP_DigestSignFinal (&ctx, signature, &signatureLength) == 1) {
+            if (EVP_DigestSignFinal (
+                    messageDigest->GetMD_CTX (),
+                    signature,
+                    &signatureLength) == 1) {
                 return signatureLength;
             }
             else {
@@ -81,10 +95,15 @@ namespace thekogans {
 
         util::Buffer OpenSSLSigner::Final () {
             std::size_t signatureLength = 0;
-            if (EVP_DigestSignFinal (&ctx, 0, &signatureLength) == 1 && signatureLength > 0) {
+            if (EVP_DigestSignFinal (
+                    messageDigest->GetMD_CTX (),
+                    0,
+                    &signatureLength) == 1 && signatureLength > 0) {
                 util::Buffer signature (util::HostEndian, signatureLength);
-                if (EVP_DigestSignFinal (&ctx,
-                        signature.GetWritePtr (), &signatureLength) == 1) {
+                if (EVP_DigestSignFinal (
+                        messageDigest->GetMD_CTX (),
+                        signature.GetWritePtr (),
+                        &signatureLength) == 1) {
                     signature.AdvanceWriteOffset (signatureLength);
                     return signature;
                 }

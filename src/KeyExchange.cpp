@@ -26,17 +26,17 @@ namespace thekogans {
                 util::Serializer::Size (id) +
                 util::Serializer::Size (signature) +
                 util::Serializer::Size (signatureKeyId) +
-                util::Serializer::Size (signatureMessageDigest);
+                util::Serializer::Size (signatureMessageDigestName);
         }
 
         void KeyExchange::Params::Read (
                 const Header & /*header*/,
                 util::Serializer &serializer) {
-            serializer >> id >> signature >> signatureKeyId >> signatureMessageDigest;
+            serializer >> id >> signature >> signatureKeyId >> signatureMessageDigestName;
         }
 
         void KeyExchange::Params::Write (util::Serializer &serializer) const {
-            serializer << id << signature << signatureKeyId << signatureMessageDigest;
+            serializer << id << signature << signatureKeyId << signatureMessageDigestName;
         }
 
     } // namespace crypto

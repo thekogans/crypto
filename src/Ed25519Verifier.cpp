@@ -25,10 +25,9 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
 
         Ed25519Verifier::Ed25519Verifier (
-                AsymmetricKey::Ptr publicKey_,
-                const EVP_MD *md) :
-                publicKey (publicKey_),
-                messageDigest (md) {
+                AsymmetricKey::Ptr publicKey,
+                MessageDigest::Ptr messageDigest) :
+                Verifier (publicKey, messageDigest) {
             if (publicKey.Get () == 0 || publicKey->IsPrivate () ||
                     publicKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -37,20 +36,20 @@ namespace thekogans {
         }
 
         void Ed25519Verifier::Init () {
-            messageDigest.Init ();
+            messageDigest->Init ();
         }
 
         void Ed25519Verifier::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            messageDigest.Update (buffer, bufferLength);
+            messageDigest->Update (buffer, bufferLength);
         }
 
         bool Ed25519Verifier::Final (
                 const void *signature,
                 std::size_t /*signatureLength*/) {
-            std::vector<util::ui8> digest (messageDigest.GetDigestLength ());
-            messageDigest.Final (digest.data ());
+            std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
+            messageDigest->Final (digest.data ());
             return Ed25519::VerifyBufferSignature (
                 digest.data (),
                 digest.size (),

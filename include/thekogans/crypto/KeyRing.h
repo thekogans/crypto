@@ -107,8 +107,8 @@ namespace thekogans {
             /// \see{Cipher} map.
             CipherMap cipherMap;
             /// \brief
-            /// \see{MAC} \see{AsymmetricKey} map.
-            AsymmetricKeyMap macKeyMap;
+            /// \see{MAC} \see{SymmetricKeyMap} map.
+            SymmetricKeyMap macKeyMap;
             /// \brief
             /// Convenient typedef for std::map<ID, MAC::Ptr>.
             typedef std::map<ID, MAC::Ptr> MACMap;
@@ -480,22 +480,22 @@ namespace thekogans {
             void DropAllCipherKeys (bool recursive = true);
 
             /// \brief
-            /// Return the \see{MAC} \see{AsymmetricKey} with the given \see{ID}.
-            /// \param[in] keyId \see{ID} of \see{MAC} \see{AsymmetricKey} to retrieve.
+            /// Return the \see{MAC} \see{SymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{MAC} \see{SymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{MAC} \see{AsymmetricKey} corresponding to the given keyId
-            /// (AsymmetricKey::Ptr () if not found).
-            AsymmetricKey::Ptr GetMACKey (
+            /// \return \see{MAC} \see{SymmetricKey} corresponding to the given keyId
+            /// (SymmetricKey::Ptr () if not found).
+            SymmetricKey::Ptr GetMACKey (
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
-            /// Return the \see{MAC} \see{AsymmetricKey} matching the given EqualityTest.
+            /// Return the \see{MAC} \see{SymmetricKey} matching the given EqualityTest.
             /// \param[in] equalityTest EqualityTest to call for each macKeyMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return First \see{MAC} \see{AsymmetricKey} matching the given EqualityTest
-            /// (AsymmetricKey::Ptr () if not found).
-            AsymmetricKey::Ptr GetMACKey (
-                const EqualityTest<AsymmetricKey> &equalityTest,
+            /// \return First \see{MAC} \see{SymmetricKey} matching the given EqualityTest
+            /// (SymmetricKey::Ptr () if not found).
+            SymmetricKey::Ptr GetMACKey (
+                const EqualityTest<SymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
             /// Return the \see{MAC} with the given key \see{ID}.
@@ -506,24 +506,24 @@ namespace thekogans {
                 const ID &keyId,
                 bool recursive);
             /// \brief
-            /// Add a \see{MAC} \see{AsymmetricKey} to this ring.
-            /// \param[in] key \see{MAC} \see{AsymmetricKey} to add.
+            /// Add a \see{MAC} \see{SymmetricKey} to this ring.
+            /// \param[in] key \see{MAC} \see{SymmetricKey} to add.
             /// \param[in] mac Optional \see{MAC} to add.
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
             bool AddMACKey (
-                AsymmetricKey::Ptr key,
+                SymmetricKey::Ptr key,
                 MAC::Ptr mac = MAC::Ptr ());
             /// \brief
-            /// Drop a \see{MAC} \see{AsymmetricKey} with the given \see{ID}.
-            /// \param[in] keyId \see{ID} of \see{MAC} \see{AsymmetricKey} to delete.
+            /// Drop a \see{MAC} \see{SymmetricKey} with the given \see{ID}.
+            /// \param[in] keyId \see{ID} of \see{MAC} \see{SymmetricKey} to delete.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return true = dropped, false = not found.
             bool DropMACKey (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
-            /// Drop all \see{MAC} \see{AsymmetricKey}.
+            /// Drop all \see{MAC} \see{SymmetricKey}.
             /// \param[in] recursive true = descend down to sub rings.
             void DropAllMACKeys (bool recursive = true);
 

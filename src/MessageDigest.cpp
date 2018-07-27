@@ -19,6 +19,7 @@
 #include <openssl/evp.h>
 #include "thekogans/util/File.h"
 #include "thekogans/util/FixedArray.h"
+#include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/MessageDigest.h"
@@ -37,6 +38,10 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+        }
+
+        std::string MessageDigest::GetName () const {
+            return CipherSuite::GetOpenSSLMessageDigestName (md);
         }
 
         void MessageDigest::Init () {

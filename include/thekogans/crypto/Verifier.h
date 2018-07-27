@@ -20,9 +20,9 @@
 
 #include <cstddef>
 #include <memory>
-#include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/MessageDigest.h"
 
 namespace thekogans {
     namespace crypto {
@@ -43,7 +43,7 @@ namespace thekogans {
             /// typedef for the Verifier factory function.
             typedef Ptr (*Factory) (
                 AsymmetricKey::Ptr publicKey,
-                const EVP_MD *md);
+                MessageDigest::Ptr messageDigest);
             /// \brief
             /// typedef for the Verifier map.
             typedef std::map<std::string, Factory> Map;
@@ -73,7 +73,21 @@ namespace thekogans {
                     Factory factory);
             };
 
+            /// \brief
+            /// Public key.
+            AsymmetricKey::Ptr publicKey;
+            /// \brief
+            /// Message digest object.
+            MessageDigest::Ptr messageDigest;
+
         public:
+            /// \brief
+            /// ctor.
+            /// \param[in] publicKey_ Public key.
+            /// \param[in] messageDigest_ Message digest object.
+            Verifier (
+                AsymmetricKey::Ptr privateKey_,
+                MessageDigest::Ptr messageDigest_);
             /// \brief
             /// dtor.
             virtual ~Verifier () {}
@@ -81,11 +95,11 @@ namespace thekogans {
             /// \brief
             /// Used for Verifier dynamic discovery and creation.
             /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
-            /// \param[in] md OpenSSL message digest to use.
+            /// \param[in] messageDigest Message digest object.
             /// \return A Verifier based on the passed in privateKey type.
             static Ptr Get (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md);
+                MessageDigest::Ptr messageDigest);
         #if defined (TOOLCHAIN_TYPE_Static)
             /// \brief
             /// Because Verifier uses dynamic initialization, when using
@@ -97,9 +111,17 @@ namespace thekogans {
         #endif // defined (TOOLCHAIN_TYPE_Static)
 
             /// \brief
-            /// Return the verifier key.
-            /// \return \see{AsymmetricKey} key used for signature verification.
-            virtual AsymmetricKey::Ptr GetKey () const = 0;
+            /// Return the verifier public key.
+            /// \return \see{AsymmetricKey} public key used for signature verification.
+            inline AsymmetricKey::Ptr GetPublicKey () const {
+                return publicKey;
+            }
+            /// \brief
+            /// Return the verifieer message digest.
+            /// \return \see{AsymmetricKey} message digest used for hashing.
+            inline MessageDigest::Ptr GetMessageDigest () const {
+                return messageDigest;
+            }
 
             /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.
@@ -125,8 +147,8 @@ namespace thekogans {
         public:\
             static thekogans::crypto::Verifier::Ptr Create (\
                     thekogans::crypto::AsymmetricKey::Ptr publicKey,\
-                    const EVP_MD *md) {\
-                return thekogans::crypto::Verifier::Ptr (new type (publicKey, md));\
+                    thekogans::crypto::MessageDigest::Ptr messageDigest) {\
+                return thekogans::crypto::Verifier::Ptr (new type (publicKey, messageDigest));\
             }
 
     #if defined (TOOLCHAIN_TYPE_Static)

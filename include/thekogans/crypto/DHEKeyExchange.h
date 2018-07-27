@@ -68,7 +68,7 @@ namespace thekogans {
                 util::SizeT keyLength;
                 /// \brief
                 /// OpenSSL message digest to use for hashing.
-                std::string messageDigest;
+                std::string messageDigestName;
                 /// \brief
                 /// A security counter. Increment the count to slow down
                 /// \see{SymmetricKey} derivation.
@@ -92,7 +92,7 @@ namespace thekogans {
                 /// \param[in] params_ \see{EC} or \see{DH} key exchange params.
                 /// \param[in] salt_ Salt for \see{SymmetricKey} derivation.
                 /// \param[in] keyLength_ Length of the resulting \see{SymmetricKey} (in bytes).
-                /// \param[in] messageDigest_ OpenSSL message digest to use for hashing.
+                /// \param[in] messageDigestName_ OpenSSL message digest to use for hashing.
                 /// \param[in] count_ A security counter. Increment the count to slow down \see{SymmetricKey} derivation.
                 /// \param[in] keyId_ \see{SymmetricKey} id.
                 /// \param[in] name_ \see{SymmetricKey} name.
@@ -103,7 +103,7 @@ namespace thekogans {
                     crypto::Params::Ptr params_,
                     const std::vector<util::ui8> &salt_,
                     std::size_t keyLength_,
-                    const std::string &messageDigest_,
+                    const std::string &messageDigestName_,
                     std::size_t count_,
                     const ID &keyId_,
                     const std::string &name_,
@@ -113,7 +113,7 @@ namespace thekogans {
                     params (params_),
                     salt (salt_),
                     keyLength (keyLength_),
-                    messageDigest (messageDigest_),
+                    messageDigestName (messageDigestName_),
                     count (count_),
                     keyId (keyId_),
                     name (name_),
@@ -124,18 +124,18 @@ namespace thekogans {
                 /// Given my private \see{AsymmetricKey}, create a signature over the parameters.
                 /// \param[in] privateKey My private \see{AsymmetricKey} used to create a signature
                 /// over the parameters.
-                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \param[in] messageDigest Message digest object.
                 virtual void CreateSignature (
                     AsymmetricKey::Ptr privateKey,
-                    const EVP_MD *md);
+                    MessageDigest::Ptr messageDigest);
                 /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
                 /// \param[in] publicKey Peer's public key used to verify parameters signature.
-                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \param[in] messageDigest Message digest object.
                 /// \return true == signature is valid, false == signature is invalid.
                 virtual bool ValidateSignature (
                     AsymmetricKey::Ptr publicKey,
-                    const EVP_MD *md);
+                    MessageDigest::Ptr messageDigest);
 
             protected:
                 // util::Serializable
@@ -178,7 +178,7 @@ namespace thekogans {
             std::size_t keyLength;
             /// \brief
             /// OpenSSL message digest to use for hashing.
-            std::string messageDigest;
+            std::string messageDigestName;
             /// \brief
             /// A security counter. Increment the count to slow down
             /// \see{SymmetricKey} derivation.
@@ -232,11 +232,11 @@ namespace thekogans {
             /// Get the parameters to send to the key exchange peer.
             /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to create a signature
             /// over the parameters.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
+            /// \param[in] messageDigest Optional message digest used to hash the parameters.
             /// \return \see{DHEParams} to send to the key exchange peer.
             virtual Params::Ptr GetParams (
                 AsymmetricKey::Ptr privateKey = AsymmetricKey::Ptr (),
-                const EVP_MD *md = 0) const;
+                MessageDigest::Ptr messageDigest = MessageDigest::Ptr ()) const;
 
             /// \brief
             /// Given the peer's \see{DHEParams}, use my private key

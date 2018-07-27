@@ -393,10 +393,12 @@ namespace thekogans {
                     AsymmetricKey::Ptr publicKey =
                         GetAuthenticatorKey (params->signatureKeyId, recursive);
                     if (publicKey.Get () != 0 && !publicKey->IsPrivate ()) {
-                        const EVP_MD *md =
-                            CipherSuite::GetOpenSSLMessageDigestByName (params->signatureMessageDigest);
-                        if (md != 0) {
-                            if (!params->ValidateSignature (publicKey, md)) {
+                        MessageDigest::Ptr messageDigest (
+                            new MessageDigest (
+                                CipherSuite::GetOpenSSLMessageDigestByName (
+                                    params->signatureMessageDigestName)));
+                        if (messageDigest.Get () != 0) {
+                            if (!params->ValidateSignature (publicKey, messageDigest)) {
                                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                                     "Params failed signature validation: %s",
                                     params->id.ToString ().c_str ());
@@ -405,7 +407,7 @@ namespace thekogans {
                         else {
                             THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                                 "Unable to get message digest for name: %s",
-                                params->signatureMessageDigest.c_str ());
+                                params->signatureMessageDigestName.c_str ());
                         }
                     }
                     else {
@@ -875,10 +877,10 @@ namespace thekogans {
             }
         }
 
-        AsymmetricKey::Ptr KeyRing::GetMACKey (
+        SymmetricKey::Ptr KeyRing::GetMACKey (
                 const ID &keyId,
                 bool recursive) const {
-            AsymmetricKeyMap::const_iterator it = macKeyMap.find (keyId);
+            SymmetricKeyMap::const_iterator it = macKeyMap.find (keyId);
             if (it != macKeyMap.end ()) {
                 return it->second;
             }
@@ -886,19 +888,19 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    AsymmetricKey::Ptr key = it->second->GetMACKey (keyId, recursive);
+                    SymmetricKey::Ptr key = it->second->GetMACKey (keyId, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
                 }
             }
-            return AsymmetricKey::Ptr ();
+            return SymmetricKey::Ptr ();
         }
 
-        AsymmetricKey::Ptr KeyRing::GetMACKey (
-                const EqualityTest<AsymmetricKey> &equalityTest,
+        SymmetricKey::Ptr KeyRing::GetMACKey (
+                const EqualityTest<SymmetricKey> &equalityTest,
                 bool recursive) const {
-            for (AsymmetricKeyMap::const_iterator
+            for (SymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
                 if (equalityTest (*it->second)) {
@@ -909,13 +911,13 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    AsymmetricKey::Ptr key = it->second->GetMACKey (equalityTest, recursive);
+                    SymmetricKey::Ptr key = it->second->GetMACKey (equalityTest, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
                 }
             }
-            return AsymmetricKey::Ptr ();
+            return SymmetricKey::Ptr ();
         }
 
         MAC::Ptr KeyRing::GetMAC (
@@ -925,9 +927,9 @@ namespace thekogans {
             if (it != macMap.end ()) {
                 return it->second;
             }
-            AsymmetricKey::Ptr key = GetMACKey (keyId, false);
+            SymmetricKey::Ptr key = GetMACKey (keyId, false);
             if (key.Get () != 0) {
-                MAC::Ptr mac = cipherSuite.GetMAC (key);
+                MAC::Ptr mac = cipherSuite.GetHMAC (key);
                 std::pair<MACMap::iterator, bool> result =
                     macMap.insert (
                         MACMap::value_type (keyId, mac));
@@ -953,12 +955,12 @@ namespace thekogans {
         }
 
         bool KeyRing::AddMACKey (
-                AsymmetricKey::Ptr key,
+                SymmetricKey::Ptr key,
                 MAC::Ptr mac) {
             if (key.Get () != 0 && cipherSuite.VerifyMACKey (*key)) {
-                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                std::pair<SymmetricKeyMap::iterator, bool> result =
                     macKeyMap.insert (
-                        AsymmetricKeyMap::value_type (key->GetId (), key));
+                        SymmetricKeyMap::value_type (key->GetId (), key));
                 if (result.second && mac.Get () != 0) {
                     std::pair<MACMap::iterator, bool> result =
                         macMap.insert (
@@ -980,7 +982,7 @@ namespace thekogans {
         bool KeyRing::DropMACKey (
                 const ID &keyId,
                 bool recursive) {
-            AsymmetricKeyMap::iterator it = macKeyMap.find (keyId);
+            SymmetricKeyMap::iterator it = macKeyMap.find (keyId);
             if (it != macKeyMap.end ()) {
                 macKeyMap.erase (it);
                 MACMap::iterator it = macMap.find (keyId);
@@ -1228,7 +1230,7 @@ namespace thekogans {
                 size += util::Serializable::Size (*it->second);
             }
             size += util::UI32_SIZE;
-            for (AsymmetricKeyMap::const_iterator
+            for (SymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
@@ -1332,11 +1334,11 @@ namespace thekogans {
             serializer >> macKeyCount;
             macKeyMap.clear ();
             while (macKeyCount-- > 0) {
-                AsymmetricKey::Ptr key;
+                SymmetricKey::Ptr key;
                 serializer >> key;
-                std::pair<AsymmetricKeyMap::iterator, bool> result =
+                std::pair<SymmetricKeyMap::iterator, bool> result =
                     macKeyMap.insert (
-                        AsymmetricKeyMap::value_type (key->GetId (), key));
+                        SymmetricKeyMap::value_type (key->GetId (), key));
                 if (!result.second) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Unable to instert MAC key: %s",
@@ -1409,7 +1411,7 @@ namespace thekogans {
                 serializer << *it->second;
             }
             serializer << util::SizeT (macKeyMap.size ());
-            for (AsymmetricKeyMap::const_iterator
+            for (SymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
                 serializer << *it->second;
@@ -1562,7 +1564,7 @@ namespace thekogans {
                     util::Attributes (),
                     false,
                     true);
-                for (AsymmetricKeyMap::const_iterator
+                for (SymmetricKeyMap::const_iterator
                         it = macKeyMap.begin (),
                         end = macKeyMap.end (); it != end; ++it) {
                     stream << it->second->ToString (

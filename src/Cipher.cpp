@@ -40,11 +40,15 @@ namespace thekogans {
                 if (GetCipherMode (cipher) != EVP_CIPH_GCM_MODE) {
                     if (md != 0) {
                         mac.Reset (
-                            new MAC (
-                                HMAC::CreateKey (
+                            new HMAC (
+                                SymmetricKey::FromSecretAndSalt (
                                     key->Get ().GetReadPtr (),
                                     key->Get ().GetDataAvailableForReading (),
-                                    md)));
+                                    0,
+                                    0,
+                                    GetMDLength (md),
+                                    md),
+                                md));
                     }
                     else {
                         THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

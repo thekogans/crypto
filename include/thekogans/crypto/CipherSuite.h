@@ -283,9 +283,9 @@ namespace thekogans {
             bool VerifyCipherKey (const SymmetricKey &key) const;
             /// \brief
             /// Verify that the given key is appropriate for \see{MAC} (EVP_PKEY_HMAC or EVP_PKEY_CMAC).
-            /// \param[in] key \see{AsymmetricKey} to verify.
+            /// \param[in] key \see{SymmetricKey} to verify.
             /// \return true = given key is appropriate.
-            bool VerifyMACKey (const AsymmetricKey &key) const;
+            bool VerifyMACKey (const SymmetricKey &key) const;
 
             /// \brief
             /// Return an instance of the \see{DHEKeyExchange} represented by keyExchange (client side [EC]DHE).
@@ -342,10 +342,15 @@ namespace thekogans {
             /// \return \see{Cipher} instance represented by cipher.
             Cipher::Ptr GetCipher (SymmetricKey::Ptr key) const;
             /// \brief
-            /// Return the \see{MAC} instance represented by messageDigest.
-            /// \param[in] key \see{AsymmetricKey} used to mac/verify.
-            /// \return \see{MAC} instance represented by messageDigest.
-            MAC::Ptr GetMAC (AsymmetricKey::Ptr key) const;
+            /// Return the \see{HMAC} instance represented by messageDigest.
+            /// \param[in] key \see{SymmetricKey} used to mac/verify.
+            /// \return \see{HMAC} instance represented by messageDigest.
+            MAC::Ptr GetHMAC (SymmetricKey::Ptr key) const;
+            /// \brief
+            /// Return the \see{CMAC} instance represented by cipher.
+            /// \param[in] key \see{SymmetricKey} used to mac/verify.
+            /// \return \see{CMAC} instance represented by cipher.
+            MAC::Ptr GetCMAC (SymmetricKey::Ptr key) const;
             /// \brief
             /// Return the message digest instance represented by messageDigest.
             /// \return Message digest instance represented by messageDigest.

@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include <openssl/evp.h>
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
-#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
 #include "thekogans/crypto/OpenSSLVerifier.h"
 
 namespace thekogans {
@@ -28,17 +28,20 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
 
         OpenSSLVerifier::OpenSSLVerifier (
-                AsymmetricKey::Ptr publicKey_,
-                const EVP_MD *md_) :
-                publicKey (publicKey_),
-                md (md_) {
+                AsymmetricKey::Ptr publicKey,
+                MessageDigest::Ptr messageDigest) :
+                Verifier (publicKey, messageDigest) {
             if (publicKey.Get () != 0 &&
                     !publicKey->IsPrivate () &&
                     (publicKey->GetKeyType () == OPENSSL_PKEY_RSA ||
                         publicKey->GetKeyType () == OPENSSL_PKEY_DSA ||
                         publicKey->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    md != 0) {
-                if (EVP_DigestVerifyInit (&ctx, 0, md, OpenSSLInit::engine,
+                    messageDigest.Get () != 0) {
+                if (EVP_DigestVerifyInit (
+                        messageDigest->GetMD_CTX (),
+                        0,
+                        messageDigest->GetMD (),
+                        OpenSSLInit::engine,
                         (EVP_PKEY *)publicKey->GetKey ()) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -50,7 +53,12 @@ namespace thekogans {
         }
 
         void OpenSSLVerifier::Init () {
-            if (EVP_DigestVerifyInit (&ctx, 0, md, 0, 0) != 1) {
+            if (EVP_DigestVerifyInit (
+                    messageDigest->GetMD_CTX (),
+                    0,
+                    messageDigest->GetMD (),
+                    0,
+                    0) != 1) {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
         }
@@ -59,7 +67,10 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestVerifyUpdate (&ctx, buffer, bufferLength) != 1) {
+                if (EVP_DigestVerifyUpdate (
+                        messageDigest->GetMD_CTX (),
+                        buffer,
+                        bufferLength) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
@@ -73,8 +84,10 @@ namespace thekogans {
                 const void *signature,
                 std::size_t signatureLength) {
             if (signature != 0 && signatureLength > 0) {
-                return EVP_DigestVerifyFinal (&ctx,
-                    (const util::ui8 *)signature, signatureLength) == 1;
+                return EVP_DigestVerifyFinal (
+                    messageDigest->GetMD_CTX (),
+                    (const util::ui8 *)signature,
+                    signatureLength) == 1;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

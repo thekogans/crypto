@@ -15,69 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/OpenSSLException.h"
-#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
+#include <openssl/evp.h>
+#include "thekogans/util/Exception.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/MAC.h"
 
 namespace thekogans {
     namespace crypto {
-
-        MAC::MAC (
-                AsymmetricKey::Ptr key_,
-                const EVP_MD *md_) :
-                key (key_),
-                md (md_) {
-            if (key.Get () != 0 &&
-                    (key->GetKeyType () == OPENSSL_PKEY_HMAC ||
-                        key->GetKeyType () == OPENSSL_PKEY_CMAC) &&
-                    md != 0) {
-                if (EVP_DigestSignInit (&ctx, 0, md, OpenSSLInit::engine, (EVP_PKEY *)key->GetKey ()) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        void MAC::Init () {
-            if (EVP_DigestSignInit (&ctx, 0, md, 0, 0) != 1) {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-            }
-        }
-
-        void MAC::Update (
-                const void *buffer,
-                std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
-                if (EVP_DigestSignUpdate (&ctx, buffer, bufferLength) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        std::size_t MAC::Final (util::ui8 *signature) {
-            if (signature != 0) {
-                std::size_t signatureLength = 0;
-                if (EVP_DigestSignFinal (&ctx, signature, &signatureLength) == 1) {
-                    return signatureLength;
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
 
         std::size_t MAC::SignBuffer (
                 const void *buffer,
@@ -98,14 +42,17 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                Init ();
-                Update (buffer, bufferLength);
-                util::ui8 signature[EVP_MAX_MD_SIZE];
-                std::size_t signatureLength = Final (signature);
-                return util::Buffer (
-                    util::HostEndian,
-                    signature,
-                    signature + signatureLength);
+                util::Buffer signature (util::HostEndian, GetMACLength ());
+                if (signature.AdvanceWriteOffset (
+                        SignBuffer (buffer, bufferLength, signature.GetWritePtr ())) == GetMACLength ()) {
+                    return signature;
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Incorrect signature length: %u (expecting %u).",
+                        signature.GetDataAvailableForReading (),
+                        GetMACLength ());
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -120,10 +67,9 @@ namespace thekogans {
                 std::size_t signatureLength) {
             if (buffer != 0 && bufferLength > 0 &&
                     signature != 0 && signatureLength > 0) {
-                Init ();
-                Update (buffer, bufferLength);
                 util::ui8 computedSignature[EVP_MAX_MD_SIZE];
-                std::size_t computedSignatureLength = Final (computedSignature);
+                std::size_t computedSignatureLength =
+                    SignBuffer (buffer, bufferLength, computedSignature);
                 return signatureLength == computedSignatureLength &&
                     TimeInsensitiveCompare (
                         signature,

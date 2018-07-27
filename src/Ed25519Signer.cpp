@@ -27,10 +27,9 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (Ed25519Signer, Ed25519AsymmetricKey::KEY_TYPE)
 
         Ed25519Signer::Ed25519Signer (
-                AsymmetricKey::Ptr privateKey_,
-                const EVP_MD *md) :
-                privateKey (privateKey_),
-                messageDigest (md) {
+                AsymmetricKey::Ptr privateKey,
+                MessageDigest::Ptr messageDigest) :
+                Signer (privateKey, messageDigest) {
             if (privateKey.Get () == 0 || !privateKey->IsPrivate () ||
                     privateKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -39,18 +38,18 @@ namespace thekogans {
         }
 
         void Ed25519Signer::Init () {
-            messageDigest.Init ();
+            messageDigest->Init ();
         }
 
         void Ed25519Signer::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            messageDigest.Update (buffer, bufferLength);
+            messageDigest->Update (buffer, bufferLength);
         }
 
         std::size_t Ed25519Signer::Final (util::ui8 *signature) {
-            std::vector<util::ui8> digest (messageDigest.GetDigestLength ());
-            messageDigest.Final (digest.data ());
+            std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
+            messageDigest->Final (digest.data ());
             return Ed25519::SignBuffer (
                 digest.data (),
                 digest.size (),

@@ -19,6 +19,8 @@
 #include "thekogans/crypto/RSAKeyExchange.h"
 #include "thekogans/crypto/X25519AsymmetricKey.h"
 #include "thekogans/crypto/Ed25519AsymmetricKey.h"
+#include "thekogans/crypto/HMAC.h"
+#include "thekogans/crypto/CMAC.h"
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
     #include "thekogans/crypto/Blake2b.h"
     #include "thekogans/crypto/Blake2s.h"
@@ -409,9 +411,9 @@ namespace thekogans {
             return GetCipherKeyLength (GetOpenSSLCipherByName (cipher)) == key.Length ();
         }
 
-        bool CipherSuite::VerifyMACKey (const AsymmetricKey &key) const {
-            const char *type = key.GetKeyType ();
-            return type == OPENSSL_PKEY_HMAC || type == OPENSSL_PKEY_CMAC;
+        bool CipherSuite::VerifyMACKey (const SymmetricKey &key) const {
+            // FIXME: implement
+            return true;
         }
 
         KeyExchange::Ptr CipherSuite::GetDHEKeyExchange (
@@ -477,9 +479,7 @@ namespace thekogans {
         Authenticator::Ptr CipherSuite::GetAuthenticator (AsymmetricKey::Ptr key) const {
             if (key.Get () != 0 && VerifyAuthenticatorKey (*key)) {
                 return Authenticator::Ptr (
-                    new Authenticator (
-                        key,
-                        GetOpenSSLMessageDigestByName (messageDigest)));
+                    new Authenticator (key, GetMessageDigest ()));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -501,12 +501,19 @@ namespace thekogans {
             }
         }
 
-        MAC::Ptr CipherSuite::GetMAC (AsymmetricKey::Ptr key) const {
+        MAC::Ptr CipherSuite::GetHMAC (SymmetricKey::Ptr key) const {
             if (key.Get () != 0 && VerifyMACKey (*key)) {
-                return MAC::Ptr (
-                    new MAC (
-                        key,
-                        GetOpenSSLMessageDigestByName (messageDigest)));
+                return MAC::Ptr (new HMAC (key, GetOpenSSLMessageDigest ()));
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        MAC::Ptr CipherSuite::GetCMAC (SymmetricKey::Ptr key) const {
+            if (key.Get () != 0 && VerifyMACKey (*key)) {
+                return MAC::Ptr (new CMAC (key, GetOpenSSLCipher ()));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

@@ -18,11 +18,7 @@
 #if !defined (__thekogans_crypto_OpenSSLVerifier_h)
 #define __thekogans_crypto_OpenSSLVerifier_h
 
-#include <cstddef>
-#include <memory>
-#include <openssl/evp.h>
 #include "thekogans/crypto/Config.h"
-#include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/Verifier.h"
 
 namespace thekogans {
@@ -39,32 +35,13 @@ namespace thekogans {
             /// OpenSSLVerifier is a \see{Verifier}.
             THEKOGANS_CRYPTO_DECLARE_VERIFIER (OpenSSLVerifier)
 
-        private:
-            /// \brief
-            /// Public key.
-            AsymmetricKey::Ptr publicKey;
-            /// \brief
-            /// OpenSSL message digest object.
-            const EVP_MD *md;
-            /// \brief
-            /// Message digest context.
-            MDContext ctx;
-
-        public:
             /// \brief
             /// ctor.
-            /// \param[in] publicKey_ Public key.
-            /// \param[in] md_ OpenSSL message digest to use.
+            /// \param[in] publicKey Public key.
+            /// \param[in] messageDigest Message digest object.
             OpenSSLVerifier (
-                AsymmetricKey::Ptr publicKey_,
-                const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
-
-            /// \brief
-            /// Return the verifier key.
-            /// \return \see{AsymmetricKey} key used for signature verification.
-            virtual AsymmetricKey::Ptr GetKey () const {
-                return publicKey;
-            }
+                AsymmetricKey::Ptr publicKey,
+                MessageDigest::Ptr messageDigest);
 
             /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.

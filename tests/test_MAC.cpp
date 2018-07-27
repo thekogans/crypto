@@ -21,23 +21,46 @@
 #include "thekogans/util/Buffer.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/crypto/OpenSSLInit.h"
-#include "thekogans/crypto/MAC.h"
 #include "thekogans/crypto/CipherSuite.h"
-#include "thekogans/crypto/CMAC.h"
 #include "thekogans/crypto/HMAC.h"
+#include "thekogans/crypto/CMAC.h"
 
 using namespace thekogans;
 
 namespace {
     std::string secret ("password");
 
-    bool TestMAC (
+    bool TestHMAC (
             const char *name,
-            crypto::AsymmetricKey::Ptr key,
+            crypto::SymmetricKey::Ptr key,
             const EVP_MD *md) {
         THEKOGANS_UTIL_TRY {
             std::cout << name << "...";
-            crypto::MAC mac (key, md);
+            crypto::HMAC mac (key, md);
+            util::ui8 buffer[1024];
+            util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
+            util::Buffer signature = mac.SignBuffer (buffer, 1024);
+            bool result = mac.VerifyBufferSignature (
+                buffer,
+                1024,
+                signature.GetReadPtr (),
+                signature.GetDataAvailableForReading ());
+            std::cout << (result ? "pass" : "fail") << std::endl;
+            return result;
+        }
+        THEKOGANS_UTIL_CATCH (util::Exception) {
+            std::cout << "fail " << exception.Report ();
+            return false;
+        }
+    }
+
+    bool TestCMAC (
+            const char *name,
+            crypto::SymmetricKey::Ptr key,
+            const EVP_CIPHER *cipher) {
+        THEKOGANS_UTIL_TRY {
+            std::cout << name << "...";
+            crypto::CMAC mac (key, cipher);
             util::ui8 buffer[1024];
             util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
             util::Buffer signature = mac.SignBuffer (buffer, 1024);
@@ -58,14 +81,14 @@ namespace {
 
 TEST (thekogans, HMAC) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr key = crypto::HMAC::CreateKey (
+    crypto::SymmetricKey::Ptr key = crypto::SymmetricKey::FromSecretAndSalt (
         secret.c_str (),
         secret.size ());
     const std::vector<std::string> &messageDigests =
         crypto::CipherSuite::GetMessageDigests ();
     for (std::size_t i = 0, count = messageDigests.size (); i < count; ++i) {
         CHECK_EQUAL (
-            TestMAC (
+            TestHMAC (
                 std::string ("HMAC-" + messageDigests[i]).c_str (),
                 key,
                 crypto::CipherSuite::GetOpenSSLMessageDigestByName (messageDigests[i])),
@@ -75,17 +98,20 @@ TEST (thekogans, HMAC) {
 
 TEST (thekogans, CMAC) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr key = crypto::CMAC::CreateKey (
-        secret.c_str (),
-        secret.size ());
-    const std::vector<std::string> &messageDigests =
-        crypto::CipherSuite::GetMessageDigests ();
-    for (std::size_t i = 0, count = messageDigests.size (); i < count; ++i) {
+    const std::vector<std::string> &ciphers =
+        crypto::CipherSuite::GetCiphers ();
+    for (std::size_t i = 0, count = ciphers.size (); i < count; ++i) {
+        const EVP_CIPHER *cipher = crypto::CipherSuite::GetOpenSSLCipherByName (ciphers[i]);
         CHECK_EQUAL (
-            TestMAC (
-                std::string ("CMAC-" + messageDigests[i]).c_str (),
-                key,
-                crypto::CipherSuite::GetOpenSSLMessageDigestByName (messageDigests[i])),
+            TestCMAC (
+                std::string ("CMAC-" + ciphers[i]).c_str (),
+                crypto::SymmetricKey::FromSecretAndSalt (
+                    secret.c_str (),
+                    secret.size (),
+                    0,
+                    0,
+                    crypto::GetCipherKeyLength (cipher)),
+                cipher),
             true);
     }
 }

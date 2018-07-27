@@ -26,6 +26,7 @@
 #include <openssl/evp.h>
 #include <openssl/ec.h>
 #include <openssl/hmac.h>
+#include <openssl/cmac.h>
 #include <openssl/bio.h>
 #include <openssl/x509v3.h>
 #include <openssl/dh.h>
@@ -395,6 +396,33 @@ namespace thekogans {
             }
         };
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
+
+        /// \struct CMACContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
+        ///
+        /// \brief
+        /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
+        struct CMACContext {
+            /// \brief
+            /// OpenSSL message digest context.
+            CMAC_CTX *ctx;
+
+            /// \brief
+            /// ctor.
+            CMACContext () :
+                ctx (CMAC_CTX_new ()) {}
+            /// \brief
+            /// dtor.
+            ~CMACContext () {
+                CMAC_CTX_free (ctx);
+            }
+
+            /// \brief
+            /// Address of operator.
+            /// \return CMAC_CTX *.
+            CMAC_CTX *operator & () const {
+                return ctx;
+            }
+        };
 
         /// \brief
         /// Return the iv length for a given OpenSSL cipher.

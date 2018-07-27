@@ -35,11 +35,15 @@ namespace {
             crypto::AsymmetricKey::Ptr privateKey) {
         THEKOGANS_UTIL_TRY {
             std::cout << name << "...";
-            crypto::Authenticator signer (privateKey);
+            crypto::Authenticator signer (
+                privateKey,
+                crypto::MessageDigest::Ptr (new crypto::MessageDigest));
             util::ui8 buffer[1024];
             util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
             util::Buffer signature = signer.SignBuffer (buffer, 1024);
-            crypto::Authenticator verifier (privateKey->GetPublicKey ());
+            crypto::Authenticator verifier (
+                privateKey->GetPublicKey (),
+                crypto::MessageDigest::Ptr (new crypto::MessageDigest));
             bool result = verifier.VerifyBufferSignature (
                 buffer,
                 1024,

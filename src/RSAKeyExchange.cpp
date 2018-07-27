@@ -40,20 +40,20 @@ namespace thekogans {
 
         void RSAKeyExchange::RSAParams::CreateSignature (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md) {
-            if (privateKey.Get () != 0 && md != 0) {
+                MessageDigest::Ptr messageDigest) {
+            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
                     util::Serializer::Size (id) +
                     util::Serializer::Size (keyId) +
                     util::Serializer::Size (buffer));
                 paramsBuffer << id << keyId << buffer;
-                Authenticator authenticator (privateKey, md);
+                Authenticator authenticator (privateKey, messageDigest);
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
                     paramsBuffer.GetDataAvailableForReading ());
                 signatureKeyId = privateKey->GetId ();
-                signatureMessageDigest = CipherSuite::GetOpenSSLMessageDigestName (md);
+                signatureMessageDigestName = messageDigest->GetName ();
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -63,10 +63,10 @@ namespace thekogans {
 
         bool RSAKeyExchange::RSAParams::ValidateSignature (
                 AsymmetricKey::Ptr publicKey,
-                const EVP_MD *md) {
-            if (publicKey.Get () != 0 && md != 0&&
+                MessageDigest::Ptr messageDigest) {
+            if (publicKey.Get () != 0 && messageDigest.Get () != 0 &&
                     publicKey->GetId () == signatureKeyId &&
-                    CipherSuite::GetOpenSSLMessageDigestName (md) == signatureMessageDigest) {
+                    messageDigest->GetName () == signatureMessageDigestName) {
                 if (!signature.IsEmpty ()) {
                     util::Buffer paramsBuffer (
                         util::NetworkEndian,
@@ -74,7 +74,7 @@ namespace thekogans {
                         util::Serializer::Size (keyId) +
                         util::Serializer::Size (buffer));
                     paramsBuffer << id << keyId << buffer;
-                    Authenticator authenticator (publicKey, md);
+                    Authenticator authenticator (publicKey, messageDigest);
                     return authenticator.VerifyBufferSignature (
                         paramsBuffer.GetReadPtr (),
                         paramsBuffer.GetDataAvailableForReading (),
@@ -182,14 +182,14 @@ namespace thekogans {
 
         KeyExchange::Params::Ptr RSAKeyExchange::GetParams (
                 AsymmetricKey::Ptr privateKey,
-                const EVP_MD *md) const {
+                MessageDigest::Ptr messageDigest) const {
             Params::Ptr rsaParams;
             util::SecureBuffer symmetricKeyBuffer (
                 util::NetworkEndian,
                 util::Serializable::Size (*symmetricKey));
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
-                Authenticator authenticator (key);
+                Authenticator authenticator (key, MessageDigest::Ptr (new MessageDigest));
                 rsaParams.Reset (
                     new RSAParams (
                         id,
@@ -208,8 +208,8 @@ namespace thekogans {
                             symmetricKeyBuffer.GetDataAvailableForReading (),
                             key)));
             }
-            if (privateKey.Get () != 0 && md != 0) {
-                rsaParams->CreateSignature (privateKey, md);
+            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
+                rsaParams->CreateSignature (privateKey, messageDigest);
             }
             return rsaParams;
         }
@@ -224,7 +224,7 @@ namespace thekogans {
                         util::NetworkEndian,
                         util::Serializable::Size (*symmetricKey));
                     symmetricKeyBuffer << *symmetricKey;
-                    Authenticator authenticator (key);
+                    Authenticator authenticator (key, MessageDigest::Ptr (new MessageDigest));
                     if (!authenticator.VerifyBufferSignature (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),

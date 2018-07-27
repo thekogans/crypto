@@ -25,6 +25,7 @@
 #include "thekogans/crypto/ID.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
+#include "thekogans/crypto/MessageDigest.h"
 
 namespace thekogans {
     namespace crypto {
@@ -64,7 +65,7 @@ namespace thekogans {
                 ID signatureKeyId;
                 /// \brief
                 /// OpenSSL message digest to use for parameter hashing.
-                std::string signatureMessageDigest;
+                std::string signatureMessageDigestName;
 
                 /// \brief
                 /// ctor.
@@ -77,18 +78,18 @@ namespace thekogans {
                 /// Given my private \see{AsymmetricKey}, create a signature over the parameters.
                 /// \param[in] privateKey My private \see{AsymmetricKey} used to create a signature
                 /// over the parameters.
-                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \param[in] messageDigest Message digest object.
                 virtual void CreateSignature (
                     AsymmetricKey::Ptr /*privateKey*/,
-                    const EVP_MD * /*md*/) = 0;
+                    MessageDigest::Ptr /*messageDigest*/) = 0;
                 /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
                 /// \param[in] publicKey Peer's public key used to verify parameters signature.
-                /// \param[in] md OpenSSL message digest used to hash the parameters.
+                /// \param[in] messageDigest Message digest object.
                 /// \return true == signature is valid, false == signature is invalid.
                 virtual bool ValidateSignature (
                     AsymmetricKey::Ptr /*publicKey*/,
-                    const EVP_MD * /*md*/) = 0;
+                    MessageDigest::Ptr /*messageDigest*/) = 0;
 
             protected:
                 // util::Serializable
@@ -133,11 +134,11 @@ namespace thekogans {
             /// Get the parameters to send to the key exchange peer.
             /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to create a signature
             /// over the parameters.
-            /// \param[in] md Optional OpenSSL message digest used to hash the parameters.
+            /// \param[in] messageDigest Optional message digest object to hash the signature parameters.
             /// \return Parameters (\see{DHEParams} or \see{RSAParams}) to send to the key exchange peer.
             virtual Params::Ptr GetParams (
                 AsymmetricKey::Ptr /*privateKey*/ = AsymmetricKey::Ptr (),
-                const EVP_MD * /*md*/ = 0) const = 0;
+                MessageDigest::Ptr /*messageDigest*/ = MessageDigest::Ptr ()) const = 0;
 
             /// \brief
             /// Given the peer's (see \see{DHEParams} and \see{RSAParams}), use my private key
