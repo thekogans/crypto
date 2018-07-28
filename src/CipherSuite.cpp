@@ -411,9 +411,10 @@ namespace thekogans {
             return GetCipherKeyLength (GetOpenSSLCipherByName (cipher)) == key.Length ();
         }
 
-        bool CipherSuite::VerifyMACKey (const SymmetricKey &key) const {
-            // FIXME: implement
-            return true;
+        bool CipherSuite::VerifyMACKey (
+                const SymmetricKey &key,
+                bool hmac) const {
+            return hmac || VerifyCipherKey (key);
         }
 
         KeyExchange::Ptr CipherSuite::GetDHEKeyExchange (
@@ -502,7 +503,7 @@ namespace thekogans {
         }
 
         MAC::Ptr CipherSuite::GetHMAC (SymmetricKey::Ptr key) const {
-            if (key.Get () != 0 && VerifyMACKey (*key)) {
+            if (key.Get () != 0 && VerifyMACKey (*key, true)) {
                 return MAC::Ptr (new HMAC (key, GetOpenSSLMessageDigest ()));
             }
             else {
@@ -512,7 +513,7 @@ namespace thekogans {
         }
 
         MAC::Ptr CipherSuite::GetCMAC (SymmetricKey::Ptr key) const {
-            if (key.Get () != 0 && VerifyMACKey (*key)) {
+            if (key.Get () != 0 && VerifyMACKey (*key, false)) {
                 return MAC::Ptr (new CMAC (key, GetOpenSSLCipher ()));
             }
             else {

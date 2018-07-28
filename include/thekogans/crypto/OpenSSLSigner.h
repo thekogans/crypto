@@ -58,10 +58,6 @@ namespace thekogans {
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
             virtual std::size_t Final (util::ui8 *signature);
-            /// \brief
-            /// Finalize the signing operation and return the signature.
-            /// \return Signature.
-            virtual util::Buffer Final ();
 
             /// \brief
             /// OpenSSLSigner is neither copy constructable, nor assignable.

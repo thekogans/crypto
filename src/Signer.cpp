@@ -78,5 +78,11 @@ namespace thekogans {
         }
     #endif // defined (TOOLCHAIN_TYPE_Static)
 
+        util::Buffer Signer::Final () {
+            util::Buffer signature (util::HostEndian, privateKey->GetKeyLength ());
+            signature.AdvanceWriteOffset (Final (signature.GetWritePtr ()));
+            return signature;
+        }
+
     } // namespace crypto
 } // namespace thekogans

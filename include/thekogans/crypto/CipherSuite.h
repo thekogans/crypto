@@ -284,8 +284,11 @@ namespace thekogans {
             /// \brief
             /// Verify that the given key is appropriate for \see{MAC} (EVP_PKEY_HMAC or EVP_PKEY_CMAC).
             /// \param[in] key \see{SymmetricKey} to verify.
+            /// \param[in] hmac true == check HMAC key, false == check CMAC key.
             /// \return true = given key is appropriate.
-            bool VerifyMACKey (const SymmetricKey &key) const;
+            bool VerifyMACKey (
+                const SymmetricKey &key,
+                bool hmac) const;
 
             /// \brief
             /// Return an instance of the \see{DHEKeyExchange} represented by keyExchange (client side [EC]DHE).

@@ -78,14 +78,14 @@ namespace thekogans {
             /// Private key.
             AsymmetricKey::Ptr privateKey;
             /// \brief
-            /// Message digest object.
+            /// Message digest.
             MessageDigest::Ptr messageDigest;
 
         public:
             /// \brief
             /// ctor.
             /// \param[in] privateKey_ Private key.
-            /// \param[in] messageDigest_ Message digest object.
+            /// \param[in] messageDigest_ Message digest.
             Signer (
                 AsymmetricKey::Ptr privateKey_,
                 MessageDigest::Ptr messageDigest_);
@@ -96,7 +96,7 @@ namespace thekogans {
             /// \brief
             /// Used for Signer dynamic discovery and creation.
             /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
-            /// \param[in] messageDigest Message digest object.
+            /// \param[in] messageDigest Message digest.
             /// \return A Signer based on the passed in privateKey type.
             static Ptr Get (
                 AsymmetricKey::Ptr privateKey,
@@ -139,10 +139,11 @@ namespace thekogans {
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
             virtual std::size_t Final (util::ui8 *signature) = 0;
+
             /// \brief
             /// Finalize the signing operation and return the signature.
             /// \return Signature.
-            virtual util::Buffer Final () = 0;
+            util::Buffer Final ();
         };
 
         /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON(type)

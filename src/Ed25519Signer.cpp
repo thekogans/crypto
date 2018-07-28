@@ -57,11 +57,5 @@ namespace thekogans {
                 signature);
         }
 
-        util::Buffer Ed25519Signer::Final () {
-            util::Buffer signature (util::HostEndian, Ed25519::SIGNATURE_LENGTH);
-            signature.AdvanceWriteOffset (Final (signature.GetWritePtr ()));
-            return signature;
-        }
-
     } // namespace crypto
 } // namespace thekogans

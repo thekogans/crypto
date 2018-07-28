@@ -888,7 +888,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    SymmetricKey::Ptr key = it->second->GetMACKey (keyId, recursive);
+                    SymmetricKey::Ptr key =
+                        it->second->GetMACKey (keyId, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
@@ -911,7 +912,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    SymmetricKey::Ptr key = it->second->GetMACKey (equalityTest, recursive);
+                    SymmetricKey::Ptr key =
+                        it->second->GetMACKey (equalityTest, recursive);
                     if (key.Get () != 0) {
                         return key;
                     }
@@ -957,14 +959,13 @@ namespace thekogans {
         bool KeyRing::AddMACKey (
                 SymmetricKey::Ptr key,
                 MAC::Ptr mac) {
-            if (key.Get () != 0 && cipherSuite.VerifyMACKey (*key)) {
+            if (key.Get () != 0 && cipherSuite.VerifyMACKey (*key, true)) {
                 std::pair<SymmetricKeyMap::iterator, bool> result =
                     macKeyMap.insert (
                         SymmetricKeyMap::value_type (key->GetId (), key));
                 if (result.second && mac.Get () != 0) {
                     std::pair<MACMap::iterator, bool> result =
-                        macMap.insert (
-                            MACMap::value_type (key->GetId (), mac));
+                        macMap.insert (MACMap::value_type (key->GetId (), mac));
                     if (!result.second) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to add a MAC: %s.",
@@ -1026,7 +1027,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    Serializable::Ptr userData = it->second->GetUserData (id, recursive);
+                    Serializable::Ptr userData =
+                        it->second->GetUserData (id, recursive);
                     if (userData.Get () != 0) {
                         return userData;
                     }
@@ -1049,7 +1051,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    Serializable::Ptr userData = it->second->GetUserData (equalityTest, recursive);
+                    Serializable::Ptr userData =
+                        it->second->GetUserData (equalityTest, recursive);
                     if (userData.Get () != 0) {
                         return userData;
                     }
