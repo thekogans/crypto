@@ -438,7 +438,7 @@ namespace thekogans {
                     RSAHeader::Size (cipherIndex));
                 headerBuffer << RSAHeader (
                     (util::ui8)cipherIndex,
-                    (util::ui8)key->Length (),
+                    (util::ui8)key->GetKeyLength (),
                     key->Get ().GetReadPtr ());
                 std::size_t headerLength =
                     RSA::EncryptAndEnlengthen (

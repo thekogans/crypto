@@ -81,15 +81,21 @@ namespace thekogans {
         }
 
         std::size_t OpenSSLSigner::Final (util::ui8 *signature) {
-            std::size_t signatureLength = privateKey->GetKeyLength ();
-            if (EVP_DigestSignFinal (
-                    messageDigest->GetMD_CTX (),
-                    signature,
-                    &signatureLength) == 1) {
-                return signatureLength;
+            if (signature != 0) {
+                std::size_t signatureLength = privateKey->GetKeyLength ();
+                if (EVP_DigestSignFinal (
+                        messageDigest->GetMD_CTX (),
+                        signature,
+                        &signatureLength) == 1) {
+                    return signatureLength;
+                }
+                else {
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                }
             }
             else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
         }
 

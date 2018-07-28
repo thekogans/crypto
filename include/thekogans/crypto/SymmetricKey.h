@@ -75,7 +75,7 @@ namespace thekogans {
             /// \brief
             /// Return the key length.
             /// \return Key length.
-            inline std::size_t Length () const {
+            inline std::size_t GetKeyLength () const {
                 return key.GetDataAvailableForReading ();
             }
 

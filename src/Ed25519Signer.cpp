@@ -31,7 +31,8 @@ namespace thekogans {
                 MessageDigest::Ptr messageDigest) :
                 Signer (privateKey, messageDigest) {
             if (privateKey.Get () == 0 || !privateKey->IsPrivate () ||
-                    privateKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE) {
+                    privateKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE ||
+                    messageDigest.Get () == 0) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
@@ -44,17 +45,29 @@ namespace thekogans {
         void Ed25519Signer::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            messageDigest->Update (buffer, bufferLength);
+            if (buffer != 0 && bufferLength > 0) {
+                messageDigest->Update (buffer, bufferLength);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
         std::size_t Ed25519Signer::Final (util::ui8 *signature) {
-            std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
-            messageDigest->Final (digest.data ());
-            return Ed25519::SignBuffer (
-                digest.data (),
-                digest.size (),
-                (const util::ui8 *)privateKey->GetKey (),
-                signature);
+            if (signature != 0) {
+                std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
+                messageDigest->Final (digest.data ());
+                return Ed25519::SignBuffer (
+                    digest.data (),
+                    digest.size (),
+                    (const util::ui8 *)privateKey->GetKey (),
+                    signature);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
     } // namespace crypto
