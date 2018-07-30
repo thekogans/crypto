@@ -277,7 +277,7 @@ namespace thekogans {
                     serializer.Read (&paramsBuffer[0], paramsLength);
                     const util::ui8 *paramsData = &paramsBuffer[0];
                     if (type == OPENSSL_PKEY_DH) {
-                        DHPtr dhParams (d2i_DHparams (0, &paramsData, paramsLength));
+                        DHPtr dhParams (d2i_DHparams (0, &paramsData, (long)paramsLength));
                         if (dhParams.get () != 0) {
                             if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                                 dhParams.release ();
@@ -291,7 +291,7 @@ namespace thekogans {
                         }
                     }
                     else if (type == OPENSSL_PKEY_DSA) {
-                        DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, paramsLength));
+                        DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, (long)paramsLength));
                         if (dsaParams.get () != 0) {
                             if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
                                 dsaParams.release ();
@@ -305,7 +305,7 @@ namespace thekogans {
                         }
                     }
                     else if (type == OPENSSL_PKEY_EC) {
-                        EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, paramsLength));
+                        EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, (long)paramsLength));
                         if (ecParams.get () != 0) {
                             if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                 ecParams.release ();

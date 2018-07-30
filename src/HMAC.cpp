@@ -34,7 +34,7 @@ namespace thekogans {
                 if (HMAC_Init_ex (
                         &ctx,
                         key->Get ().GetReadPtr (),
-                        key->Get ().GetDataAvailableForReading (),
+                        (int)key->Get ().GetDataAvailableForReading (),
                         md,
                         OpenSSLInit::engine) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

@@ -223,7 +223,13 @@ namespace thekogans {
                     const EVP_MD *md,
                     util::SecureVector<util::ui8> &prk) {
                 util::ui32 length;
-                if (HMAC (md, salt, saltLength, (const util::ui8 *)hmacKey, hmacKeyLength, prk.data (), &length) != 0) {
+                if (HMAC (md,
+                            salt,
+                            (int)saltLength,
+                            (const util::ui8 *)hmacKey,
+                            (int)hmacKeyLength,
+                            prk.data (),
+                            &length) != 0) {
                     prk.resize (length);
                 }
                 else {
@@ -239,7 +245,12 @@ namespace thekogans {
                     const EVP_MD *md,
                     util::SecureVector<util::ui8> &key) {
                 HMACContext ctx;
-                if (HMAC_Init_ex (&ctx, (const util::ui8 *)prk, prkLength, md, OpenSSLInit::engine) == 1) {
+                if (HMAC_Init_ex (
+                            &ctx,
+                            (const util::ui8 *)prk,
+                            (int)prkLength,
+                            md,
+                            OpenSSLInit::engine) == 1) {
                     std::vector<util::ui8> digest (GetMDLength (md));
                     std::size_t count = key.size () / digest.size ();
                     if ((key.size () % digest.size ()) != 0) {
@@ -252,7 +263,7 @@ namespace thekogans {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                             }
                         }
-                        const util::ui8 counter = i;
+                        const util::ui8 counter = (util::ui8)i;
                         if (HMAC_Update (&ctx, (const util::ui8 *)info, infoLength) == 1 &&
                                 HMAC_Update (&ctx, &counter, 1) == 1 &&
                                 HMAC_Final (&ctx, digest.data (), 0) == 1) {
