@@ -216,7 +216,7 @@ namespace thekogans {
             if (serializer.Read (&keyBuffer[0], keyLength) == keyLength) {
                 BIOPtr bio (BIO_new (BIO_s_mem ()));
                 if (bio.get () != 0) {
-                    if (BIO_write (bio.get (), &keyBuffer[0], (int)keyLength) == keyLength) {
+                    if (BIO_write (bio.get (), &keyBuffer[0], (int)keyLength) == (int)keyLength) {
                         key.reset (IsPrivate () ?
                             PEM_read_bio_PrivateKey (bio.get (), 0, 0, 0) :
                             PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
