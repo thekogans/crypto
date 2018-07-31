@@ -51,6 +51,8 @@ namespace thekogans {
             /// Controls Map's lifetime.
             /// \return Verifier map.
             static Map &GetMap ();
+
+        public:
             /// \struct Verifier::MapInitializer Verifier.h thekogans/crypto/Verifier.h
             ///
             /// \brief
@@ -73,6 +75,7 @@ namespace thekogans {
                     Factory factory);
             };
 
+        protected:
             /// \brief
             /// Public key.
             AsymmetricKey::Ptr publicKey;

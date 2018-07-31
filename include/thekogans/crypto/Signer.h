@@ -52,6 +52,8 @@ namespace thekogans {
             /// Controls Map's lifetime.
             /// \return Signer map.
             static Map &GetMap ();
+
+        public:
             /// \struct Signer::MapInitializer Signer.h thekogans/crypto/Signer.h
             ///
             /// \brief
@@ -74,6 +76,7 @@ namespace thekogans {
                     Factory factory);
             };
 
+        protected:
             /// \brief
             /// Private key.
             AsymmetricKey::Ptr privateKey;
