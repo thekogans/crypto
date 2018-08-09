@@ -19,6 +19,7 @@
 #define __thekogans_crypto_Encryptor_h
 
 #include <cstddef>
+#include <openssl/aes.h>
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
@@ -66,11 +67,12 @@ namespace thekogans {
             }
 
             /// \brief
-            /// Return max buffer length needed to encrypt the given amount of plaintext.
+            /// Return ciphertext buffer length needed to encrypt the given amount of plaintext.
             /// \param[in] plaintextLength Amount of plaintext to encrypt.
-            /// \return Max buffer length needed to encrypt the given amount of plaintext.
-            static std::size_t GetMaxBufferLength (std::size_t plaintextLength) {
-                return plaintextLength + EVP_MAX_BLOCK_LENGTH;
+            /// \return Ciphertext buffer length needed to encrypt the given amount of plaintext.
+            inline std::size_t GetCiphertextLength (std::size_t plaintextLength) const {
+                std::size_t blockSize = (std::size_t)EVP_CIPHER_CTX_block_size (&context);
+                return plaintextLength + blockSize - plaintextLength % blockSize;
             }
 
             /// \brief
