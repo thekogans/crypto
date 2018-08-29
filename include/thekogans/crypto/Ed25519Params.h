@@ -85,7 +85,6 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to write the parameters to.
             virtual void Write (util::Serializer &serializer) const;
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
             /// \brief
             /// Return the XML representation of parameters.
@@ -95,7 +94,6 @@ namespace thekogans {
             virtual std::string ToString (
                 std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const;
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
             /// \brief
             /// Ed25519Params is neither copy constructable, nor assignable.

@@ -42,19 +42,31 @@ namespace thekogans {
         void Ed25519Verifier::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            messageDigest->Update (buffer, bufferLength);
+            if (buffer != 0 && bufferLength > 0) {
+                messageDigest->Update (buffer, bufferLength);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
         bool Ed25519Verifier::Final (
                 const void *signature,
-                std::size_t /*signatureLength*/) {
-            std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
-            messageDigest->Final (digest.data ());
-            return Ed25519::VerifyBufferSignature (
-                digest.data (),
-                digest.size (),
-                (const util::ui8 *)publicKey->GetKey (),
-                (const util::ui8 *)signature);
+                std::size_t signatureLength) {
+            if (signature != 0 && signatureLength == Ed25519::SIGNATURE_LENGTH) {
+                std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
+                messageDigest->Final (digest.data ());
+                return Ed25519::VerifyBufferSignature (
+                    digest.data (),
+                    digest.size (),
+                    ((Ed25519AsymmetricKey *)publicKey.Get ())->key.publicKey.value,
+                    (const util::ui8 *)signature);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
     } // namespace crypto

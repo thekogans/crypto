@@ -70,13 +70,11 @@ namespace thekogans {
             serializer << id << name << description;
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         const char * const Serializable::TAG_SERIALIZABLE = "Serializable";
         const char * const Serializable::ATTR_TYPE = "Type";
         const char * const Serializable::ATTR_ID = "Id";
         const char * const Serializable::ATTR_NAME = "Name";
         const char * const Serializable::ATTR_DESCRIPTION = "Description";
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

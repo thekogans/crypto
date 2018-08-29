@@ -85,12 +85,10 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
             /// \brief
             /// "ParamsType"
             static const char * const ATTR_PARAMS_TYPE;
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
 
         /// \brief

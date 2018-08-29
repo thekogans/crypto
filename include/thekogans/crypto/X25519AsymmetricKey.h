@@ -44,6 +44,10 @@ namespace thekogans {
             /// Private/Public \see{X25519} key.
             util::FixedBuffer<X25519::KEY_LENGTH> key;
 
+            /// \brief
+            /// \see{DHEKeyExchange} needs access to key.
+            friend struct DHEKeyExchange;
+
         public:
             /// \brief
             /// ctor.
@@ -58,13 +62,6 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
-
-            /// \brief
-            /// Return the const void * representing the key bits.
-            /// \return const void * representing the key bits.
-            virtual const void *GetKey () const {
-                return key.GetReadPtr ();
-            }
 
             /// \brief
             /// "KeyType"
@@ -115,7 +112,6 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
             /// \brief
             /// "Key"
@@ -123,18 +119,12 @@ namespace thekogans {
 
             /// \brief
             /// Return the XML representation of a key.
-            /// ********************** WARNING **********************
-            /// This is antithetical to security which is precisely
-            /// why it should be used only for testing and turned off
-            /// when building for production.
-            /// *****************************************************
             /// \param[in] indentationLevel How far to indent the leading tag.
             /// \param[in] tagName The name of the leading tag.
             /// \return XML representation of a key.
             virtual std::string ToString (
                 std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const;
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
             /// \brief
             /// X25519AsymmetricKey is neither copy constructable, nor assignable.

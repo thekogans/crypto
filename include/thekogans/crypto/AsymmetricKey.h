@@ -68,11 +68,6 @@ namespace thekogans {
             }
 
             /// \brief
-            /// Return the const void * representing the key bits.
-            /// \return const void * representing the key bits.
-            virtual const void *GetKey () const = 0;
-
-            /// \brief
             /// Return the key type.
             /// \return Key type.
             virtual const char *GetKeyType () const = 0;
@@ -113,7 +108,6 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
             /// \brief
             /// "Private"
@@ -121,7 +115,6 @@ namespace thekogans {
             /// \brief
             /// "KeyType"
             static const char * const ATTR_KEY_TYPE;
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
 
         /// \brief

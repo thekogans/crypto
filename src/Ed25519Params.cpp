@@ -56,7 +56,6 @@ namespace thekogans {
             Params::Write (serializer);
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         std::string Ed25519Params::ToString (
                 std::size_t indentationLevel,
                 const char *tagName) const {
@@ -67,7 +66,6 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_PARAMS_TYPE, Ed25519AsymmetricKey::KEY_TYPE));
             return util::OpenTag (indentationLevel, tagName, attributes, true, true);
         }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

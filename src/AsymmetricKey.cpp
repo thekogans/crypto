@@ -38,10 +38,8 @@ namespace thekogans {
             serializer << isPrivate;
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         const char * const AsymmetricKey::ATTR_PRIVATE = "Private";
         const char * const AsymmetricKey::ATTR_KEY_TYPE = "KeyType";
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

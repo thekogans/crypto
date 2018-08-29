@@ -15,17 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include <sstream>
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include <sstream>
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/Exception.h"
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include "thekogans/util/StringUtils.h"
-    #include "thekogans/util/XMLUtils.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/util/StringUtils.h"
+#include "thekogans/util/XMLUtils.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLAsymmetricKey.h"
@@ -168,16 +164,15 @@ namespace thekogans {
                 const std::string &description) const {
             BIOPtr bio (BIO_new (BIO_s_mem ()));
             if (PEM_write_bio_PUBKEY (bio.get (), key.get ()) == 1) {
-                OpenSSLAsymmetricKey *publicKeyPtr;
-                AsymmetricKey::Ptr publicKey (
-                    publicKeyPtr = new OpenSSLAsymmetricKey (
-                        EVP_PKEYPtr (PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0)),
-                        false,
-                        id,
-                        name,
-                        description));
-                if (publicKeyPtr->GetKey () != 0) {
-                    return publicKey;
+                EVP_PKEYPtr publicKey (PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
+                if (publicKey.get () != 0) {
+                    return AsymmetricKey::Ptr (
+                        new OpenSSLAsymmetricKey (
+                            std::move (publicKey),
+                            false,
+                            id,
+                            name,
+                            description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -272,7 +267,6 @@ namespace thekogans {
             }
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         std::string OpenSSLAsymmetricKey::ToString (
                 std::size_t indentationLevel,
                 const char *tagName) const {
@@ -292,7 +286,6 @@ namespace thekogans {
                 util::CloseTag (indentationLevel, tagName);
             return stream.str ();
         }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

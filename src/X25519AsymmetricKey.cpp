@@ -94,7 +94,6 @@ namespace thekogans {
             }
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         const char * const X25519AsymmetricKey::ATTR_KEY = "Key";
 
         std::string X25519AsymmetricKey::ToString (
@@ -107,10 +106,9 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
             attributes.push_back (util::Attribute (ATTR_PRIVATE, util::boolTostring (IsPrivate ())));
             attributes.push_back (util::Attribute (ATTR_KEY_TYPE, GetKeyType ()));
-            attributes.push_back (util::Attribute (ATTR_KEY, util::HexEncodeBuffer (GetKey (), GetKeyLength ())));
+            attributes.push_back (util::Attribute (ATTR_KEY, util::HexEncodeBuffer (key.GetReadPtr (), GetKeyLength ())));
             return util::OpenTag (indentationLevel, tagName, attributes, true, true);
         }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

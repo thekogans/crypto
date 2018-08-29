@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include "thekogans/util/XMLUtils.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/util/XMLUtils.h"
 #include "thekogans/crypto/Stats.h"
 
 namespace thekogans {
@@ -41,7 +39,6 @@ namespace thekogans {
             totalByteCount = 0;
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         const char * const Stats::ATTR_USE_COUNT = "UseCount";
         const char * const Stats::ATTR_MIN_BYTE_COUNT = "MinByteCount";
         const char * const Stats::ATTR_MAX_BYTE_COUNT = "MaxByteCount";
@@ -69,7 +66,6 @@ namespace thekogans {
                     util::size_tTostring (totalByteCount)));
             return util::OpenTag (indentationLevel, tagName, attributes, true, true);
         }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

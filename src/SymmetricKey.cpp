@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include <sstream>
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include <sstream>
 #include <algorithm>
 #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
     #include <argon2.h>
@@ -28,10 +26,8 @@
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/HRTimer.h"
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include "thekogans/util/XMLUtils.h"
-    #include "thekogans/util/StringUtils.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/util/XMLUtils.h"
+#include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/MessageDigest.h"
 #include "thekogans/crypto/Argon2Exception.h"
 #include "thekogans/crypto/fastpbkdf2.h"
@@ -308,8 +304,7 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (hmacKey != 0 && hmacKeyLength > 0 &&
-                    keyLength > 0 && md != 0) {
+            if (hmacKey != 0 && hmacKeyLength > 0 && keyLength > 0 && md != 0) {
                 util::SecureVector<util::ui8> key (keyLength);
                 switch (mode) {
                     case HKDF_MODE_EXTRACT_AND_EXPAND:
@@ -427,7 +422,8 @@ namespace thekogans {
                 randomLength = MIN_RANDOM_LENGTH;
             }
             util::SecureVector<util::ui8> random (randomLength);
-            if (util::GlobalRandomSource::Instance ().GetBytes (&random[0], randomLength) == randomLength) {
+            if (util::GlobalRandomSource::Instance ().GetBytes (
+                    &random[0], randomLength) == randomLength) {
                 return FromSecretAndSalt (
                     &random[0],
                     randomLength,
@@ -461,7 +457,8 @@ namespace thekogans {
             serializer >> length;
             if (length > 0 && length <= EVP_MAX_KEY_LENGTH) {
                 key.Rewind ();
-                if (key.AdvanceWriteOffset (serializer.Read (key.GetWritePtr (), length)) == length) {
+                if (key.AdvanceWriteOffset (
+                        serializer.Read (key.GetWritePtr (), length)) == length) {
                     memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
                 }
                 else {
@@ -479,13 +476,13 @@ namespace thekogans {
             Serializable::Write (serializer);
             serializer << util::SizeT (key.GetDataAvailableForReading ());
             if (serializer.Write (
-                    key.GetReadPtr (), key.GetDataAvailableForReading ()) != key.GetDataAvailableForReading ()) {
+                    key.GetReadPtr (),
+                    key.GetDataAvailableForReading ()) != key.GetDataAvailableForReading ()) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Unable to write %u bytes for key.", key.GetDataAvailableForReading ());
             }
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         std::string SymmetricKey::ToString (
                 std::size_t indentationLevel,
                 const char *tagName) const {
@@ -497,11 +494,12 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
-                util::HexEncodeBuffer (key.GetReadPtr (), key.GetDataAvailableForReading ()) << std::endl <<
+                util::HexEncodeBuffer (
+                    key.GetReadPtr (),
+                    key.GetDataAvailableForReading ()) << std::endl <<
                 util::CloseTag (indentationLevel, tagName);
             return stream.str ();
         }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

@@ -96,7 +96,9 @@ namespace thekogans {
                     IsValidPadding (padding) &&
                     ciphertext != 0) {
                 EVP_PKEY_CTXPtr ctx (
-                    EVP_PKEY_CTX_new ((EVP_PKEY *)publicKey->GetKey (), OpenSSLInit::engine));
+                    EVP_PKEY_CTX_new (
+                        ((OpenSSLAsymmetricKey *)publicKey.Get ())->key.get (),
+                        OpenSSLInit::engine));
                 if (ctx.get () != 0 &&
                         EVP_PKEY_encrypt_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_padding (ctx.get (), padding) == 1) {
@@ -276,7 +278,9 @@ namespace thekogans {
                     IsValidPadding (padding) &&
                     plaintext != 0) {
                 EVP_PKEY_CTXPtr ctx (
-                    EVP_PKEY_CTX_new ((EVP_PKEY *)privateKey->GetKey (), OpenSSLInit::engine));
+                    EVP_PKEY_CTX_new (
+                        ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get (),
+                        OpenSSLInit::engine));
                 if (ctx.get () != 0 &&
                         EVP_PKEY_decrypt_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_padding (ctx.get (), padding) == 1) {

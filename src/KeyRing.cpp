@@ -15,18 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include <sstream>
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include <sstream>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/File.h"
 #include "thekogans/util/ByteSwap.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include "thekogans/util/XMLUtils.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/util/XMLUtils.h"
 #include "thekogans/crypto/DHEKeyExchange.h"
 #include "thekogans/crypto/RSA.h"
 #include "thekogans/crypto/KeyRing.h"
@@ -1433,7 +1429,6 @@ namespace thekogans {
             }
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         void KeyRing::Dump () const {
             std::cout << ToString ();
         }
@@ -1617,7 +1612,6 @@ namespace thekogans {
             stream << util::CloseTag (indentationLevel, tagName);
             return stream.str ();
         }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

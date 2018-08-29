@@ -15,18 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include <sstream>
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include <sstream>
 #include <openssl/evp.h>
 #include <openssl/ec.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/Exception.h"
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include "thekogans/util/StringUtils.h"
-    #include "thekogans/util/XMLUtils.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/util/StringUtils.h"
+#include "thekogans/util/XMLUtils.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLAsymmetricKey.h"
@@ -400,7 +396,6 @@ namespace thekogans {
             }
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         std::string OpenSSLParams::ToString (
                 std::size_t indentationLevel,
                 const char *tagName) const {
@@ -418,7 +413,6 @@ namespace thekogans {
                 util::CloseTag (indentationLevel, tagName);
             return stream.str ();
         }
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

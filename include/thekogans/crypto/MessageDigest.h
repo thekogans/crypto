@@ -51,24 +51,18 @@ namespace thekogans {
             /// EVP_MD_CTX wrapper.
             MDContext ctx;
 
+            /// \brief
+            /// \see{OpenSSLSigner} needs access to md and ctx.
+            friend struct OpenSSLSigner;
+            /// \brief
+            /// \see{OpenSSLVerifier} needs access to md and ctx.
+            friend struct OpenSSLVerifier;
+
         public:
             /// \brief
             /// ctor.
             /// \param[in] md_ OpenSSL message digest to use.
             MessageDigest (const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
-
-            /// \brief
-            /// Return the OpenSSL EVP_MD * associated with this message digest.
-            /// \return OpenSSL EVP_MD * associated with this message digest.
-            inline const EVP_MD *GetMD () const {
-                return md;
-            }
-            /// \brief
-            /// Return the OpenSSL EVP_MD_CTX * associated with this message digest.
-            /// \return OpenSSL EVP_MD_CTX * associated with this message digest.
-            inline EVP_MD_CTX *GetMD_CTX () {
-                return &ctx;
-            }
 
             /// \brief
             /// Return the message digest name.

@@ -19,9 +19,7 @@
 #define __thekogans_crypto_Serializable_h
 
 #include <string>
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include "thekogans/util/Types.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include "thekogans/util/Types.h"
 #include "thekogans/util/Serializable.h"
 #include "thekogans/util/SpinLock.h"
 #include "thekogans/util/SecureAllocator.h"
@@ -131,7 +129,6 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to write the serializable to.
             virtual void Write (util::Serializer &serializer) const;
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
             /// \brief
             /// "Serializable"
@@ -151,18 +148,12 @@ namespace thekogans {
 
             /// \brief
             /// Return the XML representation of a serializable.
-            /// ********************** WARNING **********************
-            /// This is antithetical to security which is precisely
-            /// why it should be used only for testing and turned off
-            /// when building for production.
-            /// *****************************************************
             /// \param[in] indentationLevel How far to indent the leading tag.
             /// \param[in] tagName The name of the leading tag.
             /// \return XML representation of a serializable.
             virtual std::string ToString (
                 std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const = 0;
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
 
         /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)

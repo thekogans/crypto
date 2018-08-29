@@ -18,6 +18,7 @@
 #include <openssl/evp.h>
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
+#include "thekogans/crypto/OpenSSLAsymmetricKey.h"
 #include "thekogans/crypto/OpenSSLSigner.h"
 
 namespace thekogans {
@@ -38,11 +39,11 @@ namespace thekogans {
                         privateKey->GetKeyType () == OPENSSL_PKEY_EC) &&
                     messageDigest.Get () != 0) {
                 if (EVP_DigestSignInit (
-                        messageDigest->GetMD_CTX (),
+                        &messageDigest->ctx,
                         0,
-                        messageDigest->GetMD (),
+                        messageDigest->md,
                         OpenSSLInit::engine,
-                        (EVP_PKEY *)privateKey->GetKey ()) != 1) {
+                        ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get ()) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
@@ -54,9 +55,9 @@ namespace thekogans {
 
         void OpenSSLSigner::Init () {
             if (EVP_DigestSignInit (
-                    messageDigest->GetMD_CTX (),
+                    &messageDigest->ctx,
                     0,
-                    messageDigest->GetMD (),
+                    messageDigest->md,
                     0,
                     0) != 1) {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -68,7 +69,7 @@ namespace thekogans {
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
                 if (EVP_DigestSignUpdate (
-                        messageDigest->GetMD_CTX (),
+                        &messageDigest->ctx,
                         buffer,
                         bufferLength) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -84,7 +85,7 @@ namespace thekogans {
             if (signature != 0) {
                 std::size_t signatureLength = privateKey->GetKeyLength ();
                 if (EVP_DigestSignFinal (
-                        messageDigest->GetMD_CTX (),
+                        &messageDigest->ctx,
                         signature,
                         &signatureLength) == 1) {
                     return signatureLength;

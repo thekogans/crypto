@@ -285,14 +285,14 @@ namespace thekogans {
                 if (keyType == OPENSSL_PKEY_DH || keyType == OPENSSL_PKEY_EC) {
                     EVP_PKEY_CTXPtr ctx (
                         EVP_PKEY_CTX_new (
-                            (EVP_PKEY *)privateKey->GetKey (),
+                            ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get (),
                             OpenSSLInit::engine));
                     if (ctx.get () != 0) {
                         std::size_t secretLength = 0;
                         if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
                                 EVP_PKEY_derive_set_peer (
                                     ctx.get (),
-                                    (EVP_PKEY *)dheParams->publicKey->GetKey ()) == 1 &&
+                                    ((OpenSSLAsymmetricKey *)dheParams->publicKey.Get ())->key.get ()) == 1 &&
                                 EVP_PKEY_derive (ctx.get (), 0, &secretLength) == 1) {
                             secret.resize (secretLength);
                             EVP_PKEY_derive (ctx.get (), secret.data (), &secretLength);
@@ -308,8 +308,8 @@ namespace thekogans {
                 else if (keyType == X25519AsymmetricKey::KEY_TYPE) {
                     secret.resize (X25519::SHARED_SECRET_LENGTH);
                     X25519::ComputeSharedSecret (
-                        (const util::ui8 *)privateKey->GetKey (),
-                        (const util::ui8 *)dheParams->publicKey->GetKey (),
+                        ((X25519AsymmetricKey *)privateKey.Get ())->key.GetReadPtr (),
+                        ((X25519AsymmetricKey *)dheParams->publicKey.Get ())->key.GetReadPtr (),
                         secret.data ());
                 }
                 util::Buffer salt = initiator ?

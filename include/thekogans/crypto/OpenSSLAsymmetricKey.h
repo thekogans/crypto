@@ -47,6 +47,19 @@ namespace thekogans {
             /// OpenSSL EVP_PKEY pointer.
             EVP_PKEYPtr key;
 
+            /// \brief
+            /// \see{OpenSSLSigner} needs access to key.
+            friend struct OpenSSLSigner;
+            /// \brief
+            /// \see{OpenSSLVerifier} needs access to key.
+            friend struct OpenSSLVerifier;
+            /// \brief
+            /// \see{RSA} needs access to key.
+            friend struct RSA;
+            /// \brief
+            /// \see{DHEKeyExchange} needs access to key.
+            friend struct DHEKeyExchange;
+
         public:
             /// \brief
             /// ctor.
@@ -139,13 +152,6 @@ namespace thekogans {
                 void *userData = 0);
 
             /// \brief
-            /// Return the const void * representing the key bits.
-            /// \return const void * representing the key bits.
-            virtual const void *GetKey () const {
-                return key.get ();
-            }
-
-            /// \brief
             /// Return the key type.
             /// \return Key type.
             virtual const char *GetKeyType () const {
@@ -190,22 +196,15 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         public:
             /// \brief
             /// Return the XML representation of a key.
-            /// ********************** WARNING **********************
-            /// This is antithetical to security which is precisely
-            /// why it should be used only for testing and turned off
-            /// when building for production.
-            /// *****************************************************
             /// \param[in] indentationLevel How far to indent the leading tag.
             /// \param[in] tagName The name of the leading tag.
             /// \return XML representation of a key.
             virtual std::string ToString (
                 std::size_t indentationLevel = 0,
                 const char *tagName = TAG_SERIALIZABLE) const;
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
             /// \brief
             /// OpenSSLAsymmetricKey is neither copy constructable, nor assignable.

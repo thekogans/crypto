@@ -19,10 +19,8 @@
 #define __thekogans_crypto_Stats_h
 
 #include <cstddef>
-#if defined (THEKOGANS_CRYPTO_TESTING)
-    #include <string>
-    #include "thekogans/util/Types.h"
-#endif // defined (THEKOGANS_CRYPTO_TESTING)
+#include <string>
+#include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
 
 namespace thekogans {
@@ -64,7 +62,6 @@ namespace thekogans {
             /// Reset the stats to 0.
             void Reset ();
 
-        #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// "UseCount"
             static const char * const ATTR_USE_COUNT;
@@ -86,7 +83,6 @@ namespace thekogans {
             std::string ToString (
                 std::size_t indentationLevel,
                 const char *tagName) const;
-        #endif // defined (THEKOGANS_CRYPTO_TESTING)
         };
 
     } // namespace crypto

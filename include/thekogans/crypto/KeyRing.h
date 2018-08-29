@@ -622,14 +622,8 @@ namespace thekogans {
             virtual void Write (util::Serializer &serializer) const;
 
         public:
-        #if defined (THEKOGANS_CRYPTO_TESTING)
             /// \brief
             /// Dump the key ring to std::cout.
-            /// ********************** WARNING **********************
-            /// This is antithetical to security which is precisely
-            /// why it should be used only for testing and turned off
-            /// when building for production.
-            /// *****************************************************
             void Dump () const;
 
         private:
@@ -705,7 +699,6 @@ namespace thekogans {
             std::string ToString (
                 std::size_t indentationLevel = 0,
                 const char *tagName = TAG_KEY_RING) const;
-        #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
             /// \brief
             /// KeyRing is neither copy constructable, nor assignable.

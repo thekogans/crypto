@@ -34,9 +34,7 @@ namespace thekogans {
             Serializable::Write (serializer);
         }
 
-    #if defined (THEKOGANS_CRYPTO_TESTING)
         const char * const Params::ATTR_PARAMS_TYPE = "ParamsType";
-    #endif // defined (THEKOGANS_CRYPTO_TESTING)
 
     } // namespace crypto
 } // namespace thekogans

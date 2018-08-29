@@ -61,7 +61,7 @@ namespace thekogans {
                 return Ed25519::SignBuffer (
                     digest.data (),
                     digest.size (),
-                    (const util::ui8 *)privateKey->GetKey (),
+                    ((Ed25519AsymmetricKey *)privateKey.Get ())->key.privateKey,
                     signature);
             }
             else {
