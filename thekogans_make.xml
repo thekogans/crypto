@@ -158,6 +158,7 @@
       <cpp_test>test_Params.cpp</cpp_test>
       <cpp_test>test_SymmetricKey.cpp</cpp_test>
       <cpp_test>test_SystemCACertificates.cpp</cpp_test>
+      <cpp_test>test_Version.cpp</cpp_test>
     </cpp_tests>
   </if>
 </thekogans_make>
