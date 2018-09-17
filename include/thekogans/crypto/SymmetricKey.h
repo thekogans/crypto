@@ -73,8 +73,8 @@ namespace thekogans {
             }
 
             /// \brief
-            /// Return the key length.
-            /// \return Key length.
+            /// Return the key length (in bytes).
+            /// \return Key length (in bytes).
             inline std::size_t GetKeyLength () const {
                 return key.GetDataAvailableForReading ();
             }
@@ -333,6 +333,10 @@ namespace thekogans {
             virtual void Write (util::Serializer &serializer) const;
 
         public:
+            /// \brief
+            /// "KeyLength"
+            static const char * const ATTR_KEY_LENGTH;
+
             /// \brief
             /// Return the XML representation of a key.
             /// \param[in] indentationLevel How far to indent the leading tag.

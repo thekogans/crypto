@@ -40,6 +40,7 @@ namespace thekogans {
 
         const char * const AsymmetricKey::ATTR_PRIVATE = "Private";
         const char * const AsymmetricKey::ATTR_KEY_TYPE = "KeyType";
+        const char * const AsymmetricKey::ATTR_KEY_LENGTH = "KeyLength";
 
     } // namespace crypto
 } // namespace thekogans

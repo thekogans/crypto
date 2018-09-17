@@ -483,6 +483,8 @@ namespace thekogans {
             }
         }
 
+        const char * const SymmetricKey::ATTR_KEY_LENGTH = "KeyLength";
+
         std::string SymmetricKey::ToString (
                 std::size_t indentationLevel,
                 const char *tagName) const {
@@ -492,6 +494,7 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
             attributes.push_back (util::Attribute (ATTR_NAME, name));
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
+            attributes.push_back (util::Attribute (ATTR_KEY_LENGTH, util::size_tTostring (GetKeyLength ())));
             stream <<
                 util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
                 util::HexEncodeBuffer (

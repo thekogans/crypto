@@ -20,8 +20,6 @@
 
 #include <cstddef>
 #include <string>
-#include <openssl/evp.h>
-#include <openssl/pem.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Serializable.h"

@@ -115,6 +115,9 @@ namespace thekogans {
             /// \brief
             /// "KeyType"
             static const char * const ATTR_KEY_TYPE;
+            /// \brief
+            /// "KeyLength"
+            static const char * const ATTR_KEY_LENGTH;
         };
 
         /// \brief

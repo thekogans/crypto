@@ -126,6 +126,7 @@ namespace thekogans {
             attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
             attributes.push_back (util::Attribute (ATTR_PRIVATE, util::boolTostring (IsPrivate ())));
             attributes.push_back (util::Attribute (ATTR_KEY_TYPE, GetKeyType ()));
+            attributes.push_back (util::Attribute (ATTR_KEY_LENGTH, util::size_tTostring (GetKeyLength ())));
             attributes.push_back (
                 util::Attribute (
                     ATTR_KEY,
