@@ -151,6 +151,7 @@
       <cpp_test>test_Authenticator.cpp</cpp_test>
       <cpp_test>test_Cipher.cpp</cpp_test>
       <cpp_test>test_CipherSuite.cpp</cpp_test>
+      <cpp_test>test_Curve25519.cpp</cpp_test>
       <cpp_test>test_KeyRing.cpp</cpp_test>
       <cpp_test>test_KeyExchange.cpp</cpp_test>
       <cpp_test>test_MAC.cpp</cpp_test>
