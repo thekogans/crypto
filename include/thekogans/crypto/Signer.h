@@ -212,7 +212,7 @@ namespace thekogans {
         /// \endcode
         #define THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)\
         namespace {\
-            thekogans::crypto::Signer::MapInitializer THEKOGANS_UTIL_UNIQUE_NAME (mapInitializer) (\
+            const thekogans::crypto::Signer::MapInitializer THEKOGANS_UTIL_UNIQUE_NAME (mapInitializer) (\
                 keyType, type::Create);\
         }
     #endif // defined (TOOLCHAIN_TYPE_Static)
