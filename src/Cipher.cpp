@@ -94,9 +94,7 @@ namespace thekogans {
                     plaintextLength,
                     ivCiphertextAndMAC + ciphertextHeader.ivLength);
                 std::size_t finalLength = encryptor.Final (
-                    ivCiphertextAndMAC +
-                    ciphertextHeader.ivLength +
-                    updateLength);
+                    ivCiphertextAndMAC + ciphertextHeader.ivLength + updateLength);
                 ciphertextHeader.ciphertextLength =
                     (util::ui32)(updateLength + finalLength);
                 if (mac.Get () != 0) {
@@ -286,10 +284,10 @@ namespace thekogans {
                 }
                 decryptor.Init (buffer.GetReadPtr ());
                 buffer.AdvanceReadOffset (ciphertextHeader.ivLength);
-                if (associatedData != 0) {
+                if (associatedData != 0 && associatedDataLength > 0) {
                     decryptor.SetAssociatedData (associatedData, associatedDataLength);
                 }
-                std::size_t plaintextLength = decryptor.Update (
+                std::size_t updateLength = decryptor.Update (
                     buffer.GetReadPtr (),
                     ciphertextHeader.ciphertextLength,
                     plaintext);
@@ -299,7 +297,8 @@ namespace thekogans {
                         buffer.GetReadPtr (),
                         ciphertextHeader.macLength);
                 }
-                return plaintextLength + decryptor.Final (plaintext);
+                std::size_t finalLength = decryptor.Final (plaintext + updateLength);
+                return updateLength + finalLength;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
