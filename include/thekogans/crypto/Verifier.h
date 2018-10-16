@@ -134,14 +134,16 @@ namespace thekogans {
             /// \param[in] buffer Buffer whose signature to verify.
             /// \param[in] bufferLength Buffer length.
             virtual void Update (
-                const void *buffer,
-                std::size_t bufferLength) = 0;
+                const void * /*buffer*/,
+                std::size_t /*bufferLength*/) = 0;
             /// \brief
             /// Finalize the verification operation.
+            /// \param[in] signature Signature to verify.
+            /// \param[in] signatureLength Signature length.
             /// \return true == signature matches, false == signature does not match..
             virtual bool Final (
-                const void *signature,
-                std::size_t signatureLength) = 0;
+                const void * /*signature*/,
+                std::size_t /*signatureLength*/) = 0;
         };
 
         /// \def THEKOGANS_CRYPTO_DECLARE_VERIFIER_COMMON(type)

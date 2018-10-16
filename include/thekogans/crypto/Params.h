@@ -62,9 +62,9 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return \see{AsymmetricKey} based on parameters.
             virtual AsymmetricKey::Ptr CreateKey (
-                const ID &id = ID (),
-                const std::string &name = std::string (),
-                const std::string &description = std::string ()) const = 0;
+                const ID & /*id*/ = ID (),
+                const std::string & /*name*/ = std::string (),
+                const std::string & /*description*/ = std::string ()) const = 0;
 
         protected:
             // Serializable

@@ -27,7 +27,7 @@ namespace thekogans {
         /// \struct OpenSSLVerifier OpenSSLVerifier.h thekogans/crypto/OpenSSLVerifier.h
         ///
         /// \brief
-        /// Verifier implements the public key signature verification operation using
+        /// OpenSSLVerifier implements the public key signature verification operation using
         /// various OpenSSL EVP_PKEY keys (RSA, DSA, EC).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLVerifier : public Verifier {
@@ -55,7 +55,9 @@ namespace thekogans {
                 std::size_t bufferLength);
             /// \brief
             /// Finalize the verification operation.
-            /// \return true == signature matches, false == signature does not match..
+            /// \param[in] signature Signature to verify.
+            /// \param[in] signatureLength Signature length.
+            /// \return true == signature matches, false == signature does not match.
             virtual bool Final (
                 const void *signature,
                 std::size_t signatureLength);

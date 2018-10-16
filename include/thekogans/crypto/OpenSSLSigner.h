@@ -27,7 +27,7 @@ namespace thekogans {
         /// \struct OpenSSLSigner OpenSSLSigner.h thekogans/crypto/OpenSSLSigner.h
         ///
         /// \brief
-        /// Signer implements the public key sign operation using
+        /// OpenSSLSigner implements the public key sign operation using
         /// various OpenSSL EVP_PKEY keys (RSA, DSA, EC).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLSigner : public Signer {

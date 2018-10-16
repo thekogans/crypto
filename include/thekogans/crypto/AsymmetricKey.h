@@ -85,9 +85,9 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public part of the private key (or duplicate of the pubilc key).
             virtual Ptr GetPublicKey (
-                const ID &id = ID (),
-                const std::string &name = std::string (),
-                const std::string &description = std::string ()) const = 0;
+                const ID & /*id*/ = ID (),
+                const std::string & /*name*/ = std::string (),
+                const std::string & /*description*/ = std::string ()) const = 0;
 
         protected:
             // Serializable

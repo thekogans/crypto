@@ -29,7 +29,7 @@ namespace thekogans {
         /// \struct Ed25519Signer Ed25519Signer.h thekogans/crypto/Ed25519Signer.h
         ///
         /// \brief
-        /// Signer implements the public key sign operation using \see{Ed25519} keys.
+        /// Ed25519Signer implements the public key sign operation using \see{Ed25519} keys.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Signer : public Signer {
             /// \brief
@@ -39,7 +39,7 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] privateKey Private key.
-            /// \param[in] md OpenSSL message digest to use.
+            /// \param[in] messageDigest Message digest object.
             Ed25519Signer (
                 AsymmetricKey::Ptr privateKey,
                 MessageDigest::Ptr messageDigest);
@@ -48,7 +48,7 @@ namespace thekogans {
             /// Initialize the signer and get it ready for the next signature.
             virtual void Init ();
             /// \brief
-            /// Call this method 1 or more time to sign the buffers.
+            /// Call this method 1 or more times to sign the buffers.
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
             virtual void Update (

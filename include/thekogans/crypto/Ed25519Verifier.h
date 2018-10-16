@@ -29,7 +29,7 @@ namespace thekogans {
         /// \struct Ed25519Verifier Ed25519Verifier.h thekogans/crypto/Ed25519Verifier.h
         ///
         /// \brief
-        /// Verifier implements the public key signature verification operation
+        /// Ed25519Verifier implements the public key signature verification operation
         /// using \see{Ed25519} keys.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Verifier : public Verifier {
@@ -40,7 +40,6 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] publicKey Public key.
-            /// \param[in] md OpenSSL message digest to use.
             /// \param[in] messageDigest Message digest object.
             Ed25519Verifier (
                 AsymmetricKey::Ptr publicKey,
@@ -58,7 +57,9 @@ namespace thekogans {
                 std::size_t bufferLength);
             /// \brief
             /// Finalize the verification operation.
-            /// \return true == signature matches, false == signature does not match..
+            /// \param[in] signature Signature to verify.
+            /// \param[in] signatureLength Signature length.
+            /// \return true == signature matches, false == signature does not match.
             virtual bool Final (
                 const void *signature,
                 std::size_t signatureLength);

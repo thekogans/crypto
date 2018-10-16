@@ -135,13 +135,13 @@ namespace thekogans {
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
             virtual void Update (
-                const void *buffer,
-                std::size_t bufferLength) = 0;
+                const void * /*buffer*/,
+                std::size_t /*bufferLength*/) = 0;
             /// \brief
             /// Finalize the signing operation and return the signature.
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
-            virtual std::size_t Final (util::ui8 *signature) = 0;
+            virtual std::size_t Final (util::ui8 * /*signature*/) = 0;
 
             /// \brief
             /// Finalize the signing operation and return the signature.
