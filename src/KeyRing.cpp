@@ -45,7 +45,7 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             util::ReadOnlyFile file (util::NetworkEndian, path);
-            util::Buffer buffer (util::NetworkEndian, file.GetSize ());
+            util::Buffer buffer (util::NetworkEndian, (std::size_t)file.GetSize ());
             buffer.AdvanceWriteOffset (
                 file.Read (
                     buffer.GetWritePtr (),
