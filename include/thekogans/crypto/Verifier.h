@@ -103,7 +103,7 @@ namespace thekogans {
             static Ptr Get (
                 AsymmetricKey::Ptr privateKey,
                 MessageDigest::Ptr messageDigest);
-        #if defined (TOOLCHAIN_TYPE_Static)
+        #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             /// \brief
             /// Because Verifier uses dynamic initialization, when using
             /// it in static builds call this method to have the Verifier
@@ -111,7 +111,7 @@ namespace thekogans {
             /// calling this api, the only verifiers that will be available
             /// to your application are the ones you explicitly link to.
             static void StaticInit ();
-        #endif // defined (TOOLCHAIN_TYPE_Static)
+        #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
             /// \brief
             /// Return the verifier public key.
@@ -156,7 +156,7 @@ namespace thekogans {
                 return thekogans::crypto::Verifier::Ptr (new type (publicKey, messageDigest));\
             }
 
-    #if defined (TOOLCHAIN_TYPE_Static)
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         /// \def THEKOGANS_CRYPTO_DECLARE_VERIFIER(type)
         /// Dynamic discovery macro. Add this to your class declaration.
         /// Example:
@@ -186,7 +186,7 @@ namespace thekogans {
         /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
         /// \endcode
         #define THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER(type, keyType)
-    #else // defined (TOOLCHAIN_TYPE_Static)
+    #else // defined (THEKOGANS_CRYPTO_TYPE_Static)
         /// \def THEKOGANS_CRYPTO_DECLARE_VERIFIER(type)
         /// Dynamic discovery macro. Add this to your class declaration.
         /// Example:
@@ -212,7 +212,7 @@ namespace thekogans {
             const thekogans::crypto::Verifier::MapInitializer THEKOGANS_UTIL_UNIQUE_NAME (mapInitializer) (\
                 keyType, type::Create);\
         }
-    #endif // defined (TOOLCHAIN_TYPE_Static)
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans

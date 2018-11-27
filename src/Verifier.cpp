@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (TOOLCHAIN_TYPE_Static)
+#if defined (THEKOGANS_CRYPTO_TYPE_Static)
     #include "thekogans/util/SpinLock.h"
     #include "thekogans/util/LockGuard.h"
-#endif // defined (TOOLCHAIN_TYPE_Static)
+#endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/OpenSSLVerifier.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/Ed25519Verifier.h"
@@ -63,7 +63,7 @@ namespace thekogans {
             return it != GetMap ().end () ? it->second (privateKey, messageDigest) : Verifier::Ptr ();
         }
 
-    #if defined (TOOLCHAIN_TYPE_Static)
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Verifier::StaticInit () {
             static volatile bool registered = false;
             static util::SpinLock spinLock;
@@ -76,7 +76,7 @@ namespace thekogans {
                 registered = true;
             }
         }
-    #endif // defined (TOOLCHAIN_TYPE_Static)
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans

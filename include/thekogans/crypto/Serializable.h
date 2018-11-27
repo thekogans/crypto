@@ -66,7 +66,7 @@ namespace thekogans {
                 name (name_),
                 description (description_) {}
 
-        #if defined (TOOLCHAIN_TYPE_Static)
+        #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             /// \brief
             /// Because Serializable uses dynamic initialization, when using
             /// it in static builds call this method to have the Serializable
@@ -75,7 +75,7 @@ namespace thekogans {
             /// to your application are the ones you explicitly link to.
             /// NOTE: If you're using OpenSSLInit, this call is done for you.
             static void StaticInit ();
-        #endif // defined (TOOLCHAIN_TYPE_Static)
+        #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
             /// \brief
             /// Return the serializable id.

@@ -32,7 +32,7 @@
 namespace thekogans {
     namespace crypto {
 
-    #if defined (TOOLCHAIN_TYPE_Static)
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Serializable::StaticInit () {
             static volatile bool registered = false;
             static util::SpinLock spinLock;
@@ -51,7 +51,7 @@ namespace thekogans {
                 registered = true;
             }
         }
-    #endif // defined (TOOLCHAIN_TYPE_Static)
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
         std::size_t Serializable::Size () const {
             return
