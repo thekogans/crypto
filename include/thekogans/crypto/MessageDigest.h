@@ -38,7 +38,8 @@ namespace thekogans {
         /// any order. MessageDigest is designed to be reused. It will reset it's
         /// internal state after every sign/verify operation ready for the next.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL MessageDigest : public util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL MessageDigest :
+                public virtual util::ThreadSafeRefCounted {
             /// \brief
             /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<MessageDigest>.
             typedef util::ThreadSafeRefCounted::Ptr<MessageDigest> Ptr;

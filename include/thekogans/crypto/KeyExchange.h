@@ -40,7 +40,8 @@ namespace thekogans {
         /// keys, you need to instantiate multiple KeyExchange (\see{DHEKeyExchange}
         /// or/and \see{RSAKeyExchange}) instances.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange : public util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange :
+                public virtual util::ThreadSafeRefCounted {
             /// \brief
             /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<KeyExchange>.
             typedef util::ThreadSafeRefCounted::Ptr<KeyExchange> Ptr;

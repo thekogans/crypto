@@ -41,7 +41,8 @@ namespace thekogans {
         /// be reused. It will reset it's internal state after every sign/verify
         /// operation ready for the next.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Authenticator : public util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Authenticator :
+                public virtual util::ThreadSafeRefCounted {
             /// \brief
             /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Authenticator>.
             typedef util::ThreadSafeRefCounted::Ptr<Authenticator> Ptr;

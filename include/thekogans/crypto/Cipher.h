@@ -43,7 +43,8 @@ namespace thekogans {
         /// https://moxie.org/blog/the-cryptographic-doom-principle/. See the description
         /// of Cipher::Encrypt for more information.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Cipher : public util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Cipher :
+                public virtual util::ThreadSafeRefCounted {
             /// \brief
             /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Cipher>.
             typedef util::ThreadSafeRefCounted::Ptr<Cipher> Ptr;
