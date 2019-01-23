@@ -20,6 +20,7 @@
 
 #include "thekogans/util/Types.h"
 #include "thekogans/util/Serializer.h"
+#include "thekogans/util/ValueParser.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/ID.h"
 
@@ -99,6 +100,60 @@ namespace thekogans {
         }
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \struct ValueParser<FrameHeader> FrameHeader.h thekogans/crypto/FrameHeader.h
+        ///
+        /// \brief
+        /// Specialization of ValueParser for \see{FrameHeader}.
+
+        template<>
+        struct _LIB_THEKOGANS_CRYPTO_DECL ValueParser<crypto::FrameHeader> {
+        private:
+            /// \brief
+            /// String to parse.
+            crypto::FrameHeader &value;
+            /// \brief
+            /// Parses \see{FrameHeader::keyId}.
+            ValueParser<crypto::ID> keyIdParser;
+            /// \brief
+            /// Parses \see{FrameHeader::ciphertextLength}.
+            ValueParser<ui32> ciphertextLengthParser;
+            /// \enum
+            /// \see{FrameHeader} parser is a state machine. These are it's various states.
+            enum {
+                /// \brief
+                /// Next value to parse is the \see{FrameHeader::keyId}.
+                STATE_KEY_ID,
+                /// \brief
+                /// Next value to parse is the \see{FrameHeader::ciphertextLength}.
+                STATE_CIPHERTEXT_LENGTH
+            } state;
+
+        public:
+            /// \brief
+            /// ctor.
+            /// \param[out] value_ Value to parse.
+            explicit ValueParser (crypto::FrameHeader &value_) :
+                value (value_),
+                keyIdParser (value.keyId),
+                ciphertextLengthParser (value.ciphertextLength),
+                state (STATE_KEY_ID) {}
+
+            /// \brief
+            /// Rewind the sub-parsers to get them ready for the next value.
+            void Reset ();
+
+            /// \brief
+            /// Try to parse a \see{FrameHeader} from the given serializer.
+            /// \param[in] serializer Contains a complete or partial \see{FrameHeader}.
+            /// \return true == \see{FrameHeader} was successfully parsed,
+            /// false == call back with more data.
+            bool ParseValue (Serializer &serializer);
+        };
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_FrameHeader_h)

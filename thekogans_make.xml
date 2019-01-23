@@ -118,6 +118,7 @@
     <cpp_source>Ed25519Signer.cpp</cpp_source>
     <cpp_source>Ed25519Verifier.cpp</cpp_source>
     <cpp_source>Encryptor.cpp</cpp_source>
+    <cpp_source>FrameHeader.cpp</cpp_source>
     <cpp_source>HMAC.cpp</cpp_source>
     <cpp_source>ID.cpp</cpp_source>
     <cpp_source>KeyExchange.cpp</cpp_source>
