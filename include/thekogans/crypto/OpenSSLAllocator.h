@@ -33,6 +33,11 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLAllocator : public util::Allocator {
             /// \brief
+            /// OpenSSLAllocator participates in the \see{util::Allocator} dynamic
+            /// discovery and creation.
+            THEKOGANS_UTIL_DECLARE_ALLOCATOR (OpenSSLAllocator)
+
+            /// \brief
             /// Global OpenSSLAllocator.
             static OpenSSLAllocator Global;
 

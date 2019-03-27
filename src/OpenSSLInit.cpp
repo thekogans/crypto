@@ -34,6 +34,7 @@
     #include "thekogans/crypto/Blake2s.h"
 #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+    #include "thekogans/crypto/OpenSSLAllocator.h"
     #include "thekogans/crypto/Serializable.h"
     #include "thekogans/crypto/Signer.h"
     #include "thekogans/crypto/Verifier.h"
@@ -107,6 +108,7 @@ namespace thekogans {
                 util::ui32 entropyNeeded,
                 util::ui64 workingSetSize) {
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+            OpenSSLAllocator::StaticInit ();
             Serializable::StaticInit ();
             Signer::StaticInit ();
             Verifier::StaticInit ();

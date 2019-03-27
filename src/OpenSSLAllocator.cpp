@@ -21,6 +21,8 @@
 namespace thekogans {
     namespace crypto {
 
+        THEKOGANS_UTIL_IMPLEMENT_ALLOCATOR (OpenSSLAllocator)
+
         OpenSSLAllocator OpenSSLAllocator::Global;
 
         void *OpenSSLAllocator::Alloc (std::size_t size) {
