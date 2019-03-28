@@ -106,7 +106,7 @@ namespace thekogans {
         /// \struct ValueParser<FrameHeader> FrameHeader.h thekogans/crypto/FrameHeader.h
         ///
         /// \brief
-        /// Specialization of ValueParser for \see{FrameHeader}.
+        /// Specialization of \see{util::ValueParser} for \see{FrameHeader}.
 
         template<>
         struct _LIB_THEKOGANS_CRYPTO_DECL ValueParser<crypto::FrameHeader> {
