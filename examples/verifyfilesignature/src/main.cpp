@@ -73,7 +73,8 @@ int main (
         crypto::OpenSSLInit openSSLInit;
         std::cout << "Verifying '" << options.path << "'...";
         crypto::Authenticator authenticator (
-            crypto::OpenSSLAsymmetricKey::LoadPublicKeyFromFile (options.publicKey));
+            crypto::OpenSSLAsymmetricKey::LoadPublicKeyFromFile (options.publicKey),
+            crypto::MessageDigest::Ptr (new crypto::MessageDigest));
         util::ReadOnlyFile signatureFile (util::NetworkEndian, options.path + ".sig");
         util::Buffer encodedSignature (util::NetworkEndian, signatureFile.GetSize ());
         encodedSignature.AdvanceWriteOffset (
