@@ -89,7 +89,7 @@ namespace thekogans {
             /// \param[in] publicKey_ Public key.
             /// \param[in] messageDigest_ Message digest object.
             Verifier (
-                AsymmetricKey::Ptr privateKey_,
+                AsymmetricKey::Ptr publicKey_,
                 MessageDigest::Ptr messageDigest_);
             /// \brief
             /// dtor.
@@ -97,11 +97,11 @@ namespace thekogans {
 
             /// \brief
             /// Used for Verifier dynamic discovery and creation.
-            /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
+            /// \param[in] publicKey Public \see{AsymmetricKey} used for signing.
             /// \param[in] messageDigest Message digest object.
-            /// \return A Verifier based on the passed in privateKey type.
+            /// \return A Verifier based on the passed in publicKey type.
             static Ptr Get (
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::Ptr publicKey,
                 MessageDigest::Ptr messageDigest);
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             /// \brief
@@ -184,6 +184,7 @@ namespace thekogans {
         /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_RSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_DSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
         /// \endcode
         #define THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER(type, keyType)
     #else // defined (THEKOGANS_CRYPTO_TYPE_Static)
@@ -206,6 +207,7 @@ namespace thekogans {
         /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_RSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_DSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
         /// \endcode
         #define THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER(type, keyType)\
         namespace {\

@@ -75,25 +75,27 @@ namespace thekogans {
 
             /// \brief
             /// Read the parameters from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::BinHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the parameters from.
             virtual void Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer);
             /// \brief
             /// Write the parameters to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to write the parameters to.
             virtual void Write (util::Serializer &serializer) const;
 
-        public:
             /// \brief
-            /// Return the XML representation of parameters.
-            /// \param[in] indentationLevel How far to indent the leading tag.
-            /// \param[in] tagName The name of the leading tag.
-            /// \return XML representation of parameters.
-            virtual std::string ToString (
-                std::size_t indentationLevel = 0,
-                const char *tagName = TAG_SERIALIZABLE) const;
+            /// Read a Serializable from an XML DOM.
+            /// \param[in] header \see{util::Serializable::TextHeader}.
+            /// \param[in] node XML DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader &header,
+                const pugi::xml_node &node);
+            /// \brief
+            /// Write a Serializable to the XML DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (pugi::xml_node &node) const;
 
             /// \brief
             /// Ed25519Params is neither copy constructable, nor assignable.
@@ -101,10 +103,18 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement Ed25519Params extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (Ed25519Params)
+        /// Implement Ed25519Params extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (Ed25519Params)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement Ed25519Params value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::Ed25519Params)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_Ed25519Params_h)

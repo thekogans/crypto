@@ -61,7 +61,16 @@ namespace thekogans {
         }
 
         ID::ID (const std::string &id) {
-            HashBuffer (id.c_str (), id.size (), data);
+            if (id.size () == SIZE * 2) {
+                if (util::HexDecodestring (id, data) != SIZE) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s is not an ID.", id.c_str ());
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
         }
 
         ID::ID (util::Serializer &serializer) {

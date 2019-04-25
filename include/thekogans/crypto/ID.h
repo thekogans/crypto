@@ -55,7 +55,7 @@ namespace thekogans {
                 std::size_t length = 0);
             /// \brief
             /// ctor.
-            /// \param[in] id String to hash in to id.
+            /// \param[in] id Hex encoded id.
             explicit ID (const std::string &id);
             /// \brief
             /// ctor. Initialize to a given value.

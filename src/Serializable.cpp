@@ -61,7 +61,7 @@ namespace thekogans {
         }
 
         void Serializable::Read (
-                const Header & /*header*/,
+                const BinHeader & /*header*/,
                 util::Serializer &serializer) {
             serializer >> id >> name >> description;
         }
@@ -70,11 +70,23 @@ namespace thekogans {
             serializer << id << name << description;
         }
 
-        const char * const Serializable::TAG_SERIALIZABLE = "Serializable";
-        const char * const Serializable::ATTR_TYPE = "Type";
         const char * const Serializable::ATTR_ID = "Id";
         const char * const Serializable::ATTR_NAME = "Name";
         const char * const Serializable::ATTR_DESCRIPTION = "Description";
+
+        void Serializable::Read (
+                const TextHeader & /*header*/,
+                const pugi::xml_node &node) {
+            id = node.attribute (ATTR_ID).value ();
+            name = node.attribute (ATTR_NAME).value ();
+            description = node.attribute (ATTR_DESCRIPTION).value ();
+        }
+
+        void Serializable::Write (pugi::xml_node &node) const {
+            node.append_attribute (ATTR_ID).set_value (id.ToString ().c_str ());
+            node.append_attribute (ATTR_NAME).set_value (name.c_str ());
+            node.append_attribute (ATTR_DESCRIPTION).set_value (description.c_str ());
+        }
 
     } // namespace crypto
 } // namespace thekogans

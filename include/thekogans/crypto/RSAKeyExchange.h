@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 #include "thekogans/util/Serializable.h"
 #include "thekogans/util/SpinLock.h"
 #include "thekogans/crypto/Config.h"
@@ -42,7 +43,6 @@ namespace thekogans {
         /// \see{RSA} keys no smaller than 2048 bits, this limitation shouldn't be an issue.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL RSAKeyExchange : public KeyExchange {
-        private:
             /// \struct RSAKeyExchange::RSAParams RSAKeyExchange.h thekogans/crypto/RSAKeyExchange.h
             ///
             /// \brief
@@ -57,7 +57,7 @@ namespace thekogans {
                 ID keyId;
                 /// \brief
                 /// Encrypted \see{SymmetricKey} (client). \see{SymmetricKey} signature (server).
-                util::Buffer buffer;
+                std::vector<util::ui8> buffer;
 
                 /// \brief
                 /// ctor.
@@ -68,10 +68,10 @@ namespace thekogans {
                 RSAParams (
                     const ID &id,
                     const ID &keyId_,
-                    util::Buffer buffer_) :
+                    const std::vector<util::ui8> &buffer_) :
                     Params (id),
                     keyId (keyId_),
-                    buffer (std::move (buffer_)) {}
+                    buffer (buffer_) {}
 
                 /// \brief
                 /// Given my private \see{AsymmetricKey}, create a signature over the parameters.
@@ -98,24 +98,37 @@ namespace thekogans {
                 virtual std::size_t Size () const;
 
                 /// Read the serializable from the given serializer.
-                /// \param[in] header \see{util::Serializable::Header}.
+                /// \param[in] header \see{util::Serializable::BinHeader}.
                 /// \param[in] serializer \see{util::Serializer} to read the serializable from.
                 virtual void Read (
-                    const Header &header,
+                    const BinHeader &header,
                     util::Serializer &serializer);
                 /// \brief
                 /// Write the serializable to the given serializer.
                 /// \param[out] serializer \see{util::Serializer} to write the serializable to.
                 virtual void Write (util::Serializer &serializer) const;
+
+                /// \brief
+                /// "KeyId"
+                static const char * const ATTR_KEY_ID;
+                /// \brief
+                /// "Buffer"
+                static const char * const ATTR_BUFFER;
+
+                /// \brief
+                /// Read the Serializable from an XML DOM.
+                /// \param[in] header \see{util::Serializable::TextHeader}.
+                /// \param[in] node XML DOM representation of a Serializable.
+                virtual void Read (
+                    const TextHeader &header,
+                    const pugi::xml_node &node);
+                /// \brief
+                /// Write the Serializable to the XML DOM.
+                /// \param[out] node Parent node.
+                virtual void Write (pugi::xml_node &node) const;
             };
 
-            /// \brief
-            /// \see{Serializable} needs access to RSAParams.
-            friend struct Serializable;
-            /// \brief
-            /// \see{KeyRing} needs access to RSAParams.
-            friend struct KeyRing;
-
+        private:
             /// \brief
             /// Private/public \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
             AsymmetricKey::Ptr key;
@@ -140,8 +153,8 @@ namespace thekogans {
             /// \param[in] md OpenSSL message digest to use for the signing operation.
             /// \param[in] count A security counter. Increment the count to slow down key derivation.
             /// \param[in] keyId Optional key id.
-            /// \param[in] name Optional key name.
-            /// \param[in] description Optional key description.
+            /// \param[in] keyName Optional key name.
+            /// \param[in] keyDescription Optional key description.
             RSAKeyExchange (
                 const ID &id,
                 AsymmetricKey::Ptr key_,
@@ -152,8 +165,8 @@ namespace thekogans {
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
                 const ID &keyId = ID (),
-                const std::string &name = std::string (),
-                const std::string &description = std::string ());
+                const std::string &keyName = std::string (),
+                const std::string &keyDescription = std::string ());
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
             /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
@@ -183,7 +196,19 @@ namespace thekogans {
             THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (RSAKeyExchange)
         };
 
+        /// \brief
+        /// Implement RSAKeyExchange::RSAParams extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (RSAKeyExchange::RSAParams)
+
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement RSAKeyExchange::RSAParams value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::RSAKeyExchange::RSAParams)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_RSAKeyExchange_h)

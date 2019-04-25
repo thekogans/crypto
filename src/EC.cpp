@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include "thekogans/util/Exception.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLParams.h"
@@ -1266,6 +1267,81 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             return Params::Ptr (new X25519Params (id, name, description));
+        }
+
+        Params::Ptr EC::ParamsFromCurveName (
+                const std::string &curveName,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) {
+            if (curveName == "RFC5114_CURVE_192") {
+                return ParamsFromRFC5114Curve (RFC5114_CURVE_192, id, name, description);
+            }
+            else if (curveName == "RFC5114_CURVE_224") {
+                return ParamsFromRFC5114Curve (RFC5114_CURVE_224, id, name, description);
+            }
+            else if (curveName == "RFC5114_CURVE_256") {
+                return ParamsFromRFC5114Curve (RFC5114_CURVE_256, id, name, description);
+            }
+            else if (curveName == "RFC5114_CURVE_384") {
+                return ParamsFromRFC5114Curve (RFC5114_CURVE_384, id, name, description);
+            }
+            else if (curveName == "RFC5114_CURVE_521") {
+                return ParamsFromRFC5114Curve (RFC5114_CURVE_521, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_160") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_160, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_160_T") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_160_T, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_192") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_192, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_192_T") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_192_T, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_224") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_224, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_224_T") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_224_T, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_256") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_256, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_256_T") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_256_T, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_320") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_320, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_320_T") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_320_T, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_384") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_384, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_384_T") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_384_T, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_512") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_512, id, name, description);
+            }
+            else if (curveName == "RFC5639_CURVE_512_T") {
+                return ParamsFromRFC5639Curve (RFC5639_CURVE_512_T, id, name, description);
+            }
+            else if (curveName == Ed25519AsymmetricKey::KEY_TYPE) {
+                return ParamsFromEd25519Curve (id, name, description);
+            }
+            else if (curveName == X25519AsymmetricKey::KEY_TYPE) {
+                return ParamsFromX25519Curve (id, name, description);
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unknown curve name: %s",
+                    curveName.c_str ());
+            }
         }
 
     } // namespace crypto

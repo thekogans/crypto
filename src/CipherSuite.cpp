@@ -21,6 +21,9 @@
 #include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/HMAC.h"
 #include "thekogans/crypto/CMAC.h"
+#include "thekogans/crypto/DSA.h"
+#include "thekogans/crypto/RSA.h"
+#include "thekogans/crypto/EC.h"
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
     #include "thekogans/crypto/Blake2b.h"
     #include "thekogans/crypto/Blake2s.h"
@@ -37,6 +40,7 @@ namespace thekogans {
         const char * const CipherSuite::AUTHENTICATOR_ECDSA = "ECDSA";
         const char * const CipherSuite::AUTHENTICATOR_DSA = "DSA";
         const char * const CipherSuite::AUTHENTICATOR_RSA = "RSA";
+        const char * const CipherSuite::AUTHENTICATOR_Ed25519 = "Ed25519";
 
         const char * const CipherSuite::CIPHER_AES_256_GCM = "AES-256-GCM";
         const char * const CipherSuite::CIPHER_AES_192_GCM = "AES-192-GCM";
@@ -72,27 +76,6 @@ namespace thekogans {
             }
         }
 
-        CipherSuite::CipherSuite (const std::string &cipherSuite) {
-            std::string::size_type keyExchangeSeparator = cipherSuite.find_first_of ('_');
-            keyExchange = cipherSuite.substr (0, keyExchangeSeparator++);
-            std::string::size_type authenticatorSeparator =
-                cipherSuite.find_first_of ('_', keyExchangeSeparator);
-            authenticator = cipherSuite.substr (
-                keyExchangeSeparator,
-                authenticatorSeparator++ - keyExchangeSeparator);
-            std::string::size_type cipherSeparator =
-                cipherSuite.find_first_of ('_', authenticatorSeparator);
-            cipher = cipherSuite.substr (
-                authenticatorSeparator,
-                cipherSeparator++ - authenticatorSeparator);
-            messageDigest = cipherSuite.substr (cipherSeparator);
-            if (!IsValid ()) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid cipher suite: %s",
-                    cipherSuite.c_str ());
-            }
-        }
-
         CipherSuite::CipherSuite (util::Serializer &serializer) {
             serializer >> keyExchange >> authenticator >> cipher >> messageDigest;
             if (!IsValid ()) {
@@ -100,6 +83,10 @@ namespace thekogans {
                     "Invalid cipher suite: %s",
                     ToString ().c_str ());
             }
+        }
+
+        CipherSuite::CipherSuite (const std::string &cipherSuite) {
+            Parse (cipherSuite);
         }
 
         CipherSuite::CipherSuite (const CipherSuite &cipherSuite) :
@@ -112,6 +99,11 @@ namespace thekogans {
                     "Invalid cipher suite: %s",
                     ToString ().c_str ());
             }
+        }
+
+        CipherSuite &CipherSuite::operator = (const std::string &cipherSuite) {
+            Parse (cipherSuite);
+            return *this;
         }
 
         CipherSuite &CipherSuite::operator = (const CipherSuite &cipherSuite) {
@@ -140,7 +132,8 @@ namespace thekogans {
             const char *authenticators[] = {
                 CipherSuite::AUTHENTICATOR_ECDSA,
                 CipherSuite::AUTHENTICATOR_DSA,
-                CipherSuite::AUTHENTICATOR_RSA
+                CipherSuite::AUTHENTICATOR_RSA,
+                CipherSuite::AUTHENTICATOR_Ed25519
             };
             const std::size_t authenticatorsSize = THEKOGANS_UTIL_ARRAY_SIZE (authenticators);
 
@@ -404,7 +397,8 @@ namespace thekogans {
                 (authenticator == CipherSuite::AUTHENTICATOR_ECDSA &&
                     (type == OPENSSL_PKEY_EC || type == Ed25519AsymmetricKey::KEY_TYPE)) ||
                 (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == OPENSSL_PKEY_DSA) ||
-                (authenticator == CipherSuite::AUTHENTICATOR_RSA && type == OPENSSL_PKEY_RSA);
+                (authenticator == CipherSuite::AUTHENTICATOR_RSA && type == OPENSSL_PKEY_RSA) ||
+                (authenticator == CipherSuite::AUTHENTICATOR_Ed25519 && type == Ed25519AsymmetricKey::KEY_TYPE);
         }
 
         bool CipherSuite::VerifyCipherKey (const SymmetricKey &key) const {
@@ -424,8 +418,8 @@ namespace thekogans {
                 std::size_t saltLength,
                 std::size_t count,
                 const ID &keyId,
-                const std::string &name,
-                const std::string &description) const {
+                const std::string &keyName,
+                const std::string &keyDescription) const {
             if (params.Get () != 0 && VerifyKeyExchangeParams (*params)) {
                 return KeyExchange::Ptr (
                     new DHEKeyExchange (
@@ -437,8 +431,8 @@ namespace thekogans {
                         GetOpenSSLMessageDigest (),
                         count,
                         keyId,
-                        name,
-                        description));
+                        keyName,
+                        keyDescription));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -454,8 +448,8 @@ namespace thekogans {
                 std::size_t saltLength,
                 std::size_t count,
                 const ID &keyId,
-                const std::string &name,
-                const std::string &description) const {
+                const std::string &keyName,
+                const std::string &keyDescription) const {
             if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
                 return KeyExchange::Ptr (
                     new RSAKeyExchange (
@@ -468,8 +462,8 @@ namespace thekogans {
                         GetOpenSSLMessageDigest (),
                         count,
                         keyId,
-                        name,
-                        description));
+                        keyName,
+                        keyDescription));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -525,6 +519,80 @@ namespace thekogans {
         MessageDigest::Ptr CipherSuite::GetMessageDigest () const {
             return MessageDigest::Ptr (
                 new MessageDigest (GetOpenSSLMessageDigestByName (messageDigest)));
+        }
+
+        AsymmetricKey::Ptr CipherSuite::CreateAuthenticatorKey (
+                std::size_t keyLength,
+                BIGNUMPtr RSAPublicExponent,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) const {
+            if (!IsAuthenticatorEC ()) {
+                if (authenticator == AUTHENTICATOR_DSA) {
+                    return crypto::DSA::ParamsFromKeyLength (keyLength, id, name, description)->CreateKey ();
+                }
+                else if (authenticator == AUTHENTICATOR_RSA) {
+                    return crypto::RSA::CreateKey (keyLength,
+                        std::move (RSAPublicExponent), id, name, description);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unknown authenticator: %s",
+                        authenticator.c_str ());
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid authenticator: %s",
+                    authenticator.c_str ());
+            }
+        }
+
+        AsymmetricKey::Ptr CipherSuite::CreateAuthenticatorKey (
+                const std::string curveName,
+                const ID &id,
+                const std::string &name,
+                const std::string &description) const {
+            if (IsAuthenticatorEC ()) {
+                if (authenticator == AUTHENTICATOR_ECDSA || authenticator == AUTHENTICATOR_Ed25519) {
+                    return EC::ParamsFromCurveName (curveName)->CreateKey ();
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unknown authenticator: %s",
+                        authenticator.c_str ());
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid authenticator: %s",
+                    authenticator.c_str ());
+            }
+        }
+
+        void CipherSuite::Parse (const std::string &cipherSuite) {
+            keyExchange.clear ();
+            authenticator.clear ();
+            cipher.clear ();
+            messageDigest.clear ();
+            std::string::size_type keyExchangeSeparator = cipherSuite.find_first_of ('_');
+            keyExchange = cipherSuite.substr (0, keyExchangeSeparator++);
+            std::string::size_type authenticatorSeparator =
+                cipherSuite.find_first_of ('_', keyExchangeSeparator);
+            authenticator = cipherSuite.substr (
+                keyExchangeSeparator,
+                authenticatorSeparator++ - keyExchangeSeparator);
+            std::string::size_type cipherSeparator =
+                cipherSuite.find_first_of ('_', authenticatorSeparator);
+            cipher = cipherSuite.substr (
+                authenticatorSeparator,
+                cipherSeparator++ - authenticatorSeparator);
+            messageDigest = cipherSuite.substr (cipherSeparator);
+            if (!IsValid ()) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid cipher suite: %s",
+                    cipherSuite.c_str ());
+            }
         }
 
     } // namespace crypto

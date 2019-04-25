@@ -31,14 +31,14 @@
 namespace thekogans {
     namespace crypto {
 
-        #if !defined (THEKOGANS_CRYPTO_MIN_PARAMS_IN_PAGE)
-            #define THEKOGANS_CRYPTO_MIN_PARAMS_IN_PAGE 16
-        #endif // !defined (THEKOGANS_CRYPTO_MIN_PARAMS_IN_PAGE)
+        #if !defined (THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE)
+            #define THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE 16
+        #endif // !defined (THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE)
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             OpenSSLParams,
             1,
-            THEKOGANS_CRYPTO_MIN_PARAMS_IN_PAGE)
+            THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE)
 
         OpenSSLParams::OpenSSLParams (
                 EVP_PKEYPtr params_,
@@ -48,10 +48,10 @@ namespace thekogans {
                 Params (id, name, description),
                 params (std::move (params_)) {
             if (params.get () != 0) {
-                const char *type = GetKeyType ();
-                if (type != OPENSSL_PKEY_DH && type != OPENSSL_PKEY_DSA && type != OPENSSL_PKEY_EC) {
+                const char *paramsType = GetKeyType ();
+                if (paramsType != OPENSSL_PKEY_DH && paramsType != OPENSSL_PKEY_DSA && paramsType != OPENSSL_PKEY_EC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid parameters type %d.", type);
+                        "Invalid parameters type %d.", paramsType);
                 }
             }
             else {
@@ -80,13 +80,13 @@ namespace thekogans {
 
         OpenSSLParams::Ptr OpenSSLParams::LoadFromFile (
                 const std::string &path,
-                util::i32 type,
+                util::i32 paramsType,
                 pem_password_cb *passwordCallback,
                 void *userData,
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (type == EVP_PKEY_DH) {
+            if (paramsType == EVP_PKEY_DH) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
                 if (bio.get () != 0) {
                     DHPtr dhParams (PEM_read_bio_DHparams (bio.get (), 0, passwordCallback, userData));
@@ -113,7 +113,7 @@ namespace thekogans {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
-            else if (type == EVP_PKEY_DSA) {
+            else if (paramsType == EVP_PKEY_DSA) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
                 if (bio.get () != 0) {
                     DSAPtr dsaParams (PEM_read_bio_DSAparams (bio.get (), 0, passwordCallback, userData));
@@ -140,7 +140,7 @@ namespace thekogans {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
-            else if (type == EVP_PKEY_EC) {
+            else if (paramsType == EVP_PKEY_EC) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
                 if (bio.get () != 0) {
                     EC_GROUPPtr curve (PEM_read_bio_ECPKParameters (bio.get (), 0, passwordCallback, userData));
@@ -176,29 +176,29 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid parameters type %d.", type);
+                    "Invalid parameters type %d.", paramsType);
             }
         }
 
         void OpenSSLParams::Save (const std::string &path) const {
             BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
             if (bio.get () != 0) {
-                const char *type = GetKeyType ();
-                if (type == OPENSSL_PKEY_DH) {
+                const char *paramsType = GetKeyType ();
+                if (paramsType == OPENSSL_PKEY_DH) {
                     DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
                     if (dhParams.get () == 0 ||
                             PEM_write_bio_DHparams (bio.get (), dhParams.get ()) == 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else if (type == OPENSSL_PKEY_DSA) {
+                else if (paramsType == OPENSSL_PKEY_DSA) {
                     DSAPtr dsaParams (EVP_PKEY_get1_DSA (params.get ()));
                     if (dsaParams.get () == 0 ||
                             PEM_write_bio_DSAparams (bio.get (), dsaParams.get ()) == 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else if (type == OPENSSL_PKEY_EC) {
+                else if (paramsType == OPENSSL_PKEY_EC) {
                     EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (params.get ()));
                     if (ecParams.get () == 0 ||
                             PEM_write_bio_ECPKParameters (bio.get (),
@@ -213,9 +213,9 @@ namespace thekogans {
         }
 
         std::size_t OpenSSLParams::Size () const {
-            const char *type = GetKeyType ();
+            const char *paramsType = GetKeyType ();
             util::i32 paramsLength = 0;
-            if (type == OPENSSL_PKEY_DH) {
+            if (paramsType == OPENSSL_PKEY_DH) {
                 DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
                 if (dhParams.get () != 0) {
                     paramsLength = i2d_DHparams (dhParams.get (), 0);
@@ -227,7 +227,7 @@ namespace thekogans {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
-            else if (type == OPENSSL_PKEY_DSA) {
+            else if (paramsType == OPENSSL_PKEY_DSA) {
                 DSAPtr dsaParams (EVP_PKEY_get1_DSA (params.get ()));
                 if (dsaParams.get () != 0) {
                     paramsLength = i2d_DSAparams (dsaParams.get (), 0);
@@ -239,7 +239,7 @@ namespace thekogans {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
-            else if (type == OPENSSL_PKEY_EC) {
+            else if (paramsType == OPENSSL_PKEY_EC) {
                 EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (params.get ()));
                 if (ecParams.get () != 0) {
                     paramsLength = i2d_ECParameters (ecParams.get (), 0);
@@ -253,90 +253,95 @@ namespace thekogans {
             }
             return
                 Params::Size () +
-                util::Serializer::Size (std::string (type)) + // type
+                util::Serializer::Size (std::string (paramsType)) + // paramsType
                 util::SizeT (paramsLength) + // paramsLength
                 paramsLength;
         }
 
-        void OpenSSLParams::Read (
-                const Header &header,
-                util::Serializer &serializer) {
-            Params::Read (header, serializer);
-            params.reset (EVP_PKEY_new ());
-            if (params.get () != 0) {
-                std::string type;
-                serializer >> type;
-                if (type == OPENSSL_PKEY_DH || type == OPENSSL_PKEY_DSA || type == OPENSSL_PKEY_EC) {
-                    util::SizeT paramsLength;
-                    serializer >> paramsLength;
-                    util::SecureVector<util::ui8> paramsBuffer (paramsLength);
-                    serializer.Read (&paramsBuffer[0], paramsLength);
-                    const util::ui8 *paramsData = &paramsBuffer[0];
-                    if (type == OPENSSL_PKEY_DH) {
-                        DHPtr dhParams (d2i_DHparams (0, &paramsData, (long)paramsLength));
-                        if (dhParams.get () != 0) {
-                            if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
-                                dhParams.release ();
+        namespace {
+            EVP_PKEYPtr ReadParams (
+                    const std::string &paramsType,
+                    const util::SecureString &paramsBuffer) {
+                EVP_PKEYPtr params (EVP_PKEY_new ());
+                if (params.get () != 0) {
+                    if (paramsType == OPENSSL_PKEY_DH || paramsType == OPENSSL_PKEY_DSA || paramsType == OPENSSL_PKEY_EC) {
+                        const util::ui8 *paramsData = (const util::ui8 *)paramsBuffer.data ();
+                        if (paramsType == OPENSSL_PKEY_DH) {
+                            DHPtr dhParams (d2i_DHparams (0, &paramsData, (long)paramsBuffer.size ()));
+                            if (dhParams.get () != 0) {
+                                if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
+                                    dhParams.release ();
+                                }
+                                else {
+                                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                                }
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                             }
                         }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        else if (paramsType == OPENSSL_PKEY_DSA) {
+                            DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, (long)paramsBuffer.size ()));
+                            if (dsaParams.get () != 0) {
+                                if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
+                                    dsaParams.release ();
+                                }
+                                else {
+                                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                                }
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
                         }
+                        else if (paramsType == OPENSSL_PKEY_EC) {
+                            EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, (long)paramsBuffer.size ()));
+                            if (ecParams.get () != 0) {
+                                if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
+                                    ecParams.release ();
+                                }
+                                else {
+                                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                                }
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                        return params;
                     }
-                    else if (type == OPENSSL_PKEY_DSA) {
-                        DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, (long)paramsLength));
-                        if (dsaParams.get () != 0) {
-                            if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
-                                dsaParams.release ();
-                            }
-                            else {
-                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                            }
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                    else if (type == OPENSSL_PKEY_EC) {
-                        EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, (long)paramsLength));
-                        if (ecParams.get () != 0) {
-                            if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
-                                ecParams.release ();
-                            }
-                            else {
-                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                            }
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
+                    else {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Invalid parameters type %s.", paramsType.c_str ());
                     }
                 }
                 else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid parameters type %s.", type.c_str ());
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
-            }
-            else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
         }
 
+        void OpenSSLParams::Read (
+                const BinHeader &header,
+                util::Serializer &serializer) {
+            Params::Read (header, serializer);
+            std::string paramsType;
+            util::SecureString paramsBuffer;
+            serializer >> paramsType >> paramsBuffer;
+            params = ReadParams (paramsType, paramsBuffer);
+        }
+
         namespace {
-            void WriteParams (
-                    EVP_PKEY &params,
-                    util::SecureVector<util::ui8> &paramsBuffer) {
-                util::i32 type = EVP_PKEY_base_id (&params);
-                if (type == EVP_PKEY_DH) {
+            util::SecureString WriteParams (EVP_PKEY &params) {
+                util::SecureString paramsBuffer;
+                util::i32 paramsType = EVP_PKEY_base_id (&params);
+                if (paramsType == EVP_PKEY_DH) {
                     DHPtr dhParams (EVP_PKEY_get1_DH (&params));
                     if (dhParams.get () != 0) {
                         util::i32 paramsLength = i2d_DHparams (dhParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
-                            util::ui8 *paramsData = &paramsBuffer[0];
+                            util::ui8 *paramsData = (util::ui8 *)paramsBuffer.data ();
                             i2d_DHparams (dhParams.get (), &paramsData);
                         }
                         else {
@@ -347,13 +352,13 @@ namespace thekogans {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else if (type == EVP_PKEY_DSA) {
+                else if (paramsType == EVP_PKEY_DSA) {
                     DSAPtr dsaParams (EVP_PKEY_get1_DSA (&params));
                     if (dsaParams.get () != 0) {
                         util::i32 paramsLength = i2d_DSAparams (dsaParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
-                            util::ui8 *paramsData = &paramsBuffer[0];
+                            util::ui8 *paramsData = (util::ui8 *)paramsBuffer.data ();
                             i2d_DSAparams (dsaParams.get (), &paramsData);
                         }
                         else {
@@ -364,13 +369,13 @@ namespace thekogans {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else if (type == EVP_PKEY_EC) {
+                else if (paramsType == EVP_PKEY_EC) {
                     EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (&params));
                     if (ecParams.get () != 0) {
                         util::i32 paramsLength = i2d_ECParameters (ecParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
-                            util::ui8 *paramsData = &paramsBuffer[0];
+                            util::ui8 *paramsData = (util::ui8 *)paramsBuffer.data ();
                             i2d_ECParameters (ecParams.get (), &paramsData);
                         }
                         else {
@@ -381,37 +386,32 @@ namespace thekogans {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Invalid parameters type %d.", paramsType);
+                }
+                return paramsBuffer;
             }
         }
 
         void OpenSSLParams::Write (util::Serializer &serializer) const {
             Params::Write (serializer);
-            util::SecureVector<util::ui8> paramsBuffer;
-            WriteParams (*params, paramsBuffer);
-            serializer <<
-                std::string (GetKeyType ()) <<
-                util::SizeT (paramsBuffer.size ());
-            if (!paramsBuffer.empty ()) {
-                serializer.Write (paramsBuffer.data (), paramsBuffer.size ());
-            }
+            serializer << std::string (GetKeyType ()) << WriteParams (*params);
         }
 
-        std::string OpenSSLParams::ToString (
-                std::size_t indentationLevel,
-                const char *tagName) const {
-            util::SecureVector<util::ui8> paramsBuffer;
-            WriteParams (*params, paramsBuffer);
-            std::stringstream stream;
-            util::Attributes attributes;
-            attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
-            attributes.push_back (util::Attribute (ATTR_NAME, name));
-            attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_PARAMS_TYPE, GetKeyType ()));
-            stream <<
-                util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
-                std::string (paramsBuffer.begin (), paramsBuffer.end ()) << std::endl <<
-                util::CloseTag (indentationLevel, tagName);
-            return stream.str ();
+        const char * const OpenSSLParams::ATTR_PARAMS_TYPE = "ParamsType";
+
+        void OpenSSLParams::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            Params::Read (header, node);
+            params = ReadParams (node.attribute (ATTR_PARAMS_TYPE).value (), node.text ().get ());
+        }
+
+        void OpenSSLParams::Write (pugi::xml_node &node) const {
+            Params::Write (node);
+            node.append_attribute (ATTR_PARAMS_TYPE).set_value (GetKeyType ());
+            node.append_child (pugi::node_pcdata).set_value (WriteParams (*params).c_str ());
         }
 
     } // namespace crypto

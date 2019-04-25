@@ -423,9 +423,9 @@ namespace thekogans {
             }
             util::SecureVector<util::ui8> random (randomLength);
             if (util::GlobalRandomSource::Instance ().GetBytes (
-                    &random[0], randomLength) == randomLength) {
+                    random.data (), randomLength) == randomLength) {
                 return FromSecretAndSalt (
-                    &random[0],
+                    random.data (),
                     randomLength,
                     salt,
                     saltLength,
@@ -438,7 +438,29 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to get %u random bytes for key.", randomLength);
+                    "Unable to get " THEKOGANS_UTIL_SIZE_T_FORMAT " random bytes for key.",
+                    randomLength);
+            }
+        }
+
+        void SymmetricKey::Set (
+                const void *buffer,
+                std::size_t length) {
+            if (buffer != 0 && length <= key.GetLength ()) {
+                key.Rewind ();
+                if (key.Write (buffer, length) == length) {
+                    if (length < key.GetLength ()) {
+                        memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to write " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes.", length);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
         }
 
@@ -450,12 +472,12 @@ namespace thekogans {
         }
 
         void SymmetricKey::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             util::SizeT length;
             serializer >> length;
-            if (length > 0 && length <= EVP_MAX_KEY_LENGTH) {
+            if (length > 0 && length <= key.GetLength ()) {
                 key.Rewind ();
                 if (key.AdvanceWriteOffset (
                         serializer.Read (key.GetWritePtr (), length)) == length) {
@@ -463,12 +485,12 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to read %u bytes for key.", length);
+                        "Unable to read " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes for key.", length);
                 }
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid key size %u.", length);
+                    "Invalid key size " THEKOGANS_UTIL_SIZE_T_FORMAT ".", length);
             }
         }
 
@@ -479,29 +501,40 @@ namespace thekogans {
                     key.GetReadPtr (),
                     key.GetDataAvailableForReading ()) != key.GetDataAvailableForReading ()) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to write %u bytes for key.", key.GetDataAvailableForReading ());
+                    "Unable to write " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes for key.",
+                    key.GetDataAvailableForReading ());
             }
         }
 
-        const char * const SymmetricKey::ATTR_KEY_LENGTH = "KeyLength";
+        const char * const SymmetricKey::ATTR_KEY = "Key";
 
-        std::string SymmetricKey::ToString (
-                std::size_t indentationLevel,
-                const char *tagName) const {
-            std::stringstream stream;
-            util::Attributes attributes;
-            attributes.push_back (util::Attribute (ATTR_TYPE, Type ()));
-            attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
-            attributes.push_back (util::Attribute (ATTR_NAME, name));
-            attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_KEY_LENGTH, util::size_tTostring (GetKeyLength ())));
-            stream <<
-                util::OpenTag (indentationLevel, tagName, attributes, false, true) <<
-                util::HexEncodeBuffer (
-                    key.GetReadPtr (),
-                    key.GetDataAvailableForReading ()) << std::endl <<
-                util::CloseTag (indentationLevel, tagName);
-            return stream.str ();
+        void SymmetricKey::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            Serializable::Read (header, node);
+            util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
+            std::size_t length = hexKey.size () / 2;
+            if (length > 0 && length <= key.GetLength ()) {
+                key.Rewind ();
+                if (key.AdvanceWriteOffset (
+                        util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key.GetWritePtr ())) == length) {
+                    memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to decode " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes for key.", length);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid key size " THEKOGANS_UTIL_SIZE_T_FORMAT ".", length);
+            }
+        }
+
+        void SymmetricKey::Write (pugi::xml_node &node) const {
+            Serializable::Write (node);
+            node.append_attribute (ATTR_KEY).set_value (
+                util::HexEncodeBuffer (key.GetReadPtr (), key.GetDataAvailableForReading ()).c_str ());
         }
 
     } // namespace crypto

@@ -197,7 +197,7 @@ namespace thekogans {
         /// \param[in] plaintext Plaintext to encrypt.
         /// \param[in] plaintextLength Length of plaintext.
         /// \param[in] publicKey Public key used to encrypt the generated random
-        /// \see{SymmetricKey} encryption.
+        /// \see{SymmetricKey}.
         /// \param[in] padding RSA padding type.
         /// \param[out] ciphertext Where to write the encrypted plaintext.
         /// \return Number of bytes written to ciphertext.

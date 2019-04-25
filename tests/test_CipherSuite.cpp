@@ -64,6 +64,9 @@ namespace {
         if (algorithm == crypto::CipherSuite::AUTHENTICATOR_RSA) {
             return crypto::RSA::CreateKey (512);
         }
+        if (algorithm == crypto::CipherSuite::AUTHENTICATOR_Ed25519) {
+            return crypto::EC::ParamsFromEd25519Curve ()->CreateKey ();
+        }
         return crypto::AsymmetricKey::Ptr ();
     }
 

@@ -186,6 +186,19 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+
+            /// \brief
+            /// Generate Elliptic Curve (EC) parameters given a curve name (RFC5114Curve, RFC5639Curve).
+            /// \param[in] curveNamw RFC5114Curve or RFC5639Curve curve name.
+            /// \param[in] id Optional parameters id.
+            /// \param[in] name Optional parameters name.
+            /// \param[in] description Optional parameters description.
+            /// \return OpenSSL named elliptic curve parameters.
+            static Params::Ptr ParamsFromCurveName (
+                const std::string &curveName,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
         };
 
     } // namespace crypto

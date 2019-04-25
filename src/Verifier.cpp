@@ -57,10 +57,10 @@ namespace thekogans {
         }
 
         Verifier::Ptr Verifier::Get (
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::Ptr publicKey,
                 MessageDigest::Ptr messageDigest) {
-            Map::iterator it = GetMap ().find (privateKey->GetKeyType ());
-            return it != GetMap ().end () ? it->second (privateKey, messageDigest) : Verifier::Ptr ();
+            Map::iterator it = GetMap ().find (publicKey->GetKeyType ());
+            return it != GetMap ().end () ? it->second (publicKey, messageDigest) : Verifier::Ptr ();
         }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)

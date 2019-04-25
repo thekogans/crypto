@@ -98,33 +98,45 @@ namespace thekogans {
 
             /// \brief
             /// Read the key from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::BinHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the key from.
             virtual void Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer);
             /// \brief
             /// Serialize the key to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-        public:
             /// \brief
             /// "Private"
             static const char * const ATTR_PRIVATE;
+
             /// \brief
-            /// "KeyType"
-            static const char * const ATTR_KEY_TYPE;
+            /// Read the Serializable from an XML DOM.
+            /// \param[in] node XML DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader &header,
+                const pugi::xml_node &node);
             /// \brief
-            /// "KeyLength"
-            static const char * const ATTR_KEY_LENGTH;
+            /// Write the Serializable to the XML DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (pugi::xml_node &node) const;
         };
 
         /// \brief
-        /// Implement AsymmetricKey extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (AsymmetricKey)
+        /// Implement AsymmetricKey extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (AsymmetricKey)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement AsymmetricKey value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::AsymmetricKey)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_AsymmetricKey_h)

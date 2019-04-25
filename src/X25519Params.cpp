@@ -43,11 +43,11 @@ namespace thekogans {
         }
 
         std::size_t X25519Params::Size () const {
-            return Serializable::Size ();
+            return Params::Size ();
         }
 
         void X25519Params::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
         }
@@ -56,15 +56,14 @@ namespace thekogans {
             Params::Write (serializer);
         }
 
-        std::string X25519Params::ToString (
-                std::size_t indentationLevel,
-                const char *tagName) const {
-            util::Attributes attributes;
-            attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
-            attributes.push_back (util::Attribute (ATTR_NAME, name));
-            attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_PARAMS_TYPE, X25519AsymmetricKey::KEY_TYPE));
-            return util::OpenTag (indentationLevel, tagName, attributes, true, true);
+        void X25519Params::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            Params::Read (header, node);
+        }
+
+        void X25519Params::Write (pugi::xml_node &node) const {
+            Params::Write (node);
         }
 
     } // namespace crypto

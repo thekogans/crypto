@@ -16,6 +16,7 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include "thekogans/util/Serializer.h"
+#include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/KeyExchange.h"
 
 namespace thekogans {
@@ -30,13 +31,35 @@ namespace thekogans {
         }
 
         void KeyExchange::Params::Read (
-                const Header & /*header*/,
+                const BinHeader & /*header*/,
                 util::Serializer &serializer) {
             serializer >> id >> signature >> signatureKeyId >> signatureMessageDigestName;
         }
 
         void KeyExchange::Params::Write (util::Serializer &serializer) const {
             serializer << id << signature << signatureKeyId << signatureMessageDigestName;
+        }
+
+        const char * const KeyExchange::Params::ATTR_ID = "Id";
+        const char * const KeyExchange::Params::ATTR_SIGNATURE = "Signature";
+        const char * const KeyExchange::Params::ATTR_SIGNATURE_KEY_ID = "SignatureKeyId";
+        const char * const KeyExchange::Params::ATTR_SIGNATURE_MESSAGE_DIGEST_NAME = "SignatureMessageDigestName";
+
+        void KeyExchange::Params::Read (
+                const TextHeader & /*header*/,
+                const pugi::xml_node &node) {
+            id = node.attribute (ATTR_ID).value ();
+            signature = util::HexDecodestring (node.attribute (ATTR_SIGNATURE).value ());
+            signatureKeyId = node.attribute (ATTR_SIGNATURE_KEY_ID).value ();
+            signatureMessageDigestName = node.attribute (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME).value ();
+        }
+
+        void KeyExchange::Params::Write (pugi::xml_node &node) const {
+            node.append_attribute (ATTR_ID).set_value (id.ToString ().c_str ());
+            node.append_attribute (ATTR_SIGNATURE).set_value (
+                util::HexEncodeBuffer (signature.data (), signature.size ()).c_str ());
+            node.append_attribute (ATTR_SIGNATURE_KEY_ID).set_value (signatureKeyId.ToString ().c_str ());
+            node.append_attribute (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME).set_value (signatureMessageDigestName.c_str ());
         }
 
     } // namespace crypto

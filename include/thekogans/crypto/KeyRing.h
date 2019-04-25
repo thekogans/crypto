@@ -611,34 +611,19 @@ namespace thekogans {
 
             /// \brief
             /// Read the key ring from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::BinHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the key ring from.
             virtual void Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer);
             /// \brief
             /// Write the key ring to the given serializer.
             /// \param[in] serializer \see{util::Serializer} to write the key ring to.
             virtual void Write (util::Serializer &serializer) const;
 
-        public:
-            /// \brief
-            /// Dump the key ring to std::cout.
-            void Dump () const;
-
-        private:
             /// \brief
             /// "KeyRing"
             static const char * const TAG_KEY_RING;
-            /// \brief
-            /// "Id"
-            static const char * const ATTR_ID;
-            /// \brief
-            /// "Name"
-            static const char * const ATTR_NAME;
-            /// \brief
-            /// "Description"
-            static const char * const ATTR_DESCRIPTION;
             /// \brief
             /// "CipherSuite"
             static const char * const ATTR_CIPHER_SUITE;
@@ -692,13 +677,16 @@ namespace thekogans {
             static const char * const TAG_SUB_RING;
 
             /// \brief
-            /// Return the XML representation of a key ring.
-            /// \param[in] indentationLevel How far to indent the leading tag.
-            /// \param[in] tagName The name of the leading tag.
-            /// \return XML representation of a key ring.
-            std::string ToString (
-                std::size_t indentationLevel = 0,
-                const char *tagName = TAG_KEY_RING) const;
+            /// Read the Serializable from an XML DOM.
+            /// \param[in] header \see{util::Serializable::TextHeader}.
+            /// \param[in] node XML DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader &header,
+                const pugi::xml_node &node);
+            /// \brief
+            /// Write the Serializable to the XML DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (pugi::xml_node &node) const;
 
             /// \brief
             /// KeyRing is neither copy constructable, nor assignable.
@@ -706,10 +694,18 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement KeyRing extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (KeyRing)
+        /// Implement KeyRing extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (KeyRing)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement KeyRing value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::KeyRing)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_KeyRing_h)

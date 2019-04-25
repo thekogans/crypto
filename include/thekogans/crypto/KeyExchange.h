@@ -60,7 +60,7 @@ namespace thekogans {
                 ID id;
                 /// \brief
                 /// Signature over the parameter data.
-                util::Buffer signature;
+                std::vector<util::ui8> signature;
                 /// \brief
                 /// Signature \see{AsymmetricKey} id.
                 ID signatureKeyId;
@@ -101,15 +101,40 @@ namespace thekogans {
 
                 /// \brief
                 /// Read the serializable from the given serializer.
-                /// \param[in] header \see{util::Serializable::Header}.
+                /// \param[in] header \see{util::Serializable::BinHeader}.
                 /// \param[in] serializer \see{util::Serializer} to read the serializable from.
                 virtual void Read (
-                    const Header & /*header*/,
+                    const BinHeader & /*header*/,
                     util::Serializer &serializer);
                 /// \brief
                 /// Write the serializable to the given serializer.
                 /// \param[out] serializer \see{util::Serializer} to write the serializable to.
                 virtual void Write (util::Serializer &serializer) const;
+
+                /// \brief
+                /// "Id"
+                static const char * const ATTR_ID;
+                /// \brief
+                /// "Signature"
+                static const char * const ATTR_SIGNATURE;
+                /// \brief
+                /// "SignatureKeyId"
+                static const char * const ATTR_SIGNATURE_KEY_ID;
+                /// \brief
+                /// "SignatureMessageDigestName"
+                static const char * const ATTR_SIGNATURE_MESSAGE_DIGEST_NAME;
+
+                /// \brief
+                /// Read the Serializable from an XML DOM.
+                /// \param[in] header \see{util::Serializable::TextHeader}.
+                /// \param[in] node XML DOM representation of a Serializable.
+                virtual void Read (
+                    const TextHeader &header,
+                    const pugi::xml_node &node);
+                /// \brief
+                /// Write the Serializable to the XML DOM.
+                /// \param[out] node Parent node.
+                virtual void Write (pugi::xml_node &node) const;
             };
 
         protected:
@@ -154,10 +179,18 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement KeyExchange::Params extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (KeyExchange::Params)
+        /// Implement KeyExchange::Params extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (KeyExchange::Params)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement KeyExchange::Params value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::KeyExchange::Params)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_KeyExchange_h)

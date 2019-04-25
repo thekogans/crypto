@@ -66,6 +66,13 @@ namespace thekogans {
             MessageDigest (const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
             /// \brief
+            /// Given a message digest name \see{CipherSuite::GetMessageDigests},
+            /// return a MessageDigest.
+            /// \param[in] name Message digest name.
+            /// \return MessageDigest.
+            static Ptr GetByName (const std::string &name);
+
+            /// \brief
             /// Return the message digest name.
             /// \return Message digest name.
             std::string GetName () const;

@@ -80,7 +80,8 @@ int main (
         {
             std::cout << "Signing '" << options.path << "'...";
             crypto::Authenticator signer (
-                crypto::OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (options.prefix + "private_key.pem"));
+                crypto::OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (options.prefix + "private_key.pem"),
+                crypto::MessageDigest::Ptr (new crypto::MessageDigest));
             util::Buffer signature = signer.SignFile (options.path);
             util::Buffer encodedSignature =
                 util::Base64::Encode (
@@ -101,7 +102,8 @@ int main (
         if (options.verify) {
             std::cout << "Verifying '" << options.path << "'...";
             crypto::Authenticator verifier (
-                crypto::OpenSSLAsymmetricKey::LoadPublicKeyFromFile (options.prefix + "public_key.pem"));
+                crypto::OpenSSLAsymmetricKey::LoadPublicKeyFromFile (options.prefix + "public_key.pem"),
+                crypto::MessageDigest::Ptr (new crypto::MessageDigest));
             util::ReadOnlyFile signatureFile (util::NetworkEndian, options.path + ".sig");
             util::Buffer encodedSignature (util::NetworkEndian, signatureFile.GetSize ());
             encodedSignature.AdvanceWriteOffset (

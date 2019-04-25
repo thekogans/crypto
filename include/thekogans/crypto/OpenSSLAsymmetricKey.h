@@ -80,6 +80,26 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
+            /// Load a PEM encoded private key from a buffer.
+            /// \param[in] buffer Buffer containing a private key.
+            /// \param[in] length Buffer length.
+            /// \param[in] passwordCallback Provide a password if file is encrypted.
+            /// \param[in] userData User data for passwordCallback.
+            /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+            /// will interpret the userData as a NULL terminated password.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return Private key.
+            static AsymmetricKey::Ptr LoadPrivateKeyFromBuffer (
+                const void *buffer,
+                std::size_t length,
+                pem_password_cb *passwordCallback = 0,
+                void *userData = 0,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
+            /// \brief
             /// Load a PEM encoded private key from a file.
             /// \param[in] path File containing a private key.
             /// \param[in] passwordCallback Provide a password if file is encrypted.
@@ -92,6 +112,27 @@ namespace thekogans {
             /// \return Private key.
             static AsymmetricKey::Ptr LoadPrivateKeyFromFile (
                 const std::string &path,
+                pem_password_cb *passwordCallback = 0,
+                void *userData = 0,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ());
+
+            /// \brief
+            /// Load a PEM encoded public key from a buffer.
+            /// \param[in] buffer Buffer containing a public key.
+            /// \param[in] length Buffer length.
+            /// \param[in] passwordCallback Provide a password if file is encrypted.
+            /// \param[in] userData User data for passwordCallback.
+            /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
+            /// will interpret the userData as a NULL terminated password.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return Public key.
+            static AsymmetricKey::Ptr LoadPublicKeyFromBuffer (
+                const void *buffer,
+                std::size_t length,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
                 const ID &id = ID (),
@@ -133,6 +174,7 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+
             /// \brief
             /// Save the key to a file.
             /// \param[in] path File name to save the key to.
@@ -186,25 +228,27 @@ namespace thekogans {
 
             /// \brief
             /// Read the key from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::BinHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the key from.
             virtual void Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer);
             /// \brief
             /// Serialize the key to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-        public:
             /// \brief
-            /// Return the XML representation of a key.
-            /// \param[in] indentationLevel How far to indent the leading tag.
-            /// \param[in] tagName The name of the leading tag.
-            /// \return XML representation of a key.
-            virtual std::string ToString (
-                std::size_t indentationLevel = 0,
-                const char *tagName = TAG_SERIALIZABLE) const;
+            /// Read the Serializable from an XML DOM.
+            /// \param[in] header \see{util::Serializable::TextHeader}.
+            /// \param[in] node XML DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader &header,
+                const pugi::xml_node &node);
+            /// \brief
+            /// Write the Serializable to the XML DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (pugi::xml_node &node) const;
 
             /// \brief
             /// OpenSSLAsymmetricKey is neither copy constructable, nor assignable.
@@ -212,10 +256,18 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement OpenSSLAsymmetricKey extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (OpenSSLAsymmetricKey)
+        /// Implement OpenSSLAsymmetricKey extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (OpenSSLAsymmetricKey)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement OpenSSLAsymmetricKey value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::OpenSSLAsymmetricKey)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_OpenSSLAsymmetricKey_h)

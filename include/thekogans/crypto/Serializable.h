@@ -119,23 +119,16 @@ namespace thekogans {
 
             /// \brief
             /// Read the serializable from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::BinHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the serializable from.
             virtual void Read (
-                const Header & /*header*/,
+                const BinHeader & /*header*/,
                 util::Serializer &serializer);
             /// \brief
             /// Write the serializable to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to write the serializable to.
             virtual void Write (util::Serializer &serializer) const;
 
-        public:
-            /// \brief
-            /// "Serializable"
-            static const char * const TAG_SERIALIZABLE;
-            /// \brief
-            /// "Type"
-            static const char * const ATTR_TYPE;
             /// \brief
             /// "Id"
             static const char * const ATTR_ID;
@@ -147,13 +140,16 @@ namespace thekogans {
             static const char * const ATTR_DESCRIPTION;
 
             /// \brief
-            /// Return the XML representation of a serializable.
-            /// \param[in] indentationLevel How far to indent the leading tag.
-            /// \param[in] tagName The name of the leading tag.
-            /// \return XML representation of a serializable.
-            virtual std::string ToString (
-                std::size_t /*indentationLevel*/ = 0,
-                const char * /*tagName*/ = TAG_SERIALIZABLE) const = 0;
+            /// Read the Serializable from an XML DOM.
+            /// \param[in] header \see{util::Serializable::TextHeader}.
+            /// \param[in] node XML DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader & /*header*/,
+                const pugi::xml_node &node);
+            /// \brief
+            /// Write the Serializable to the XML DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (pugi::xml_node &node) const;
         };
 
         /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)
@@ -190,10 +186,18 @@ namespace thekogans {
                 thekogans::util::SecureAllocator::Global)
 
         /// \brief
-        /// Implement Serializable extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (Serializable)
+        /// Implement Serializable extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (Serializable)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement Serializable value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::Serializable)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_Serializable_h)

@@ -18,6 +18,7 @@
 #if defined (TOOLCHAIN_OS_Windows)
     #include <winsock2.h>
 #endif // defined (TOOLCHAIN_OS_Windows)
+#include "thekogans/util/Exception.h"
 #include "thekogans/util/FixedArray.h"
 #include "thekogans/util/File.h"
 #include "thekogans/crypto/OpenSSLInit.h"
@@ -25,6 +26,35 @@
 
 namespace thekogans {
     namespace crypto {
+
+        Authenticator::Authenticator (
+                AsymmetricKey::Ptr key,
+                MessageDigest::Ptr messageDigest) {
+            if (key.Get () != 0 && messageDigest.Get () != 0) {
+                if (key->IsPrivate ()) {
+                    signer = Signer::Get (key, messageDigest);
+                    if (signer.get () == 0) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to get a Signer for key: %s and digest: %s.",
+                            key->GetKeyType (),
+                            messageDigest->GetName ().c_str ());
+                    }
+                }
+                else {
+                    verifier = Verifier::Get (key, messageDigest);
+                    if (verifier.get () == 0) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to get a Verifier for key: %s and digest: %s.",
+                            key->GetKeyType (),
+                            messageDigest->GetName ().c_str ());
+                    }
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
 
         util::Buffer Authenticator::SignBuffer (
                 const void *buffer,

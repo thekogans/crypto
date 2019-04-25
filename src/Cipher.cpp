@@ -114,10 +114,7 @@ namespace thekogans {
                             ciphertextHeader.ivLength +
                             ciphertextHeader.ciphertextLength);
                 }
-                util::TenantWriteBuffer buffer (
-                    util::NetworkEndian,
-                    ciphertext,
-                    CiphertextHeader::SIZE);
+                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, CiphertextHeader::SIZE);
                 buffer << ciphertextHeader;
                 return CiphertextHeader::SIZE + ciphertextHeader.GetTotalLength ();
             }
@@ -165,10 +162,7 @@ namespace thekogans {
                     associatedData,
                     associatedDataLength,
                     ciphertext + util::UI32_SIZE);
-                util::TenantWriteBuffer buffer (
-                    util::NetworkEndian,
-                    ciphertext,
-                    util::UI32_SIZE);
+                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, util::UI32_SIZE);
                 buffer << (util::ui32)ciphertextLength;
                 return util::UI32_SIZE + ciphertextLength;
             }
@@ -216,10 +210,7 @@ namespace thekogans {
                     associatedData,
                     associatedDataLength,
                     ciphertext + FrameHeader::SIZE);
-                util::TenantWriteBuffer buffer (
-                    util::NetworkEndian,
-                    ciphertext,
-                    FrameHeader::SIZE);
+                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, FrameHeader::SIZE);
                 buffer << FrameHeader (key->GetId (), (util::ui32)ciphertextLength);
                 return FrameHeader::SIZE + ciphertextLength;
             }
@@ -261,10 +252,7 @@ namespace thekogans {
             if (ciphertext != 0 && ciphertextLength > 0 &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
                     plaintext != 0) {
-                util::TenantReadBuffer buffer (
-                    util::NetworkEndian,
-                    (const util::ui8 *)ciphertext,
-                    ciphertextLength);
+                util::TenantReadBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
                 CiphertextHeader ciphertextHeader;
                 buffer >> ciphertextHeader;
                 // If we're in CBC mode, verify the MAC before attempting to

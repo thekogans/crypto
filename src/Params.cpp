@@ -25,7 +25,7 @@ namespace thekogans {
         }
 
         void Params::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
         }
@@ -34,7 +34,15 @@ namespace thekogans {
             Serializable::Write (serializer);
         }
 
-        const char * const Params::ATTR_PARAMS_TYPE = "ParamsType";
+        void Params::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            Serializable::Read (header, node);
+        }
+
+        void Params::Write (pugi::xml_node &node) const {
+            Serializable::Write (node);
+        }
 
     } // namespace crypto
 } // namespace thekogans

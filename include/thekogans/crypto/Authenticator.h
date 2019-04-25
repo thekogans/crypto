@@ -59,12 +59,10 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] key Private (Sign)/Public (Verify) key.
-            /// \param[in] md OpenSSL message digest to use.
+            /// \param[in] messageDigest \see{MessageDigest} to use for hash generation.
             Authenticator (
                 AsymmetricKey::Ptr key,
-                MessageDigest::Ptr messageDigest) :
-                signer (key->IsPrivate () ? Signer::Get (key, messageDigest) : Signer::Ptr ()),
-                verifier (!key->IsPrivate () ? Verifier::Get (key, messageDigest) : Verifier::Ptr ()) {}
+                MessageDigest::Ptr messageDigest);
 
             /// \brief
             /// Return the key associated with this authenticator.

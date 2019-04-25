@@ -72,13 +72,14 @@ namespace thekogans {
         }
 
         void X25519AsymmetricKey::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
+            key.Rewind ();
             if (key.AdvanceWriteOffset (
                     serializer.Read (key.GetWritePtr (), X25519::KEY_LENGTH)) != X25519::KEY_LENGTH) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Read (key, %u) != %u",
+                    "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                     X25519::KEY_LENGTH,
                     X25519::KEY_LENGTH);
             }
@@ -88,7 +89,7 @@ namespace thekogans {
             AsymmetricKey::Write (serializer);
             if (serializer.Write (key.GetReadPtr (), X25519::KEY_LENGTH) != X25519::KEY_LENGTH) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Write (key, %u) != %u",
+                    "Write (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                     X25519::KEY_LENGTH,
                     X25519::KEY_LENGTH);
             }
@@ -96,19 +97,37 @@ namespace thekogans {
 
         const char * const X25519AsymmetricKey::ATTR_KEY = "Key";
 
-        std::string X25519AsymmetricKey::ToString (
-                std::size_t indentationLevel,
-                const char *tagName) const {
-            util::Attributes attributes;
-            attributes.push_back (util::Attribute (ATTR_TYPE, Type ()));
-            attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
-            attributes.push_back (util::Attribute (ATTR_NAME, name));
-            attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_PRIVATE, util::boolTostring (IsPrivate ())));
-            attributes.push_back (util::Attribute (ATTR_KEY_TYPE, GetKeyType ()));
-            attributes.push_back (util::Attribute (ATTR_KEY_LENGTH, util::size_tTostring (GetKeyLength ())));
-            attributes.push_back (util::Attribute (ATTR_KEY, util::HexEncodeBuffer (key.GetReadPtr (), GetKeyLength ())));
-            return util::OpenTag (indentationLevel, tagName, attributes, true, true);
+        void X25519AsymmetricKey::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            AsymmetricKey::Read (header, node);
+            util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
+            if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
+                key.Rewind ();
+                if (key.AdvanceWriteOffset (
+                        util::HexDecodeBuffer (
+                            hexKey.data (),
+                            hexKey.size (),
+                            key.GetWritePtr ())) != X25519::KEY_LENGTH) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
+                        X25519::KEY_LENGTH,
+                        X25519::KEY_LENGTH);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Wrong key length. Expected " THEKOGANS_UTIL_SIZE_T_FORMAT
+                    ", received " THEKOGANS_UTIL_SIZE_T_FORMAT ".",
+                    X25519::KEY_LENGTH * 2,
+                    hexKey.size ());
+            }
+        }
+
+        void X25519AsymmetricKey::Write (pugi::xml_node &node) const {
+            AsymmetricKey::Write (node);
+            node.append_attribute (ATTR_KEY).set_value (
+                util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH).c_str ());
         }
 
     } // namespace crypto

@@ -50,8 +50,8 @@ namespace thekogans {
                     util::Serializer::Size (messageDigestName) +
                     util::Serializer::Size (count) +
                     util::Serializer::Size (keyId) +
-                    util::Serializer::Size (name) +
-                    util::Serializer::Size (description) +
+                    util::Serializer::Size (keyName) +
+                    util::Serializer::Size (keyDescription) +
                     util::Serializable::Size (*publicKey));
                 paramsBuffer <<
                     id <<
@@ -61,13 +61,13 @@ namespace thekogans {
                     messageDigestName <<
                     count <<
                     keyId <<
-                    name <<
-                    description <<
+                    keyName <<
+                    keyDescription <<
                     *publicKey;
                 Authenticator authenticator (privateKey, messageDigest);
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
-                    paramsBuffer.GetDataAvailableForReading ());
+                    paramsBuffer.GetDataAvailableForReading ()).Tovector ();
                 signatureKeyId = privateKey->GetId ();
                 signatureMessageDigestName = messageDigest->GetName ();
             }
@@ -83,7 +83,7 @@ namespace thekogans {
             if (publicKey.Get () != 0 && messageDigest.Get () != 0 &&
                     publicKey->GetId () == signatureKeyId &&
                     messageDigest->GetName () == signatureMessageDigestName) {
-                if (!signature.IsEmpty ()) {
+                if (!signature.empty ()) {
                     util::Buffer paramsBuffer (
                         util::NetworkEndian,
                         util::Serializer::Size (id) +
@@ -93,8 +93,8 @@ namespace thekogans {
                         util::Serializer::Size (messageDigestName) +
                         util::Serializer::Size (count) +
                         util::Serializer::Size (keyId) +
-                        util::Serializer::Size (name) +
-                        util::Serializer::Size (description) +
+                        util::Serializer::Size (keyName) +
+                        util::Serializer::Size (keyDescription) +
                         util::Serializable::Size (*this->publicKey));
                     paramsBuffer <<
                         id <<
@@ -104,15 +104,15 @@ namespace thekogans {
                         messageDigestName <<
                         count <<
                         keyId <<
-                        name <<
-                        description <<
+                        keyName <<
+                        keyDescription <<
                         *this->publicKey;
                     Authenticator authenticator (publicKey, messageDigest);
                     return authenticator.VerifyBufferSignature (
                         paramsBuffer.GetReadPtr (),
                         paramsBuffer.GetDataAvailableForReading (),
-                        signature.GetReadPtr (),
-                        signature.GetDataAvailableForReading ());
+                        signature.data (),
+                        signature.size ());
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -135,13 +135,13 @@ namespace thekogans {
                 util::Serializer::Size (messageDigestName) +
                 util::Serializer::Size (count) +
                 util::Serializer::Size (keyId) +
-                util::Serializer::Size (name) +
-                util::Serializer::Size (description) +
+                util::Serializer::Size (keyName) +
+                util::Serializer::Size (keyDescription) +
                 util::Serializable::Size (*publicKey);
         }
 
         void DHEKeyExchange::DHEParams::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
             serializer >>
@@ -151,8 +151,8 @@ namespace thekogans {
                 messageDigestName >>
                 count >>
                 keyId >>
-                name >>
-                description >>
+                keyName >>
+                keyDescription >>
                 publicKey;
         }
 
@@ -165,9 +165,51 @@ namespace thekogans {
                 messageDigestName <<
                 count <<
                 keyId <<
-                name <<
-                description <<
+                keyName <<
+                keyDescription <<
                 *publicKey;
+        }
+
+        const char * const DHEKeyExchange::DHEParams::TAG_PARAMS = "Params";
+        const char * const DHEKeyExchange::DHEParams::ATTR_SALT = "Salt";
+        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_LENGTH = "KeyLength";
+        const char * const DHEKeyExchange::DHEParams::ATTR_MESSAGE_DIGEST_NAME = "MessageDigestName";
+        const char * const DHEKeyExchange::DHEParams::ATTR_COUNT = "Count";
+        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_ID = "KeyId";
+        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_NAME = "KeyName";
+        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_DESCRIPTION = "KeyDescription";
+        const char * const DHEKeyExchange::DHEParams::TAG_PUBLIC_KEY = "PublicKey";
+
+        void DHEKeyExchange::DHEParams::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            Params::Read (header, node);
+            salt = util::HexDecodestring (node.attribute (ATTR_SALT).value ());
+            keyLength = util::stringToui64 (node.attribute (ATTR_KEY_LENGTH).value ());
+            messageDigestName = node.attribute (ATTR_MESSAGE_DIGEST_NAME).value ();
+            count = util::stringToui64 (node.attribute (ATTR_COUNT).value ());
+            keyId = node.attribute (ATTR_KEY_ID).value ();
+            keyName = node.attribute (ATTR_KEY_NAME).value ();
+            keyDescription = node.attribute (ATTR_KEY_DESCRIPTION).value ();
+            pugi::xml_node paramsNode = node.child (TAG_PARAMS);
+            paramsNode >> params;
+            pugi::xml_node publicKeyNode = node.child (TAG_PUBLIC_KEY);
+            publicKeyNode >> publicKey;
+        }
+
+        void DHEKeyExchange::DHEParams::Write (pugi::xml_node &node) const {
+            Params::Write (node);
+            node.append_attribute (ATTR_SALT).set_value (util::HexEncodeBuffer (salt.data (), salt.size ()).c_str ());
+            node.append_attribute (ATTR_KEY_LENGTH).set_value (util::ui64Tostring (keyLength).c_str ());
+            node.append_attribute (ATTR_MESSAGE_DIGEST_NAME).set_value (messageDigestName.c_str ());
+            node.append_attribute (ATTR_COUNT).set_value (util::ui64Tostring (count).c_str ());
+            node.append_attribute (ATTR_KEY_ID).set_value (keyId.ToString ().c_str ());
+            node.append_attribute (ATTR_KEY_NAME).set_value (keyName.c_str ());
+            node.append_attribute (ATTR_KEY_DESCRIPTION).set_value (keyDescription.c_str ());
+            pugi::xml_node paramsNode = node.append_child (TAG_PARAMS);
+            paramsNode << *params;
+            pugi::xml_node publicKeyNode = node.append_child (TAG_PUBLIC_KEY);
+            publicKeyNode << *publicKey;
         }
 
         namespace {
@@ -188,8 +230,8 @@ namespace thekogans {
                 const EVP_MD *md_,
                 std::size_t count_,
                 const ID &keyId_,
-                const std::string &name_,
-                const std::string &description_) :
+                const std::string &keyName_,
+                const std::string &keyDescription_) :
                 KeyExchange (id),
                 initiator (true),
                 params (params_),
@@ -203,8 +245,8 @@ namespace thekogans {
                 messageDigestName (CipherSuite::GetOpenSSLMessageDigestName (md_)),
                 count (count_),
                 keyId (keyId_),
-                name (name_),
-                description (description_) {
+                keyName (keyName_),
+                keyDescription (keyDescription_) {
             if (params.Get () != 0 && ValidateParamsKeyType (params->GetKeyType ())) {
                 privateKey = params->CreateKey ();
                 publicKey = privateKey->GetPublicKey ();
@@ -229,8 +271,8 @@ namespace thekogans {
                 messageDigestName = dheParams->messageDigestName;
                 count = dheParams->count;
                 keyId = dheParams->keyId;
-                name = dheParams->name;
-                description = dheParams->description;
+                keyName = dheParams->keyName;
+                keyDescription = dheParams->keyDescription;
                 privateKey = this->params->CreateKey ();
                 publicKey = privateKey->GetPublicKey ();
             }
@@ -252,8 +294,8 @@ namespace thekogans {
                     messageDigestName,
                     count,
                     keyId,
-                    name,
-                    description,
+                    keyName,
+                    keyDescription,
                     publicKey));
             if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
                 dheParams->CreateSignature (privateKey, messageDigest);
@@ -324,8 +366,8 @@ namespace thekogans {
                     CipherSuite::GetOpenSSLMessageDigestByName (dheParams->messageDigestName),
                     dheParams->count,
                     dheParams->keyId,
-                    dheParams->name,
-                    dheParams->description);
+                    dheParams->keyName,
+                    dheParams->keyDescription);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

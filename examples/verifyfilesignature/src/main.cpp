@@ -27,6 +27,7 @@
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLAsymmetricKey.h"
 #include "thekogans/crypto/Authenticator.h"
+#include "thekogans/crypto/MessageDigest.h"
 
 using namespace thekogans;
 

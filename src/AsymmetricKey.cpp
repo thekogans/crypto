@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 
 namespace thekogans {
@@ -27,7 +28,7 @@ namespace thekogans {
         }
 
         void AsymmetricKey::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             serializer >> isPrivate;
@@ -39,8 +40,18 @@ namespace thekogans {
         }
 
         const char * const AsymmetricKey::ATTR_PRIVATE = "Private";
-        const char * const AsymmetricKey::ATTR_KEY_TYPE = "KeyType";
-        const char * const AsymmetricKey::ATTR_KEY_LENGTH = "KeyLength";
+
+        void AsymmetricKey::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            Serializable::Read (header, node);
+            isPrivate = util::stringTobool (node.attribute (ATTR_PRIVATE).value ());
+        }
+
+        void AsymmetricKey::Write (pugi::xml_node &node) const {
+            Serializable::Write (node);
+            node.append_attribute (ATTR_PRIVATE).set_value (util::boolTostring (IsPrivate ()).c_str ());
+        }
 
     } // namespace crypto
 } // namespace thekogans

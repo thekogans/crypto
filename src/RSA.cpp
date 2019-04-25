@@ -102,9 +102,11 @@ namespace thekogans {
                 if (ctx.get () != 0 &&
                         EVP_PKEY_encrypt_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_padding (ctx.get (), padding) == 1) {
-                    size_t ciphertextLength = publicKey->GetKeyLength ();
-                    if (EVP_PKEY_encrypt (ctx.get (), ciphertext, &ciphertextLength,
-                            (const util::ui8 *)plaintext, plaintextLength) == 1) {
+                    size_t ciphertextLength = 0;
+                    if (EVP_PKEY_encrypt (ctx.get (), 0, &ciphertextLength,
+                                (const util::ui8 *)plaintext, plaintextLength) == 1 &&
+                            EVP_PKEY_encrypt (ctx.get (), ciphertext, &ciphertextLength,
+                                (const util::ui8 *)plaintext, plaintextLength) == 1) {
                         return ciphertextLength;
                     }
                     else {
@@ -163,10 +165,7 @@ namespace thekogans {
                     publicKey,
                     padding,
                     ciphertext + util::UI32_SIZE);
-                util::TenantWriteBuffer buffer (
-                    util::NetworkEndian,
-                    ciphertext,
-                    util::UI32_SIZE);
+                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, util::UI32_SIZE);
                 buffer << (util::ui32)ciphertextLength;
                 return util::UI32_SIZE + ciphertextLength;
             }
@@ -226,10 +225,7 @@ namespace thekogans {
                     publicKey,
                     padding,
                     ciphertext + FrameHeader::SIZE);
-                util::TenantWriteBuffer buffer (
-                    util::NetworkEndian,
-                    ciphertext,
-                    FrameHeader::SIZE);
+                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, FrameHeader::SIZE);
                 buffer << FrameHeader (publicKey->GetId (), (util::ui32)ciphertextLength);
                 return FrameHeader::SIZE + ciphertextLength;
             }
@@ -510,10 +506,7 @@ namespace thekogans {
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     plaintext != 0) {
-                util::TenantReadBuffer buffer (
-                    util::NetworkEndian,
-                    (const util::ui8 *)ciphertext,
-                    ciphertextLength);
+                util::TenantReadBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
                 util::ui32 headerLength;
                 buffer >> headerLength;
                 util::SecureBuffer headerBuffer (

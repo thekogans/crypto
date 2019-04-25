@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include <sstream>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/File.h"
 #include "thekogans/util/ByteSwap.h"
@@ -385,7 +384,7 @@ namespace thekogans {
                 bool recursive) {
             if (params.Get () != 0) {
                 // Validate the parameters signature (if one was provided).
-                if (!params->signature.IsEmpty ()) {
+                if (!params->signature.empty ()) {
                     AsymmetricKey::Ptr publicKey =
                         GetAuthenticatorKey (params->signatureKeyId, recursive);
                     if (publicKey.Get () != 0 && !publicKey->IsPrivate ()) {
@@ -1250,7 +1249,7 @@ namespace thekogans {
         }
 
         void KeyRing::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             serializer >> cipherSuite;
@@ -1429,14 +1428,7 @@ namespace thekogans {
             }
         }
 
-        void KeyRing::Dump () const {
-            std::cout << ToString ();
-        }
-
         const char * const KeyRing::TAG_KEY_RING = "KeyRing";
-        const char * const KeyRing::ATTR_ID = "Id";
-        const char * const KeyRing::ATTR_NAME = "Name";
-        const char * const KeyRing::ATTR_DESCRIPTION = "Description";
         const char * const KeyRing::ATTR_CIPHER_SUITE = "CipherSuite";
         const char * const KeyRing::TAG_KEY_EXCHANGE_PARAMS = "KeyExchangeParams";
         const char * const KeyRing::TAG_KEY_EXCHANGE_PARAM = "KeyExchangeParam";
@@ -1455,162 +1447,248 @@ namespace thekogans {
         const char * const KeyRing::TAG_SUB_RINGS = "SubRings";
         const char * const KeyRing::TAG_SUB_RING = "SubRing";
 
-        std::string KeyRing::ToString (
-                std::size_t indentationLevel,
-                const char *tagName) const {
-            std::stringstream stream;
-            util::Attributes attributes;
-            attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
-            attributes.push_back (util::Attribute (ATTR_NAME, name));
-            attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_CIPHER_SUITE, cipherSuite.ToString ()));
-            stream << util::OpenTag (indentationLevel, tagName, attributes, false, true);
+        void KeyRing::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            Serializable::Read (header, node);
+            cipherSuite = node.attribute (ATTR_CIPHER_SUITE).value ();
+            keyExchangeParamsMap.clear ();
+            pugi::xml_node keyExchangeParams = node.child (TAG_KEY_EXCHANGE_PARAMS);
+            for (pugi::xml_node child = keyExchangeParams.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_KEY_EXCHANGE_PARAM) {
+                        Params::Ptr params;
+                        child >> params;
+                        std::pair<ParamsMap::iterator, bool> result =
+                            keyExchangeParamsMap.insert (
+                                ParamsMap::value_type (params->GetId (), params));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert KeyExchange params: %s",
+                                params->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+            keyExchangeKeyMap.clear ();
+            pugi::xml_node keyExchangeKeys = node.child (TAG_KEY_EXCHANGE_KEYS);
+            for (pugi::xml_node child = keyExchangeKeys.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_KEY_EXCHANGE_KEY) {
+                        AsymmetricKey::Ptr key;
+                        child >> key;
+                        std::pair<AsymmetricKeyMap::iterator, bool> result =
+                            keyExchangeKeyMap.insert (
+                                AsymmetricKeyMap::value_type (key->GetId (), key));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert KeyExchange key: %s",
+                                key->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+            authenticatorParamsMap.clear ();
+            pugi::xml_node authenticatorParams = node.child (TAG_AUTHENTICATOR_PARAMS);
+            for (pugi::xml_node child = authenticatorParams.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_AUTHENTICATOR_PARAM) {
+                        Params::Ptr params;
+                        child >> params;
+                        std::pair<ParamsMap::iterator, bool> result =
+                            authenticatorParamsMap.insert (
+                                ParamsMap::value_type (params->GetId (), params));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert Authenticator params: %s",
+                                params->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+            authenticatorKeyMap.clear ();
+            pugi::xml_node authenticatorKeys = node.child (TAG_AUTHENTICATOR_KEYS);
+            for (pugi::xml_node child = authenticatorKeys.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_AUTHENTICATOR_KEY) {
+                        AsymmetricKey::Ptr key;
+                        child >> key;
+                        std::pair<AsymmetricKeyMap::iterator, bool> result =
+                            authenticatorKeyMap.insert (
+                                AsymmetricKeyMap::value_type (key->GetId (), key));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert Authenticator key: %s",
+                                key->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+            cipherKeyMap.clear ();
+            pugi::xml_node cipherKeys = node.child (TAG_CIPHER_KEYS);
+            for (pugi::xml_node child = cipherKeys.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_CIPHER_KEY) {
+                        SymmetricKey::Ptr key;
+                        child >> key;
+                        std::pair<SymmetricKeyMap::iterator, bool> result =
+                            cipherKeyMap.insert (
+                                SymmetricKeyMap::value_type (key->GetId (), key));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert Cipher key: %s",
+                                key->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+            macKeyMap.clear ();
+            pugi::xml_node macKeys = node.child (TAG_MAC_KEYS);
+            for (pugi::xml_node child = macKeys.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_MAC_KEY) {
+                        SymmetricKey::Ptr key;
+                        child >> key;
+                        std::pair<SymmetricKeyMap::iterator, bool> result =
+                            macKeyMap.insert (
+                                SymmetricKeyMap::value_type (key->GetId (), key));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert MAC key: %s",
+                                key->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+            userDataMap.clear ();
+            pugi::xml_node userDatas = node.child (TAG_USER_DATAS);
+            for (pugi::xml_node child = userDatas.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_USER_DATA) {
+                        Serializable::Ptr userData;
+                        child >> userData;
+                        std::pair<SerializableMap::iterator, bool> result =
+                            userDataMap.insert (
+                                SerializableMap::value_type (userData->GetId (), userData));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert user data: %s",
+                                userData->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+            subringMap.clear ();
+            pugi::xml_node subrings = node.child (TAG_SUB_RINGS);
+            for (pugi::xml_node child = subrings.first_child ();
+                    !child.empty (); child = child.next_sibling ()) {
+                if (child.type () == pugi::node_element) {
+                    std::string childName = child.name ();
+                    if (childName == TAG_SUB_RING) {
+                        Ptr subring;
+                        child >> subring;
+                        std::pair<KeyRingMap::iterator, bool> result =
+                            subringMap.insert (
+                                KeyRingMap::value_type (subring->GetId (), subring));
+                        if (!result.second) {
+                            THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                "Unable to instert subring: %s",
+                                subring->GetName ().c_str ());
+                        }
+                    }
+                }
+            }
+        }
+
+        void KeyRing::Write (pugi::xml_node &node) const {
+            Serializable::Write (node);
+            node.append_attribute (ATTR_CIPHER_SUITE).set_value (cipherSuite.ToString ().c_str ());
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_KEY_EXCHANGE_PARAMS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node keyExchangeParams = node.append_child (TAG_KEY_EXCHANGE_PARAMS);
                 for (ParamsMap::const_iterator
                         it = keyExchangeParamsMap.begin (),
                         end = keyExchangeParamsMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_KEY_EXCHANGE_PARAM);
+                    pugi::xml_node keyExchangeParam = keyExchangeParams.append_child (TAG_KEY_EXCHANGE_PARAM);
+                    keyExchangeParam << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_KEY_EXCHANGE_PARAMS);
             }
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_KEY_EXCHANGE_KEYS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node keyExchangeKeys = node.append_child (TAG_KEY_EXCHANGE_KEYS);
                 for (AsymmetricKeyMap::const_iterator
                         it = keyExchangeKeyMap.begin (),
                         end = keyExchangeKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_KEY_EXCHANGE_KEY);
+                    pugi::xml_node keyExchangeKey = keyExchangeKeys.append_child (TAG_KEY_EXCHANGE_KEY);
+                    keyExchangeKey << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_KEY_EXCHANGE_KEYS);
             }
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_AUTHENTICATOR_PARAMS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node authenticatorParams = node.append_child (TAG_AUTHENTICATOR_PARAMS);
                 for (ParamsMap::const_iterator
                         it = authenticatorParamsMap.begin (),
                         end = authenticatorParamsMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_AUTHENTICATOR_PARAM);
+                    pugi::xml_node authenticatorParam = authenticatorParams.append_child (TAG_AUTHENTICATOR_PARAM);
+                    authenticatorParam << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_AUTHENTICATOR_PARAMS);
             }
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_AUTHENTICATOR_KEYS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node authenticatorKeys = node.append_child (TAG_AUTHENTICATOR_KEYS);
                 for (AsymmetricKeyMap::const_iterator
                         it = authenticatorKeyMap.begin (),
                         end = authenticatorKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_AUTHENTICATOR_KEY);
+                    pugi::xml_node authenticatorKey = authenticatorKeys.append_child (TAG_AUTHENTICATOR_KEY);
+                    authenticatorKey << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_AUTHENTICATOR_KEYS);
             }
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_CIPHER_KEYS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node cipherKeys = node.append_child (TAG_CIPHER_KEYS);
                 for (SymmetricKeyMap::const_iterator
                         it = cipherKeyMap.begin (),
                         end = cipherKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_CIPHER_KEY);
+                    pugi::xml_node cipherKey = cipherKeys.append_child (TAG_CIPHER_KEY);
+                    cipherKey << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_CIPHER_KEYS);
             }
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_MAC_KEYS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node macKeys = node.append_child (TAG_MAC_KEYS);
                 for (SymmetricKeyMap::const_iterator
                         it = macKeyMap.begin (),
                         end = macKeyMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_MAC_KEY);
+                    pugi::xml_node macKey = macKeys.append_child (TAG_CIPHER_KEY);
+                    macKey << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_MAC_KEYS);
             }
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_USER_DATAS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node userDatas = node.append_child (TAG_USER_DATAS);
                 for (SerializableMap::const_iterator
                         it = userDataMap.begin (),
                         end = userDataMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_USER_DATA);
+                    pugi::xml_node userData = userDatas.append_child (TAG_USER_DATA);
+                    userData << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_USER_DATAS);
             }
             {
-                stream << util::OpenTag (
-                    indentationLevel + 1,
-                    TAG_SUB_RINGS,
-                    util::Attributes (),
-                    false,
-                    true);
+                pugi::xml_node subRings = node.append_child (TAG_SUB_RINGS);
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    stream << it->second->ToString (
-                        indentationLevel + 2,
-                        TAG_SUB_RING);
+                    pugi::xml_node subRing = subRings.append_child (TAG_SUB_RING);
+                    subRing << *it->second;
                 }
-                stream << util::CloseTag (
-                    indentationLevel + 1,
-                    TAG_SUB_RINGS);
             }
-            stream << util::CloseTag (indentationLevel, tagName);
-            return stream.str ();
         }
 
     } // namespace crypto

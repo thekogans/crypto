@@ -187,6 +187,7 @@ namespace thekogans {
         /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_RSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_DSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
         /// \endcode
         #define THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)
     #else // defined (THEKOGANS_CRYPTO_TYPE_Static)
@@ -209,6 +210,7 @@ namespace thekogans {
         /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_RSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_DSA)
         /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
+        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
         /// \endcode
         #define THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)\
         namespace {\

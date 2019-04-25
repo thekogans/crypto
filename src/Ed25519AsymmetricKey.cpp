@@ -69,27 +69,27 @@ namespace thekogans {
         }
 
         std::size_t Ed25519AsymmetricKey::Size () const {
-            return AsymmetricKey::Size () + GetKeyLength ();
+            return AsymmetricKey::Size () + (IsPrivate () ? Ed25519::PRIVATE_KEY_LENGTH : Ed25519::PUBLIC_KEY_LENGTH);
         }
 
         void Ed25519AsymmetricKey::Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
             if (IsPrivate ()) {
-                if (serializer.Read (key.privateKey, X25519::PRIVATE_KEY_LENGTH) != X25519::PRIVATE_KEY_LENGTH) {
+                if (serializer.Read (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Read (key.privateKey, %u) != %u",
-                        X25519::PRIVATE_KEY_LENGTH,
-                        X25519::PRIVATE_KEY_LENGTH);
+                        Ed25519::PRIVATE_KEY_LENGTH,
+                        Ed25519::PRIVATE_KEY_LENGTH);
                 }
             }
             else {
-                if (serializer.Read (key.publicKey.value, X25519::PUBLIC_KEY_LENGTH) != X25519::PUBLIC_KEY_LENGTH) {
+                if (serializer.Read (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Read (key.publicKey.value, %u) != %u",
-                        X25519::PUBLIC_KEY_LENGTH,
-                        X25519::PUBLIC_KEY_LENGTH);
+                        Ed25519::PUBLIC_KEY_LENGTH,
+                        Ed25519::PUBLIC_KEY_LENGTH);
                 }
             }
         }
@@ -97,43 +97,67 @@ namespace thekogans {
         void Ed25519AsymmetricKey::Write (util::Serializer &serializer) const {
             AsymmetricKey::Write (serializer);
             if (IsPrivate ()) {
-                if (serializer.Write (key.privateKey, X25519::PRIVATE_KEY_LENGTH) != X25519::PRIVATE_KEY_LENGTH) {
+                if (serializer.Write (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Write (key.privateKey, %u) != %u",
-                        X25519::PRIVATE_KEY_LENGTH,
-                        X25519::PRIVATE_KEY_LENGTH);
+                        Ed25519::PRIVATE_KEY_LENGTH,
+                        Ed25519::PRIVATE_KEY_LENGTH);
                 }
             }
             else {
-                if (serializer.Write (key.publicKey.value, X25519::PUBLIC_KEY_LENGTH) != X25519::PUBLIC_KEY_LENGTH) {
+                if (serializer.Write (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Write (key.publicKey.value, %u) != %u",
-                        X25519::PUBLIC_KEY_LENGTH,
-                        X25519::PUBLIC_KEY_LENGTH);
+                        Ed25519::PUBLIC_KEY_LENGTH,
+                        Ed25519::PUBLIC_KEY_LENGTH);
                 }
             }
         }
 
         const char * const Ed25519AsymmetricKey::ATTR_KEY = "Key";
 
-        std::string Ed25519AsymmetricKey::ToString (
-                std::size_t indentationLevel,
-                const char *tagName) const {
-            util::Attributes attributes;
-            attributes.push_back (util::Attribute (ATTR_TYPE, Type ()));
-            attributes.push_back (util::Attribute (ATTR_ID, id.ToString ()));
-            attributes.push_back (util::Attribute (ATTR_NAME, name));
-            attributes.push_back (util::Attribute (ATTR_DESCRIPTION, description));
-            attributes.push_back (util::Attribute (ATTR_PRIVATE, util::boolTostring (IsPrivate ())));
-            attributes.push_back (util::Attribute (ATTR_KEY_TYPE, GetKeyType ()));
-            attributes.push_back (util::Attribute (ATTR_KEY_LENGTH, util::size_tTostring (GetKeyLength ())));
-            attributes.push_back (
-                util::Attribute (
-                    ATTR_KEY,
-                    util::HexEncodeBuffer (
-                        IsPrivate () ? key.privateKey : key.publicKey.value,
-                        GetKeyLength ())));
-            return util::OpenTag (indentationLevel, tagName, attributes, true, true);
+        void Ed25519AsymmetricKey::Read (
+                const TextHeader &header,
+                const pugi::xml_node &node) {
+            AsymmetricKey::Read (header, node);
+            if (IsPrivate ()) {
+                std::string privateKey = node.attribute (ATTR_KEY).value ();
+                if (privateKey.size () == Ed25519::PRIVATE_KEY_LENGTH * 2) {
+                    util::HexDecodestring (privateKey, key.privateKey);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Wrong private key length. Expected " THEKOGANS_UTIL_SIZE_T_FORMAT
+                        ", received " THEKOGANS_UTIL_SIZE_T_FORMAT ".",
+                        Ed25519::PRIVATE_KEY_LENGTH * 2,
+                        privateKey.size ());
+                }
+            }
+            else {
+                std::string publicKey = node.attribute (ATTR_KEY).value ();
+                if (publicKey.size () == Ed25519::PUBLIC_KEY_LENGTH * 2) {
+                    util::HexDecodestring (publicKey, key.publicKey.value);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Wrong public key length. Expected " THEKOGANS_UTIL_SIZE_T_FORMAT
+                        ", received " THEKOGANS_UTIL_SIZE_T_FORMAT ".",
+                        Ed25519::PUBLIC_KEY_LENGTH * 2,
+                        publicKey.size ());
+                }
+            }
+        }
+
+        void Ed25519AsymmetricKey::Write (pugi::xml_node &node) const {
+            AsymmetricKey::Write (node);
+            if (IsPrivate ()) {
+                node.append_attribute (ATTR_KEY).set_value (
+                    util::HexEncodeBuffer (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH).c_str ());
+            }
+            else {
+                node.append_attribute (ATTR_KEY).set_value (
+                    util::HexEncodeBuffer (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH).c_str ());
+            }
         }
 
     } // namespace crypto

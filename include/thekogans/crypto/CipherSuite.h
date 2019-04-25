@@ -91,6 +91,9 @@ namespace thekogans {
             /// \brief
             /// "RSA"
             static const char * const AUTHENTICATOR_RSA;
+            /// \brief
+            /// "Ed25519"
+            static const char * const AUTHENTICATOR_Ed25519;
 
             /// \brief
             /// "AES-256-GCM"
@@ -165,12 +168,12 @@ namespace thekogans {
                 const std::string &messageDigest_);
             /// \brief
             /// ctor.
-            /// \param[in] cipherSuite String encoded cipher suite: Kx_Auth_Enc_MD.
-            explicit CipherSuite (const std::string &cipherSuite);
-            /// \brief
-            /// ctor.
             /// \param[in] serializer Serializer containing the cipher suite.
             explicit CipherSuite (util::Serializer &serializer);
+            /// \brief
+            /// ctor.
+            /// \param[in] cipherSuite String encoded cipher suite: Kx_Auth_Enc_MD.
+            explicit CipherSuite (const std::string &cipherSuite);
             /// \brief
             /// copy ctor.
             /// \param[in] cipherSuite Cipher suite to copy.
@@ -186,6 +189,11 @@ namespace thekogans {
             /// Weakest cipher suite.
             static const CipherSuite Weakest;
 
+            /// \brief
+            /// Assignment operator.
+            /// \param[in] cipherSuite String containing a properly formated cipher suite.
+            /// \return *this.
+            CipherSuite &operator = (const std::string &cipherSuite);
             /// \brief
             /// Assignment operator.
             /// \param[in] cipherSuite Cipher suite to copy.
@@ -299,8 +307,8 @@ namespace thekogans {
             /// \param[in] count A security counter. Increment the count to slow down
             /// \see{SymmetricKey} derivation.
             /// \param[in] keyId Optional \see{SymmetricKey} id.
-            /// \param[in] name Optional \see{SymmetricKey} name.
-            /// \param[in] description Optional \see{SymmetricKey} description.
+            /// \param[in] keyName Optional \see{SymmetricKey} name.
+            /// \param[in] keyDescription Optional \see{SymmetricKey} description.
             /// \return \see{DHEKeyExchange} instance represented by keyExchange.
             KeyExchange::Ptr GetDHEKeyExchange (
                 const ID &keyExchangeId,
@@ -309,8 +317,8 @@ namespace thekogans {
                 std::size_t saltLength = 0,
                 std::size_t count = 1,
                 const ID &keyId = ID (),
-                const std::string &name = std::string (),
-                const std::string &description = std::string ()) const;
+                const std::string &keyName = std::string (),
+                const std::string &keyDescription = std::string ()) const;
             /// \brief
             /// Return an instance of the \see{RSAKeyExchange} represented by keyExchange (client side RSA).
             /// \param[in] keyExchangeId \see{KeyExchange::keyExchangeId}.
@@ -321,8 +329,8 @@ namespace thekogans {
             /// \param[in] count A security counter. Increment the count to slow down
             /// \see{SymmetricKey} derivation.
             /// \param[in] keyId Optional \see{SymmetricKey} id.
-            /// \param[in] name Optional \see{SymmetricKey} name.
-            /// \param[in] description Optional \see{SymmetricKey} description.
+            /// \param[in] keyName Optional \see{SymmetricKey} name.
+            /// \param[in] keyDescription Optional \see{SymmetricKey} description.
             /// \return \see{RSAKeyExchange} instance represented by keyExchange.
             KeyExchange::Ptr GetRSAKeyExchange (
                 const ID &keyExchangeId,
@@ -332,8 +340,8 @@ namespace thekogans {
                 std::size_t saltLength = 0,
                 std::size_t count = 1,
                 const ID &keyId = ID (),
-                const std::string &name = std::string (),
-                const std::string &description = std::string ()) const;
+                const std::string &keyName = std::string (),
+                const std::string &keyDescription = std::string ()) const;
             /// \brief
             /// Return the \see{Authenticator} instance represented by authenticator.
             /// \param[in] key Private (Sign)/Public (Verify) key.
@@ -360,6 +368,48 @@ namespace thekogans {
             MessageDigest::Ptr GetMessageDigest () const;
 
             /// \brief
+            /// Return true if key exchange is ECDHE.
+            /// \return true == key exchange is ECDHE.
+            inline bool IsKeyExchangeEC () const {
+                return authenticator == KEY_EXCHANGE_ECDHE;
+            }
+
+            /// \brief
+            /// Return true if authenticator is ECDSA or Ed25519.
+            /// \return true == authenticator is ECDSA or Ed25519.
+            inline bool IsAuthenticatorEC () const {
+                return authenticator == AUTHENTICATOR_ECDSA || authenticator == AUTHENTICATOR_Ed25519;
+            }
+            /// \brief
+            /// Given a key length (in bits), create an DSA or RSA
+            /// (based on authenticator) private/public key pair.
+            /// \param[in] keyLength Length of key (in bits).
+            /// \param[in] RSAPublicExponent RSA key public exponent. Ignored for DSA.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return Private/public random key pair.
+            AsymmetricKey::Ptr CreateAuthenticatorKey (
+                std::size_t keyLength,
+                BIGNUMPtr RSAPublicExponent = BIGNUMFromui32 (65537),
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ()) const;
+            /// \brief
+            /// Given a curve name (See \see{EC}), create an ECDSA or Ed25519
+            /// (based on authenticator) private/public key pair.
+            /// \param[in] curveName Name one of the many curve names defined in see{EC}.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            /// \return Private/public random key pair.
+            AsymmetricKey::Ptr CreateAuthenticatorKey (
+                const std::string curveName,
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ()) const;
+
+            /// \brief
             /// Return the OpenSSL EVP_CIPHER represented by cipher.
             /// \return OpenSSL EVP_CIPHER represented by cipher.
             inline const EVP_CIPHER *GetOpenSSLCipher () const {
@@ -378,6 +428,12 @@ namespace thekogans {
             inline std::string ToString () const {
                 return keyExchange + "_" + authenticator + "_" + cipher + "_" + messageDigest;
             }
+
+        private:
+            /// \brief
+            /// Parse a properly formated cipher suite string.
+            /// \param[in] cipherSuite String encoded cipher suite: Kx_Auth_Enc_MD.
+            void Parse (const std::string &cipherSuite);
         };
 
         /// \brief

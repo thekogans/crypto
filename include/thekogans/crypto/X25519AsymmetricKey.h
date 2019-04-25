@@ -102,29 +102,31 @@ namespace thekogans {
 
             /// \brief
             /// Read the key from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::BinHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the key from.
             virtual void Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer);
             /// \brief
             /// Serialize the key to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-        public:
             /// \brief
             /// "Key"
             static const char * const ATTR_KEY;
 
             /// \brief
-            /// Return the XML representation of a key.
-            /// \param[in] indentationLevel How far to indent the leading tag.
-            /// \param[in] tagName The name of the leading tag.
-            /// \return XML representation of a key.
-            virtual std::string ToString (
-                std::size_t indentationLevel = 0,
-                const char *tagName = TAG_SERIALIZABLE) const;
+            /// Read the Serializable from an XML DOM.
+            /// \param[in] header \see{util::Serializable::TextHeader}.
+            /// \param[in] node XML DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader &header,
+                const pugi::xml_node &node);
+            /// \brief
+            /// Write the Serializable to the XML DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (pugi::xml_node &node) const;
 
             /// \brief
             /// X25519AsymmetricKey is neither copy constructable, nor assignable.
@@ -132,10 +134,18 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement X25519AsymmetricKey extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (X25519AsymmetricKey)
+        /// Implement X25519AsymmetricKey extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (X25519AsymmetricKey)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement X25519AsymmetricKey value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::X25519AsymmetricKey)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_X25519AsymmetricKey_h)

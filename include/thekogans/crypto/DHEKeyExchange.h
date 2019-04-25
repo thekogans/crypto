@@ -47,7 +47,6 @@ namespace thekogans {
         /// the parameters before exchanging keys with an unknown peer.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL DHEKeyExchange : public KeyExchange {
-        private:
             /// \struct DHEKeyExchange::DHEParams DHEKeyExchange.h thekogans/crypto/DHEKeyExchange.h
             ///
             /// \brief
@@ -78,10 +77,10 @@ namespace thekogans {
                 ID keyId;
                 /// \brief
                 /// \see{SymmetricKey} name.
-                std::string name;
+                std::string keyName;
                 /// \brief
                 /// \see{SymmetricKey} description.
-                std::string description;
+                std::string keyDescription;
                 /// \brief
                 /// Public \see{AsymmetricKey} used for key exchange.
                 AsymmetricKey::Ptr publicKey;
@@ -95,8 +94,8 @@ namespace thekogans {
                 /// \param[in] messageDigestName_ OpenSSL message digest to use for hashing.
                 /// \param[in] count_ A security counter. Increment the count to slow down \see{SymmetricKey} derivation.
                 /// \param[in] keyId_ \see{SymmetricKey} id.
-                /// \param[in] name_ \see{SymmetricKey} name.
-                /// \param[in] description_ \see{SymmetricKey} description.
+                /// \param[in] keyName_ \see{SymmetricKey} name.
+                /// \param[in] keyDescription_ \see{SymmetricKey} description.
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
                 DHEParams (
                     const ID &id,
@@ -106,8 +105,8 @@ namespace thekogans {
                     const std::string &messageDigestName_,
                     std::size_t count_,
                     const ID &keyId_,
-                    const std::string &name_,
-                    const std::string &description_,
+                    const std::string &keyName_,
+                    const std::string &keyDescription_,
                     AsymmetricKey::Ptr publicKey_) :
                     Params (id),
                     params (params_),
@@ -116,8 +115,8 @@ namespace thekogans {
                     messageDigestName (messageDigestName_),
                     count (count_),
                     keyId (keyId_),
-                    name (name_),
-                    description (description_),
+                    keyName (keyName_),
+                    keyDescription (keyDescription_),
                     publicKey (publicKey_) {}
 
                 /// \brief
@@ -146,24 +145,58 @@ namespace thekogans {
 
                 /// \brief
                 /// Read the serializable from the given serializer.
-                /// \param[in] header \see{util::Serializable::Header}.
+                /// \param[in] header \see{util::Serializable::BinHeader}.
                 /// \param[in] serializer \see{util::Serializer} to read the serializable from.
                 virtual void Read (
-                    const Header &header,
+                    const BinHeader &header,
                     util::Serializer &serializer);
                 /// \brief
                 /// Write the serializable to the given serializer.
                 /// \param[out] serializer \see{util::Serializer} to write the serializable to.
                 virtual void Write (util::Serializer &serializer) const;
+
+                /// \brief
+                /// "Params"
+                static const char * const TAG_PARAMS;
+                /// \brief
+                /// "Salt"
+                static const char * const ATTR_SALT;
+                /// \brief
+                /// "KeyLength"
+                static const char * const ATTR_KEY_LENGTH;
+                /// \brief
+                /// "MessageDigestName"
+                static const char * const ATTR_MESSAGE_DIGEST_NAME;
+                /// \brief
+                /// "Count"
+                static const char * const ATTR_COUNT;
+                /// \brief
+                /// "KeyId"
+                static const char * const ATTR_KEY_ID;
+                /// \brief
+                /// "KeyName"
+                static const char * const ATTR_KEY_NAME;
+                /// \brief
+                /// "KeyDescription"
+                static const char * const ATTR_KEY_DESCRIPTION;
+                /// \brief
+                /// "PublicKey"
+                static const char * const TAG_PUBLIC_KEY;
+
+                /// \brief
+                /// Read a Serializable from an XML DOM.
+                /// \param[in] header \see{util::Serializable::TextHeader}.
+                /// \param[in] node XML DOM representation of a Serializable.
+                virtual void Read (
+                    const TextHeader &header,
+                    const pugi::xml_node &node);
+                /// \brief
+                /// Write a Serializable to the XML DOM.
+                /// \param[out] node Parent node.
+                virtual void Write (pugi::xml_node &node) const;
             };
 
-            /// \brief
-            /// \see{Serializable} needs access to DHEParams.
-            friend struct Serializable;
-            /// \brief
-            /// \see{KeyRing} needs access to DHEParams.
-            friend struct KeyRing;
-
+        private:
             /// \brief
             /// true == Initiator of key exchange, false == Receiver of key exchange.
             const bool initiator;
@@ -188,10 +221,10 @@ namespace thekogans {
             ID keyId;
             /// \brief
             /// \see{SymmetricKey} name.
-            std::string name;
+            std::string keyName;
             /// \brief
             /// \see{SymmetricKey} description.
-            std::string description;
+            std::string keyDescription;
             /// \brief
             /// Private \see{DH}/\see{EC} \see{AsymmetricKey} used for key exchange.
             AsymmetricKey::Ptr privateKey;
@@ -210,8 +243,8 @@ namespace thekogans {
             /// \param[in] md OpenSSL message digest to use for hashing.
             /// \param[in] count A security counter. Increment the count to slow down \see{SymmetricKey} derivation.
             /// \param[in] keyId Optional \see{SymmetricKey} id.
-            /// \param[in] name Optional \see{SymmetricKey} name.
-            /// \param[in] description Optional \see{SymmetricKey} description.
+            /// \param[in] keyName Optional \see{SymmetricKey} name.
+            /// \param[in] keyDescription Optional \see{SymmetricKey} description.
             DHEKeyExchange (
                 const ID &id,
                 crypto::Params::Ptr params_,
@@ -221,8 +254,8 @@ namespace thekogans {
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count_ = 1,
                 const ID &keyId_ = ID (),
-                const std::string &name_ = std::string (),
-                const std::string &description_ = std::string ());
+                const std::string &keyName_ = std::string (),
+                const std::string &keyDescription_ = std::string ());
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
             /// \param[in] params \see{DHEParams} containing info to create a shared \see{SymmetricKey}.
@@ -250,7 +283,19 @@ namespace thekogans {
             THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (DHEKeyExchange)
         };
 
+        /// \brief
+        /// Implement DHEKeyExchange::DHEParams extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (DHEKeyExchange::DHEParams)
+
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement DHEKeyExchange::DHEParams value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::DHEKeyExchange::DHEParams)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_DHEKeyExchange_h)

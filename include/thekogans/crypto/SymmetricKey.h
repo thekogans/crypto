@@ -44,19 +44,23 @@ namespace thekogans {
             /// SymmetricKey is a \see{Serializable}
             THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (SymmetricKey)
 
+            /// \brief
+            /// Convenient typedef for util::FixedBuffer<EVP_MAX_KEY_LENGTH>.
+            typedef util::FixedBuffer<EVP_MAX_KEY_LENGTH> KeyType;
+
         private:
             /// \brief
             /// Symmetric key.
-            util::FixedBuffer<EVP_MAX_KEY_LENGTH> key;
+            KeyType key;
 
         public:
             /// \brief
             /// ctor.
+            /// \param[in] buffer Optional buffer containing the key.
+            /// \param[in] length Key buffer length.
             /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
-            /// \param[in] begin Option start of key.
-            /// \param[in] end Option end of key.
             SymmetricKey (
                 const void *buffer = 0,
                 std::size_t length = 0,
@@ -65,9 +69,9 @@ namespace thekogans {
                 const std::string &description = std::string ()) :
                 Serializable (id, name, description),
                 // FixedBuffer will throw if length > EVP_MAX_KEY_LENGTH.
-                key (util::HostEndian, (const util::ui8 *)buffer, length, true) {}
+                key (util::HostEndian, buffer, length, true) {}
             ~SymmetricKey () {
-                memset (key.data, 0, EVP_MAX_KEY_LENGTH);
+                memset (key.GetDataPtr (), 0, key.GetLength ());
             }
 
             /// \brief
@@ -307,9 +311,16 @@ namespace thekogans {
             /// \brief
             /// Return the key buffer.
             /// \return Key buffer.
-            inline const util::FixedBuffer<EVP_MAX_KEY_LENGTH> &Get () const {
+            inline const KeyType &Get () const {
                 return key;
             }
+            /// \brief
+            /// Set the key.
+            /// \param[in] buffer Buffer containing the new key.
+            /// \param[in] length Legth of key buffer.
+            void Set (
+                const void *buffer,
+                std::size_t length);
 
         protected:
             // Serializable
@@ -320,29 +331,31 @@ namespace thekogans {
 
             /// \brief
             /// Read the key from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::BinHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the key from.
             virtual void Read (
-                const Header &header,
+                const BinHeader &header,
                 util::Serializer &serializer);
             /// \brief
             /// Write the key to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to write the key to.
             virtual void Write (util::Serializer &serializer) const;
 
-        public:
             /// \brief
-            /// "KeyLength"
-            static const char * const ATTR_KEY_LENGTH;
+            /// "Key"
+            static const char * const ATTR_KEY;
 
             /// \brief
-            /// Return the XML representation of a key.
-            /// \param[in] indentationLevel How far to indent the leading tag.
-            /// \param[in] tagName The name of the leading tag.
-            /// \return XML representation of a key.
-            virtual std::string ToString (
-                std::size_t indentationLevel = 0,
-                const char *tagName = TAG_SERIALIZABLE) const;
+            /// Read the Serializable from an XML DOM.
+            /// \param[in] header \see{util::Serializable::TextHeader}.
+            /// \param[in] node XML DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader &header,
+                const pugi::xml_node &node);
+            /// \brief
+            /// Write the Serializable to the XML DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (pugi::xml_node &node) const;
 
             /// \brief
             /// SymmetricKey is neither copy constructable, nor assignable.
@@ -350,10 +363,18 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement SymmetricKey extraction operator.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATOR (SymmetricKey)
+        /// Implement SymmetricKey extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (SymmetricKey)
 
     } // namespace crypto
+
+    namespace util {
+
+        /// \brief
+        /// Implement SymmetricKey value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::SymmetricKey)
+
+    } // namespace util
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_SymmetricKey_h)
