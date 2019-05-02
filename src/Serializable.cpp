@@ -88,5 +88,17 @@ namespace thekogans {
             node.append_attribute (ATTR_DESCRIPTION).set_value (description.c_str ());
         }
 
+        void Serializable::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void Serializable::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
     } // namespace crypto
 } // namespace thekogans

@@ -44,16 +44,20 @@ namespace thekogans {
 
         namespace {
         #if defined (TOOLCHAIN_OS_Windows)
-            std::string GetCertName (PCERT_NAME_BLOB certName) {
+            const DWORD ENCODING = X509_ASN_ENCODING | PKCS_7_ASN_ENCODING;
+
+            std::string GetCertName (
+                    DWORD encoding,
+                    PCERT_NAME_BLOB certName) {
                 DWORD size = CertNameToStr (
-                    X509_ASN_ENCODING,
+                    encoding,
                     certName,
                     CERT_SIMPLE_NAME_STR,
                     0, 0);
                 if (size != 0) {
                     std::vector<char> buffer (size);
                     CertNameToStr (
-                        X509_ASN_ENCODING,
+                        encoding,
                         certName,
                         CERT_SIMPLE_NAME_STR,
                         &buffer[0],
@@ -63,17 +67,38 @@ namespace thekogans {
                 return std::string ();
             }
 
-            X509Ptr ParseDERCertificate (
+            X509Ptr ParseCertificate (
+                    DWORD encoding,
                     const void *buffer,
-                    std::size_t bufferLength) {
-                if (buffer != 0 && bufferLength > 0) {
-                    X509Ptr certificate (
-                        d2i_X509 (0, (const unsigned char **)&buffer, (long)bufferLength));
-                    if (certificate.get () != 0) {
-                        return certificate;
+                    std::size_t bufferLength,
+                    pem_password_cb *passwordCallback = 0,
+                    void *userData = 0) {
+                if ((encoding & ENCODING) != 0 && buffer != 0 && bufferLength > 0) {
+                    if (encoding == X509_ASN_ENCODING) {
+                        X509Ptr certificate (
+                            d2i_X509 (0, (const unsigned char **)&buffer, (long)bufferLength));
+                        if (certificate.get () != 0) {
+                            return certificate;
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
                     }
                     else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)bufferLength));
+                        if (bio.get () != 0) {
+                            X509Ptr certificate (
+                                PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
+                            if (certificate.get () != 0) {
+                                return certificate;
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
                     }
                 }
                 else {
@@ -213,16 +238,20 @@ namespace thekogans {
                             // We only want to add Root CAs, so make
                             // sure Subject and Issuer names match.
                             std::string subject =
-                                GetCertName (&certContext->pCertInfo->Subject);
+                                GetCertName (
+                                    certContext->dwCertEncodingType,
+                                    &certContext->pCertInfo->Subject);
                             std::string issuer =
-                                GetCertName (&certContext->pCertInfo->Issuer);
+                                GetCertName (
+                                    certContext->dwCertEncodingType,
+                                    &certContext->pCertInfo->Issuer);
                             if (subject.empty () || issuer.empty () || subject != issuer) {
                                 continue;
                             }
                         }
-                        // M$ certificates are DER encoded.
                         X509Ptr certificate =
-                            ParseDERCertificate (
+                            ParseCertificate (
+                                certContext->dwCertEncodingType,
                                 certContext->pbCertEncoded,
                                 certContext->cbCertEncoded);
                         if (certificate.get () != 0) {

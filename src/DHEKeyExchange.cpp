@@ -212,6 +212,18 @@ namespace thekogans {
             publicKeyNode << *publicKey;
         }
 
+        void DHEKeyExchange::DHEParams::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void DHEKeyExchange::DHEParams::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
         namespace {
             inline bool ValidateParamsKeyType (const char *keyType) {
                 return

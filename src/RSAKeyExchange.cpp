@@ -129,6 +129,18 @@ namespace thekogans {
             node.append_attribute (ATTR_BUFFER).set_value (util::HexEncodeBuffer (buffer.data (), buffer.size ()).c_str ());
         }
 
+        void RSAKeyExchange::RSAParams::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void RSAKeyExchange::RSAParams::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
         RSAKeyExchange::RSAKeyExchange (
                 const ID &id,
                 AsymmetricKey::Ptr key_,

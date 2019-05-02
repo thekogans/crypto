@@ -153,6 +153,17 @@ namespace thekogans {
             virtual void Write (pugi::xml_node &node) const;
 
             /// \brief
+            /// Read a Serializable from an JSON DOM.
+            /// \param[in] node JSON DOM representation of a Serializable.
+            virtual void Read (
+                const TextHeader &header,
+                const util::JSON::Object &object);
+            /// \brief
+            /// Write a Serializable to the JSON DOM.
+            /// \param[out] node Parent node.
+            virtual void Write (util::JSON::Object &object) const;
+
+            /// \brief
             /// OpenSSLParams is neither copy constructable, nor assignable.
             THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (OpenSSLParams)
         };

@@ -1691,5 +1691,17 @@ namespace thekogans {
             }
         }
 
+        void KeyRing::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void KeyRing::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
     } // namespace crypto
 } // namespace thekogans

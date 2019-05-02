@@ -317,5 +317,17 @@ namespace thekogans {
             node.append_child (pugi::node_pcdata).set_value (WriteKey (IsPrivate (), *key).c_str ());
         }
 
+        void OpenSSLAsymmetricKey::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
     } // namespace crypto
 } // namespace thekogans

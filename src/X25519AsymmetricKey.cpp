@@ -130,5 +130,17 @@ namespace thekogans {
                 util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH).c_str ());
         }
 
+        void X25519AsymmetricKey::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void X25519AsymmetricKey::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
     } // namespace crypto
 } // namespace thekogans

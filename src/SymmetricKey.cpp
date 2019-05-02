@@ -537,5 +537,17 @@ namespace thekogans {
                 util::HexEncodeBuffer (key.GetReadPtr (), key.GetDataAvailableForReading ()).c_str ());
         }
 
+        void SymmetricKey::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void SymmetricKey::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
     } // namespace crypto
 } // namespace thekogans

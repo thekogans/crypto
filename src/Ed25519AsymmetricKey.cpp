@@ -160,5 +160,17 @@ namespace thekogans {
             }
         }
 
+        void Ed25519AsymmetricKey::Read (
+                const TextHeader &header,
+                const util::JSON::Object &object) {
+            // FIXME: implement
+            assert (0);
+        }
+
+        void Ed25519AsymmetricKey::Write (util::JSON::Object &object) const {
+            // FIXME: implement
+            assert (0);
+        }
+
     } // namespace crypto
 } // namespace thekogans
