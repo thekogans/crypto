@@ -73,7 +73,7 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             if (buffer != 0 && length > 0) {
-                BIOPtr bio (BIO_new_mem_buf (buffer, length));
+                BIOPtr bio (BIO_new_mem_buf (buffer, (int)length));
                 if (bio.get () != 0) {
                     return AsymmetricKey::Ptr (
                         new OpenSSLAsymmetricKey (
@@ -124,7 +124,7 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             if (buffer != 0 && length > 0) {
-                BIOPtr bio (BIO_new_mem_buf (buffer, length));
+                BIOPtr bio (BIO_new_mem_buf (buffer, (int)length));
                 if (bio.get () != 0) {
                     return AsymmetricKey::Ptr (
                         new OpenSSLAsymmetricKey (
