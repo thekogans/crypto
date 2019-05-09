@@ -534,19 +534,44 @@ namespace thekogans {
         void SymmetricKey::Write (pugi::xml_node &node) const {
             Serializable::Write (node);
             node.append_attribute (ATTR_KEY).set_value (
-                util::HexEncodeBuffer (key.GetReadPtr (), key.GetDataAvailableForReading ()).c_str ());
+                util::HexEncodeBuffer (
+                    key.GetReadPtr (),
+                    key.GetDataAvailableForReading ()).c_str ());
         }
 
         void SymmetricKey::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            Serializable::Read (header, object);
+            util::SecureString hexKey = object.GetValue (ATTR_KEY)->ToString ().c_str ();
+            std::size_t length = hexKey.size () / 2;
+            if (length > 0 && length <= key.GetLength ()) {
+                key.Rewind ();
+                if (key.AdvanceWriteOffset (
+                        util::HexDecodeBuffer (
+                            hexKey.data (),
+                            hexKey.size (),
+                            key.GetWritePtr ())) == length) {
+                    memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to decode " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes for key.", length);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Invalid key size " THEKOGANS_UTIL_SIZE_T_FORMAT ".", length);
+            }
         }
 
         void SymmetricKey::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            Serializable::Write (object);
+            object.AddString (
+                ATTR_KEY,
+                util::HexEncodeBuffer (
+                    key.GetReadPtr (),
+                    key.GetDataAvailableForReading ()));
         }
 
     } // namespace crypto

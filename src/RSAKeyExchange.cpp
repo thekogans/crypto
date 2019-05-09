@@ -84,7 +84,7 @@ namespace thekogans {
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Params (%s) are not signed.",
-                        id.ToString ().c_str ());
+                        id.ToHexString ().c_str ());
                 }
             }
             else {
@@ -119,26 +119,28 @@ namespace thekogans {
                 const TextHeader &header,
                 const pugi::xml_node &node) {
             Params::Read (header, node);
-            keyId = node.attribute (ATTR_KEY_ID).value ();
+            keyId = ID::FromHexString (node.attribute (ATTR_KEY_ID).value ());
             buffer = util::HexDecodestring (node.attribute (ATTR_BUFFER).value ());
         }
 
         void RSAKeyExchange::RSAParams::Write (pugi::xml_node &node) const {
             Params::Write (node);
-            node.append_attribute (ATTR_KEY_ID).set_value (keyId.ToString ().c_str ());
+            node.append_attribute (ATTR_KEY_ID).set_value (keyId.ToHexString ().c_str ());
             node.append_attribute (ATTR_BUFFER).set_value (util::HexEncodeBuffer (buffer.data (), buffer.size ()).c_str ());
         }
 
         void RSAKeyExchange::RSAParams::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            Params::Read (header, object);
+            keyId = ID::FromHexString (object.GetValue (ATTR_KEY_ID)->ToString ());
+            buffer = util::HexDecodestring (object.GetValue (ATTR_BUFFER)->ToString ());
         }
 
         void RSAKeyExchange::RSAParams::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            Params::Write (object);
+            object.AddString (ATTR_KEY_ID, keyId.ToHexString ());
+            object.AddString (ATTR_BUFFER, util::HexEncodeBuffer (buffer.data (), buffer.size ()));
         }
 
         RSAKeyExchange::RSAKeyExchange (
@@ -261,7 +263,7 @@ namespace thekogans {
                             rsaParams->buffer.size ())) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Key (%s) failed signature verification.",
-                            symmetricKey->GetId ().ToString ().c_str ());
+                            symmetricKey->GetId ().ToHexString ().c_str ());
                     }
                 }
                 else {

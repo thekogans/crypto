@@ -163,13 +163,47 @@ namespace thekogans {
         void Ed25519AsymmetricKey::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            AsymmetricKey::Read (header, object);
+            if (IsPrivate ()) {
+                std::string privateKey = object.GetValue (ATTR_KEY)->ToString ();
+                if (privateKey.size () == Ed25519::PRIVATE_KEY_LENGTH * 2) {
+                    util::HexDecodestring (privateKey, key.privateKey);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Wrong private key length. Expected " THEKOGANS_UTIL_SIZE_T_FORMAT
+                        ", received " THEKOGANS_UTIL_SIZE_T_FORMAT ".",
+                        Ed25519::PRIVATE_KEY_LENGTH * 2,
+                        privateKey.size ());
+                }
+            }
+            else {
+                std::string publicKey = object.GetValue (ATTR_KEY)->ToString ();
+                if (publicKey.size () == Ed25519::PUBLIC_KEY_LENGTH * 2) {
+                    util::HexDecodestring (publicKey, key.publicKey.value);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Wrong public key length. Expected " THEKOGANS_UTIL_SIZE_T_FORMAT
+                        ", received " THEKOGANS_UTIL_SIZE_T_FORMAT ".",
+                        Ed25519::PUBLIC_KEY_LENGTH * 2,
+                        publicKey.size ());
+                }
+            }
         }
 
         void Ed25519AsymmetricKey::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            AsymmetricKey::Write (object);
+            if (IsPrivate ()) {
+                object.AddString (
+                    ATTR_KEY,
+                    util::HexEncodeBuffer (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH));
+            }
+            else {
+                object.AddString (
+                    ATTR_KEY,
+                    util::HexEncodeBuffer (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH));
+            }
         }
 
     } // namespace crypto

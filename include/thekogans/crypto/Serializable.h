@@ -155,7 +155,7 @@ namespace thekogans {
             /// Read a Serializable from an JSON DOM.
             /// \param[in] node JSON DOM representation of a Serializable.
             virtual void Read (
-                const TextHeader &header,
+                const TextHeader & /*header*/,
                 const util::JSON::Object &object);
             /// \brief
             /// Write a Serializable to the JSON DOM.

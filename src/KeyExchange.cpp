@@ -48,30 +48,34 @@ namespace thekogans {
         void KeyExchange::Params::Read (
                 const TextHeader & /*header*/,
                 const pugi::xml_node &node) {
-            id = node.attribute (ATTR_ID).value ();
+            id = ID::FromHexString (node.attribute (ATTR_ID).value ());
             signature = util::HexDecodestring (node.attribute (ATTR_SIGNATURE).value ());
-            signatureKeyId = node.attribute (ATTR_SIGNATURE_KEY_ID).value ();
+            signatureKeyId = ID::FromHexString (node.attribute (ATTR_SIGNATURE_KEY_ID).value ());
             signatureMessageDigestName = node.attribute (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME).value ();
         }
 
         void KeyExchange::Params::Write (pugi::xml_node &node) const {
-            node.append_attribute (ATTR_ID).set_value (id.ToString ().c_str ());
+            node.append_attribute (ATTR_ID).set_value (id.ToHexString ().c_str ());
             node.append_attribute (ATTR_SIGNATURE).set_value (
                 util::HexEncodeBuffer (signature.data (), signature.size ()).c_str ());
-            node.append_attribute (ATTR_SIGNATURE_KEY_ID).set_value (signatureKeyId.ToString ().c_str ());
+            node.append_attribute (ATTR_SIGNATURE_KEY_ID).set_value (signatureKeyId.ToHexString ().c_str ());
             node.append_attribute (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME).set_value (signatureMessageDigestName.c_str ());
         }
 
         void KeyExchange::Params::Read (
-                const TextHeader &header,
+                const TextHeader & /*header*/,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            id = ID::FromHexString (object.GetValue (ATTR_ID)->ToString ());
+            signature = util::HexDecodestring (object.GetValue (ATTR_SIGNATURE)->ToString ());
+            signatureKeyId = ID::FromHexString (object.GetValue (ATTR_SIGNATURE_KEY_ID)->ToString ());
+            signatureMessageDigestName = object.GetValue (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME)->ToString ();
         }
 
         void KeyExchange::Params::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            object.AddString (ATTR_ID, id.ToHexString ());
+            object.AddString (ATTR_SIGNATURE, util::HexEncodeBuffer (signature.data (), signature.size ()));
+            object.AddString (ATTR_SIGNATURE_KEY_ID, signatureKeyId.ToHexString ());
+            object.AddString (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME, signatureMessageDigestName);
         }
 
     } // namespace crypto

@@ -69,13 +69,11 @@ namespace thekogans {
         void X25519Params::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            Params::Read (header, object);
         }
 
         void X25519Params::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            Params::Write (object);
         }
 
     } // namespace crypto

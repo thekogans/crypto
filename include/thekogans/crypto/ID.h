@@ -47,16 +47,15 @@ namespace thekogans {
             util::ui8 data[SIZE];
 
             /// \brief
+            /// ctor. Create a random ID using \see{util::RandomSource}.
+            ID ();
+            /// \brief
             /// ctor.
             /// \param[in] buffer Optional data to hash in to id.
             /// NOTE: if none is provided, ID will use random bytes.
             /// \param[in] length Optional buffer length.
-            ID (const void *buffer = 0,
-                std::size_t length = 0);
-            /// \brief
-            /// ctor.
-            /// \param[in] id Hex encoded id.
-            explicit ID (const std::string &id);
+            ID (const void *buffer,
+                std::size_t length);
             /// \brief
             /// ctor. Initialize to a given value.
             /// \param[in] data_ Value to initialize to.
@@ -83,10 +82,12 @@ namespace thekogans {
             /// \param[out] serializer \see{util::Serializer} serialize the id to.
             void Serialize (util::Serializer &serializer) const;
 
+            static ID FromHexString (const std::string &hexString);
+
             /// \brief
             /// Return a hex string representation of the id.
             /// \return Hex string representation of the id.
-            inline std::string ToString () const {
+            inline std::string ToHexString () const {
                 return util::HexEncodeBuffer (data, SIZE);
             }
         };

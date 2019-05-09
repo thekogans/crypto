@@ -23,7 +23,7 @@ namespace thekogans {
     namespace crypto {
 
         namespace {
-            const util::ui8 _data_[ID::SIZE] = {
+            const util::ui8 emptyIdData[ID::SIZE] = {
                 util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX,
                 util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX,
                 util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX,
@@ -31,40 +31,25 @@ namespace thekogans {
             };
         }
 
-        const ID ID::Empty (_data_);
+        const ID ID::Empty (emptyIdData);
 
-        namespace {
-            void HashBuffer (
-                    const void *buffer,
-                    std::size_t length,
-                    util::ui8 *hash) {
-                MessageDigest messageDigest (EVP_sha256 ());
-                messageDigest.Init ();
-                messageDigest.Update (buffer, length);
-                length = messageDigest.Final (hash);
-                if (length != ID::SIZE) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Incorrect ID length (%u, %u).", length, ID::SIZE);
-                }
+        ID::ID () {
+            if (util::GlobalRandomSource::Instance ().GetBytes (data, SIZE) != SIZE) {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unable to get %u random bytes for ID.", SIZE);
             }
         }
 
         ID::ID (const void *buffer,
                 std::size_t length) {
             if (buffer != 0 && length > 0) {
-                HashBuffer (buffer, length, data);
-            }
-            else if (util::GlobalRandomSource::Instance ().GetBytes (data, SIZE) != SIZE) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to get %u random bytes for ID.", SIZE);
-            }
-        }
-
-        ID::ID (const std::string &id) {
-            if (id.size () == SIZE * 2) {
-                if (util::HexDecodestring (id, data) != SIZE) {
+                MessageDigest messageDigest (EVP_sha256 ());
+                messageDigest.Init ();
+                messageDigest.Update (buffer, length);
+                length = messageDigest.Final (data);
+                if (length != ID::SIZE) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s is not an ID.", id.c_str ());
+                        "Incorrect ID length (%u, %u).", length, ID::SIZE);
                 }
             }
             else {
@@ -84,6 +69,23 @@ namespace thekogans {
             if (serializer.Write (data, ID::SIZE) != ID::SIZE) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Unable to write %u bytes to the buffer.", ID::SIZE);
+            }
+        }
+
+        ID ID::FromHexString (const std::string &hexString) {
+            if (hexString.size () == SIZE * 2) {
+                util::ui8 data[SIZE];
+                if (util::HexDecodestring (hexString, data) == SIZE) {
+                    return ID (data);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s is not a hex encoded ID.", hexString.c_str ());
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
         }
 

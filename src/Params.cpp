@@ -47,13 +47,11 @@ namespace thekogans {
         void Params::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            Serializable::Read (header, object);
         }
 
         void Params::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            Serializable::Write (object);
         }
 
     } // namespace crypto

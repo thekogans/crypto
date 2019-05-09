@@ -320,11 +320,13 @@ namespace thekogans {
         void OpenSSLAsymmetricKey::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
+            AsymmetricKey::Read (header, object);
             // FIXME: implement
             assert (0);
         }
 
         void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
+            AsymmetricKey::Write (object);
             // FIXME: implement
             assert (0);
         }

@@ -50,19 +50,20 @@ namespace thekogans {
 
         void AsymmetricKey::Write (pugi::xml_node &node) const {
             Serializable::Write (node);
-            node.append_attribute (ATTR_PRIVATE).set_value (util::boolTostring (IsPrivate ()).c_str ());
+            node.append_attribute (ATTR_PRIVATE).set_value (
+                util::boolTostring (IsPrivate ()).c_str ());
         }
 
         void AsymmetricKey::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            Serializable::Read (header, object);
+            isPrivate = object.GetValue (ATTR_PRIVATE)->ToBool ();
         }
 
         void AsymmetricKey::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            Serializable::Write (object);
+            object.AddBool (ATTR_PRIVATE, IsPrivate ());
         }
 
     } // namespace crypto

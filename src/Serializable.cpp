@@ -77,27 +77,29 @@ namespace thekogans {
         void Serializable::Read (
                 const TextHeader & /*header*/,
                 const pugi::xml_node &node) {
-            id = node.attribute (ATTR_ID).value ();
+            id = ID::FromHexString (node.attribute (ATTR_ID).value ());
             name = node.attribute (ATTR_NAME).value ();
             description = node.attribute (ATTR_DESCRIPTION).value ();
         }
 
         void Serializable::Write (pugi::xml_node &node) const {
-            node.append_attribute (ATTR_ID).set_value (id.ToString ().c_str ());
+            node.append_attribute (ATTR_ID).set_value (id.ToHexString ().c_str ());
             node.append_attribute (ATTR_NAME).set_value (name.c_str ());
             node.append_attribute (ATTR_DESCRIPTION).set_value (description.c_str ());
         }
 
         void Serializable::Read (
-                const TextHeader &header,
+                const TextHeader & /*header*/,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            id = ID::FromHexString (object.GetValue (ATTR_ID)->ToString ());
+            name = object.GetValue (ATTR_NAME)->ToString ();
+            description = object.GetValue (ATTR_DESCRIPTION)->ToString ();
         }
 
         void Serializable::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            object.AddString (ATTR_ID, id.ToHexString ());
+            object.AddString (ATTR_NAME, name);
+            object.AddString (ATTR_DESCRIPTION, description);
         }
 
     } // namespace crypto

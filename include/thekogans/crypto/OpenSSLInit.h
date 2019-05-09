@@ -59,7 +59,7 @@ namespace thekogans {
             /// Initialize the Open SSL library.
             /// \param[in] multiThreaded true = initialize thread support.
             /// \param[in] entropyNeeded Number of entropy bytes to use to seed the PRNG.
-            /// \param[in] workingSetSize OpenSSL engine object.
+            /// \param[in] workingSetSize Physical pages to reserve.
             /// NOTE: All values are in bytes.
             OpenSSLInit (
                 bool multiThreaded = true,

@@ -117,7 +117,7 @@ namespace thekogans {
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Params (%s) are not signed.",
-                        id.ToString ().c_str ());
+                        id.ToHexString ().c_str ());
                 }
             }
             else {
@@ -188,7 +188,7 @@ namespace thekogans {
             keyLength = util::stringToui64 (node.attribute (ATTR_KEY_LENGTH).value ());
             messageDigestName = node.attribute (ATTR_MESSAGE_DIGEST_NAME).value ();
             count = util::stringToui64 (node.attribute (ATTR_COUNT).value ());
-            keyId = node.attribute (ATTR_KEY_ID).value ();
+            keyId = ID::FromHexString (node.attribute (ATTR_KEY_ID).value ());
             keyName = node.attribute (ATTR_KEY_NAME).value ();
             keyDescription = node.attribute (ATTR_KEY_DESCRIPTION).value ();
             pugi::xml_node paramsNode = node.child (TAG_PARAMS);
@@ -203,7 +203,7 @@ namespace thekogans {
             node.append_attribute (ATTR_KEY_LENGTH).set_value (util::ui64Tostring (keyLength).c_str ());
             node.append_attribute (ATTR_MESSAGE_DIGEST_NAME).set_value (messageDigestName.c_str ());
             node.append_attribute (ATTR_COUNT).set_value (util::ui64Tostring (count).c_str ());
-            node.append_attribute (ATTR_KEY_ID).set_value (keyId.ToString ().c_str ());
+            node.append_attribute (ATTR_KEY_ID).set_value (keyId.ToHexString ().c_str ());
             node.append_attribute (ATTR_KEY_NAME).set_value (keyName.c_str ());
             node.append_attribute (ATTR_KEY_DESCRIPTION).set_value (keyDescription.c_str ());
             pugi::xml_node paramsNode = node.append_child (TAG_PARAMS);
@@ -215,13 +215,35 @@ namespace thekogans {
         void DHEKeyExchange::DHEParams::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            Params::Read (header, object);
+            salt = util::HexDecodestring (object.GetValue (ATTR_SALT)->ToString ());
+            keyLength = (std::size_t)object.GetValue (ATTR_KEY_LENGTH)->ToNumber ();
+            messageDigestName = object.GetValue (ATTR_MESSAGE_DIGEST_NAME)->ToString ();
+            count = (std::size_t)object.GetValue (ATTR_COUNT)->ToNumber ();
+            keyId = ID::FromHexString (object.GetValue (ATTR_KEY_ID)->ToString ());
+            keyName = object.GetValue (ATTR_KEY_NAME)->ToString ();
+            keyDescription = object.GetValue (ATTR_KEY_DESCRIPTION)->ToString ();
+            util::JSON::Object::Ptr paramsObject = object.GetObject (TAG_PARAMS);
+            *paramsObject >> params;
+            util::JSON::Object::Ptr publicKeyObject = object.GetObject (TAG_PUBLIC_KEY);
+            *publicKeyObject >> publicKey;
         }
 
         void DHEKeyExchange::DHEParams::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            Params::Write (object);
+            object.AddString (ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
+            object.AddNumber (ATTR_KEY_LENGTH, keyLength);
+            object.AddString (ATTR_MESSAGE_DIGEST_NAME, messageDigestName);
+            object.AddNumber (ATTR_COUNT, count);
+            object.AddString (ATTR_KEY_ID, keyId.ToHexString ());
+            object.AddString (ATTR_KEY_NAME, keyName);
+            object.AddString (ATTR_KEY_DESCRIPTION, keyDescription);
+            util::JSON::Object::Ptr paramsObject (new util::JSON::Object);
+            *paramsObject << *params;
+            object.AddObject (TAG_PARAMS, paramsObject);
+            util::JSON::Object::Ptr publicKeyObject (new util::JSON::Object);
+            *publicKeyObject << *publicKey;
+            object.AddObject (TAG_PUBLIC_KEY, publicKeyObject);
         }
 
         namespace {

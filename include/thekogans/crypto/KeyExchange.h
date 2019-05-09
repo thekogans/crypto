@@ -129,7 +129,7 @@ namespace thekogans {
                 /// \param[in] header \see{util::Serializable::TextHeader}.
                 /// \param[in] node XML DOM representation of a Serializable.
                 virtual void Read (
-                    const TextHeader &header,
+                    const TextHeader & /*header*/,
                     const pugi::xml_node &node);
                 /// \brief
                 /// Write the Serializable to the XML DOM.
@@ -140,7 +140,7 @@ namespace thekogans {
                 /// Read a Serializable from an JSON DOM.
                 /// \param[in] node JSON DOM representation of a Serializable.
                 virtual void Read (
-                    const TextHeader &header,
+                    const TextHeader & /*header*/,
                     const util::JSON::Object &object);
                 /// \brief
                 /// Write a Serializable to the JSON DOM.

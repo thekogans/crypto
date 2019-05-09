@@ -133,13 +133,33 @@ namespace thekogans {
         void X25519AsymmetricKey::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            AsymmetricKey::Read (header, object);
+            util::SecureString hexKey = object.GetValue (ATTR_KEY)->ToString ().c_str ();
+            if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
+                key.Rewind ();
+                if (key.AdvanceWriteOffset (
+                        util::HexDecodeBuffer (
+                            hexKey.data (),
+                            hexKey.size (),
+                            key.GetWritePtr ())) != X25519::KEY_LENGTH) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
+                        X25519::KEY_LENGTH,
+                        X25519::KEY_LENGTH);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Wrong key length. Expected " THEKOGANS_UTIL_SIZE_T_FORMAT
+                    ", received " THEKOGANS_UTIL_SIZE_T_FORMAT ".",
+                    X25519::KEY_LENGTH * 2,
+                    hexKey.size ());
+            }
         }
 
         void X25519AsymmetricKey::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            AsymmetricKey::Write (object);
+            object.AddString (ATTR_KEY, util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH));
         }
 
     } // namespace crypto
