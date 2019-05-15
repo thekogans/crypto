@@ -65,6 +65,7 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPrivateKeyFromBuffer (
+                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
                 pem_password_cb *passwordCallback,
@@ -94,6 +95,7 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (
+                const std::string encoding,
                 const std::string &path,
                 pem_password_cb *passwordCallback,
                 void *userData,
@@ -116,6 +118,7 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromBuffer (
+                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
                 pem_password_cb *passwordCallback,
@@ -145,6 +148,7 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromFile (
+                const std::string encoding,
                 const std::string &path,
                 pem_password_cb *passwordCallback,
                 void *userData,
@@ -167,6 +171,7 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromCertificate (
+                const std::string encoding,
                 const std::string &path,
                 pem_password_cb *passwordCallback,
                 void *userData,
@@ -195,6 +200,7 @@ namespace thekogans {
         }
 
         void OpenSSLAsymmetricKey::Save (
+                const std::string encoding,
                 const std::string &path,
                 const EVP_CIPHER *cipher,
                 const void *symmetricKey,

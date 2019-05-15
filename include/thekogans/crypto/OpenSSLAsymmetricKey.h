@@ -92,6 +92,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Private key.
             static AsymmetricKey::Ptr LoadPrivateKeyFromBuffer (
+                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
                 pem_password_cb *passwordCallback = 0,
@@ -111,6 +112,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Private key.
             static AsymmetricKey::Ptr LoadPrivateKeyFromFile (
+                const std::string encoding,
                 const std::string &path,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
@@ -131,6 +133,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public key.
             static AsymmetricKey::Ptr LoadPublicKeyFromBuffer (
+                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
                 pem_password_cb *passwordCallback = 0,
@@ -150,6 +153,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public key.
             static AsymmetricKey::Ptr LoadPublicKeyFromFile (
+                const std::string encoding,
                 const std::string &path,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
@@ -168,6 +172,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public key.
             static AsymmetricKey::Ptr LoadPublicKeyFromCertificate (
+                const std::string encoding,
                 const std::string &path,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
@@ -186,6 +191,7 @@ namespace thekogans {
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
             void Save (
+                const std::string encoding,
                 const std::string &path,
                 const EVP_CIPHER *cipher = 0,
                 const void *symmetricKey = 0,

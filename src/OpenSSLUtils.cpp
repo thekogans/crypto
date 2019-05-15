@@ -28,6 +28,9 @@
 namespace thekogans {
     namespace crypto {
 
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const DER_ENCODING = "DER";
+        _LIB_THEKOGANS_CRYPTO_DECL const char * const PEM_ENCODING = "PEM";
+
         void BN_CTXDeleter::operator () (BN_CTX *ctx) {
             if (ctx != 0) {
                 BN_CTX_free (ctx);
@@ -318,6 +321,331 @@ namespace thekogans {
                 X509_REVOKED *entry = 0;
                 X509_CRL_get0_by_cert (crl, &entry, cert);
                 return entry != 0;
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL X509Ptr _LIB_THEKOGANS_CRYPTO_API
+        ParseCertificate (
+                const std::string &encoding,
+                const void *buffer,
+                std::size_t length,
+                pem_password_cb *passwordCallback,
+                void *userData) {
+            if (buffer != 0 && length > 0) {
+                if (encoding == DER_ENCODING) {
+                    X509Ptr certificate (
+                        d2i_X509 (0, (const util::ui8 **)&buffer, (long)length));
+                    if (certificate.get () != 0) {
+                        return certificate;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (encoding == PEM_ENCODING) {
+                    // NOTE: I hate casting away constness, but thankfully,
+                    // in this case it's harmless. Even though BIO_new_mem_buf
+                    // wants an util::ui8 *, it marks the bio as read only,
+                    // and therefore will not alter the buffer.
+                    BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
+                    if (bio.get () != 0) {
+                        X509Ptr certificate (
+                            PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
+                        if (certificate.get () != 0) {
+                            return certificate;
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
+        ParsePUBKEY (
+                const std::string &encoding,
+                const void *buffer,
+                std::size_t length,
+                pem_password_cb *passwordCallback,
+                void *userData) {
+            if (buffer != 0 && length > 0) {
+                if (encoding == DER_ENCODING) {
+                    EVP_PKEYPtr key (
+                        d2i_PUBKEY (0, (const util::ui8 **)&buffer, (long)length));
+                    if (key.get () != 0) {
+                        return key;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (encoding == PEM_ENCODING) {
+                    // NOTE: I hate casting away constness, but thankfully,
+                    // in this case it's harmless. Even though BIO_new_mem_buf
+                    // wants an util::ui8 *, it marks the bio as read only,
+                    // and therefore will not alter the buffer.
+                    BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
+                    if (bio.get () != 0) {
+                        EVP_PKEYPtr key (
+                            PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData));
+                        if (key.get () != 0) {
+                            return key;
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
+        ParsePrivateKey (
+                const std::string &encoding,
+                const std::string &type,
+                const void *buffer,
+                std::size_t length,
+                pem_password_cb *passwordCallback,
+                void *userData) {
+            if (buffer != 0 && length > 0) {
+                if (encoding == DER_ENCODING) {
+                    EVP_PKEYPtr key (
+                        d2i_PrivateKey (
+                            stringToEVP_PKEYtype (type.c_str ()),
+                            0,
+                            (const util::ui8 **)&buffer,
+                            (long)length));
+                    if (key.get () != 0) {
+                        return key;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (encoding == PEM_ENCODING) {
+                    // NOTE: I hate casting away constness, but thankfully,
+                    // in this case it's harmless. Even though BIO_new_mem_buf
+                    // wants an util::ui8 *, it marks the bio as read only,
+                    // and therefore will not alter the buffer.
+                    BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
+                    if (bio.get () != 0) {
+                        EVP_PKEYPtr key (
+                            PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData));
+                        if (key.get () != 0) {
+                            std::string keyType = EVP_PKEYtypeTostring (EVP_PKEY_base_id (key.get ()));
+                            if (keyType == type) {
+                                return key;
+                            }
+                            else {
+                                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                                    "Invalid key type: %s, expecting %s.",
+                                    keyType.c_str (),
+                                    type.c_str ());
+                            }
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
+        ParsePublicKey (
+                const std::string &encoding,
+                const std::string &type,
+                const void *buffer,
+                std::size_t length,
+                pem_password_cb *passwordCallback,
+                void *userData) {
+            if (buffer != 0 && length > 0) {
+                if (encoding == DER_ENCODING) {
+                    EVP_PKEYPtr key (
+                        d2i_PublicKey (
+                            stringToEVP_PKEYtype (type.c_str ()),
+                            0,
+                            (const util::ui8 **)&buffer,
+                            (long)length));
+                    if (key.get () != 0) {
+                        return key;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (encoding == PEM_ENCODING && type == OPENSSL_PKEY_RSA) {
+                    // NOTE: I hate casting away constness, but thankfully,
+                    // in this case it's harmless. Even though BIO_new_mem_buf
+                    // wants an util::ui8 *, it marks the bio as read only,
+                    // and therefore will not alter the buffer.
+                    BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
+                    if (bio.get () != 0) {
+                        RSAPtr rsa (
+                            PEM_read_bio_RSAPublicKey (
+                                bio.get (),
+                                0,
+                                passwordCallback,
+                                userData));
+                        if (rsa.get () != 0) {
+                            EVP_PKEYPtr key (EVP_PKEY_new ());
+                            if (key.get () != 0 &&
+                                    EVP_PKEY_assign_RSA (key.get (), rsa.get ()) == 1) {
+                                rsa.release ();
+                                return key;
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL DHPtr _LIB_THEKOGANS_CRYPTO_API
+        ParseDHParams (
+                const std::string &encoding,
+                const void *buffer,
+                std::size_t length,
+                pem_password_cb *passwordCallback,
+                void *userData) {
+            if (buffer != 0 && length > 0) {
+                if (encoding == DER_ENCODING) {
+                    DHPtr dhParams (
+                        d2i_DHparams (0, (const util::ui8 **)&buffer, (long)length));
+                    if (dhParams.get () != 0) {
+                        return dhParams;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (encoding == PEM_ENCODING) {
+                    // NOTE: I hate casting away constness, but thankfully,
+                    // in this case it's harmless. Even though BIO_new_mem_buf
+                    // wants an util::ui8 *, it marks the bio as read only,
+                    // and therefore will not alter the buffer.
+                    BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
+                    if (bio.get () != 0) {
+                        DHPtr dh (
+                            PEM_read_bio_DHparams (bio.get (), 0, passwordCallback, userData));
+                        if (dh.get () != 0) {
+                            return dh;
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else {
+                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+            }
+        }
+
+        _LIB_THEKOGANS_CRYPTO_DECL DSAPtr _LIB_THEKOGANS_CRYPTO_API
+        ParseDSAParams (
+                const std::string &encoding,
+                const void *buffer,
+                std::size_t length,
+                pem_password_cb *passwordCallback,
+                void *userData) {
+            if (buffer != 0 && length > 0) {
+                if (encoding == DER_ENCODING) {
+                    DSAPtr dsaParams (
+                        d2i_DSAparams (0, (const util::ui8 **)&buffer, (long)length));
+                    if (dsaParams.get () != 0) {
+                        return dsaParams;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else if (encoding == PEM_ENCODING) {
+                    // NOTE: I hate casting away constness, but thankfully,
+                    // in this case it's harmless. Even though BIO_new_mem_buf
+                    // wants an util::ui8 *, it marks the bio as read only,
+                    // and therefore will not alter the buffer.
+                    BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
+                    if (bio.get () != 0) {
+                        DSAPtr dsa (
+                            PEM_read_bio_DSAparams (bio.get (), 0, passwordCallback, userData));
+                        if (dsa.get () != 0) {
+                            return dsa;
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

@@ -46,6 +46,11 @@ namespace thekogans {
         #if defined (TOOLCHAIN_OS_Windows)
             const DWORD ENCODING = X509_ASN_ENCODING | PKCS_7_ASN_ENCODING;
 
+            std::string encodingToString (DWORD encoding) {
+                return encoding == X509_ASN_ENCODING ? DER_ENCODING :
+                    encoding == PKCS_7_ASN_ENCODING ? PEM_ENCODING : std::string ();
+            }
+
             std::string GetCertName (
                     DWORD encoding,
                     PCERT_NAME_BLOB certName) {
@@ -65,46 +70,6 @@ namespace thekogans {
                     return std::string (&buffer[0]);
                 }
                 return std::string ();
-            }
-
-            X509Ptr ParseCertificate (
-                    DWORD encoding,
-                    const void *buffer,
-                    std::size_t bufferLength,
-                    pem_password_cb *passwordCallback = 0,
-                    void *userData = 0) {
-                if ((encoding & ENCODING) != 0 && buffer != 0 && bufferLength > 0) {
-                    if (encoding == X509_ASN_ENCODING) {
-                        X509Ptr certificate (
-                            d2i_X509 (0, (const unsigned char **)&buffer, (long)bufferLength));
-                        if (certificate.get () != 0) {
-                            return certificate;
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                    else {
-                        BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)bufferLength));
-                        if (bio.get () != 0) {
-                            X509Ptr certificate (
-                                PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
-                            if (certificate.get () != 0) {
-                                return certificate;
-                            }
-                            else {
-                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                            }
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                }
             }
         #elif defined (TOOLCHAIN_OS_OSX)
             struct CFArrayRefDeleter {
@@ -170,37 +135,6 @@ namespace thekogans {
                 }
                 return false;
             }
-
-            X509Ptr ParsePEMCertificate (
-                    const void *buffer,
-                    std::size_t bufferLength,
-                    pem_password_cb *passwordCallback = 0,
-                    void *userData = 0) {
-                if (buffer != 0 && bufferLength > 0) {
-                    // NOTE: I hate casting away constness, but thankfully,
-                    // in this case it's harmless. Even though BIO_new_mem_buf
-                    // wants an util::ui8 *, it marks the bio as read only,
-                    // and therefore will not alter the buffer.
-                    BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)bufferLength));
-                    if (bio.get () != 0) {
-                        X509Ptr certificate (
-                            PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
-                        if (certificate.get () != 0) {
-                            return certificate;
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                        }
-                    }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                }
-            }
         #endif // defined (TOOLCHAIN_OS_OSX)
         }
 
@@ -251,7 +185,7 @@ namespace thekogans {
                         }
                         X509Ptr certificate =
                             ParseCertificate (
-                                certContext->dwCertEncodingType,
+                                encodingTostring (certContext->dwCertEncodingType),
                                 certContext->pbCertEncoded,
                                 certContext->cbCertEncoded);
                         if (certificate.get () != 0) {
@@ -339,7 +273,8 @@ namespace thekogans {
                                         CFDataRefPtr dataPtr (data);
                                         // Apple certificates are PEM encoded.
                                         X509Ptr certificate =
-                                            ParsePEMCertificate (
+                                            ParseCertificate (
+                                                PEM_ENCODING,
                                                 CFDataGetBytePtr (data),
                                                 CFDataGetLength (data));
                                         if (certificate.get () != 0) {
