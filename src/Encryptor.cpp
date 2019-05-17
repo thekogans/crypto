@@ -64,7 +64,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to get %u random bytes for iv.", ivLength);
+                        "Unable to get " THEKOGANS_UTIL_SIZE_T_FORMAT " random bytes for iv.", ivLength);
                 }
             }
             else {

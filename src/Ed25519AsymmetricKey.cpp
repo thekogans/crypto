@@ -79,7 +79,7 @@ namespace thekogans {
             if (IsPrivate ()) {
                 if (serializer.Read (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Read (key.privateKey, %u) != %u",
+                        "Read (key.privateKey, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PRIVATE_KEY_LENGTH,
                         Ed25519::PRIVATE_KEY_LENGTH);
                 }
@@ -87,7 +87,7 @@ namespace thekogans {
             else {
                 if (serializer.Read (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Read (key.publicKey.value, %u) != %u",
+                        "Read (key.publicKey.value, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PUBLIC_KEY_LENGTH,
                         Ed25519::PUBLIC_KEY_LENGTH);
                 }
@@ -99,7 +99,7 @@ namespace thekogans {
             if (IsPrivate ()) {
                 if (serializer.Write (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Write (key.privateKey, %u) != %u",
+                        "Write (key.privateKey, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PRIVATE_KEY_LENGTH,
                         Ed25519::PRIVATE_KEY_LENGTH);
                 }
@@ -107,7 +107,7 @@ namespace thekogans {
             else {
                 if (serializer.Write (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Write (key.publicKey.value, %u) != %u",
+                        "Write (key.publicKey.value, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PUBLIC_KEY_LENGTH,
                         Ed25519::PUBLIC_KEY_LENGTH);
                 }

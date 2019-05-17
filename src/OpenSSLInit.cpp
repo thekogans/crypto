@@ -163,13 +163,15 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to get %u random bytes for seed.", entropy.length);
+                        "Unable to get " THEKOGANS_UTIL_SIZE_T_FORMAT " random bytes for seed.",
+                        entropy.length);
                 }
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Not enough entropy: %u < %u",
-                    entropyNeeded, MIN_ENTROPY_NEEDED);
+                    "Not enough entropy: " THEKOGANS_UTIL_SIZE_T_FORMAT " < " THEKOGANS_UTIL_SIZE_T_FORMAT,
+                    entropyNeeded,
+                    MIN_ENTROPY_NEEDED);
             }
             // FIXME: load a CRL.
         #if OPENSSL_VERSION_NUMBER < 0x10100000L

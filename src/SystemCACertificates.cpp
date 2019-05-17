@@ -185,9 +185,9 @@ namespace thekogans {
                         }
                         X509Ptr certificate =
                             ParseCertificate (
-                                encodingTostring (certContext->dwCertEncodingType),
                                 certContext->pbCertEncoded,
-                                certContext->cbCertEncoded);
+                                certContext->cbCertEncoded,
+                                encodingTostring (certContext->dwCertEncodingType));
                         if (certificate.get () != 0) {
                             certificates.push_back (std::move (certificate));
                         }
@@ -274,9 +274,9 @@ namespace thekogans {
                                         // Apple certificates are PEM encoded.
                                         X509Ptr certificate =
                                             ParseCertificate (
-                                                PEM_ENCODING,
                                                 CFDataGetBytePtr (data),
-                                                CFDataGetLength (data));
+                                                CFDataGetLength (data),
+                                                PEM_ENCODING);
                                         if (certificate.get () != 0) {
                                             certificates.push_back (std::move (certificate));
                                         }

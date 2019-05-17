@@ -18,6 +18,8 @@
 #include <sstream>
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
+#include "thekogans/util/Buffer.h"
+#include "thekogans/util/File.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/StringUtils.h"
@@ -55,7 +57,7 @@ namespace thekogans {
                         type != OPENSSL_PKEY_HMAC &&
                         type != OPENSSL_PKEY_CMAC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid key type %d.", type);
+                        "Invalid key type %s.", type);
                 }
             }
             else {
@@ -65,114 +67,112 @@ namespace thekogans {
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPrivateKeyFromBuffer (
-                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData,
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (buffer != 0 && length > 0) {
-                BIOPtr bio (BIO_new_mem_buf (buffer, (int)length));
-                if (bio.get () != 0) {
-                    return AsymmetricKey::Ptr (
-                        new OpenSSLAsymmetricKey (
-                            EVP_PKEYPtr (PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData)),
-                            true,
-                            id,
-                            name,
-                            description));
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
+            return AsymmetricKey::Ptr (
+                new OpenSSLAsymmetricKey (
+                    ParsePrivateKey (buffer, length, encoding, passwordCallback, userData),
+                    true,
+                    id,
+                    name,
+                    description));
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData,
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            BIOPtr bio (BIO_new_file (path.c_str (), "r"));
-            if (bio.get () != 0) {
-                return AsymmetricKey::Ptr (
-                    new OpenSSLAsymmetricKey (
-                        EVP_PKEYPtr (PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData)),
-                        true,
-                        id,
-                        name,
-                        description));
+            util::ReadOnlyFile file (util::NetworkEndian, path);
+            util::SecureBuffer buffer (util::NetworkEndian, file.GetSize ());
+            if (buffer.AdvanceWriteOffset (
+                    file.Read (
+                        buffer.GetWritePtr (),
+                        buffer.GetDataAvailableForWriting ())) == file.GetSize ()) {
+                return LoadPrivateKeyFromBuffer (
+                    buffer.GetReadPtr (),
+                    buffer.GetDataAvailableForReading (),
+                    encoding,
+                    passwordCallback,
+                    userData,
+                    id,
+                    name,
+                    description);
             }
             else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unable to read " THEKOGANS_UTIL_SIZE_T_FORMAT
+                    " from %s. (" THEKOGANS_UTIL_SIZE_T_FORMAT ").",
+                    file.GetSize (),
+                    path.c_str (),
+                    buffer.GetDataAvailableForReading ());
             }
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromBuffer (
-                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData,
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (buffer != 0 && length > 0) {
-                BIOPtr bio (BIO_new_mem_buf (buffer, (int)length));
-                if (bio.get () != 0) {
-                    return AsymmetricKey::Ptr (
-                        new OpenSSLAsymmetricKey (
-                            EVP_PKEYPtr (PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData)),
-                            false,
-                            id,
-                            name,
-                            description));
-                }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
+            return AsymmetricKey::Ptr (
+                new OpenSSLAsymmetricKey (
+                    ParsePUBKEY (buffer, length, encoding, passwordCallback, userData),
+                    false,
+                    id,
+                    name,
+                    description));
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromFile (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData,
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            BIOPtr bio (BIO_new_file (path.c_str (), "r"));
-            if (bio.get () != 0) {
-                return AsymmetricKey::Ptr (
-                    new OpenSSLAsymmetricKey (
-                        EVP_PKEYPtr (PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData)),
-                        false,
-                        id,
-                        name,
-                        description));
+            util::ReadOnlyFile file (util::NetworkEndian, path);
+            util::SecureBuffer buffer (util::NetworkEndian, file.GetSize ());
+            if (buffer.AdvanceWriteOffset (
+                    file.Read (
+                        buffer.GetWritePtr (),
+                        buffer.GetDataAvailableForWriting ())) == file.GetSize ()) {
+                return LoadPublicKeyFromBuffer (
+                    buffer.GetReadPtr (),
+                    buffer.GetDataAvailableForReading (),
+                    encoding,
+                    passwordCallback,
+                    userData,
+                    id,
+                    name,
+                    description);
             }
             else {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "Unable to read " THEKOGANS_UTIL_SIZE_T_FORMAT
+                    " from %s. (" THEKOGANS_UTIL_SIZE_T_FORMAT ").",
+                    file.GetSize (),
+                    path.c_str (),
+                    buffer.GetDataAvailableForReading ());
             }
         }
 
         AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromCertificate (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData,
                 const ID &id,
@@ -200,8 +200,8 @@ namespace thekogans {
         }
 
         void OpenSSLAsymmetricKey::Save (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding,
                 const EVP_CIPHER *cipher,
                 const void *symmetricKey,
                 std::size_t symmetricKeyLength,

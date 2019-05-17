@@ -381,14 +381,14 @@ namespace thekogans {
                         }
                         else {
                             THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                                "Invalid key: %u, %u",
+                                "Invalid key: %u, " THEKOGANS_UTIL_SIZE_T_FORMAT,
                                 header.cipherIndex,
                                 header.keyLength);
                         }
                     }
                     else {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                            "Invalid keyLength: %u",
+                            "Invalid keyLength: " THEKOGANS_UTIL_SIZE_T_FORMAT,
                             header.keyLength);
                     }
                 }

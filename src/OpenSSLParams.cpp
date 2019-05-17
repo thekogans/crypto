@@ -51,7 +51,7 @@ namespace thekogans {
                 const char *paramsType = GetKeyType ();
                 if (paramsType != OPENSSL_PKEY_DH && paramsType != OPENSSL_PKEY_DSA && paramsType != OPENSSL_PKEY_EC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid parameters type %d.", paramsType);
+                        "Invalid parameters type %s.", paramsType);
                 }
             }
             else {

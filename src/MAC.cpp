@@ -49,7 +49,8 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Incorrect signature length: %u (expecting %u).",
+                        "Incorrect signature length: " THEKOGANS_UTIL_SIZE_T_FORMAT
+                        " (expecting " THEKOGANS_UTIL_SIZE_T_FORMAT ").",
                         signature.GetDataAvailableForReading (),
                         GetMACLength ());
                 }

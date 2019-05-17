@@ -520,18 +520,10 @@ namespace thekogans {
             GetCRLDistributionPoints (
                 X509 *cert,
                 std::vector<std::string> &crlDistributionPoints);
-        enum {
-            /// \brief
-            /// CRL is in DER format.
-            FORMAT_DER,
-            /// \brief
-            /// CRL is in PEM format.
-            FORMAT_PEM
-        };
         /// \brief
-        /// Load a CRL from a file.
+        /// Load a DER or PEM encoded CRL from a file.
         /// \param[in] path Path to CRL file.
-        /// \param[in] format Format of the CRL file (DER/PEM).
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
@@ -540,19 +532,19 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL X509_CRLPtr _LIB_THEKOGANS_CRYPTO_API
             LoadCRL (
                 const std::string &path,
-                util::ui32 format,
-                pem_password_cb *passwordCallback,
-                void *userData);
+                const std::string encoding = DER_ENCODING,
+                pem_password_cb *passwordCallback = 0,
+                void *userData = 0);
         /// \brief
-        /// Save the given CRL to a from.
-        /// \param[in] path Path to CRL file.
+        /// Save the given CRL to a file using the given encodong.
         /// \param[in] crl CRL to save.
-        /// \param[in] format Format of the CRL file (DER/PEM).
+        /// \param[in] path Path to CRL file.
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
         _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API
             SaveCRL (
-                const std::string &path,
                 X509_CRL *crl,
-                util::ui32 format = FORMAT_PEM);
+                const std::string &path,
+                const std::string encoding = DER_ENCODING);
         /// \brief
         /// Check a given certificate (X509) against the given CRL.
         /// \param[in] crl CRL to check against.
@@ -564,98 +556,94 @@ namespace thekogans {
                 X509 *cert);
 
         /// \brief
-        /// Parse an encoded certificate.
-        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
+        /// Parse a DER or PEM encoded certificate.
         /// \param[in] buffer Buffer containing the encoded certificate.
         /// \param[in] length Length of buffer.
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed certificate.
         _LIB_THEKOGANS_CRYPTO_DECL crypto::X509Ptr _LIB_THEKOGANS_CRYPTO_API
             ParseCertificate (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0);
         /// \brief
-        /// Parse an encoded PUBKEY public key.
-        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
+        /// Parse a DER or PEM encoded PUBKEY public key.
         /// \param[in] buffer Buffer containing the encoded PUBKEY public key.
         /// \param[in] length Length of buffer.
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed public key.
         _LIB_THEKOGANS_CRYPTO_DECL crypto::EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
             ParsePUBKEY (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0);
         /// \brief
-        /// Parse an encoded private key.
-        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
-        /// \param[in] type OPENSSL_PKEY_*.
+        /// Parse a DER or PEM encoded private key.
         /// \param[in] buffer Buffer containing the encoded private key.
         /// \param[in] length Length of buffer.
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed private key.
         _LIB_THEKOGANS_CRYPTO_DECL crypto::EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
             ParsePrivateKey (
-                const std::string &encoding,
-                const std::string &type,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0);
         /// \brief
-        /// Parse an encoded public key.
-        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
-        /// \param[in] type OPENSSL_PKEY_*.
-        /// NOTE: If the encoding is PEM_ENCODING, type must be OPENSSL_PKEY_RSA.
+        /// Parse a DER or PEM encoded public key.
         /// \param[in] buffer Buffer containing the encoded public key.
         /// \param[in] length Length of buffer.
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
+        /// NOTE: If the encoding is PEM_ENCODING, key type must be OPENSSL_PKEY_RSA.
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed public key.
         _LIB_THEKOGANS_CRYPTO_DECL crypto::EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
             ParsePublicKey (
-                const std::string &encoding,
-                const std::string &type,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0);
         /// \brief
-        /// Parse an encoded DH parameters.
-        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
+        /// Parse a DER or PEM encoded DH parameters.
         /// \param[in] buffer Buffer containing the encoded DH parameters.
         /// \param[in] length Length of buffer.
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed DH parameters.
         _LIB_THEKOGANS_CRYPTO_DECL crypto::DHPtr _LIB_THEKOGANS_CRYPTO_API
             ParseDHParams (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0);
         /// \brief
-        /// Parse an encoded DSA parameters.
-        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
+        /// Parse a DER or PEM encoded DSA parameters.
         /// \param[in] buffer Buffer containing the encoded DSA parameters.
         /// \param[in] length Length of buffer.
+        /// \param[in] encoding DER_ENCODING or PEM_ENCODING.
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed DSA parameters.
         _LIB_THEKOGANS_CRYPTO_DECL crypto::DSAPtr _LIB_THEKOGANS_CRYPTO_API
             ParseDSAParams (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0);
 

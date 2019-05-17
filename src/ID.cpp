@@ -36,7 +36,7 @@ namespace thekogans {
         ID::ID () {
             if (util::GlobalRandomSource::Instance ().GetBytes (data, SIZE) != SIZE) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to get %u random bytes for ID.", SIZE);
+                    "Unable to get " THEKOGANS_UTIL_SIZE_T_FORMAT " random bytes for ID.", SIZE);
             }
         }
 
@@ -49,7 +49,9 @@ namespace thekogans {
                 length = messageDigest.Final (data);
                 if (length != ID::SIZE) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Incorrect ID length (%u, %u).", length, ID::SIZE);
+                        "Incorrect ID length (" THEKOGANS_UTIL_SIZE_T_FORMAT ", "
+                        THEKOGANS_UTIL_SIZE_T_FORMAT ").",
+                        length, ID::SIZE);
                 }
             }
             else {
@@ -61,14 +63,14 @@ namespace thekogans {
         ID::ID (util::Serializer &serializer) {
             if (serializer.Read (data, ID::SIZE) != ID::SIZE) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to read %u bytes from the buffer.", ID::SIZE);
+                    "Unable to read " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes from the buffer.", ID::SIZE);
             }
         }
 
         void ID::Serialize (util::Serializer &serializer) const {
             if (serializer.Write (data, ID::SIZE) != ID::SIZE) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to write %u bytes to the buffer.", ID::SIZE);
+                    "Unable to write " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes to the buffer.", ID::SIZE);
             }
         }
 

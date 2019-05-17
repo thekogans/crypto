@@ -267,13 +267,13 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL X509_CRLPtr _LIB_THEKOGANS_CRYPTO_API
         LoadCRL (
                 const std::string &path,
-                util::ui32 format,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (!path.empty () && (format == FORMAT_DER || format == FORMAT_PEM)) {
+            if (!path.empty () && (encoding == DER_ENCODING || encoding == PEM_ENCODING)) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
                 if (bio.get () != 0) {
-                    X509_CRLPtr crl (format == FORMAT_DER ?
+                    X509_CRLPtr crl (encoding == DER_ENCODING ?
                         d2i_X509_CRL_bio (bio.get (), 0) :
                         PEM_read_bio_X509_CRL (bio.get (), 0, passwordCallback, userData));
                     if (crl.get () != 0) {
@@ -295,13 +295,13 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL void _LIB_THEKOGANS_CRYPTO_API
         SaveCRL (
-                const std::string &path,
                 X509_CRL *crl,
-                util::ui32 format) {
-            if (!path.empty () && crl != 0 && (format == FORMAT_DER || format == FORMAT_PEM)) {
+                const std::string &path,
+                const std::string &encoding) {
+            if (!path.empty () && crl != 0 && (encoding == DER_ENCODING || encoding == PEM_ENCODING)) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
                 if (bio.get () != 0 ||
-                        (format == FORMAT_PEM ?
+                        (encoding == DER_ENCODING ?
                             PEM_write_bio_X509_CRL (bio.get (), crl) :
                             i2d_X509_CRL_bio (bio.get (), crl)) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -330,9 +330,9 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL X509Ptr _LIB_THEKOGANS_CRYPTO_API
         ParseCertificate (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (buffer != 0 && length > 0) {
@@ -379,9 +379,9 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
         ParsePUBKEY (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (buffer != 0 && length > 0) {
@@ -428,20 +428,14 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
         ParsePrivateKey (
-                const std::string &encoding,
-                const std::string &type,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (buffer != 0 && length > 0) {
                 if (encoding == DER_ENCODING) {
-                    EVP_PKEYPtr key (
-                        d2i_PrivateKey (
-                            stringToEVP_PKEYtype (type.c_str ()),
-                            0,
-                            (const util::ui8 **)&buffer,
-                            (long)length));
+                    EVP_PKEYPtr key (d2i_AutoPrivateKey (0, (const util::ui8 **)&buffer, (long)length));
                     if (key.get () != 0) {
                         return key;
                     }
@@ -459,16 +453,7 @@ namespace thekogans {
                         EVP_PKEYPtr key (
                             PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData));
                         if (key.get () != 0) {
-                            std::string keyType = EVP_PKEYtypeTostring (EVP_PKEY_base_id (key.get ()));
-                            if (keyType == type) {
-                                return key;
-                            }
-                            else {
-                                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                                    "Invalid key type: %s, expecting %s.",
-                                    keyType.c_str (),
-                                    type.c_str ());
-                            }
+                            return key;
                         }
                         else {
                             THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -491,28 +476,66 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
         ParsePublicKey (
-                const std::string &encoding,
-                const std::string &type,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (buffer != 0 && length > 0) {
                 if (encoding == DER_ENCODING) {
-                    EVP_PKEYPtr key (
-                        d2i_PublicKey (
-                            stringToEVP_PKEYtype (type.c_str ()),
-                            0,
-                            (const util::ui8 **)&buffer,
-                            (long)length));
-                    if (key.get () != 0) {
-                        return key;
+                    {
+                        const util::ui8 **ptr = (const util::ui8 **)&buffer;
+                        // RSA is most common. Try it first.
+                        RSAPtr rsa (d2i_RSAPublicKey (0, ptr, (long)length));
+                        if (rsa.get () != 0) {
+                            EVP_PKEYPtr key (EVP_PKEY_new ());
+                            if (key.get () != 0 && EVP_PKEY_assign_RSA (key.get (), rsa.get ()) == 1) {
+                                rsa.release ();
+                                return key;
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
                     }
-                    else {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    {
+                        const util::ui8 **ptr = (const util::ui8 **)&buffer;
+                        // If not RSA, try DSA.
+                        DSAPtr dsa (d2i_DSAPublicKey (0, ptr, (long)length));
+                        if (dsa.get () != 0) {
+                            EVP_PKEYPtr key (EVP_PKEY_new ());
+                            if (key.get () != 0 && EVP_PKEY_assign_DSA (key.get (), dsa.get ()) == 1) {
+                                dsa.release ();
+                                return key;
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
                     }
+                    {
+                        const util::ui8 **ptr = (const util::ui8 **)&buffer;
+                        // Finally, try an Elliptic curve public key.
+                        EC_KEYPtr ec (o2i_ECPublicKey (0, ptr, (long)length));
+                        if (ec.get () != 0) {
+                            EVP_PKEYPtr key (EVP_PKEY_new ());
+                            if (key.get () != 0 && EVP_PKEY_assign_EC_KEY (key.get (), ec.get ()) == 1) {
+                                ec.release ();
+                                return key;
+                            }
+                            else {
+                                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            }
+                        }
+                    }
+                    // None of the above? Throw.
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Unable to determine public key type. (Tried: %s, %s, %s)",
+                        OPENSSL_PKEY_RSA,
+                        OPENSSL_PKEY_DSA,
+                        OPENSSL_PKEY_EC);
                 }
-                else if (encoding == PEM_ENCODING && type == OPENSSL_PKEY_RSA) {
+                else if (encoding == PEM_ENCODING) {
                     // NOTE: I hate casting away constness, but thankfully,
                     // in this case it's harmless. Even though BIO_new_mem_buf
                     // wants an util::ui8 *, it marks the bio as read only,
@@ -557,9 +580,9 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL DHPtr _LIB_THEKOGANS_CRYPTO_API
         ParseDHParams (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (buffer != 0 && length > 0) {
@@ -606,9 +629,9 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL DSAPtr _LIB_THEKOGANS_CRYPTO_API
         ParseDSAParams (
-                const std::string &encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (buffer != 0 && length > 0) {

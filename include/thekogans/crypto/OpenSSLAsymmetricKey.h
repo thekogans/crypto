@@ -80,11 +80,14 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
-            /// Load a PEM encoded private key from a buffer.
+            /// Load a DER or PEM encoded private key from a buffer.
             /// \param[in] buffer Buffer containing a private key.
             /// \param[in] length Buffer length.
-            /// \param[in] passwordCallback Provide a password if file is encrypted.
-            /// \param[in] userData User data for passwordCallback.
+            /// \param[in] encoding Private key encoding (DER or PEM).
+            /// \param[in] passwordCallback For PEM encoding only.
+            /// Provide a password if file is encrypted.
+            /// \param[in] userData For PEM encoding only.
+            /// User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
             /// \param[in] id Optional key id.
@@ -92,19 +95,22 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Private key.
             static AsymmetricKey::Ptr LoadPrivateKeyFromBuffer (
-                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
-            /// Load a PEM encoded private key from a file.
+            /// Load a DER or PEM encoded private key from a file.
             /// \param[in] path File containing a private key.
-            /// \param[in] passwordCallback Provide a password if file is encrypted.
-            /// \param[in] userData User data for passwordCallback.
+            /// \param[in] encoding Private key encoding (DER or PEM).
+            /// \param[in] passwordCallback For PEM encoding only.
+            /// Provide a password if file is encrypted.
+            /// \param[in] userData For PEM encoding only.
+            /// User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
             /// \param[in] id Optional key id.
@@ -112,8 +118,8 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Private key.
             static AsymmetricKey::Ptr LoadPrivateKeyFromFile (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
                 const ID &id = ID (),
@@ -121,11 +127,14 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
-            /// Load a PEM encoded public key from a buffer.
+            /// Load a DER or PEM encoded public key from a buffer.
             /// \param[in] buffer Buffer containing a public key.
             /// \param[in] length Buffer length.
-            /// \param[in] passwordCallback Provide a password if file is encrypted.
-            /// \param[in] userData User data for passwordCallback.
+            /// \param[in] encoding Public key encoding (DER or PEM).
+            /// \param[in] passwordCallback For PEM encoding only.
+            /// Provide a password if file is encrypted.
+            /// \param[in] userData For PEM encoding only.
+            /// User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
             /// \param[in] id Optional key id.
@@ -133,19 +142,22 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public key.
             static AsymmetricKey::Ptr LoadPublicKeyFromBuffer (
-                const std::string encoding,
                 const void *buffer,
                 std::size_t length,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
-            /// Load a PEM encoded public key from a file.
+            /// Load a DER or PEM encoded public key from a file.
             /// \param[in] path File containing a public key.
-            /// \param[in] passwordCallback Provide a password if file is encrypted.
-            /// \param[in] userData User data for passwordCallback.
+            /// \param[in] encoding Public key encoding (DER or PEM).
+            /// \param[in] passwordCallback For PEM encoding only.
+            /// Provide a password if file is encrypted.
+            /// \param[in] userData For PEM encoding only.
+            /// User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
             /// \param[in] id Optional key id.
@@ -153,18 +165,21 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public key.
             static AsymmetricKey::Ptr LoadPublicKeyFromFile (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
-            /// Load a public key from a certificate file.
+            /// Load a public key from a DER or PEM encoded certificate file.
             /// \param[in] path File containing a certificate.
-            /// \param[in] passwordCallback Provide a password if file is encrypted.
-            /// \param[in] userData User data for passwordCallback.
+            /// \param[in] encoding Public key encoding (DER or PEM).
+            /// \param[in] passwordCallback For PEM encoding only.
+            /// Provide a password if file is encrypted.
+            /// \param[in] userData For PEM encoding only.
+            /// User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
             /// \param[in] id Optional key id.
@@ -172,8 +187,8 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public key.
             static AsymmetricKey::Ptr LoadPublicKeyFromCertificate (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
                 const ID &id = ID (),
@@ -181,18 +196,24 @@ namespace thekogans {
                 const std::string &description = std::string ());
 
             /// \brief
-            /// Save the key to a file.
+            /// Save the key to a file using DER or EM encoding.
             /// \param[in] path File name to save the key to.
-            /// \param[in] cipher Optional cipher to use to encrypt the private key.
-            /// \param[in] symmetricKey Optional symmetric key to use with the cipher.
-            /// \param[in] symmetricKeyLength Optional symmetric key length.
-            /// \param[in] passwordCallback Provide a password if file is encrypted.
-            /// \param[in] userData User data for passwordCallback.
+            /// \param[in] encoding Key encoding (DER or PEM).
+            /// \param[in] cipher For PEM encoding only.
+            /// Optional cipher to use to encrypt the private key.
+            /// \param[in] symmetricKey For PEM encoding only.
+            /// Optional symmetric key to use with the cipher.
+            /// \param[in] symmetricKeyLength For PEM encoding only.
+            /// Optional symmetric key length.
+            /// \param[in] passwordCallback For PEM encoding only.
+            /// Provide a password if file is encrypted.
+            /// \param[in] userData For PEM encoding only.
+            /// User data for passwordCallback.
             /// NOTE: If passwordCallback == 0 and userData != 0, OpenSSL
             /// will interpret the userData as a NULL terminated password.
             void Save (
-                const std::string encoding,
                 const std::string &path,
+                const std::string &encoding = DER_ENCODING,
                 const EVP_CIPHER *cipher = 0,
                 const void *symmetricKey = 0,
                 std::size_t symmetricKeyLength = 0,
