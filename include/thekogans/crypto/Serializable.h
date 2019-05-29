@@ -197,16 +197,16 @@ namespace thekogans {
                 thekogans::util::SecureAllocator::Global)
 
         /// \brief
-        /// Implement Serializable extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (Serializable)
+        /// Implement Serializable::Ptr extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (Serializable)
 
     } // namespace crypto
 
     namespace util {
 
         /// \brief
-        /// Implement Serializable value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::Serializable)
+        /// Implement Serializable::Ptr value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::Serializable)
 
     } // namespace util
 } // namespace thekogans

@@ -110,16 +110,16 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement Params extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (Params)
+        /// Implement Params::Ptr extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (Params)
 
     } // namespace crypto
 
     namespace util {
 
         /// \brief
-        /// Implement Params value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::Params)
+        /// Implement Params::Ptr value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::Params)
 
     } // namespace util
 } // namespace thekogans

@@ -136,16 +136,16 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement AsymmetricKey extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (AsymmetricKey)
+        /// Implement AsymmetricKey::Ptr extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (AsymmetricKey)
 
     } // namespace crypto
 
     namespace util {
 
         /// \brief
-        /// Implement AsymmetricKey value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::AsymmetricKey)
+        /// Implement AsymmetricKey::Ptr value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::AsymmetricKey)
 
     } // namespace util
 } // namespace thekogans

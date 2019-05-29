@@ -190,16 +190,16 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement KeyExchange::Params extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (KeyExchange::Params)
+        /// Implement KeyExchange::Params::Ptr extraction operators.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (KeyExchange::Params)
 
     } // namespace crypto
 
     namespace util {
 
         /// \brief
-        /// Implement KeyExchange::Params value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::KeyExchange::Params)
+        /// Implement KeyExchange::Params::Ptr value parser.
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::KeyExchange::Params)
 
     } // namespace util
 } // namespace thekogans
