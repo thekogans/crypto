@@ -165,7 +165,7 @@ namespace thekogans {
                 const util::JSON::Object &object) {
             AsymmetricKey::Read (header, object);
             if (IsPrivate ()) {
-                std::string privateKey = object.GetValue (ATTR_KEY)->ToString ();
+                std::string privateKey = object.Get<util::JSON::String> (ATTR_KEY)->value;
                 if (privateKey.size () == Ed25519::PRIVATE_KEY_LENGTH * 2) {
                     util::HexDecodestring (privateKey, key.privateKey);
                 }
@@ -178,7 +178,7 @@ namespace thekogans {
                 }
             }
             else {
-                std::string publicKey = object.GetValue (ATTR_KEY)->ToString ();
+                std::string publicKey = object.Get<util::JSON::String> (ATTR_KEY)->value;
                 if (publicKey.size () == Ed25519::PUBLIC_KEY_LENGTH * 2) {
                     util::HexDecodestring (publicKey, key.publicKey.value);
                 }
@@ -195,12 +195,12 @@ namespace thekogans {
         void Ed25519AsymmetricKey::Write (util::JSON::Object &object) const {
             AsymmetricKey::Write (object);
             if (IsPrivate ()) {
-                object.AddString (
+                object.Add (
                     ATTR_KEY,
                     util::HexEncodeBuffer (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH));
             }
             else {
-                object.AddString (
+                object.Add (
                     ATTR_KEY,
                     util::HexEncodeBuffer (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH));
             }

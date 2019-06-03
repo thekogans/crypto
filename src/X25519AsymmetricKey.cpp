@@ -134,7 +134,7 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             AsymmetricKey::Read (header, object);
-            util::SecureString hexKey = object.GetValue (ATTR_KEY)->ToString ().c_str ();
+            util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
                 key.Rewind ();
                 if (key.AdvanceWriteOffset (
@@ -159,7 +159,7 @@ namespace thekogans {
 
         void X25519AsymmetricKey::Write (util::JSON::Object &object) const {
             AsymmetricKey::Write (object);
-            object.AddString (ATTR_KEY, util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH));
+            object.Add (ATTR_KEY, util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH));
         }
 
     } // namespace crypto

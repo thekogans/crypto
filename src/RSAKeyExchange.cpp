@@ -133,14 +133,14 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             Params::Read (header, object);
-            keyId = ID::FromHexString (object.GetValue (ATTR_KEY_ID)->ToString ());
-            buffer = util::HexDecodestring (object.GetValue (ATTR_BUFFER)->ToString ());
+            keyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_KEY_ID)->value);
+            buffer = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_BUFFER)->value);
         }
 
         void RSAKeyExchange::RSAParams::Write (util::JSON::Object &object) const {
             Params::Write (object);
-            object.AddString (ATTR_KEY_ID, keyId.ToHexString ());
-            object.AddString (ATTR_BUFFER, util::HexEncodeBuffer (buffer.data (), buffer.size ()));
+            object.Add (ATTR_KEY_ID, keyId.ToHexString ());
+            object.Add (ATTR_BUFFER, util::HexEncodeBuffer (buffer.data (), buffer.size ()));
         }
 
         RSAKeyExchange::RSAKeyExchange (

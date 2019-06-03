@@ -543,7 +543,7 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             Serializable::Read (header, object);
-            util::SecureString hexKey = object.GetValue (ATTR_KEY)->ToString ().c_str ();
+            util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             std::size_t length = hexKey.size () / 2;
             if (length > 0 && length <= key.GetLength ()) {
                 key.Rewind ();
@@ -567,7 +567,7 @@ namespace thekogans {
 
         void SymmetricKey::Write (util::JSON::Object &object) const {
             Serializable::Write (object);
-            object.AddString (
+            object.Add (
                 ATTR_KEY,
                 util::HexEncodeBuffer (
                     key.GetReadPtr (),

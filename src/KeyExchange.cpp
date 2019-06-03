@@ -65,17 +65,17 @@ namespace thekogans {
         void KeyExchange::Params::Read (
                 const TextHeader & /*header*/,
                 const util::JSON::Object &object) {
-            id = ID::FromHexString (object.GetValue (ATTR_ID)->ToString ());
-            signature = util::HexDecodestring (object.GetValue (ATTR_SIGNATURE)->ToString ());
-            signatureKeyId = ID::FromHexString (object.GetValue (ATTR_SIGNATURE_KEY_ID)->ToString ());
-            signatureMessageDigestName = object.GetValue (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME)->ToString ();
+            id = ID::FromHexString (object.Get<util::JSON::String> (ATTR_ID)->value);
+            signature = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_SIGNATURE)->value);
+            signatureKeyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_SIGNATURE_KEY_ID)->value);
+            signatureMessageDigestName = object.Get<util::JSON::String> (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME)->value;
         }
 
         void KeyExchange::Params::Write (util::JSON::Object &object) const {
-            object.AddString (ATTR_ID, id.ToHexString ());
-            object.AddString (ATTR_SIGNATURE, util::HexEncodeBuffer (signature.data (), signature.size ()));
-            object.AddString (ATTR_SIGNATURE_KEY_ID, signatureKeyId.ToHexString ());
-            object.AddString (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME, signatureMessageDigestName);
+            object.Add (ATTR_ID, id.ToHexString ());
+            object.Add (ATTR_SIGNATURE, util::HexEncodeBuffer (signature.data (), signature.size ()));
+            object.Add (ATTR_SIGNATURE_KEY_ID, signatureKeyId.ToHexString ());
+            object.Add (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME, signatureMessageDigestName);
         }
 
     } // namespace crypto

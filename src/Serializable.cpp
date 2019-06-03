@@ -91,15 +91,15 @@ namespace thekogans {
         void Serializable::Read (
                 const TextHeader & /*header*/,
                 const util::JSON::Object &object) {
-            id = ID::FromHexString (object.GetValue (ATTR_ID)->ToString ());
-            name = object.GetValue (ATTR_NAME)->ToString ();
-            description = object.GetValue (ATTR_DESCRIPTION)->ToString ();
+            id = ID::FromHexString (object.Get<util::JSON::String> (ATTR_ID)->value);
+            name = object.Get<util::JSON::String> (ATTR_NAME)->value;
+            description = object.Get<util::JSON::String> (ATTR_DESCRIPTION)->value;
         }
 
         void Serializable::Write (util::JSON::Object &object) const {
-            object.AddString (ATTR_ID, id.ToHexString ());
-            object.AddString (ATTR_NAME, name);
-            object.AddString (ATTR_DESCRIPTION, description);
+            object.Add (ATTR_ID, id.ToHexString ());
+            object.Add (ATTR_NAME, name);
+            object.Add (ATTR_DESCRIPTION, description);
         }
 
     } // namespace crypto

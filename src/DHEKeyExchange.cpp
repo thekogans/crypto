@@ -216,34 +216,34 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             Params::Read (header, object);
-            salt = util::HexDecodestring (object.GetValue (ATTR_SALT)->ToString ());
-            keyLength = (std::size_t)object.GetValue (ATTR_KEY_LENGTH)->ToNumber ();
-            messageDigestName = object.GetValue (ATTR_MESSAGE_DIGEST_NAME)->ToString ();
-            count = (std::size_t)object.GetValue (ATTR_COUNT)->ToNumber ();
-            keyId = ID::FromHexString (object.GetValue (ATTR_KEY_ID)->ToString ());
-            keyName = object.GetValue (ATTR_KEY_NAME)->ToString ();
-            keyDescription = object.GetValue (ATTR_KEY_DESCRIPTION)->ToString ();
-            util::JSON::Object::Ptr paramsObject = object.GetObject (TAG_PARAMS);
+            salt = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_SALT)->value);
+            keyLength = object.Get<util::JSON::Number> (ATTR_KEY_LENGTH)->To<std::size_t> ();
+            messageDigestName = object.Get<util::JSON::String> (ATTR_MESSAGE_DIGEST_NAME)->value;
+            count = object.Get<util::JSON::Number> (ATTR_COUNT)->To<std::size_t> ();
+            keyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_KEY_ID)->value);
+            keyName = object.Get<util::JSON::String> (ATTR_KEY_NAME)->value;
+            keyDescription = object.Get<util::JSON::String> (ATTR_KEY_DESCRIPTION)->value;
+            util::JSON::Object::Ptr paramsObject = object.Get<util::JSON::Object> (TAG_PARAMS);
             *paramsObject >> params;
-            util::JSON::Object::Ptr publicKeyObject = object.GetObject (TAG_PUBLIC_KEY);
+            util::JSON::Object::Ptr publicKeyObject = object.Get<util::JSON::Object> (TAG_PUBLIC_KEY);
             *publicKeyObject >> publicKey;
         }
 
         void DHEKeyExchange::DHEParams::Write (util::JSON::Object &object) const {
             Params::Write (object);
-            object.AddString (ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
-            object.AddNumber (ATTR_KEY_LENGTH, keyLength);
-            object.AddString (ATTR_MESSAGE_DIGEST_NAME, messageDigestName);
-            object.AddNumber (ATTR_COUNT, count);
-            object.AddString (ATTR_KEY_ID, keyId.ToHexString ());
-            object.AddString (ATTR_KEY_NAME, keyName);
-            object.AddString (ATTR_KEY_DESCRIPTION, keyDescription);
+            object.Add (ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
+            object.Add (ATTR_KEY_LENGTH, keyLength);
+            object.Add (ATTR_MESSAGE_DIGEST_NAME, messageDigestName);
+            object.Add (ATTR_COUNT, count);
+            object.Add (ATTR_KEY_ID, keyId.ToHexString ());
+            object.Add (ATTR_KEY_NAME, keyName);
+            object.Add (ATTR_KEY_DESCRIPTION, keyDescription);
             util::JSON::Object::Ptr paramsObject (new util::JSON::Object);
             *paramsObject << *params;
-            object.AddObject (TAG_PARAMS, paramsObject);
+            object.Add (TAG_PARAMS, paramsObject);
             util::JSON::Object::Ptr publicKeyObject (new util::JSON::Object);
             *publicKeyObject << *publicKey;
-            object.AddObject (TAG_PUBLIC_KEY, publicKeyObject);
+            object.Add (TAG_PUBLIC_KEY, publicKeyObject);
         }
 
         namespace {

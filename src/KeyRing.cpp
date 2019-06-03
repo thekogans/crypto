@@ -1197,49 +1197,49 @@ namespace thekogans {
 
         std::size_t KeyRing::Size () const {
             std::size_t size = Serializable::Size () + cipherSuite.Size ();
-            size += util::UI32_SIZE;
+            size += util::SizeT (keyExchangeParamsMap.size ()).Size ();
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
                     end = keyExchangeParamsMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
-            size += util::UI32_SIZE;
+            size += util::SizeT (keyExchangeKeyMap.size ()).Size ();
             for (AsymmetricKeyMap::const_iterator
                     it = keyExchangeKeyMap.begin (),
                     end = keyExchangeKeyMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
-            size += util::UI32_SIZE;
+            size += util::SizeT (authenticatorParamsMap.size ()).Size ();
             for (ParamsMap::const_iterator
                     it = authenticatorParamsMap.begin (),
                     end = authenticatorParamsMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
-            size += util::UI32_SIZE;
+            size += util::SizeT (authenticatorKeyMap.size ()).Size ();
             for (AsymmetricKeyMap::const_iterator
                     it = authenticatorKeyMap.begin (),
                     end = authenticatorKeyMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
-            size += util::UI32_SIZE;
+            size += util::SizeT (cipherKeyMap.size ()).Size ();
             for (SymmetricKeyMap::const_iterator
                     it = cipherKeyMap.begin (),
                     end = cipherKeyMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
-            size += util::UI32_SIZE;
+            size += util::SizeT (macKeyMap.size ()).Size ();
             for (SymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
-            size += util::UI32_SIZE;
+            size += util::SizeT (userDataMap.size ()).Size ();
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
                 size += util::Serializable::Size (*it->second);
             }
-            size += util::UI32_SIZE;
+            size += util::SizeT (subringMap.size ()).Size ();
             for (KeyRingMap::const_iterator
                     it = subringMap.begin (),
                     end = subringMap.end (); it != end; ++it) {
@@ -1618,38 +1618,46 @@ namespace thekogans {
             Serializable::Write (node);
             node.append_attribute (ATTR_CIPHER_SUITE).set_value (cipherSuite.ToString ().c_str ());
             {
-                pugi::xml_node keyExchangeParams = node.append_child (TAG_KEY_EXCHANGE_PARAMS);
+                pugi::xml_node keyExchangeParams =
+                    node.append_child (TAG_KEY_EXCHANGE_PARAMS);
                 for (ParamsMap::const_iterator
                         it = keyExchangeParamsMap.begin (),
                         end = keyExchangeParamsMap.end (); it != end; ++it) {
-                    pugi::xml_node keyExchangeParam = keyExchangeParams.append_child (TAG_KEY_EXCHANGE_PARAM);
+                    pugi::xml_node keyExchangeParam =
+                        keyExchangeParams.append_child (TAG_KEY_EXCHANGE_PARAM);
                     keyExchangeParam << *it->second;
                 }
             }
             {
-                pugi::xml_node keyExchangeKeys = node.append_child (TAG_KEY_EXCHANGE_KEYS);
+                pugi::xml_node keyExchangeKeys =
+                    node.append_child (TAG_KEY_EXCHANGE_KEYS);
                 for (AsymmetricKeyMap::const_iterator
                         it = keyExchangeKeyMap.begin (),
                         end = keyExchangeKeyMap.end (); it != end; ++it) {
-                    pugi::xml_node keyExchangeKey = keyExchangeKeys.append_child (TAG_KEY_EXCHANGE_KEY);
+                    pugi::xml_node keyExchangeKey =
+                        keyExchangeKeys.append_child (TAG_KEY_EXCHANGE_KEY);
                     keyExchangeKey << *it->second;
                 }
             }
             {
-                pugi::xml_node authenticatorParams = node.append_child (TAG_AUTHENTICATOR_PARAMS);
+                pugi::xml_node authenticatorParams =
+                    node.append_child (TAG_AUTHENTICATOR_PARAMS);
                 for (ParamsMap::const_iterator
                         it = authenticatorParamsMap.begin (),
                         end = authenticatorParamsMap.end (); it != end; ++it) {
-                    pugi::xml_node authenticatorParam = authenticatorParams.append_child (TAG_AUTHENTICATOR_PARAM);
+                    pugi::xml_node authenticatorParam =
+                        authenticatorParams.append_child (TAG_AUTHENTICATOR_PARAM);
                     authenticatorParam << *it->second;
                 }
             }
             {
-                pugi::xml_node authenticatorKeys = node.append_child (TAG_AUTHENTICATOR_KEYS);
+                pugi::xml_node authenticatorKeys =
+                    node.append_child (TAG_AUTHENTICATOR_KEYS);
                 for (AsymmetricKeyMap::const_iterator
                         it = authenticatorKeyMap.begin (),
                         end = authenticatorKeyMap.end (); it != end; ++it) {
-                    pugi::xml_node authenticatorKey = authenticatorKeys.append_child (TAG_AUTHENTICATOR_KEY);
+                    pugi::xml_node authenticatorKey =
+                        authenticatorKeys.append_child (TAG_AUTHENTICATOR_KEY);
                     authenticatorKey << *it->second;
                 }
             }
@@ -1695,132 +1703,158 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             Serializable::Read (header, object);
-            cipherSuite = object.GetValue (ATTR_CIPHER_SUITE)->ToString ();
+            cipherSuite = object.Get<util::JSON::String> (ATTR_CIPHER_SUITE)->value;
             keyExchangeParamsMap.clear ();
-            util::JSON::Array::Ptr keyExchangeParams = object.GetArray (TAG_KEY_EXCHANGE_PARAMS);
-            for (std::size_t i = 0, count = keyExchangeParams->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr keyExchangeParam = keyExchangeParams->GetObject (i);
-                Params::Ptr params;
-                *keyExchangeParam >> params;
-                std::pair<ParamsMap::iterator, bool> result =
-                    keyExchangeParamsMap.insert (
-                        ParamsMap::value_type (params->GetId (), params));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert KeyExchange params: %s",
-                        params->GetName ().c_str ());
+            util::JSON::Array::Ptr keyExchangeParams =
+                object.Get<util::JSON::Array> (TAG_KEY_EXCHANGE_PARAMS);
+            if (keyExchangeParams.Get () != 0) {
+                for (std::size_t i = 0, count = keyExchangeParams->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr keyExchangeParam =
+                        keyExchangeParams->Get<util::JSON::Object> (i);
+                    Params::Ptr params;
+                    *keyExchangeParam >> params;
+                    std::pair<ParamsMap::iterator, bool> result =
+                        keyExchangeParamsMap.insert (
+                            ParamsMap::value_type (params->GetId (), params));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert KeyExchange params: %s",
+                            params->GetName ().c_str ());
+                    }
                 }
             }
             keyExchangeKeyMap.clear ();
-            util::JSON::Array::Ptr keyExchangeKeys = object.GetArray (TAG_KEY_EXCHANGE_KEYS);
-            for (std::size_t i = 0, count = keyExchangeKeys->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr keyExchangeKey = keyExchangeKeys->GetObject (i);
-                AsymmetricKey::Ptr key;
-                *keyExchangeKey >> key;
-                std::pair<AsymmetricKeyMap::iterator, bool> result =
-                    keyExchangeKeyMap.insert (
-                        AsymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert KeyExchange key: %s",
-                        key->GetName ().c_str ());
+            util::JSON::Array::Ptr keyExchangeKeys =
+                object.Get<util::JSON::Array> (TAG_KEY_EXCHANGE_KEYS);
+            if (keyExchangeKeys.Get () != 0) {
+                for (std::size_t i = 0, count = keyExchangeKeys->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr keyExchangeKey =
+                        keyExchangeKeys->Get<util::JSON::Object> (i);
+                    AsymmetricKey::Ptr key;
+                    *keyExchangeKey >> key;
+                    std::pair<AsymmetricKeyMap::iterator, bool> result =
+                        keyExchangeKeyMap.insert (
+                            AsymmetricKeyMap::value_type (key->GetId (), key));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert KeyExchange key: %s",
+                            key->GetName ().c_str ());
+                    }
                 }
             }
             authenticatorParamsMap.clear ();
-            util::JSON::Array::Ptr authenticatorParams = object.GetArray (TAG_AUTHENTICATOR_PARAMS);
-            for (std::size_t i = 0, count = authenticatorParams->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr authenticatorParam = authenticatorParams->GetObject (i);
-                Params::Ptr params;
-                *authenticatorParam >> params;
-                std::pair<ParamsMap::iterator, bool> result =
-                    authenticatorParamsMap.insert (
-                        ParamsMap::value_type (params->GetId (), params));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Authenticator params: %s",
-                        params->GetName ().c_str ());
+            util::JSON::Array::Ptr authenticatorParams =
+                object.Get<util::JSON::Array> (TAG_AUTHENTICATOR_PARAMS);
+            if (authenticatorParams.Get () != 0) {
+                for (std::size_t i = 0, count = authenticatorParams->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr authenticatorParam =
+                        authenticatorParams->Get<util::JSON::Object> (i);
+                    Params::Ptr params;
+                    *authenticatorParam >> params;
+                    std::pair<ParamsMap::iterator, bool> result =
+                        authenticatorParamsMap.insert (
+                            ParamsMap::value_type (params->GetId (), params));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert Authenticator params: %s",
+                            params->GetName ().c_str ());
+                    }
                 }
             }
             authenticatorKeyMap.clear ();
-            util::JSON::Array::Ptr authenticatorKeys = object.GetArray (TAG_AUTHENTICATOR_KEYS);
-            for (std::size_t i = 0, count = authenticatorKeys->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr authenticatorKey = authenticatorKeys->GetObject (i);
-                AsymmetricKey::Ptr key;
-                *authenticatorKey >> key;
-                std::pair<AsymmetricKeyMap::iterator, bool> result =
-                    authenticatorKeyMap.insert (
-                        AsymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Authenticator key: %s",
-                        key->GetName ().c_str ());
+            util::JSON::Array::Ptr authenticatorKeys =
+                object.Get<util::JSON::Array> (TAG_AUTHENTICATOR_KEYS);
+            if (authenticatorKeys.Get () != 0) {
+                for (std::size_t i = 0, count = authenticatorKeys->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr authenticatorKey =
+                        authenticatorKeys->Get<util::JSON::Object> (i);
+                    AsymmetricKey::Ptr key;
+                    *authenticatorKey >> key;
+                    std::pair<AsymmetricKeyMap::iterator, bool> result =
+                        authenticatorKeyMap.insert (
+                            AsymmetricKeyMap::value_type (key->GetId (), key));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert Authenticator key: %s",
+                            key->GetName ().c_str ());
+                    }
                 }
             }
             cipherKeyMap.clear ();
-            util::JSON::Array::Ptr cipherKeys = object.GetArray (TAG_CIPHER_KEYS);
-            for (std::size_t i = 0, count = cipherKeys->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr cipherKey = cipherKeys->GetObject (i);
-                SymmetricKey::Ptr key;
-                *cipherKey >> key;
-                std::pair<SymmetricKeyMap::iterator, bool> result =
-                    cipherKeyMap.insert (
-                        SymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert Cipher key: %s",
-                        key->GetName ().c_str ());
+            util::JSON::Array::Ptr cipherKeys =
+                object.Get<util::JSON::Array> (TAG_CIPHER_KEYS);
+            if (cipherKeys.Get () != 0) {
+                for (std::size_t i = 0, count = cipherKeys->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr cipherKey =
+                        cipherKeys->Get<util::JSON::Object> (i);
+                    SymmetricKey::Ptr key;
+                    *cipherKey >> key;
+                    std::pair<SymmetricKeyMap::iterator, bool> result =
+                        cipherKeyMap.insert (
+                            SymmetricKeyMap::value_type (key->GetId (), key));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert Cipher key: %s",
+                            key->GetName ().c_str ());
+                    }
                 }
             }
             macKeyMap.clear ();
-            util::JSON::Array::Ptr macKeys = object.GetArray (TAG_MAC_KEYS);
-            for (std::size_t i = 0, count = macKeys->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr macKey = macKeys->GetObject (i);
-                SymmetricKey::Ptr key;
-                *macKey >> key;
-                std::pair<SymmetricKeyMap::iterator, bool> result =
-                    macKeyMap.insert (
-                        SymmetricKeyMap::value_type (key->GetId (), key));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert MAC key: %s",
-                        key->GetName ().c_str ());
+            util::JSON::Array::Ptr macKeys = object.Get<util::JSON::Array> (TAG_MAC_KEYS);
+            if (macKeys.Get () != 0) {
+                for (std::size_t i = 0, count = macKeys->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr macKey = macKeys->Get<util::JSON::Object> (i);
+                    SymmetricKey::Ptr key;
+                    *macKey >> key;
+                    std::pair<SymmetricKeyMap::iterator, bool> result =
+                        macKeyMap.insert (
+                            SymmetricKeyMap::value_type (key->GetId (), key));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert MAC key: %s",
+                            key->GetName ().c_str ());
+                    }
                 }
             }
             userDataMap.clear ();
-            util::JSON::Array::Ptr userDatas = object.GetArray (TAG_USER_DATAS);
-            for (std::size_t i = 0, count = userDatas->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr userData = userDatas->GetObject (i);
-                Serializable::Ptr data;
-                *userData >> data;
-                std::pair<SerializableMap::iterator, bool> result =
-                    userDataMap.insert (
-                        SerializableMap::value_type (data->GetId (), data));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert user data: %s",
-                        data->GetName ().c_str ());
+            util::JSON::Array::Ptr userDatas = object.Get<util::JSON::Array> (TAG_USER_DATAS);
+            if (userDatas.Get () != 0) {
+                for (std::size_t i = 0, count = userDatas->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr userData = userDatas->Get<util::JSON::Object> (i);
+                    Serializable::Ptr data;
+                    *userData >> data;
+                    std::pair<SerializableMap::iterator, bool> result =
+                        userDataMap.insert (
+                            SerializableMap::value_type (data->GetId (), data));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert user data: %s",
+                            data->GetName ().c_str ());
+                    }
                 }
             }
             subringMap.clear ();
-            util::JSON::Array::Ptr subrings = object.GetArray (TAG_SUB_RINGS);
-            for (std::size_t i = 0, count = subrings->GetValueCount (); i < count; ++i) {
-                util::JSON::Object::Ptr subring = subrings->GetObject (i);
-                Ptr keyRing;
-                *subring >> keyRing;
-                std::pair<KeyRingMap::iterator, bool> result =
-                    subringMap.insert (
-                        KeyRingMap::value_type (keyRing->GetId (), keyRing));
-                if (!result.second) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to instert subring: %s",
-                        keyRing->GetName ().c_str ());
+            util::JSON::Array::Ptr subrings = object.Get<util::JSON::Array> (TAG_SUB_RINGS);
+            if (subrings.Get () != 0) {
+                for (std::size_t i = 0, count = subrings->GetValueCount (); i < count; ++i) {
+                    util::JSON::Object::Ptr subring = subrings->Get<util::JSON::Object> (i);
+                    Ptr keyRing;
+                    *subring >> keyRing;
+                    std::pair<KeyRingMap::iterator, bool> result =
+                        subringMap.insert (
+                            KeyRingMap::value_type (keyRing->GetId (), keyRing));
+                    if (!result.second) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "Unable to instert subring: %s",
+                            keyRing->GetName ().c_str ());
+                    }
                 }
             }
         }
 
         void KeyRing::Write (util::JSON::Object &object) const {
             Serializable::Write (object);
-            object.AddString (ATTR_CIPHER_SUITE, cipherSuite.ToString ());
+            object.Add (ATTR_CIPHER_SUITE, cipherSuite.ToString ());
             {
                 util::JSON::Array::Ptr keyExchangeParams (new util::JSON::Array);
                 for (ParamsMap::const_iterator
@@ -1828,9 +1862,9 @@ namespace thekogans {
                         end = keyExchangeParamsMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr keyExchangeParam (new util::JSON::Object);
                     *keyExchangeParam << *it->second;
-                    keyExchangeParams->AddObject (keyExchangeParam);
+                    keyExchangeParams->Add (keyExchangeParam);
                 }
-                object.AddArray (TAG_KEY_EXCHANGE_PARAMS, keyExchangeParams);
+                object.Add (TAG_KEY_EXCHANGE_PARAMS, keyExchangeParams);
             }
             {
                 util::JSON::Array::Ptr keyExchangeKeys (new util::JSON::Array);
@@ -1839,9 +1873,9 @@ namespace thekogans {
                         end = keyExchangeKeyMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr keyExchangeKey (new util::JSON::Object);
                     *keyExchangeKey << *it->second;
-                    keyExchangeKeys->AddObject (keyExchangeKey);
+                    keyExchangeKeys->Add (keyExchangeKey);
                 }
-                object.AddArray (TAG_KEY_EXCHANGE_KEYS, keyExchangeKeys);
+                object.Add (TAG_KEY_EXCHANGE_KEYS, keyExchangeKeys);
             }
             {
                 util::JSON::Array::Ptr authenticatorParams (new util::JSON::Array);
@@ -1850,9 +1884,9 @@ namespace thekogans {
                         end = authenticatorParamsMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr authenticatorParam (new util::JSON::Object);
                     *authenticatorParam << *it->second;
-                    authenticatorParams->AddObject (authenticatorParam);
+                    authenticatorParams->Add (authenticatorParam);
                 }
-                object.AddArray (TAG_AUTHENTICATOR_PARAMS, authenticatorParams);
+                object.Add (TAG_AUTHENTICATOR_PARAMS, authenticatorParams);
             }
             {
                 util::JSON::Array::Ptr authenticatorKeys (new util::JSON::Array);
@@ -1861,9 +1895,9 @@ namespace thekogans {
                         end = authenticatorKeyMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr authenticatorKey (new util::JSON::Object);
                     *authenticatorKey << *it->second;
-                    authenticatorKeys->AddObject (authenticatorKey);
+                    authenticatorKeys->Add (authenticatorKey);
                 }
-                object.AddArray (TAG_AUTHENTICATOR_KEYS, authenticatorKeys);
+                object.Add (TAG_AUTHENTICATOR_KEYS, authenticatorKeys);
             }
             {
                 util::JSON::Array::Ptr cipherKeys (new util::JSON::Array);
@@ -1872,9 +1906,9 @@ namespace thekogans {
                         end = cipherKeyMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr cipherKey (new util::JSON::Object);
                     *cipherKey << *it->second;
-                    cipherKeys->AddObject (cipherKey);
+                    cipherKeys->Add (cipherKey);
                 }
-                object.AddArray (TAG_CIPHER_KEYS, cipherKeys);
+                object.Add (TAG_CIPHER_KEYS, cipherKeys);
             }
             {
                 util::JSON::Array::Ptr macKeys (new util::JSON::Array);
@@ -1883,9 +1917,9 @@ namespace thekogans {
                         end = macKeyMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr macKey (new util::JSON::Object);
                     *macKey << *it->second;
-                    macKeys->AddObject (macKey);
+                    macKeys->Add (macKey);
                 }
-                object.AddArray (TAG_MAC_KEYS, macKeys);
+                object.Add (TAG_MAC_KEYS, macKeys);
             }
             {
                 util::JSON::Array::Ptr userDatas (new util::JSON::Array);
@@ -1894,9 +1928,9 @@ namespace thekogans {
                         end = userDataMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr userData (new util::JSON::Object);
                     *userData << *it->second;
-                    userDatas->AddObject (userData);
+                    userDatas->Add (userData);
                 }
-                object.AddArray (TAG_USER_DATAS, userDatas);
+                object.Add (TAG_USER_DATAS, userDatas);
             }
             {
                 util::JSON::Array::Ptr subRings (new util::JSON::Array);
@@ -1905,9 +1939,9 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     util::JSON::Object::Ptr subRing (new util::JSON::Object);
                     *subRing << *it->second;
-                    subRings->AddObject (subRing);
+                    subRings->Add (subRing);
                 }
-                object.AddArray (TAG_SUB_RINGS, subRings);
+                object.Add (TAG_SUB_RINGS, subRings);
             }
         }
 

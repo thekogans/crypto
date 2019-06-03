@@ -58,12 +58,12 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             Serializable::Read (header, object);
-            isPrivate = object.GetValue (ATTR_PRIVATE)->ToBool ();
+            isPrivate = object.Get<util::JSON::Bool> (ATTR_PRIVATE)->value;
         }
 
         void AsymmetricKey::Write (util::JSON::Object &object) const {
             Serializable::Write (object);
-            object.AddBool (ATTR_PRIVATE, IsPrivate ());
+            object.Add (ATTR_PRIVATE, IsPrivate ());
         }
 
     } // namespace crypto
