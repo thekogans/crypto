@@ -46,7 +46,7 @@ namespace thekogans {
         #if defined (TOOLCHAIN_OS_Windows)
             const DWORD ENCODING = X509_ASN_ENCODING | PKCS_7_ASN_ENCODING;
 
-            std::string encodingToString (DWORD encoding) {
+            std::string encodingTostring (DWORD encoding) {
                 return encoding == X509_ASN_ENCODING ? DER_ENCODING :
                     encoding == PKCS_7_ASN_ENCODING ? PEM_ENCODING : std::string ();
             }

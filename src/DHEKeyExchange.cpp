@@ -217,9 +217,9 @@ namespace thekogans {
                 const util::JSON::Object &object) {
             Params::Read (header, object);
             salt = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_SALT)->value);
-            keyLength = object.Get<util::JSON::Number> (ATTR_KEY_LENGTH)->To<std::size_t> ();
+            keyLength = object.Get<util::JSON::Number> (ATTR_KEY_LENGTH)->To<util::SizeT> ();
             messageDigestName = object.Get<util::JSON::String> (ATTR_MESSAGE_DIGEST_NAME)->value;
-            count = object.Get<util::JSON::Number> (ATTR_COUNT)->To<std::size_t> ();
+            count = object.Get<util::JSON::Number> (ATTR_COUNT)->To<util::SizeT> ();
             keyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_KEY_ID)->value);
             keyName = object.Get<util::JSON::String> (ATTR_KEY_NAME)->value;
             keyDescription = object.Get<util::JSON::String> (ATTR_KEY_DESCRIPTION)->value;
