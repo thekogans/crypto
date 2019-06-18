@@ -72,10 +72,18 @@ namespace thekogans {
         }
 
         void KeyExchange::Params::Write (util::JSON::Object &object) const {
-            object.Add (ATTR_ID, id.ToHexString ());
-            object.Add (ATTR_SIGNATURE, util::HexEncodeBuffer (signature.data (), signature.size ()));
-            object.Add (ATTR_SIGNATURE_KEY_ID, signatureKeyId.ToHexString ());
-            object.Add (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME, signatureMessageDigestName);
+            object.Add<const std::string &> (
+                ATTR_ID,
+                id.ToHexString ());
+            object.Add<const std::string &> (
+                ATTR_SIGNATURE,
+                util::HexEncodeBuffer (signature.data (), signature.size ()));
+            object.Add<const std::string &> (
+                ATTR_SIGNATURE_KEY_ID,
+                signatureKeyId.ToHexString ());
+            object.Add<const std::string &> (
+                ATTR_SIGNATURE_MESSAGE_DIGEST_NAME,
+                signatureMessageDigestName);
         }
 
     } // namespace crypto

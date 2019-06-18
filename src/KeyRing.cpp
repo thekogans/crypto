@@ -1854,7 +1854,7 @@ namespace thekogans {
 
         void KeyRing::Write (util::JSON::Object &object) const {
             Serializable::Write (object);
-            object.Add (ATTR_CIPHER_SUITE, cipherSuite.ToString ());
+            object.Add<const std::string &> (ATTR_CIPHER_SUITE, cipherSuite.ToString ());
             {
                 util::JSON::Array::Ptr keyExchangeParams (new util::JSON::Array);
                 for (ParamsMap::const_iterator

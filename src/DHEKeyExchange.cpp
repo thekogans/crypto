@@ -231,13 +231,13 @@ namespace thekogans {
 
         void DHEKeyExchange::DHEParams::Write (util::JSON::Object &object) const {
             Params::Write (object);
-            object.Add (ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
-            object.Add (ATTR_KEY_LENGTH, keyLength);
-            object.Add (ATTR_MESSAGE_DIGEST_NAME, messageDigestName);
-            object.Add (ATTR_COUNT, count);
-            object.Add (ATTR_KEY_ID, keyId.ToHexString ());
-            object.Add (ATTR_KEY_NAME, keyName);
-            object.Add (ATTR_KEY_DESCRIPTION, keyDescription);
+            object.Add<const std::string &> (ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
+            object.Add<const util::SizeT &> (ATTR_KEY_LENGTH, keyLength);
+            object.Add<const std::string &> (ATTR_MESSAGE_DIGEST_NAME, messageDigestName);
+            object.Add<const util::SizeT &> (ATTR_COUNT, count);
+            object.Add<const std::string &> (ATTR_KEY_ID, keyId.ToHexString ());
+            object.Add<const std::string &> (ATTR_KEY_NAME, keyName);
+            object.Add<const std::string &> (ATTR_KEY_DESCRIPTION, keyDescription);
             util::JSON::Object::Ptr paramsObject (new util::JSON::Object);
             *paramsObject << *params;
             object.Add (TAG_PARAMS, paramsObject);

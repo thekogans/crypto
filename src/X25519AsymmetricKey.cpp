@@ -159,7 +159,9 @@ namespace thekogans {
 
         void X25519AsymmetricKey::Write (util::JSON::Object &object) const {
             AsymmetricKey::Write (object);
-            object.Add (ATTR_KEY, util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH));
+            object.Add<const std::string &> (
+                ATTR_KEY,
+                util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH));
         }
 
     } // namespace crypto

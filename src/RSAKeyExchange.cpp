@@ -139,8 +139,12 @@ namespace thekogans {
 
         void RSAKeyExchange::RSAParams::Write (util::JSON::Object &object) const {
             Params::Write (object);
-            object.Add (ATTR_KEY_ID, keyId.ToHexString ());
-            object.Add (ATTR_BUFFER, util::HexEncodeBuffer (buffer.data (), buffer.size ()));
+            object.Add<const std::string &> (
+                ATTR_KEY_ID,
+                keyId.ToHexString ());
+            object.Add<const std::string &> (
+                ATTR_BUFFER,
+                util::HexEncodeBuffer (buffer.data (), buffer.size ()));
         }
 
         RSAKeyExchange::RSAKeyExchange (

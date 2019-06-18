@@ -567,7 +567,7 @@ namespace thekogans {
 
         void SymmetricKey::Write (util::JSON::Object &object) const {
             Serializable::Write (object);
-            object.Add (
+            object.Add<const std::string &> (
                 ATTR_KEY,
                 util::HexEncodeBuffer (
                     key.GetReadPtr (),

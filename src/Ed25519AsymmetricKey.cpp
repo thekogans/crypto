@@ -195,12 +195,12 @@ namespace thekogans {
         void Ed25519AsymmetricKey::Write (util::JSON::Object &object) const {
             AsymmetricKey::Write (object);
             if (IsPrivate ()) {
-                object.Add (
+                object.Add<const std::string &> (
                     ATTR_KEY,
                     util::HexEncodeBuffer (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH));
             }
             else {
-                object.Add (
+                object.Add<const std::string &> (
                     ATTR_KEY,
                     util::HexEncodeBuffer (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH));
             }

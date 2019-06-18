@@ -97,9 +97,9 @@ namespace thekogans {
         }
 
         void Serializable::Write (util::JSON::Object &object) const {
-            object.Add (ATTR_ID, id.ToHexString ());
-            object.Add (ATTR_NAME, name);
-            object.Add (ATTR_DESCRIPTION, description);
+            object.Add<const std::string &> (ATTR_ID, id.ToHexString ());
+            object.Add<const std::string &> (ATTR_NAME, name);
+            object.Add<const std::string &> (ATTR_DESCRIPTION, description);
         }
 
     } // namespace crypto
