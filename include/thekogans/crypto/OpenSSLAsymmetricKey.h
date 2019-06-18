@@ -39,7 +39,7 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLAsymmetricKey : public AsymmetricKey {
             /// \brief
-            /// OpenSSLAsymmetricKey is a \see{OpenSSLAsymmetricKey}.
+            /// OpenSSLAsymmetricKey is a \see{Serializable}.
             THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (OpenSSLAsymmetricKey)
 
         private:
