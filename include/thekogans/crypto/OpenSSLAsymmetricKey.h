@@ -278,6 +278,10 @@ namespace thekogans {
             virtual void Write (pugi::xml_node &node) const;
 
             /// \brief
+            /// "Key"
+            static const char * const TAG_KEY;
+
+            /// \brief
             /// Read a Serializable from an JSON DOM.
             /// \param[in] node JSON DOM representation of a Serializable.
             virtual void Read (

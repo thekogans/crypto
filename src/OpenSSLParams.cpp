@@ -265,9 +265,11 @@ namespace thekogans {
                 EVP_PKEYPtr params (EVP_PKEY_new ());
                 if (params.get () != 0) {
                     if (paramsType == OPENSSL_PKEY_DH || paramsType == OPENSSL_PKEY_DSA || paramsType == OPENSSL_PKEY_EC) {
-                        const util::ui8 *paramsData = (const util::ui8 *)paramsBuffer.data ();
+                        util::SecureVector<util::ui8> decodedParams (paramsBuffer.size () / 2);
+                        util::HexDecodeBuffer (paramsBuffer.data (), paramsBuffer.size (), decodedParams.data ());
+                        const util::ui8 *paramsData = decodedParams.data ();
                         if (paramsType == OPENSSL_PKEY_DH) {
-                            DHPtr dhParams (d2i_DHparams (0, &paramsData, (long)paramsBuffer.size ()));
+                            DHPtr dhParams (d2i_DHparams (0, &paramsData, (long)decodedParams.size ()));
                             if (dhParams.get () != 0) {
                                 if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                                     dhParams.release ();
@@ -281,7 +283,7 @@ namespace thekogans {
                             }
                         }
                         else if (paramsType == OPENSSL_PKEY_DSA) {
-                            DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, (long)paramsBuffer.size ()));
+                            DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, (long)decodedParams.size ()));
                             if (dsaParams.get () != 0) {
                                 if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
                                     dsaParams.release ();
@@ -295,7 +297,7 @@ namespace thekogans {
                             }
                         }
                         else if (paramsType == OPENSSL_PKEY_EC) {
-                            EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, (long)paramsBuffer.size ()));
+                            EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, (long)decodedParams.size ()));
                             if (ecParams.get () != 0) {
                                 if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                     ecParams.release ();
@@ -333,7 +335,7 @@ namespace thekogans {
 
         namespace {
             util::SecureString WriteParams (EVP_PKEY &params) {
-                util::SecureString paramsBuffer;
+                util::SecureVector<util::ui8> paramsBuffer;
                 util::i32 paramsType = EVP_PKEY_base_id (&params);
                 if (paramsType == EVP_PKEY_DH) {
                     DHPtr dhParams (EVP_PKEY_get1_DH (&params));
@@ -341,7 +343,7 @@ namespace thekogans {
                         util::i32 paramsLength = i2d_DHparams (dhParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
-                            util::ui8 *paramsData = (util::ui8 *)paramsBuffer.data ();
+                            util::ui8 *paramsData = paramsBuffer.data ();
                             i2d_DHparams (dhParams.get (), &paramsData);
                         }
                         else {
@@ -358,7 +360,7 @@ namespace thekogans {
                         util::i32 paramsLength = i2d_DSAparams (dsaParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
-                            util::ui8 *paramsData = (util::ui8 *)paramsBuffer.data ();
+                            util::ui8 *paramsData = paramsBuffer.data ();
                             i2d_DSAparams (dsaParams.get (), &paramsData);
                         }
                         else {
@@ -375,7 +377,7 @@ namespace thekogans {
                         util::i32 paramsLength = i2d_ECParameters (ecParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
-                            util::ui8 *paramsData = (util::ui8 *)paramsBuffer.data ();
+                            util::ui8 *paramsData = paramsBuffer.data ();
                             i2d_ECParameters (ecParams.get (), &paramsData);
                         }
                         else {
@@ -390,7 +392,10 @@ namespace thekogans {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Invalid parameters type %d.", paramsType);
                 }
-                return paramsBuffer;
+                util::SecureString encodedParams;
+                encodedParams.resize (paramsBuffer.size () * 2);
+                util::HexEncodeBuffer (paramsBuffer.data (), paramsBuffer.size (), &encodedParams[0]);
+                return encodedParams;
             }
         }
 
@@ -400,6 +405,7 @@ namespace thekogans {
         }
 
         const char * const OpenSSLParams::ATTR_PARAMS_TYPE = "ParamsType";
+        const char * const OpenSSLParams::ATTR_PARAMS = "Params";
 
         void OpenSSLParams::Read (
                 const TextHeader &header,
@@ -411,19 +417,22 @@ namespace thekogans {
         void OpenSSLParams::Write (pugi::xml_node &node) const {
             Params::Write (node);
             node.append_attribute (ATTR_PARAMS_TYPE).set_value (GetKeyType ());
-            node.append_child (pugi::node_pcdata).set_value (WriteParams (*params).c_str ());
+            node.append_attribute (ATTR_PARAMS).set_value (WriteParams (*params).c_str ());
         }
 
         void OpenSSLParams::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
-            // FIXME: implement
-            assert (0);
+            Params::Read (header, object);
+            params = ReadParams (
+                object.Get<util::JSON::String> (ATTR_PARAMS_TYPE)->value,
+                object.Get<util::JSON::String> (ATTR_PARAMS)->value.c_str ());
         }
 
         void OpenSSLParams::Write (util::JSON::Object &object) const {
-            // FIXME: implement
-            assert (0);
+            Params::Write (object);
+            object.Add<const std::string &> (ATTR_PARAMS_TYPE, GetKeyType ());
+            object.Add<const std::string &> (ATTR_PARAMS, WriteParams (*params).c_str ());
         }
 
     } // namespace crypto

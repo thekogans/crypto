@@ -323,18 +323,22 @@ namespace thekogans {
             node.append_child (pugi::node_pcdata).set_value (WriteKey (IsPrivate (), *key).c_str ());
         }
 
+        const char * const OpenSSLAsymmetricKey::TAG_KEY = "Key";
+
         void OpenSSLAsymmetricKey::Read (
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             AsymmetricKey::Read (header, object);
-            // FIXME: implement
-            assert (0);
+            key = ReadKey (
+                IsPrivate (),
+                util::SecureString (object.Get<util::JSON::Array> (TAG_KEY)->ToString ()));
         }
 
         void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
             AsymmetricKey::Write (object);
-            // FIXME: implement
-            assert (0);
+            object.Add (TAG_KEY,
+                util::JSON::Value::Ptr (
+                    new util::JSON::Array (WriteKey (IsPrivate (), *key).c_str ())));
         }
 
     } // namespace crypto

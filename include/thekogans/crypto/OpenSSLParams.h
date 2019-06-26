@@ -139,6 +139,9 @@ namespace thekogans {
             /// \brief
             /// "ParamsType"
             static const char * const ATTR_PARAMS_TYPE;
+            /// \brief
+            /// "Params"
+            static const char * const ATTR_PARAMS;
 
             /// \brief
             /// Read the Serializable from an XML DOM.
