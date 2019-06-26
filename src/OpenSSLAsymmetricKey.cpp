@@ -331,7 +331,7 @@ namespace thekogans {
             AsymmetricKey::Read (header, object);
             key = ReadKey (
                 IsPrivate (),
-                util::SecureString (object.Get<util::JSON::Array> (TAG_KEY)->ToString ()));
+                util::SecureString (object.Get<util::JSON::Array> (TAG_KEY)->ToString ().c_str ()));
         }
 
         void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
