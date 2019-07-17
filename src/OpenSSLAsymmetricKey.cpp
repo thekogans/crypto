@@ -279,10 +279,11 @@ namespace thekogans {
         namespace {
             EVP_PKEYPtr ReadKey (
                     bool isPrivate,
-                    const util::SecureString &keyBuffer) {
+                    const char *keyBuffer,
+                    std::size_t keyBufferLength) {
                 BIOPtr bio (BIO_new (BIO_s_mem ()));
                 if (bio.get () != 0) {
-                    if (BIO_write (bio.get (), keyBuffer.data (), (int)keyBuffer.size ()) == (int)keyBuffer.size ()) {
+                    if (BIO_write (bio.get (), keyBuffer, (int)keyBufferLength) == (int)keyBufferLength) {
                         return EVP_PKEYPtr (isPrivate ?
                             PEM_read_bio_PrivateKey (bio.get (), 0, 0, 0) :
                             PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
@@ -303,7 +304,7 @@ namespace thekogans {
             AsymmetricKey::Read (header, serializer);
             util::SecureString keyBuffer;
             serializer >> keyBuffer;
-            key = ReadKey (IsPrivate (), keyBuffer);
+            key = ReadKey (IsPrivate (), keyBuffer.data (), keyBuffer.size ());
         }
 
         void OpenSSLAsymmetricKey::Write (util::Serializer &serializer) const {
@@ -315,7 +316,7 @@ namespace thekogans {
                 const TextHeader &header,
                 const pugi::xml_node &node) {
             AsymmetricKey::Read (header, node);
-            key = ReadKey (IsPrivate (), util::SecureString (node.text ().get ()));
+            key = ReadKey (IsPrivate (), node.text ().get (), strlen (node.text ().get ()));
         }
 
         void OpenSSLAsymmetricKey::Write (pugi::xml_node &node) const {
@@ -329,9 +330,8 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             AsymmetricKey::Read (header, object);
-            key = ReadKey (
-                IsPrivate (),
-                util::SecureString (object.Get<util::JSON::Array> (TAG_KEY)->ToString ().c_str ()));
+            std::string keyBuffer = object.Get<util::JSON::Array> (TAG_KEY)->ToString ();
+            key = ReadKey (IsPrivate (), keyBuffer.data (), keyBuffer.size ());
         }
 
         void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
