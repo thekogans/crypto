@@ -104,7 +104,7 @@ int main (
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Unable to get key %s",
-                        frameHeader.keyId.ToString ().c_str ());
+                        frameHeader.keyId.ToHexString ().c_str ());
                 }
                 ciphertextLength = frameHeader.ciphertextLength;
             }
