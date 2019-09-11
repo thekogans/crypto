@@ -106,7 +106,8 @@ namespace thekogans {
         OpenSSLInit::OpenSSLInit (
                 bool multiThreaded,
                 util::ui32 entropyNeeded,
-                util::ui64 workingSetSize) {
+                util::ui64 workingSetSize,
+                ENGINE *engine_) {
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             OpenSSLAllocator::StaticInit ();
             Serializable::StaticInit ();
@@ -173,6 +174,7 @@ namespace thekogans {
                     entropyNeeded,
                     MIN_ENTROPY_NEEDED);
             }
+            engine = engine_;
             // FIXME: load a CRL.
         #if OPENSSL_VERSION_NUMBER < 0x10100000L
             util::Thread::AddExitFunc (ExitFunc);
