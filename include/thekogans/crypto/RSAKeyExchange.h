@@ -36,7 +36,7 @@ namespace thekogans {
         ///
         /// \brief
         /// A class for computing and exchanging shared \see{SymmetricKey}s using \see{RSA}.
-        /// VERY IMPORTANT: The initiator (client) used the public \see{RSA} key to encrypt
+        /// VERY IMPORTANT: The initiator (client) uses the public \see{RSA} key to encrypt
         /// a random \see{SymmetricKey}. The size of the \see{SymmetricKey} + \see{RSA} padding
         /// used to encrypt it puts a lower bound on the size of \see{RSA} keys that can be used
         /// for key exchange (512 bits). Given that today's (2018) best practice is to use

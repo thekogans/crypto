@@ -34,7 +34,11 @@
 #include <memory>
 #include <string>
 #include <openssl/ssl.h>
+#include "thekogans/util/Array.h"
 #include "thekogans/util/Exception.h"
+#if defined (TOOLCHAIN_OS_Windows)
+    #include "thekogans/util/WindowsUtils.h"
+#endif // defined (TOOLCHAIN_OS_Windows)
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/SystemCACertificates.h"
@@ -54,20 +58,20 @@ namespace thekogans {
             std::string GetCertName (
                     DWORD encoding,
                     PCERT_NAME_BLOB certName) {
-                DWORD size = CertNameToStr (
+                DWORD size = CertNameToStrW (
                     encoding,
                     certName,
                     CERT_SIMPLE_NAME_STR,
                     0, 0);
                 if (size != 0) {
-                    std::vector<char> buffer (size);
-                    CertNameToStr (
+                    util::Array<wchar_t> buffer (size);
+                    CertNameToStrW (
                         encoding,
                         certName,
                         CERT_SIMPLE_NAME_STR,
-                        &buffer[0],
-                        (DWORD)buffer.size ());
-                    return std::string (&buffer[0]);
+                        buffer,
+                        size);
+                    return util::UTF16ToUTF8 (buffer, size);
                 }
                 return std::string ();
             }
