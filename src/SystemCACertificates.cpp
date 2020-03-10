@@ -148,8 +148,8 @@ namespace thekogans {
         #if defined (TOOLCHAIN_OS_Windows)
             struct SystemStore {
                 HCERTSTORE certStore;
-                explicit SystemStore (const char *storeName) :
-                        certStore (CertOpenSystemStore (0, storeName)) {
+                explicit SystemStore (const wchar_t *storeName) :
+                        certStore (CertOpenSystemStoreW (0, storeName)) {
                     if (certStore == 0) {
                         THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                             THEKOGANS_UTIL_OS_ERROR_CODE);
@@ -159,9 +159,9 @@ namespace thekogans {
                     CertCloseStore (certStore, 0);
                 }
             };
-            SystemStore rootStore ("ROOT");
-            SystemStore caStore ("CA");
-            SystemStore myStore ("MY");
+            SystemStore rootStore (L"ROOT");
+            SystemStore caStore (L"CA");
+            SystemStore myStore (L"MY");
             SystemStore *stores[] = {
                 &rootStore,
                 &caStore,

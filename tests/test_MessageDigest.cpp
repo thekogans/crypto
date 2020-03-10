@@ -20,9 +20,6 @@
 #include <CppUnitXLite/CppUnitXLite.cpp>
 #include "thekogans/util/Buffer.h"
 #include "thekogans/util/File.h"
-#if defined (TOOLCHAIN_OS_Windows)
-    #include "thekogans/util/WindowsUtils.h"
-#endif // defined (TOOLCHAIN_OS_Windows)
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/MessageDigest.h"

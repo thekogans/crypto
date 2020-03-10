@@ -36,19 +36,21 @@ namespace thekogans {
         void Serializable::StaticInit () {
             static volatile bool registered = false;
             static util::SpinLock spinLock;
-            util::LockGuard<util::SpinLock> guard (spinLock);
             if (!registered) {
-                KeyRing::StaticInit ();
-                OpenSSLParams::StaticInit ();
-                Ed25519Params::StaticInit ();
-                X25519Params::StaticInit ();
-                SymmetricKey::StaticInit ();
-                OpenSSLAsymmetricKey::StaticInit ();
-                Ed25519AsymmetricKey::StaticInit ();
-                X25519AsymmetricKey::StaticInit ();
-                DHEKeyExchange::DHEParams::StaticInit ();
-                RSAKeyExchange::RSAParams::StaticInit ();
-                registered = true;
+                util::LockGuard<util::SpinLock> guard (spinLock);
+                if (!registered) {
+                    KeyRing::StaticInit ();
+                    OpenSSLParams::StaticInit ();
+                    Ed25519Params::StaticInit ();
+                    X25519Params::StaticInit ();
+                    SymmetricKey::StaticInit ();
+                    OpenSSLAsymmetricKey::StaticInit ();
+                    Ed25519AsymmetricKey::StaticInit ();
+                    X25519AsymmetricKey::StaticInit ();
+                    DHEKeyExchange::DHEParams::StaticInit ();
+                    RSAKeyExchange::RSAParams::StaticInit ();
+                    registered = true;
+                }
             }
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)

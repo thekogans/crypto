@@ -367,7 +367,8 @@ namespace thekogans {
                 (IsValidKeyExchange (keyExchange) &&
                 IsValidAuthenticator (authenticator) &&
                 IsValidCipher (cipher) &&
-                IsValidMessageDigest (messageDigest));
+                IsValidMessageDigest (messageDigest) &&
+                ValidateAlgorithms (keyExchange, authenticator, cipher, messageDigest));
         }
 
         bool CipherSuite::VerifyKeyExchangeParams (const Params &params) const {

@@ -67,13 +67,15 @@ namespace thekogans {
         void Signer::StaticInit () {
             static volatile bool registered = false;
             static util::SpinLock spinLock;
-            util::LockGuard<util::SpinLock> guard (spinLock);
             if (!registered) {
-                OpenSSLSigner::StaticInit (OPENSSL_PKEY_RSA);
-                OpenSSLSigner::StaticInit (OPENSSL_PKEY_DSA);
-                OpenSSLSigner::StaticInit (OPENSSL_PKEY_EC);
-                Ed25519Signer::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
-                registered = true;
+                util::LockGuard<util::SpinLock> guard (spinLock);
+                if (!registered) {
+                    OpenSSLSigner::StaticInit (OPENSSL_PKEY_RSA);
+                    OpenSSLSigner::StaticInit (OPENSSL_PKEY_DSA);
+                    OpenSSLSigner::StaticInit (OPENSSL_PKEY_EC);
+                    Ed25519Signer::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
+                    registered = true;
+                }
             }
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
