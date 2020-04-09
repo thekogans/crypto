@@ -194,7 +194,7 @@ namespace thekogans {
                 version,\
                 thekogans::util::SpinLock,\
                 minSerializablesInPage,\
-                thekogans::util::SecureAllocator::Global)
+                thekogans::util::SecureAllocator::Instance ())
 
         /// \brief
         /// Implement Serializable::Ptr extraction operators.

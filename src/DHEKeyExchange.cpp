@@ -35,7 +35,7 @@ namespace thekogans {
             1,
             util::SpinLock,
             16,
-            util::DefaultAllocator::Global)
+            util::DefaultAllocator::Instance ())
 
         void DHEKeyExchange::DHEParams::CreateSignature (
                 AsymmetricKey::Ptr privateKey,

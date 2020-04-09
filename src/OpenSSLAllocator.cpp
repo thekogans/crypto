@@ -23,7 +23,10 @@ namespace thekogans {
 
         THEKOGANS_UTIL_IMPLEMENT_ALLOCATOR (OpenSSLAllocator)
 
-        OpenSSLAllocator OpenSSLAllocator::Global;
+        OpenSSLAllocator &OpenSSLAllocator::Instance () {
+            static OpenSSLAllocator instance;
+            return instance;
+        }
 
         void *OpenSSLAllocator::Alloc (std::size_t size) {
             return size > 0 ? OPENSSL_malloc (size) : 0;

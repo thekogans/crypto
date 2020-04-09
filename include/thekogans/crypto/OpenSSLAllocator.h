@@ -39,7 +39,7 @@ namespace thekogans {
 
             /// \brief
             /// Global OpenSSLAllocator.
-            static OpenSSLAllocator Global;
+            static OpenSSLAllocator &Instance ();
 
             /// \brief
             /// ctor.

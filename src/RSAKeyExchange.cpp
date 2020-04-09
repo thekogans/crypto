@@ -36,7 +36,7 @@ namespace thekogans {
             1,
             util::SpinLock,
             16,
-            util::DefaultAllocator::Global)
+            util::DefaultAllocator::Instance ())
 
         void RSAKeyExchange::RSAParams::CreateSignature (
                 AsymmetricKey::Ptr privateKey,
