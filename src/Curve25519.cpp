@@ -37,6 +37,7 @@
  * The field functions are shared by Ed25519 and X25519, although Ed25519 is
  * disabled when |OPENSSL_SMALL| is defined. */
 
+#include <openssl/x509v3.h>
 #include <openssl/crypto.h>
 #include <openssl/sha.h>
 #include "thekogans/util/RandomSource.h"
