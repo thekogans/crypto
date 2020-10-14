@@ -185,8 +185,8 @@ namespace thekogans {
                 return true;
             }
 
-            std::vector<CipherSuite> BuildCipherSuites () {
-                std::vector<CipherSuite> cipherSuites;
+            std::vector<CipherSuite> *BuildCipherSuites () {
+                std::vector<CipherSuite> *cipherSuites = new std::vector<CipherSuite>;
                 for (std::size_t i = 0; i < keyExchangesSize; ++i) {
                     for (std::size_t j = 0; j < authenticatorsSize; ++j) {
                         for (std::size_t k = 0; k < ciphersSize; ++k) {
@@ -196,7 +196,7 @@ namespace thekogans {
                                         authenticators[j],
                                         ciphers[k].name,
                                         messageDigests[l].name)) {
-                                    cipherSuites.push_back (
+                                    cipherSuites->push_back (
                                         CipherSuite (
                                             keyExchanges[i],
                                             authenticators[j],
@@ -210,34 +210,34 @@ namespace thekogans {
                 return cipherSuites;
             }
 
-            std::vector<std::string> BuildKeyExchanges () {
-                std::vector<std::string> keyExchanges_;
+            std::vector<std::string> *BuildKeyExchanges () {
+                std::vector<std::string> *keyExchanges_ = new std::vector<std::string>;
                 for (std::size_t i = 0; i < keyExchangesSize; ++i) {
-                    keyExchanges_.push_back (keyExchanges[i]);
+                    keyExchanges_->push_back (keyExchanges[i]);
                 }
                 return keyExchanges_;
             }
 
-            std::vector<std::string> BuildAuthenticators () {
-                std::vector<std::string> authenticators_;
+            std::vector<std::string> *BuildAuthenticators () {
+                std::vector<std::string> *authenticators_ = new std::vector<std::string>;
                 for (std::size_t i = 0; i < authenticatorsSize; ++i) {
-                    authenticators_.push_back (authenticators[i]);
+                    authenticators_->push_back (authenticators[i]);
                 }
                 return authenticators_;
             }
 
-            std::vector<std::string> BuildCiphers () {
-                std::vector<std::string> ciphers_;
+            std::vector<std::string> *BuildCiphers () {
+                std::vector<std::string> *ciphers_ = new std::vector<std::string>;
                 for (std::size_t i = 0; i < ciphersSize; ++i) {
-                    ciphers_.push_back (ciphers[i].name);
+                    ciphers_->push_back (ciphers[i].name);
                 }
                 return ciphers_;
             }
 
-            std::vector<std::string> BuildMessageDigests () {
-                std::vector<std::string> messageDigests_;
+            std::vector<std::string> *BuildMessageDigests () {
+                std::vector<std::string> *messageDigests_ = new std::vector<std::string>;
                 for (std::size_t i = 0; i < messageDigestsSize; ++i) {
-                    messageDigests_.push_back (messageDigests[i].name);
+                    messageDigests_->push_back (messageDigests[i].name);
                 }
                 return messageDigests_;
             }
@@ -256,28 +256,28 @@ namespace thekogans {
             MESSAGE_DIGEST_SHA2_256);
 
         const std::vector<CipherSuite> &CipherSuite::GetCipherSuites () {
-            static std::vector<CipherSuite> cipherSuites = BuildCipherSuites ();
-            return cipherSuites;
+            static std::vector<CipherSuite> *cipherSuites = BuildCipherSuites ();
+            return *cipherSuites;
         }
 
         const std::vector<std::string> &CipherSuite::GetKeyExchanges () {
-            static std::vector<std::string> keyExchanges = BuildKeyExchanges ();
-            return keyExchanges;
+            static std::vector<std::string> *keyExchanges = BuildKeyExchanges ();
+            return *keyExchanges;
         }
 
         const std::vector<std::string> &CipherSuite::GetAuthenticators () {
-            static std::vector<std::string> authenticators = BuildAuthenticators ();
-            return authenticators;
+            static std::vector<std::string> *authenticators = BuildAuthenticators ();
+            return *authenticators;
         }
 
         const std::vector<std::string> &CipherSuite::GetCiphers () {
-            static std::vector<std::string> ciphers = BuildCiphers ();
-            return ciphers;
+            static std::vector<std::string> *ciphers = BuildCiphers ();
+            return *ciphers;
         }
 
         const std::vector<std::string> &CipherSuite::GetMessageDigests () {
-            static std::vector<std::string> messageDigests = BuildMessageDigests ();
-            return messageDigests;
+            static std::vector<std::string> *messageDigests = BuildMessageDigests ();
+            return *messageDigests;
         }
 
         const EVP_CIPHER *CipherSuite::GetOpenSSLCipherByName (const std::string &cipherName) {

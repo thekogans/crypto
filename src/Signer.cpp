@@ -29,8 +29,8 @@ namespace thekogans {
     namespace crypto {
 
         Signer::Map &Signer::GetMap () {
-            static Signer::Map map;
-            return map;
+            static Map *map = new Map;
+            return *map;
         }
 
         Signer::MapInitializer::MapInitializer (

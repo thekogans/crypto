@@ -29,8 +29,8 @@ namespace thekogans {
     namespace crypto {
 
         Verifier::Map &Verifier::GetMap () {
-            static Verifier::Map map;
-            return map;
+            static Map *map = new Map;
+            return *map;
         }
 
         Verifier::MapInitializer::MapInitializer (

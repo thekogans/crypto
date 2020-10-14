@@ -21,11 +21,11 @@ namespace thekogans {
     namespace crypto {
 
         _LIB_THEKOGANS_CRYPTO_DECL const util::Version & _LIB_THEKOGANS_CRYPTO_API GetVersion () {
-            static const util::Version version (
+            static const util::Version *version = new util::Version (
                 THEKOGANS_CRYPTO_MAJOR_VERSION,
                 THEKOGANS_CRYPTO_MINOR_VERSION,
                 THEKOGANS_CRYPTO_PATCH_VERSION);
-            return version;
+            return *version;
         }
 
     } // namespace crypto

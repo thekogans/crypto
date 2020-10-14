@@ -24,8 +24,8 @@ namespace thekogans {
         THEKOGANS_UTIL_IMPLEMENT_ALLOCATOR (OpenSSLAllocator)
 
         OpenSSLAllocator &OpenSSLAllocator::Instance () {
-            static OpenSSLAllocator instance;
-            return instance;
+            static OpenSSLAllocator *instance = new OpenSSLAllocator;
+            return *instance;
         }
 
         void *OpenSSLAllocator::Alloc (std::size_t size) {
