@@ -66,7 +66,7 @@ namespace thekogans {
             }
         }
 
-        AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPrivateKeyFromBuffer (
+        AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPrivateKeyFromBuffer (
                 const void *buffer,
                 std::size_t length,
                 const std::string &encoding,
@@ -75,7 +75,7 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return AsymmetricKey::Ptr (
+            return AsymmetricKey::SharedPtr (
                 new OpenSSLAsymmetricKey (
                     ParsePrivateKey (buffer, length, encoding, passwordCallback, userData),
                     true,
@@ -84,7 +84,7 @@ namespace thekogans {
                     description));
         }
 
-        AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (
+        AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (
                 const std::string &path,
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
@@ -118,7 +118,7 @@ namespace thekogans {
             }
         }
 
-        AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromBuffer (
+        AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPublicKeyFromBuffer (
                 const void *buffer,
                 std::size_t length,
                 const std::string &encoding,
@@ -127,7 +127,7 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return AsymmetricKey::Ptr (
+            return AsymmetricKey::SharedPtr (
                 new OpenSSLAsymmetricKey (
                     ParsePUBKEY (buffer, length, encoding, passwordCallback, userData),
                     false,
@@ -136,7 +136,7 @@ namespace thekogans {
                     description));
         }
 
-        AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromFile (
+        AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPublicKeyFromFile (
                 const std::string &path,
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
@@ -170,7 +170,7 @@ namespace thekogans {
             }
         }
 
-        AsymmetricKey::Ptr OpenSSLAsymmetricKey::LoadPublicKeyFromCertificate (
+        AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPublicKeyFromCertificate (
                 const std::string &path,
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
@@ -182,7 +182,7 @@ namespace thekogans {
             if (bio.get () != 0) {
                 X509Ptr certificate (PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
                 if (certificate.get () != 0) {
-                    return AsymmetricKey::Ptr (
+                    return AsymmetricKey::SharedPtr (
                         new OpenSSLAsymmetricKey (
                             EVP_PKEYPtr (X509_get_pubkey (certificate.get ())),
                             false,
@@ -222,7 +222,7 @@ namespace thekogans {
             }
         }
 
-        AsymmetricKey::Ptr OpenSSLAsymmetricKey::GetPublicKey (
+        AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::GetPublicKey (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) const {
@@ -230,7 +230,7 @@ namespace thekogans {
             if (PEM_write_bio_PUBKEY (bio.get (), key.get ()) == 1) {
                 EVP_PKEYPtr publicKey (PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
                 if (publicKey.get () != 0) {
-                    return AsymmetricKey::Ptr (
+                    return AsymmetricKey::SharedPtr (
                         new OpenSSLAsymmetricKey (
                             std::move (publicKey),
                             false,
@@ -337,7 +337,7 @@ namespace thekogans {
         void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
             AsymmetricKey::Write (object);
             object.Add (TAG_KEY,
-                util::JSON::Value::Ptr (
+                util::JSON::Value::SharedPtr (
                     new util::JSON::Array (WriteKey (IsPrivate (), *key).c_str ())));
         }
 

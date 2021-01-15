@@ -36,8 +36,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<AsymmetricKey>.
-            typedef util::ThreadSafeRefCounted::Ptr<AsymmetricKey> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<AsymmetricKey>.
+            typedef util::RefCounted::SharedPtr<AsymmetricKey> SharedPtr;
 
         private:
             /// \brief
@@ -84,7 +84,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public part of the private key (or duplicate of the pubilc key).
-            virtual Ptr GetPublicKey (
+            virtual SharedPtr GetPublicKey (
                 const ID & /*id*/ = ID (),
                 const std::string & /*name*/ = std::string (),
                 const std::string & /*description*/ = std::string ()) const = 0;
@@ -136,7 +136,7 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement AsymmetricKey::Ptr extraction operators.
+        /// Implement AsymmetricKey::SharedPtr extraction operators.
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (AsymmetricKey)
 
     } // namespace crypto
@@ -144,7 +144,7 @@ namespace thekogans {
     namespace util {
 
         /// \brief
-        /// Implement AsymmetricKey::Ptr value parser.
+        /// Implement AsymmetricKey::SharedPtr value parser.
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::AsymmetricKey)
 
     } // namespace util

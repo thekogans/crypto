@@ -29,8 +29,8 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
 
         OpenSSLVerifier::OpenSSLVerifier (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest) :
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest) :
                 Verifier (publicKey, messageDigest) {
             if (publicKey.Get () != 0 &&
                     !publicKey->IsPrivate () &&

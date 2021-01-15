@@ -27,8 +27,8 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (Ed25519Signer, Ed25519AsymmetricKey::KEY_TYPE)
 
         Ed25519Signer::Ed25519Signer (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest) :
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest) :
                 Signer (privateKey, messageDigest) {
             if (privateKey.Get () == 0 || !privateKey->IsPrivate () ||
                     privateKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE ||

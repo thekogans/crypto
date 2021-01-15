@@ -46,8 +46,8 @@ namespace thekogans {
         }
 
         Signer::Signer (
-                AsymmetricKey::Ptr privateKey_,
-                MessageDigest::Ptr messageDigest_) :
+                AsymmetricKey::SharedPtr privateKey_,
+                MessageDigest::SharedPtr messageDigest_) :
                 privateKey (privateKey_),
                 messageDigest (messageDigest_) {
             if (privateKey.Get () == 0 || messageDigest.Get () == 0) {
@@ -56,11 +56,11 @@ namespace thekogans {
             }
         }
 
-        Signer::Ptr Signer::Get (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest) {
+        Signer::SharedPtr Signer::Get (
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest) {
             Map::iterator it = GetMap ().find (privateKey->GetKeyType ());
-            return it != GetMap ().end () ? it->second (privateKey, messageDigest) : Signer::Ptr ();
+            return it != GetMap ().end () ? it->second (privateKey, messageDigest) : Signer::SharedPtr ();
         }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)

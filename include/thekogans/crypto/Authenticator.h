@@ -41,19 +41,18 @@ namespace thekogans {
         /// be reused. It will reset it's internal state after every sign/verify
         /// operation ready for the next.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Authenticator :
-                public virtual util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Authenticator : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Authenticator>.
-            typedef util::ThreadSafeRefCounted::Ptr<Authenticator> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<Authenticator>.
+            typedef util::RefCounted::SharedPtr<Authenticator> SharedPtr;
 
         private:
             /// \brief
             /// Used if key->IsPrivate ().
-            Signer::Ptr signer;
+            Signer::SharedPtr signer;
             /// \brief
             /// Used if !key->IsPrivate ().
-            Verifier::Ptr verifier;
+            Verifier::SharedPtr verifier;
 
         public:
             /// \brief
@@ -61,20 +60,20 @@ namespace thekogans {
             /// \param[in] key Private (Sign)/Public (Verify) key.
             /// \param[in] messageDigest \see{MessageDigest} to use for hash generation.
             Authenticator (
-                AsymmetricKey::Ptr key,
-                MessageDigest::Ptr messageDigest);
+                AsymmetricKey::SharedPtr key,
+                MessageDigest::SharedPtr messageDigest);
 
             /// \brief
             /// Return the key associated with this authenticator.
             /// \return \see{Signer} or \see{Verifier} key (depending on op).
-            inline AsymmetricKey::Ptr GetKey () const {
-                return signer.get () != 0 ? signer->GetPrivateKey () : verifier->GetPublicKey ();
+            inline AsymmetricKey::SharedPtr GetKey () const {
+                return signer.Get () != 0 ? signer->GetPrivateKey () : verifier->GetPublicKey ();
             }
             /// \brief
             /// Return the message digest associated with this authenticator.
             /// \return \see{AsymmetricKey} message digest used for hashing.
-            inline MessageDigest::Ptr GetMessageDigest () const {
-                return signer.get () != 0 ? signer->GetMessageDigest () : verifier->GetMessageDigest ();
+            inline MessageDigest::SharedPtr GetMessageDigest () const {
+                return signer.Get () != 0 ? signer->GetMessageDigest () : verifier->GetMessageDigest ();
             }
 
             /// \brief

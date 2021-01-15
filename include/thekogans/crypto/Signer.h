@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <memory>
+#include "thekogans/util/RefCounted.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
@@ -34,17 +35,17 @@ namespace thekogans {
         /// Signer is a base for public key sign operation. It defines the API
         /// a concrete signer needs to implement.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Signer {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Signer : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for std::unique_ptr<Signer>.
-            typedef std::unique_ptr<Signer> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<Signer>.
+            typedef util::RefCounted::SharedPtr<Signer> SharedPtr;
 
         protected:
             /// \brief
             /// typedef for the Signer factory method.
-            typedef Ptr (*Factory) (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest);
+            typedef SharedPtr (*Factory) (
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest);
             /// \brief
             /// typedef for the Signer map.
             typedef std::map<std::string, Factory> Map;
@@ -79,10 +80,10 @@ namespace thekogans {
         protected:
             /// \brief
             /// Private key.
-            AsymmetricKey::Ptr privateKey;
+            AsymmetricKey::SharedPtr privateKey;
             /// \brief
             /// Message digest.
-            MessageDigest::Ptr messageDigest;
+            MessageDigest::SharedPtr messageDigest;
 
         public:
             /// \brief
@@ -90,8 +91,8 @@ namespace thekogans {
             /// \param[in] privateKey_ Private key.
             /// \param[in] messageDigest_ Message digest.
             Signer (
-                AsymmetricKey::Ptr privateKey_,
-                MessageDigest::Ptr messageDigest_);
+                AsymmetricKey::SharedPtr privateKey_,
+                MessageDigest::SharedPtr messageDigest_);
             /// \brief
             /// dtor.
             virtual ~Signer () {}
@@ -101,9 +102,9 @@ namespace thekogans {
             /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
             /// \param[in] messageDigest Message digest.
             /// \return A Signer based on the passed in privateKey type.
-            static Ptr Get (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest);
+            static SharedPtr Get (
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest);
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             /// \brief
             /// Because Signer uses dynamic initialization, when using
@@ -117,13 +118,13 @@ namespace thekogans {
             /// \brief
             /// Return the signer private key.
             /// \return \see{AsymmetricKey} private key used for signing.
-            inline AsymmetricKey::Ptr GetPrivateKey () const {
+            inline AsymmetricKey::SharedPtr GetPrivateKey () const {
                 return privateKey;
             }
             /// \brief
             /// Return the signer message digest.
             /// \return \see{AsymmetricKey} message digest used for hashing.
-            inline MessageDigest::Ptr GetMessageDigest () const {
+            inline MessageDigest::SharedPtr GetMessageDigest () const {
                 return messageDigest;
             }
 
@@ -153,10 +154,10 @@ namespace thekogans {
         /// Common code used by both Static and Shared builds.
         #define THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON(type)\
         public:\
-            static thekogans::crypto::Signer::Ptr Create (\
-                    thekogans::crypto::AsymmetricKey::Ptr privateKey,\
-                    thekogans::crypto::MessageDigest::Ptr messageDigest) {\
-                return thekogans::crypto::Signer::Ptr (new type (privateKey, messageDigest));\
+            static thekogans::crypto::Signer::SharedPtr Create (\
+                    thekogans::crypto::AsymmetricKey::SharedPtr privateKey,\
+                    thekogans::crypto::MessageDigest::SharedPtr messageDigest) {\
+                return thekogans::crypto::Signer::SharedPtr (new type (privateKey, messageDigest));\
             }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)

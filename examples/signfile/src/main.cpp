@@ -73,7 +73,7 @@ int main (
     THEKOGANS_UTIL_LOG_INIT (
         util::LoggerMgr::Debug,
         util::LoggerMgr::All);
-    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
+    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::SharedPtr (new util::ConsoleLogger));
     THEKOGANS_UTIL_IMPLEMENT_LOG_FLUSHER;
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
@@ -81,7 +81,7 @@ int main (
             std::cout << "Signing '" << options.path << "'...";
             crypto::Authenticator signer (
                 crypto::OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (options.prefix + "private_key.pem"),
-                crypto::MessageDigest::Ptr (new crypto::MessageDigest));
+                crypto::MessageDigest::SharedPtr (new crypto::MessageDigest));
             util::Buffer signature = signer.SignFile (options.path);
             util::Buffer encodedSignature =
                 util::Base64::Encode (
@@ -103,7 +103,7 @@ int main (
             std::cout << "Verifying '" << options.path << "'...";
             crypto::Authenticator verifier (
                 crypto::OpenSSLAsymmetricKey::LoadPublicKeyFromFile (options.prefix + "public_key.pem"),
-                crypto::MessageDigest::Ptr (new crypto::MessageDigest));
+                crypto::MessageDigest::SharedPtr (new crypto::MessageDigest));
             util::ReadOnlyFile signatureFile (util::NetworkEndian, options.path + ".sig");
             util::Buffer encodedSignature (util::NetworkEndian, signatureFile.GetSize ());
             encodedSignature.AdvanceWriteOffset (

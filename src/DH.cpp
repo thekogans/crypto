@@ -24,7 +24,7 @@
 namespace thekogans {
     namespace crypto {
 
-        Params::Ptr DH::ParamsFromPrimeLengthAndGenerator (
+        Params::SharedPtr DH::ParamsFromPrimeLengthAndGenerator (
                 std::size_t primeLength,
                 std::size_t generator,
                 const ID &id,
@@ -38,7 +38,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_set_dh_paramgen_prime_len (ctx.get (), (util::i32)primeLength) == 1 &&
                     EVP_PKEY_CTX_set_dh_paramgen_generator (ctx.get (), (util::i32)generator) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return Params::Ptr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
+                return Params::SharedPtr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -66,7 +66,7 @@ namespace thekogans {
         }
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
-        Params::Ptr DH::ParamsFromPrimeAndGenerator (
+        Params::SharedPtr DH::ParamsFromPrimeAndGenerator (
                 const BIGNUM &prime,
                 const BIGNUM &generator,
                 const ID &id,
@@ -79,7 +79,7 @@ namespace thekogans {
                     if (params.get () != 0 &&
                             EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                         dhParams.release ();
-                        return Params::Ptr (new OpenSSLParams (std::move (params), id, name, description));
+                        return Params::SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -102,7 +102,7 @@ namespace thekogans {
                 util::i32 generatorLength;
             };
 
-            Params::Ptr ParamsFromDHParams (
+            Params::SharedPtr ParamsFromDHParams (
                     const DHParams &params,
                     const ID &id,
                     const std::string &name,
@@ -345,7 +345,7 @@ namespace thekogans {
             };
         }
 
-        Params::Ptr DH::ParamsFromRFC3526Prime (
+        Params::SharedPtr DH::ParamsFromRFC3526Prime (
                 RFC3526Prime prime,
                 const ID &id,
                 const std::string &name,
@@ -459,7 +459,7 @@ namespace thekogans {
             };
         }
 
-        Params::Ptr DH::ParamsFromRFC5114Prime (
+        Params::SharedPtr DH::ParamsFromRFC5114Prime (
                 RFC5114Prime prime,
                 const ID &id,
                 const std::string &name,
@@ -530,7 +530,7 @@ namespace thekogans {
             };
         }
 
-        Params::Ptr DH::ParamsDavidPrime (
+        Params::SharedPtr DH::ParamsDavidPrime (
                 DavidPrime prime,
                 const ID &id,
                 const std::string &name,

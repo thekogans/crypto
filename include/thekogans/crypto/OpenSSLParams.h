@@ -86,7 +86,7 @@ namespace thekogans {
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             /// \return Private key parameters.
-            static Ptr LoadFromFile (
+            static SharedPtr LoadFromFile (
                 const std::string &path,
                 util::i32 type,
                 pem_password_cb *passwordCallback = 0,
@@ -112,7 +112,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return \see{AsymmetricKey} based on parameters.
-            virtual AsymmetricKey::Ptr CreateKey (
+            virtual AsymmetricKey::SharedPtr CreateKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;

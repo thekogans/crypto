@@ -32,13 +32,13 @@ namespace thekogans {
             1,
             THEKOGANS_CRYPTO_MIN_X25519_PARAMS_IN_PAGE)
 
-        AsymmetricKey::Ptr X25519Params::CreateKey (
+        AsymmetricKey::SharedPtr X25519Params::CreateKey (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) const {
             util::SecureVector<util::ui8> privateKey (X25519::PRIVATE_KEY_LENGTH);
             X25519::CreateKey (privateKey.data ());
-            return AsymmetricKey::Ptr (
+            return AsymmetricKey::SharedPtr (
                 new X25519AsymmetricKey (privateKey.data (), true, id, name, description));
         }
 

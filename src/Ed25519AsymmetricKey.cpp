@@ -55,11 +55,11 @@ namespace thekogans {
 
         const char * const Ed25519AsymmetricKey::KEY_TYPE = "Ed25519";
 
-        AsymmetricKey::Ptr Ed25519AsymmetricKey::GetPublicKey (
+        AsymmetricKey::SharedPtr Ed25519AsymmetricKey::GetPublicKey (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) const {
-            return AsymmetricKey::Ptr (
+            return AsymmetricKey::SharedPtr (
                 new Ed25519AsymmetricKey (
                     key.publicKey.value,
                     false,

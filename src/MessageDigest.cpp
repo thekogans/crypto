@@ -40,10 +40,10 @@ namespace thekogans {
             }
         }
 
-        MessageDigest::Ptr MessageDigest::GetByName (const std::string &name) {
+        MessageDigest::SharedPtr MessageDigest::GetByName (const std::string &name) {
             const EVP_MD *md = CipherSuite::GetOpenSSLMessageDigestByName (name);
             if (md != 0) {
-                return Ptr (new MessageDigest (md));
+                return SharedPtr (new MessageDigest (md));
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (

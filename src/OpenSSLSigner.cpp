@@ -29,8 +29,8 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
 
         OpenSSLSigner::OpenSSLSigner (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest) :
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest) :
                 Signer (privateKey, messageDigest) {
             if (privateKey.Get () != 0 &&
                     privateKey->IsPrivate () &&

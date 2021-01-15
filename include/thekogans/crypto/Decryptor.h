@@ -55,7 +55,7 @@ namespace thekogans {
             /// \param[in] key SymmetricKey used for decryption.
             /// \param[in] cipher Cipher used for decryption.
             Decryptor (
-                SymmetricKey::Ptr key,
+                SymmetricKey::SharedPtr key,
                 const EVP_CIPHER *cipher = THEKOGANS_CRYPTO_DEFAULT_CIPHER);
 
             /// \brief

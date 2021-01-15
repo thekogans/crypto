@@ -28,12 +28,12 @@ namespace thekogans {
     namespace crypto {
 
         Authenticator::Authenticator (
-                AsymmetricKey::Ptr key,
-                MessageDigest::Ptr messageDigest) {
+                AsymmetricKey::SharedPtr key,
+                MessageDigest::SharedPtr messageDigest) {
             if (key.Get () != 0 && messageDigest.Get () != 0) {
                 if (key->IsPrivate ()) {
                     signer = Signer::Get (key, messageDigest);
-                    if (signer.get () == 0) {
+                    if (signer.Get () == 0) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Signer for key: %s and digest: %s.",
                             key->GetKeyType (),
@@ -42,7 +42,7 @@ namespace thekogans {
                 }
                 else {
                     verifier = Verifier::Get (key, messageDigest);
-                    if (verifier.get () == 0) {
+                    if (verifier.Get () == 0) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Verifier for key: %s and digest: %s.",
                             key->GetKeyType (),
@@ -60,7 +60,7 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                if (signer.get () != 0) {
+                if (signer.Get () != 0) {
                     signer->Init ();
                     signer->Update (buffer, bufferLength);
                     return signer->Final ();
@@ -83,7 +83,7 @@ namespace thekogans {
                 std::size_t signatureLength) {
             if (buffer != 0 && bufferLength > 0 &&
                     signature != 0 && signatureLength > 0) {
-                if (verifier.get () != 0) {
+                if (verifier.Get () != 0) {
                     verifier->Init ();
                     verifier->Update (buffer, bufferLength);
                     return verifier->Final (signature, signatureLength);
@@ -100,7 +100,7 @@ namespace thekogans {
         }
 
         util::Buffer Authenticator::SignFile (const std::string &path) {
-            if (signer.get () != 0) {
+            if (signer.Get () != 0) {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 util::FixedArray<util::ui8, 4096> buffer;
@@ -122,7 +122,7 @@ namespace thekogans {
                 const void *signature,
                 std::size_t signatureLength) {
             if (signature != 0 && signatureLength > 0) {
-                if (verifier.get () != 0) {
+                if (verifier.Get () != 0) {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;

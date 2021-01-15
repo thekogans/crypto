@@ -112,7 +112,7 @@ int main (
     THEKOGANS_UTIL_LOG_INIT (
         util::LoggerMgr::Debug,
         util::LoggerMgr::All);
-    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
+    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::SharedPtr (new util::ConsoleLogger));
     THEKOGANS_UTIL_IMPLEMENT_LOG_FLUSHER;
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
@@ -124,8 +124,8 @@ int main (
             util::SimpleFile::ReadWrite |
             util::SimpleFile::Create |
             util::SimpleFile::Truncate);
-        crypto::KeyRing::Ptr keyRing;
-        crypto::Cipher::Ptr cipher;
+        crypto::KeyRing::SharedPtr keyRing;
+        crypto::Cipher::SharedPtr cipher;
         if (options.cipherSuite != crypto::CipherSuite::Empty) {
             keyRing.Reset (
                 new crypto::KeyRing (
@@ -150,7 +150,7 @@ int main (
                 plaintextLength = fromFile.Read (plaintext.array, blockSize)) {
             std::size_t ciphertextLength;
             if (keyRing.Get () != 0) {
-                crypto::SymmetricKey::Ptr key =
+                crypto::SymmetricKey::SharedPtr key =
                     crypto::SymmetricKey::FromRandom (
                         crypto::SymmetricKey::MIN_RANDOM_LENGTH,
                         0,

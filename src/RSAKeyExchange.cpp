@@ -39,8 +39,8 @@ namespace thekogans {
             util::DefaultAllocator::Instance ())
 
         void RSAKeyExchange::RSAParams::CreateSignature (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest) {
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest) {
             if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
@@ -62,8 +62,8 @@ namespace thekogans {
         }
 
         bool RSAKeyExchange::RSAParams::ValidateSignature (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest) {
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest) {
             if (publicKey.Get () != 0 && messageDigest.Get () != 0 &&
                     publicKey->GetId () == signatureKeyId &&
                     messageDigest->GetName () == signatureMessageDigestName) {
@@ -149,7 +149,7 @@ namespace thekogans {
 
         RSAKeyExchange::RSAKeyExchange (
                 const ID &id,
-                AsymmetricKey::Ptr key_,
+                AsymmetricKey::SharedPtr key_,
                 std::size_t secretLength,
                 const void *salt,
                 std::size_t saltLength,
@@ -191,11 +191,11 @@ namespace thekogans {
         }
 
         RSAKeyExchange::RSAKeyExchange (
-                AsymmetricKey::Ptr key_,
-                Params::Ptr params) :
+                AsymmetricKey::SharedPtr key_,
+                Params::SharedPtr params) :
                 KeyExchange (ID::Empty),
                 key (key_) {
-            RSAParams::Ptr rsaParams =
+            RSAParams::SharedPtr rsaParams =
                 util::dynamic_refcounted_pointer_cast<RSAParams> (params);
             if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && key->IsPrivate () &&
                     rsaParams.Get () != 0) {
@@ -215,16 +215,16 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Params::Ptr RSAKeyExchange::GetParams (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest) const {
-            Params::Ptr rsaParams;
+        KeyExchange::Params::SharedPtr RSAKeyExchange::GetParams (
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest) const {
+            Params::SharedPtr rsaParams;
             util::SecureBuffer symmetricKeyBuffer (
                 util::NetworkEndian,
                 util::Serializable::Size (*symmetricKey));
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
-                Authenticator authenticator (key, MessageDigest::Ptr (new MessageDigest));
+                Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
                 rsaParams.Reset (
                     new RSAParams (
                         id,
@@ -249,17 +249,17 @@ namespace thekogans {
             return rsaParams;
         }
 
-        SymmetricKey::Ptr RSAKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
+        SymmetricKey::SharedPtr RSAKeyExchange::DeriveSharedSymmetricKey (Params::SharedPtr params) const {
             assert (symmetricKey.Get () != 0);
             if (!key->IsPrivate ()) {
-                RSAParams::Ptr rsaParams =
+                RSAParams::SharedPtr rsaParams =
                     util::dynamic_refcounted_pointer_cast<RSAParams> (params);
                 if (rsaParams.Get () != 0) {
                     util::SecureBuffer symmetricKeyBuffer (
                         util::NetworkEndian,
                         util::Serializable::Size (*symmetricKey));
                     symmetricKeyBuffer << *symmetricKey;
-                    Authenticator authenticator (key, MessageDigest::Ptr (new MessageDigest));
+                    Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
                     if (!authenticator.VerifyBufferSignature (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),

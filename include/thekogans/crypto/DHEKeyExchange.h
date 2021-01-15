@@ -58,7 +58,7 @@ namespace thekogans {
 
                 /// \brief
                 /// \see{EC} or \see{DH} key exchange params.
-                crypto::Params::Ptr params;
+                crypto::Params::SharedPtr params;
                 /// \brief
                 /// Salt for \see{SymmetricKey} derivation.
                 std::vector<util::ui8> salt;
@@ -83,7 +83,7 @@ namespace thekogans {
                 std::string keyDescription;
                 /// \brief
                 /// Public \see{AsymmetricKey} used for key exchange.
-                AsymmetricKey::Ptr publicKey;
+                AsymmetricKey::SharedPtr publicKey;
 
                 /// \brief
                 /// ctor.
@@ -99,7 +99,7 @@ namespace thekogans {
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
                 DHEParams (
                     const ID &id,
-                    crypto::Params::Ptr params_,
+                    crypto::Params::SharedPtr params_,
                     const std::vector<util::ui8> &salt_,
                     std::size_t keyLength_,
                     const std::string &messageDigestName_,
@@ -107,7 +107,7 @@ namespace thekogans {
                     const ID &keyId_,
                     const std::string &keyName_,
                     const std::string &keyDescription_,
-                    AsymmetricKey::Ptr publicKey_) :
+                    AsymmetricKey::SharedPtr publicKey_) :
                     Params (id),
                     params (params_),
                     salt (salt_),
@@ -125,16 +125,16 @@ namespace thekogans {
                 /// over the parameters.
                 /// \param[in] messageDigest Message digest object.
                 virtual void CreateSignature (
-                    AsymmetricKey::Ptr privateKey,
-                    MessageDigest::Ptr messageDigest);
+                    AsymmetricKey::SharedPtr privateKey,
+                    MessageDigest::SharedPtr messageDigest);
                 /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
                 /// \param[in] publicKey Peer's public key used to verify parameters signature.
                 /// \param[in] messageDigest Message digest object.
                 /// \return true == signature is valid, false == signature is invalid.
                 virtual bool ValidateSignature (
-                    AsymmetricKey::Ptr publicKey,
-                    MessageDigest::Ptr messageDigest);
+                    AsymmetricKey::SharedPtr publicKey,
+                    MessageDigest::SharedPtr messageDigest);
 
             protected:
                 // util::Serializable
@@ -213,7 +213,7 @@ namespace thekogans {
             const bool initiator;
             /// \brief
             /// \see{DH}/\see{EC} \see{Params} used for DHE \see{SymmetricKey} derivation.
-            crypto::Params::Ptr params;
+            crypto::Params::SharedPtr params;
             /// \brief
             /// Salt for \see{SymmetricKey} derivation.
             std::vector<util::ui8> salt;
@@ -238,10 +238,10 @@ namespace thekogans {
             std::string keyDescription;
             /// \brief
             /// Private \see{DH}/\see{EC} \see{AsymmetricKey} used for key exchange.
-            AsymmetricKey::Ptr privateKey;
+            AsymmetricKey::SharedPtr privateKey;
             /// \brief
             /// Public \see{DH}/\see{EC} \see{AsymmetricKey} used for key exchange.
-            AsymmetricKey::Ptr publicKey;
+            AsymmetricKey::SharedPtr publicKey;
 
         public:
             /// \brief
@@ -258,7 +258,7 @@ namespace thekogans {
             /// \param[in] keyDescription Optional \see{SymmetricKey} description.
             DHEKeyExchange (
                 const ID &id,
-                crypto::Params::Ptr params_,
+                crypto::Params::SharedPtr params_,
                 const void *salt_ = 0,
                 std::size_t saltLength_ = 0,
                 std::size_t keyLength_ = GetCipherKeyLength (),
@@ -270,7 +270,7 @@ namespace thekogans {
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
             /// \param[in] params \see{DHEParams} containing info to create a shared \see{SymmetricKey}.
-            explicit DHEKeyExchange (Params::Ptr params);
+            explicit DHEKeyExchange (Params::SharedPtr params);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
@@ -278,16 +278,16 @@ namespace thekogans {
             /// over the parameters.
             /// \param[in] messageDigest Optional message digest used to hash the parameters.
             /// \return \see{DHEParams} to send to the key exchange peer.
-            virtual Params::Ptr GetParams (
-                AsymmetricKey::Ptr privateKey = AsymmetricKey::Ptr (),
-                MessageDigest::Ptr messageDigest = MessageDigest::Ptr ()) const;
+            virtual Params::SharedPtr GetParams (
+                AsymmetricKey::SharedPtr privateKey = AsymmetricKey::SharedPtr (),
+                MessageDigest::SharedPtr messageDigest = MessageDigest::SharedPtr ()) const;
 
             /// \brief
             /// Given the peer's \see{DHEParams}, use my private key
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{DHEParams} parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (Params::Ptr params) const;
+            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr params) const;
 
             /// \brief
             /// DHEKeyExchange is neither copy constructable, nor assignable.

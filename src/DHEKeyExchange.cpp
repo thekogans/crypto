@@ -38,8 +38,8 @@ namespace thekogans {
             util::DefaultAllocator::Instance ())
 
         void DHEKeyExchange::DHEParams::CreateSignature (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest) {
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest) {
             if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
@@ -78,8 +78,8 @@ namespace thekogans {
         }
 
         bool DHEKeyExchange::DHEParams::ValidateSignature (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest) {
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest) {
             if (publicKey.Get () != 0 && messageDigest.Get () != 0 &&
                     publicKey->GetId () == signatureKeyId &&
                     messageDigest->GetName () == signatureMessageDigestName) {
@@ -223,9 +223,9 @@ namespace thekogans {
             keyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_KEY_ID)->value);
             keyName = object.Get<util::JSON::String> (ATTR_KEY_NAME)->value;
             keyDescription = object.Get<util::JSON::String> (ATTR_KEY_DESCRIPTION)->value;
-            util::JSON::Object::Ptr paramsObject = object.Get<util::JSON::Object> (TAG_PARAMS);
+            util::JSON::Object::SharedPtr paramsObject = object.Get<util::JSON::Object> (TAG_PARAMS);
             *paramsObject >> params;
-            util::JSON::Object::Ptr publicKeyObject = object.Get<util::JSON::Object> (TAG_PUBLIC_KEY);
+            util::JSON::Object::SharedPtr publicKeyObject = object.Get<util::JSON::Object> (TAG_PUBLIC_KEY);
             *publicKeyObject >> publicKey;
         }
 
@@ -238,10 +238,10 @@ namespace thekogans {
             object.Add<const std::string &> (ATTR_KEY_ID, keyId.ToHexString ());
             object.Add<const std::string &> (ATTR_KEY_NAME, keyName);
             object.Add<const std::string &> (ATTR_KEY_DESCRIPTION, keyDescription);
-            util::JSON::Object::Ptr paramsObject (new util::JSON::Object);
+            util::JSON::Object::SharedPtr paramsObject (new util::JSON::Object);
             *paramsObject << *params;
             object.Add (TAG_PARAMS, paramsObject);
-            util::JSON::Object::Ptr publicKeyObject (new util::JSON::Object);
+            util::JSON::Object::SharedPtr publicKeyObject (new util::JSON::Object);
             *publicKeyObject << *publicKey;
             object.Add (TAG_PUBLIC_KEY, publicKeyObject);
         }
@@ -257,7 +257,7 @@ namespace thekogans {
 
         DHEKeyExchange::DHEKeyExchange (
                 const ID &id,
-                crypto::Params::Ptr params_,
+                crypto::Params::SharedPtr params_,
                 const void *salt_,
                 std::size_t saltLength_,
                 std::size_t keyLength_,
@@ -291,10 +291,10 @@ namespace thekogans {
             }
         }
 
-        DHEKeyExchange::DHEKeyExchange (Params::Ptr params) :
+        DHEKeyExchange::DHEKeyExchange (Params::SharedPtr params) :
                 KeyExchange (ID::Empty),
                 initiator (false) {
-            DHEParams::Ptr dheParams =
+            DHEParams::SharedPtr dheParams =
                 util::dynamic_refcounted_pointer_cast<DHEParams> (params);
             if (dheParams.Get () != 0 &&
                     ValidateParamsKeyType (dheParams->params->GetKeyType ())) {
@@ -316,10 +316,10 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Params::Ptr DHEKeyExchange::GetParams (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest) const {
-            Params::Ptr dheParams (
+        KeyExchange::Params::SharedPtr DHEKeyExchange::GetParams (
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest) const {
+            Params::SharedPtr dheParams (
                 new DHEParams (
                     id,
                     params,
@@ -352,8 +352,8 @@ namespace thekogans {
             }
         }
 
-        SymmetricKey::Ptr DHEKeyExchange::DeriveSharedSymmetricKey (Params::Ptr params) const {
-            DHEParams::Ptr dheParams =
+        SymmetricKey::SharedPtr DHEKeyExchange::DeriveSharedSymmetricKey (Params::SharedPtr params) const {
+            DHEParams::SharedPtr dheParams =
                 util::dynamic_refcounted_pointer_cast<DHEParams> (params);
             if (dheParams.Get () != 0) {
                 util::SecureVector<util::ui8> secret;

@@ -310,9 +310,9 @@ namespace thekogans {
             /// \param[in] keyName Optional \see{SymmetricKey} name.
             /// \param[in] keyDescription Optional \see{SymmetricKey} description.
             /// \return \see{DHEKeyExchange} instance represented by keyExchange.
-            KeyExchange::Ptr GetDHEKeyExchange (
+            KeyExchange::SharedPtr GetDHEKeyExchange (
                 const ID &keyExchangeId,
-                Params::Ptr params,
+                Params::SharedPtr params,
                 const void *salt = 0,
                 std::size_t saltLength = 0,
                 std::size_t count = 1,
@@ -332,9 +332,9 @@ namespace thekogans {
             /// \param[in] keyName Optional \see{SymmetricKey} name.
             /// \param[in] keyDescription Optional \see{SymmetricKey} description.
             /// \return \see{RSAKeyExchange} instance represented by keyExchange.
-            KeyExchange::Ptr GetRSAKeyExchange (
+            KeyExchange::SharedPtr GetRSAKeyExchange (
                 const ID &keyExchangeId,
-                AsymmetricKey::Ptr key,
+                AsymmetricKey::SharedPtr key,
                 std::size_t secretLength = RSAKeyExchange::DEFAULT_SECRET_LENGTH,
                 const void *salt = 0,
                 std::size_t saltLength = 0,
@@ -346,26 +346,26 @@ namespace thekogans {
             /// Return the \see{Authenticator} instance represented by authenticator.
             /// \param[in] key Private (Sign)/Public (Verify) key.
             /// \return \see{Authenticator} instance represented by authenticator.
-            Authenticator::Ptr GetAuthenticator (AsymmetricKey::Ptr key) const;
+            Authenticator::SharedPtr GetAuthenticator (AsymmetricKey::SharedPtr key) const;
             /// \brief
             /// Return the \see{Cipher} instance represented by cipher.
             /// \param[in] key \see{SymmetricKey} used to encrypt/decrypt.
             /// \return \see{Cipher} instance represented by cipher.
-            Cipher::Ptr GetCipher (SymmetricKey::Ptr key) const;
+            Cipher::SharedPtr GetCipher (SymmetricKey::SharedPtr key) const;
             /// \brief
             /// Return the \see{HMAC} instance represented by messageDigest.
             /// \param[in] key \see{SymmetricKey} used to mac/verify.
             /// \return \see{HMAC} instance represented by messageDigest.
-            MAC::Ptr GetHMAC (SymmetricKey::Ptr key) const;
+            MAC::SharedPtr GetHMAC (SymmetricKey::SharedPtr key) const;
             /// \brief
             /// Return the \see{CMAC} instance represented by cipher.
             /// \param[in] key \see{SymmetricKey} used to mac/verify.
             /// \return \see{CMAC} instance represented by cipher.
-            MAC::Ptr GetCMAC (SymmetricKey::Ptr key) const;
+            MAC::SharedPtr GetCMAC (SymmetricKey::SharedPtr key) const;
             /// \brief
             /// Return the message digest instance represented by messageDigest.
             /// \return Message digest instance represented by messageDigest.
-            MessageDigest::Ptr GetMessageDigest () const;
+            MessageDigest::SharedPtr GetMessageDigest () const;
 
             /// \brief
             /// Return true if key exchange is ECDHE.
@@ -389,7 +389,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Private/public random key pair.
-            AsymmetricKey::Ptr CreateAuthenticatorKey (
+            AsymmetricKey::SharedPtr CreateAuthenticatorKey (
                 std::size_t keyLength,
                 BIGNUMPtr RSAPublicExponent = BIGNUMFromui32 (65537),
                 const ID &id = ID (),
@@ -403,7 +403,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Private/public random key pair.
-            AsymmetricKey::Ptr CreateAuthenticatorKey (
+            AsymmetricKey::SharedPtr CreateAuthenticatorKey (
                 const std::string curveName,
                 const ID &id = ID (),
                 const std::string &name = std::string (),

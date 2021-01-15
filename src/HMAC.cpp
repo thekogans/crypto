@@ -26,7 +26,7 @@ namespace thekogans {
     namespace crypto {
 
         HMAC::HMAC (
-                SymmetricKey::Ptr key_,
+                SymmetricKey::SharedPtr key_,
                 const EVP_MD *md_) :
                 key (key_),
                 md (md_) {

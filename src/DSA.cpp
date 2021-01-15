@@ -25,7 +25,7 @@
 namespace thekogans {
     namespace crypto {
 
-        Params::Ptr DSA::ParamsFromKeyLength (
+        Params::SharedPtr DSA::ParamsFromKeyLength (
                 std::size_t keyLength,
                 const ID &id,
                 const std::string &name,
@@ -38,7 +38,7 @@ namespace thekogans {
                         EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_dsa_paramgen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
                         EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                    return Params::Ptr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
+                    return Params::SharedPtr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

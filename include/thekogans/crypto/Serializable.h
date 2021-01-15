@@ -38,8 +38,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::Serializable {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Serializable>.
-            typedef util::ThreadSafeRefCounted::Ptr<Serializable> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<Serializable>.
+            typedef util::RefCounted::SharedPtr<Serializable> SharedPtr;
 
         protected:
             /// \brief
@@ -197,7 +197,7 @@ namespace thekogans {
                 thekogans::util::SecureAllocator::Instance ())
 
         /// \brief
-        /// Implement Serializable::Ptr extraction operators.
+        /// Implement Serializable::SharedPtr extraction operators.
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (Serializable)
 
     } // namespace crypto
@@ -205,7 +205,7 @@ namespace thekogans {
     namespace util {
 
         /// \brief
-        /// Implement Serializable::Ptr value parser.
+        /// Implement Serializable::SharedPtr value parser.
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::Serializable)
 
     } // namespace util

@@ -94,7 +94,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Private key.
-            static AsymmetricKey::Ptr LoadPrivateKeyFromBuffer (
+            static AsymmetricKey::SharedPtr LoadPrivateKeyFromBuffer (
                 const void *buffer,
                 std::size_t length,
                 const std::string &encoding = DER_ENCODING,
@@ -117,7 +117,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Private key.
-            static AsymmetricKey::Ptr LoadPrivateKeyFromFile (
+            static AsymmetricKey::SharedPtr LoadPrivateKeyFromFile (
                 const std::string &path,
                 const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
@@ -141,7 +141,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public key.
-            static AsymmetricKey::Ptr LoadPublicKeyFromBuffer (
+            static AsymmetricKey::SharedPtr LoadPublicKeyFromBuffer (
                 const void *buffer,
                 std::size_t length,
                 const std::string &encoding = DER_ENCODING,
@@ -164,7 +164,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public key.
-            static AsymmetricKey::Ptr LoadPublicKeyFromFile (
+            static AsymmetricKey::SharedPtr LoadPublicKeyFromFile (
                 const std::string &path,
                 const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
@@ -186,7 +186,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public key.
-            static AsymmetricKey::Ptr LoadPublicKeyFromCertificate (
+            static AsymmetricKey::SharedPtr LoadPublicKeyFromCertificate (
                 const std::string &path,
                 const std::string &encoding = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
@@ -241,7 +241,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public part of the privateKey (or duplicate of the pubilc key).
-            virtual AsymmetricKey::Ptr GetPublicKey (
+            virtual AsymmetricKey::SharedPtr GetPublicKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;

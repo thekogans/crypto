@@ -31,7 +31,7 @@
 namespace thekogans {
     namespace crypto {
 
-        AsymmetricKey::Ptr RSA::CreateKey (
+        AsymmetricKey::SharedPtr RSA::CreateKey (
                 std::size_t keyLength,
                 BIGNUMPtr publicExponent,
                 const ID &id,
@@ -47,7 +47,7 @@ namespace thekogans {
                         EVP_PKEY_CTX_set_rsa_keygen_pubexp (ctx.get (), publicExponent.get ()) == 1 &&
                         EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                     publicExponent.release ();
-                    return AsymmetricKey::Ptr (
+                    return AsymmetricKey::SharedPtr (
                         new OpenSSLAsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
                 }
                 else {
@@ -87,7 +87,7 @@ namespace thekogans {
         std::size_t RSA::Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
@@ -126,7 +126,7 @@ namespace thekogans {
         util::Buffer RSA::Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
@@ -151,7 +151,7 @@ namespace thekogans {
         std::size_t RSA::EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
@@ -184,7 +184,7 @@ namespace thekogans {
         util::Buffer RSA::EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
@@ -211,7 +211,7 @@ namespace thekogans {
         std::size_t RSA::EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
@@ -238,7 +238,7 @@ namespace thekogans {
         util::Buffer RSA::EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
@@ -265,7 +265,7 @@ namespace thekogans {
         std::size_t RSA::Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 util::ui8 *plaintext) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
@@ -302,7 +302,7 @@ namespace thekogans {
         util::Buffer RSA::Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 bool secure,
                 util::Endianness endianness) {
@@ -417,7 +417,7 @@ namespace thekogans {
         RSAEncrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
@@ -426,7 +426,7 @@ namespace thekogans {
                     IsValidPadding (padding) &&
                     ciphertext != 0) {
                 std::size_t cipherIndex = GetCipherIndex (publicKey->GetKeyLength (), padding);
-                SymmetricKey::Ptr key =
+                SymmetricKey::SharedPtr key =
                     SymmetricKey::FromRandom (
                         SymmetricKey::MIN_RANDOM_LENGTH,
                         0,
@@ -469,7 +469,7 @@ namespace thekogans {
         RSAEncrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
                     publicKey.Get () != 0 && !publicKey->IsPrivate () &&
@@ -498,7 +498,7 @@ namespace thekogans {
         RSADecrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 util::ui8 *plaintext) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
@@ -523,7 +523,7 @@ namespace thekogans {
                 RSAHeader header;
                 headerBuffer >> header;
                 Cipher cipher (
-                    SymmetricKey::Ptr (
+                    SymmetricKey::SharedPtr (
                         new SymmetricKey (header.key, header.keyLength)),
                     CipherSuite::GetOpenSSLCipherByIndex (header.cipherIndex));
                 util::ui32 ciphertextLength;
@@ -545,7 +545,7 @@ namespace thekogans {
         RSADecrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 bool secure,
                 util::Endianness endianness) {

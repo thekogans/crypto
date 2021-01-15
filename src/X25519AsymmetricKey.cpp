@@ -47,7 +47,7 @@ namespace thekogans {
 
         const char * const X25519AsymmetricKey::KEY_TYPE = "X25519";
 
-        AsymmetricKey::Ptr X25519AsymmetricKey::GetPublicKey (
+        AsymmetricKey::SharedPtr X25519AsymmetricKey::GetPublicKey (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) const {
@@ -58,7 +58,7 @@ namespace thekogans {
             else {
                 memcpy (publicKey, key.GetReadPtr (), X25519::PUBLIC_KEY_LENGTH);
             }
-            return AsymmetricKey::Ptr (
+            return AsymmetricKey::SharedPtr (
                 new X25519AsymmetricKey (
                     publicKey,
                     false,

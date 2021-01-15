@@ -412,9 +412,9 @@ namespace thekogans {
             return hmac || VerifyCipherKey (key);
         }
 
-        KeyExchange::Ptr CipherSuite::GetDHEKeyExchange (
+        KeyExchange::SharedPtr CipherSuite::GetDHEKeyExchange (
                 const ID &keyExchangeId,
-                Params::Ptr params,
+                Params::SharedPtr params,
                 const void *salt,
                 std::size_t saltLength,
                 std::size_t count,
@@ -422,7 +422,7 @@ namespace thekogans {
                 const std::string &keyName,
                 const std::string &keyDescription) const {
             if (params.Get () != 0 && VerifyKeyExchangeParams (*params)) {
-                return KeyExchange::Ptr (
+                return KeyExchange::SharedPtr (
                     new DHEKeyExchange (
                         keyExchangeId,
                         params,
@@ -441,9 +441,9 @@ namespace thekogans {
             }
         }
 
-        KeyExchange::Ptr CipherSuite::GetRSAKeyExchange (
+        KeyExchange::SharedPtr CipherSuite::GetRSAKeyExchange (
                 const ID &keyExchangeId,
-                AsymmetricKey::Ptr key,
+                AsymmetricKey::SharedPtr key,
                 std::size_t secretLength,
                 const void *salt,
                 std::size_t saltLength,
@@ -452,7 +452,7 @@ namespace thekogans {
                 const std::string &keyName,
                 const std::string &keyDescription) const {
             if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
-                return KeyExchange::Ptr (
+                return KeyExchange::SharedPtr (
                     new RSAKeyExchange (
                         keyExchangeId,
                         key,
@@ -472,9 +472,9 @@ namespace thekogans {
             }
         }
 
-        Authenticator::Ptr CipherSuite::GetAuthenticator (AsymmetricKey::Ptr key) const {
+        Authenticator::SharedPtr CipherSuite::GetAuthenticator (AsymmetricKey::SharedPtr key) const {
             if (key.Get () != 0 && VerifyAuthenticatorKey (*key)) {
-                return Authenticator::Ptr (
+                return Authenticator::SharedPtr (
                     new Authenticator (key, GetMessageDigest ()));
             }
             else {
@@ -483,9 +483,9 @@ namespace thekogans {
             }
         }
 
-        Cipher::Ptr CipherSuite::GetCipher (SymmetricKey::Ptr key) const {
+        Cipher::SharedPtr CipherSuite::GetCipher (SymmetricKey::SharedPtr key) const {
             if (key.Get () != 0 && VerifyCipherKey (*key)) {
-                return Cipher::Ptr (
+                return Cipher::SharedPtr (
                     new Cipher (
                         key,
                         GetOpenSSLCipherByName (cipher),
@@ -497,9 +497,9 @@ namespace thekogans {
             }
         }
 
-        MAC::Ptr CipherSuite::GetHMAC (SymmetricKey::Ptr key) const {
+        MAC::SharedPtr CipherSuite::GetHMAC (SymmetricKey::SharedPtr key) const {
             if (key.Get () != 0 && VerifyMACKey (*key, true)) {
-                return MAC::Ptr (new HMAC (key, GetOpenSSLMessageDigest ()));
+                return MAC::SharedPtr (new HMAC (key, GetOpenSSLMessageDigest ()));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -507,9 +507,9 @@ namespace thekogans {
             }
         }
 
-        MAC::Ptr CipherSuite::GetCMAC (SymmetricKey::Ptr key) const {
+        MAC::SharedPtr CipherSuite::GetCMAC (SymmetricKey::SharedPtr key) const {
             if (key.Get () != 0 && VerifyMACKey (*key, false)) {
-                return MAC::Ptr (new CMAC (key, GetOpenSSLCipher ()));
+                return MAC::SharedPtr (new CMAC (key, GetOpenSSLCipher ()));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -517,12 +517,12 @@ namespace thekogans {
             }
         }
 
-        MessageDigest::Ptr CipherSuite::GetMessageDigest () const {
-            return MessageDigest::Ptr (
+        MessageDigest::SharedPtr CipherSuite::GetMessageDigest () const {
+            return MessageDigest::SharedPtr (
                 new MessageDigest (GetOpenSSLMessageDigestByName (messageDigest)));
         }
 
-        AsymmetricKey::Ptr CipherSuite::CreateAuthenticatorKey (
+        AsymmetricKey::SharedPtr CipherSuite::CreateAuthenticatorKey (
                 std::size_t keyLength,
                 BIGNUMPtr RSAPublicExponent,
                 const ID &id,
@@ -549,7 +549,7 @@ namespace thekogans {
             }
         }
 
-        AsymmetricKey::Ptr CipherSuite::CreateAuthenticatorKey (
+        AsymmetricKey::SharedPtr CipherSuite::CreateAuthenticatorKey (
                 const std::string curveName,
                 const ID &id,
                 const std::string &name,

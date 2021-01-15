@@ -26,7 +26,7 @@ namespace thekogans {
     namespace crypto {
 
         Encryptor::Encryptor (
-                SymmetricKey::Ptr key,
+                SymmetricKey::SharedPtr key,
                 const EVP_CIPHER *cipher) {
             if (key.Get () != 0 && cipher != 0 &&
                     key->GetKeyLength () == GetCipherKeyLength (cipher)) {

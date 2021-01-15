@@ -40,8 +40,8 @@ namespace thekogans {
             /// \param[in] publicKey Public key.
             /// \param[in] messageDigest Message digest object.
             OpenSSLVerifier (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest);
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest);
 
             /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.

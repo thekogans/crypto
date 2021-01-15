@@ -37,11 +37,10 @@ namespace thekogans {
         /// be reused. It will reset it's internal state after every
         /// sign/verify operation ready for the next.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL MAC :
-                public virtual util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL MAC : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<MAC>.
-            typedef util::ThreadSafeRefCounted::Ptr<MAC> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<MAC>.
+            typedef util::RefCounted::SharedPtr<MAC> SharedPtr;
 
             /// \brief
             /// dtor.

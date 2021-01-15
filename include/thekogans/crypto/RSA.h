@@ -46,7 +46,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new RSA key.
-            static AsymmetricKey::Ptr CreateKey (
+            static AsymmetricKey::SharedPtr CreateKey (
                 std::size_t keyLength,
                 BIGNUMPtr publicExponent = BIGNUMFromui32 (65537),
                 const ID &id = ID (),
@@ -81,7 +81,7 @@ namespace thekogans {
             static std::size_t Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext);
             /// \brief
@@ -94,7 +94,7 @@ namespace thekogans {
             static util::Buffer Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING);
 
             /// \brief
@@ -109,7 +109,7 @@ namespace thekogans {
             static std::size_t EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext);
             /// \brief
@@ -122,7 +122,7 @@ namespace thekogans {
             static util::Buffer EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING);
 
             /// \brief
@@ -137,7 +137,7 @@ namespace thekogans {
             static std::size_t EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext);
             /// \brief
@@ -150,7 +150,7 @@ namespace thekogans {
             static util::Buffer EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING);
 
             /// \brief
@@ -164,7 +164,7 @@ namespace thekogans {
             static std::size_t Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 util::ui8 *plaintext);
             /// \brief
@@ -179,7 +179,7 @@ namespace thekogans {
             static util::Buffer Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING,
                 bool secure = false,
                 util::Endianness endianness = util::NetworkEndian);
@@ -205,7 +205,7 @@ namespace thekogans {
             RSAEncrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext);
         /// \brief
@@ -227,7 +227,7 @@ namespace thekogans {
             RSAEncrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
-                AsymmetricKey::Ptr publicKey,
+                AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING);
 
         /// \brief
@@ -242,7 +242,7 @@ namespace thekogans {
             RSADecrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 util::ui8 *plaintext);
         /// \brief
@@ -258,7 +258,7 @@ namespace thekogans {
             RSADecrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
-                AsymmetricKey::Ptr privateKey,
+                AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding = RSA_PKCS1_OAEP_PADDING,
                 bool secure = false,
                 util::Endianness endianness = util::NetworkEndian);

@@ -40,11 +40,10 @@ namespace thekogans {
         /// keys, you need to instantiate multiple KeyExchange (\see{DHEKeyExchange}
         /// or/and \see{RSAKeyExchange}) instances.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange :
-                public virtual util::ThreadSafeRefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<KeyExchange>.
-            typedef util::ThreadSafeRefCounted::Ptr<KeyExchange> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<KeyExchange>.
+            typedef util::RefCounted::SharedPtr<KeyExchange> SharedPtr;
 
             /// \struct KeyExchange::Params KeyExchange.h thekogans/crypto/KeyExchange.h
             ///
@@ -52,8 +51,8 @@ namespace thekogans {
             /// Key exchange parameters base.
             struct _LIB_THEKOGANS_CRYPTO_DECL Params : public util::Serializable {
                 /// \brief
-                /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Params>.
-                typedef util::ThreadSafeRefCounted::Ptr<Params> Ptr;
+                /// Convenient typedef for util::RefCounted::SharedPtr<Params>.
+                typedef util::RefCounted::SharedPtr<Params> SharedPtr;
 
                 /// \brief
                 /// KeyExchange id (see \see{KeyRing::AddKeyExchange}).
@@ -81,16 +80,16 @@ namespace thekogans {
                 /// over the parameters.
                 /// \param[in] messageDigest Message digest object.
                 virtual void CreateSignature (
-                    AsymmetricKey::Ptr /*privateKey*/,
-                    MessageDigest::Ptr /*messageDigest*/) = 0;
+                    AsymmetricKey::SharedPtr /*privateKey*/,
+                    MessageDigest::SharedPtr /*messageDigest*/) = 0;
                 /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
                 /// \param[in] publicKey Peer's public key used to verify parameters signature.
                 /// \param[in] messageDigest Message digest object.
                 /// \return true == signature is valid, false == signature is invalid.
                 virtual bool ValidateSignature (
-                    AsymmetricKey::Ptr /*publicKey*/,
-                    MessageDigest::Ptr /*messageDigest*/) = 0;
+                    AsymmetricKey::SharedPtr /*publicKey*/,
+                    MessageDigest::SharedPtr /*messageDigest*/) = 0;
 
             protected:
                 // util::Serializable
@@ -173,16 +172,16 @@ namespace thekogans {
             /// over the parameters.
             /// \param[in] messageDigest Optional message digest object to hash the signature parameters.
             /// \return Parameters (\see{DHEParams} or \see{RSAParams}) to send to the key exchange peer.
-            virtual Params::Ptr GetParams (
-                AsymmetricKey::Ptr /*privateKey*/ = AsymmetricKey::Ptr (),
-                MessageDigest::Ptr /*messageDigest*/ = MessageDigest::Ptr ()) const = 0;
+            virtual Params::SharedPtr GetParams (
+                AsymmetricKey::SharedPtr /*privateKey*/ = AsymmetricKey::SharedPtr (),
+                MessageDigest::SharedPtr /*messageDigest*/ = MessageDigest::SharedPtr ()) const = 0;
 
             /// \brief
             /// Given the peer's (see \see{DHEParams} and \see{RSAParams}), use my private key
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (Params::Ptr /*params*/) const = 0;
+            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr /*params*/) const = 0;
 
             /// \brief
             /// KeyExchange is neither copy constructable, nor assignable.
@@ -190,7 +189,7 @@ namespace thekogans {
         };
 
         /// \brief
-        /// Implement KeyExchange::Params::Ptr extraction operators.
+        /// Implement KeyExchange::Params::SharedPtr extraction operators.
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (KeyExchange::Params)
 
     } // namespace crypto
@@ -198,7 +197,7 @@ namespace thekogans {
     namespace util {
 
         /// \brief
-        /// Implement KeyExchange::Params::Ptr value parser.
+        /// Implement KeyExchange::Params::SharedPtr value parser.
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::KeyExchange::Params)
 
     } // namespace util

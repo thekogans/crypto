@@ -109,7 +109,7 @@ int main (
     THEKOGANS_UTIL_LOG_INIT (
         util::LoggerMgr::Debug,
         util::LoggerMgr::All);
-    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
+    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::SharedPtr (new util::ConsoleLogger));
     THEKOGANS_UTIL_IMPLEMENT_LOG_FLUSHER;
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
@@ -133,7 +133,7 @@ int main (
                 crypto::SymmetricKey::FromSecretAndSalt (
                     options.password.c_str (),
                     options.password.size ()));
-            crypto::KeyRing::Ptr keyRing = crypto::KeyRing::Load (options.path, &cipher);
+            crypto::KeyRing::SharedPtr keyRing = crypto::KeyRing::Load (options.path, &cipher);
             {
                 util::FixedBuffer<256> originalPlaintext;
                 originalPlaintext.AdvanceWriteOffset (

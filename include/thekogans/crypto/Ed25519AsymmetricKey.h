@@ -103,7 +103,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return Public part of the privateKey (or duplicate of the pubilc key).
-            virtual AsymmetricKey::Ptr GetPublicKey (
+            virtual AsymmetricKey::SharedPtr GetPublicKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;

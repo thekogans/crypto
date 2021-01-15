@@ -65,20 +65,20 @@ namespace thekogans {
             /// \see{CipherSuite} associated with this key ring.
             CipherSuite cipherSuite;
             /// \brief
-            /// Convenient typedef for std::map<ID, Params::Ptr>.
-            typedef std::map<ID, Params::Ptr> ParamsMap;
+            /// Convenient typedef for std::map<ID, Params::SharedPtr>.
+            typedef std::map<ID, Params::SharedPtr> ParamsMap;
             /// \brief
             /// \see{KeyExchange} \see{Params} map.
             ParamsMap keyExchangeParamsMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, AsymmetricKeyMap::Ptr>.
-            typedef std::map<ID, AsymmetricKey::Ptr> AsymmetricKeyMap;
+            /// Convenient typedef for std::map<ID, AsymmetricKeyMap::SharedPtr>.
+            typedef std::map<ID, AsymmetricKey::SharedPtr> AsymmetricKeyMap;
             /// \brief
             /// \see{KeyExchange} \see{AsymmetricKey} map.
             AsymmetricKeyMap keyExchangeKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, KeyExchange::Ptr>.
-            typedef std::map<ID, KeyExchange::Ptr> KeyExchangeMap;
+            /// Convenient typedef for std::map<ID, KeyExchange::SharedPtr>.
+            typedef std::map<ID, KeyExchange::SharedPtr> KeyExchangeMap;
             /// \brief
             /// \see{KeyExchange} map.
             KeyExchangeMap keyExchangeMap;
@@ -89,20 +89,20 @@ namespace thekogans {
             /// \see{Authenticator} \see{AsymmetricKey} map.
             AsymmetricKeyMap authenticatorKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Authenticator::Ptr>.
-            typedef std::map<ID, Authenticator::Ptr> AuthenticatorMap;
+            /// Convenient typedef for std::map<ID, Authenticator::SharedPtr>.
+            typedef std::map<ID, Authenticator::SharedPtr> AuthenticatorMap;
             /// \brief
             /// \see{Authenticator} map.
             AuthenticatorMap authenticatorMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, SymmetricKey::Ptr>.
-            typedef std::map<ID, SymmetricKey::Ptr> SymmetricKeyMap;
+            /// Convenient typedef for std::map<ID, SymmetricKey::SharedPtr>.
+            typedef std::map<ID, SymmetricKey::SharedPtr> SymmetricKeyMap;
             /// \brief
             /// \see{Cipher} \see{SymmetricKey} map.
             SymmetricKeyMap cipherKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Cipher::Ptr>.
-            typedef std::map<ID, Cipher::Ptr> CipherMap;
+            /// Convenient typedef for std::map<ID, Cipher::SharedPtr>.
+            typedef std::map<ID, Cipher::SharedPtr> CipherMap;
             /// \brief
             /// \see{Cipher} map.
             CipherMap cipherMap;
@@ -110,20 +110,20 @@ namespace thekogans {
             /// \see{MAC} \see{SymmetricKeyMap} map.
             SymmetricKeyMap macKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, MAC::Ptr>.
-            typedef std::map<ID, MAC::Ptr> MACMap;
+            /// Convenient typedef for std::map<ID, MAC::SharedPtr>.
+            typedef std::map<ID, MAC::SharedPtr> MACMap;
             /// \brief
             /// \see{MAC} map.
             MACMap macMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Serializable::Ptr>.
-            typedef std::map<ID, Serializable::Ptr> SerializableMap;
+            /// Convenient typedef for std::map<ID, Serializable::SharedPtr>.
+            typedef std::map<ID, Serializable::SharedPtr> SerializableMap;
             /// \brief
             /// \see{Serializable} map.
             SerializableMap userDataMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Ptr>.
-            typedef std::map<ID, Ptr> KeyRingMap;
+            /// Convenient typedef for std::map<ID, SharedPtr>.
+            typedef std::map<ID, SharedPtr> KeyRingMap;
             /// \brief
             /// Subrings hanging off this key ring.
             KeyRingMap subringMap;
@@ -149,7 +149,7 @@ namespace thekogans {
             /// \param[in] cipher Optional \see{Cipher} used to decrypt the file data.
             /// \param[in] associatedData Optional associated data (GCM mode only).
             /// \param[in] associatedDataLength Length of optional associated data.
-            static Ptr Load (
+            static SharedPtr Load (
                 const std::string &path,
                 Cipher *cipher = 0,
                 const void *associatedData = 0,
@@ -178,8 +178,8 @@ namespace thekogans {
             /// \param[in] paramsId \see{ID} of \see{KeyExchange} \see{Params} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{KeyExchange} \see{Params} corresponding to the given paramsId
-            /// (Params::Ptr () if not found).
-            Params::Ptr GetKeyExchangeParams (
+            /// (Params::SharedPtr () if not found).
+            Params::SharedPtr GetKeyExchangeParams (
                 const ID &paramsId,
                 bool recursive = true) const;
             /// \struct KeyRing::EqualityTest KeyRing.h thekogans/crypto/KeyRing.h
@@ -203,20 +203,20 @@ namespace thekogans {
             /// \param[in] equalityTest EqualityTest to call for each keyExchangeParamsMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{KeyExchange} \see{Params} matching the given EqualityTest
-            /// (Params::Ptr () if not found).
-            Params::Ptr GetKeyExchangeParams (
+            /// (Params::SharedPtr () if not found).
+            Params::SharedPtr GetKeyExchangeParams (
                 const EqualityTest<Params> &equalityTest,
                 bool recursive = true) const;
             /// \brief
             /// Return randomly chosen \see{KeyExchange} \see{Params}.
             /// \return Randomly chosen \see{KeyExchange} \see{Params}.
-            Params::Ptr GetRandomKeyExchangeParams () const;
+            Params::SharedPtr GetRandomKeyExchangeParams () const;
             /// \brief
             /// Add a \see{KeyExchange} \see{Params} to this ring.
             /// \param[in] params \see{KeyExchange} \see{Params} to add.
             /// \return true = params added. false = A \see{Params} with
             /// this \see{ID} already exists in the ring.
-            bool AddKeyExchangeParams (Params::Ptr params);
+            bool AddKeyExchangeParams (Params::SharedPtr params);
             /// \brief
             /// Drop a \see{KeyExchange} \see{Params} with the given \see{ID}.
             /// \param[in] paramsId \see{ID} of \see{KeyExchange} \see{Params} to delete.
@@ -235,8 +235,8 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{KeyExchange} \see{AsymmetricKey} corresponding to the given keyId
-            /// (AsymmetricKey::Ptr () if not found).
-            AsymmetricKey::Ptr GetKeyExchangeKey (
+            /// (AsymmetricKey::SharedPtr () if not found).
+            AsymmetricKey::SharedPtr GetKeyExchangeKey (
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
@@ -244,8 +244,8 @@ namespace thekogans {
             /// \param[in] equalityTest EqualityTest to call for each keyExchangeKeyMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{KeyExchange} \see{AsymmetricKey} matching the given EqualityTest
-            /// (AsymmetricKey::Ptr () if not found).
-            AsymmetricKey::Ptr GetKeyExchangeKey (
+            /// (AsymmetricKey::SharedPtr () if not found).
+            AsymmetricKey::SharedPtr GetKeyExchangeKey (
                 const EqualityTest<AsymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
@@ -253,7 +253,7 @@ namespace thekogans {
             /// \param[in] key \see{KeyExchange} \see{AsymmetricKey} to add.
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
-            bool AddKeyExchangeKey (AsymmetricKey::Ptr key);
+            bool AddKeyExchangeKey (AsymmetricKey::SharedPtr key);
             /// \brief
             /// Drop a \see{KeyExchange} \see{AsymmetricKey} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{KeyExchange} \see{AsymmetricKey} to delete.
@@ -286,9 +286,9 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{KeyExchange::Ptr} corresponding to the given paramsOrKeyId
-            /// (\see{KeyExchange::Ptr} () if not found).
-            KeyExchange::Ptr AddKeyExchange (
+            /// \return \see{KeyExchange::SharedPtr} corresponding to the given paramsOrKeyId
+            /// (\see{KeyExchange::SharedPtr} () if not found).
+            KeyExchange::SharedPtr AddKeyExchange (
                 const ID &paramsOrKeyId,
                 std::size_t secretLength = RSAKeyExchange::DEFAULT_SECRET_LENGTH,
                 const void *salt = 0,
@@ -309,14 +309,14 @@ namespace thekogans {
             /// must have the same id. You can accomplish this like this:
             /// \code{.cpp}
             /// using namespace thekogans;
-            /// crypto::AsymmetricKey::Ptr privateKey = crypto::RSA:CreateKey (bits);
-            /// crypto::AsymmetricKey::Ptr publicKey = privateKey->GetPublicKey (privateKey->GetId ());
+            /// crypto::AsymmetricKey::SharedPtr privateKey = crypto::RSA:CreateKey (bits);
+            /// crypto::AsymmetricKey::SharedPtr publicKey = privateKey->GetPublicKey (privateKey->GetId ());
             /// \endcode
-            /// \param[in] params \see{KeyExchange::Params::Ptr} returned by AddKeyExchange.
+            /// \param[in] params \see{KeyExchange::Params::SharedPtr} returned by AddKeyExchange.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{KeyExchange::Ptr} corresponding to the given params.
-            KeyExchange::Ptr CreateKeyExchange (
-                KeyExchange::Params::Ptr params,
+            /// \return \see{KeyExchange::SharedPtr} corresponding to the given params.
+            KeyExchange::SharedPtr CreateKeyExchange (
+                KeyExchange::Params::SharedPtr params,
                 bool recursive = true);
             /// \brief
             /// Return the previously created \see{KeyExchange} by AddKeyExchange above.
@@ -327,7 +327,7 @@ namespace thekogans {
             /// \param[in] keyExchangeId \see{KeyExchange::keyExchangeId}.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{KeyExchange} corresponding to the given keyExchangeId.
-            KeyExchange::Ptr GetKeyExchange (
+            KeyExchange::SharedPtr GetKeyExchange (
                 const ID &keyExchangeId,
                 bool recursive = true);
 
@@ -336,8 +336,8 @@ namespace thekogans {
             /// \param[in] paramsId \see{ID} of \see{Authenticator} \see{Params} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Authenticator} \see{Params} corresponding to the given paramsId
-            /// (Params::Ptr () if not found).
-            Params::Ptr GetAuthenticatorParams (
+            /// (Params::SharedPtr () if not found).
+            Params::SharedPtr GetAuthenticatorParams (
                 const ID &paramsId,
                 bool recursive = true) const;
             /// \brief
@@ -345,8 +345,8 @@ namespace thekogans {
             /// \param[in] equalityTest EqualityTest to call for each authenticatorParamsMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{Authenticator} \see{Params} matching the given EqualityTest
-            /// (Params::Ptr () if not found).
-            Params::Ptr GetAuthenticatorParams (
+            /// (Params::SharedPtr () if not found).
+            Params::SharedPtr GetAuthenticatorParams (
                 const EqualityTest<Params> &equalityTest,
                 bool recursive = true) const;
             /// \brief
@@ -354,7 +354,7 @@ namespace thekogans {
             /// \param[in] params \see{Authenticator} \see{Params} to add.
             /// \return true = params added. false = A \see{Params} with
             /// this \see{ID} already exists in the ring.
-            bool AddAuthenticatorParams (Params::Ptr params);
+            bool AddAuthenticatorParams (Params::SharedPtr params);
             /// \brief
             /// Drop a \see{Authenticator} \see{Params} with the given \see{ID}.
             /// \param[in] paramsId \see{ID} of \see{Authenticator} \see{Params} to delete.
@@ -373,8 +373,8 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Authenticator} \see{AsymmetricKey} corresponding to the given keyId
-            /// (AsymmetricKey::Ptr () if not found).
-            AsymmetricKey::Ptr GetAuthenticatorKey (
+            /// (AsymmetricKey::SharedPtr () if not found).
+            AsymmetricKey::SharedPtr GetAuthenticatorKey (
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
@@ -382,8 +382,8 @@ namespace thekogans {
             /// \param[in] equalityTest EqualityTest to call for each authenticatorKeyMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{Authenticator} \see{AsymmetricKey} matching the given EqualityTest
-            /// (AsymmetricKey::Ptr () if not found).
-            AsymmetricKey::Ptr GetAuthenticatorKey (
+            /// (AsymmetricKey::SharedPtr () if not found).
+            AsymmetricKey::SharedPtr GetAuthenticatorKey (
                 const EqualityTest<AsymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
@@ -391,8 +391,8 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey}.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Authenticator} corresponding to the given op and keyId
-            /// (Authenticator::Ptr () if not found).
-            Authenticator::Ptr GetAuthenticator (
+            /// (Authenticator::SharedPtr () if not found).
+            Authenticator::SharedPtr GetAuthenticator (
                 const ID &keyId,
                 bool recursive);
             /// \brief
@@ -402,8 +402,8 @@ namespace thekogans {
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
             bool AddAuthenticatorKey (
-                AsymmetricKey::Ptr key,
-                Authenticator::Ptr authenticator = Authenticator::Ptr ());
+                AsymmetricKey::SharedPtr key,
+                Authenticator::SharedPtr authenticator = Authenticator::SharedPtr ());
             /// \brief
             /// Drop a \see{Authenticator} \see{AsymmetricKey} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{Authenticator} \see{AsymmetricKey} to delete.
@@ -422,8 +422,8 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{Cipher} \see{SymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Cipher} \see{SymmetricKey} corresponding to the given \see{ID}
-            /// (\see{SymmetricKey::Ptr} () if not found).
-            SymmetricKey::Ptr GetCipherKey (
+            /// (\see{SymmetricKey::SharedPtr} () if not found).
+            SymmetricKey::SharedPtr GetCipherKey (
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
@@ -431,8 +431,8 @@ namespace thekogans {
             /// \param[in] equalityTest EqualityTest to call for each cipherKeyMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{Cipher} \see{SymmetricKey} matching the given EqualityTest
-            /// (SymmetricKey::Ptr () if not found).
-            SymmetricKey::Ptr GetCipherKey (
+            /// (SymmetricKey::SharedPtr () if not found).
+            SymmetricKey::SharedPtr GetCipherKey (
                 const EqualityTest<SymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
@@ -440,8 +440,8 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{Cipher} key.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Cipher} corresponding to the given key \see{ID}
-            /// (\see{Cipher::Ptr} () if not found).
-            Cipher::Ptr GetCipher (
+            /// (\see{Cipher::SharedPtr} () if not found).
+            Cipher::SharedPtr GetCipher (
                 const ID &keyId,
                 bool recursive = true);
             /// \brief
@@ -455,7 +455,7 @@ namespace thekogans {
             /// better security.
             /// WARNING: This method runs in O(cipherKeyMap.size ()).
             /// \return \see{Cipher} based on randomly chosen \see{SymmetricKey}.
-            Cipher::Ptr GetRandomCipher ();
+            Cipher::SharedPtr GetRandomCipher ();
             /// \brief
             /// Add a \see{Cipher} \see{SymmetricKey} to the ring.
             /// \param[in] key \see{Cipher} \see{SymmetricKey} to add.
@@ -463,8 +463,8 @@ namespace thekogans {
             /// \return true = key added. false = A key with
             /// this id already exists in the ring.
             bool AddCipherKey (
-                SymmetricKey::Ptr key,
-                Cipher::Ptr cipher = Cipher::Ptr ());
+                SymmetricKey::SharedPtr key,
+                Cipher::SharedPtr cipher = Cipher::SharedPtr ());
             /// \brief
             /// Given a \see{Cipher} \see{SymmetricKey} \see{ID}, drop the corresponding key
             /// from the key ring.
@@ -484,8 +484,8 @@ namespace thekogans {
             /// \param[in] keyId \see{ID} of \see{MAC} \see{SymmetricKey} to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{MAC} \see{SymmetricKey} corresponding to the given keyId
-            /// (SymmetricKey::Ptr () if not found).
-            SymmetricKey::Ptr GetMACKey (
+            /// (SymmetricKey::SharedPtr () if not found).
+            SymmetricKey::SharedPtr GetMACKey (
                 const ID &keyId,
                 bool recursive = true) const;
             /// \brief
@@ -493,16 +493,16 @@ namespace thekogans {
             /// \param[in] equalityTest EqualityTest to call for each macKeyMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{MAC} \see{SymmetricKey} matching the given EqualityTest
-            /// (SymmetricKey::Ptr () if not found).
-            SymmetricKey::Ptr GetMACKey (
+            /// (SymmetricKey::SharedPtr () if not found).
+            SymmetricKey::SharedPtr GetMACKey (
                 const EqualityTest<SymmetricKey> &equalityTest,
                 bool recursive = true) const;
             /// \brief
             /// Return the \see{MAC} with the given key \see{ID}.
             /// \param[in] keyId \see{ID} of \see{MAC} key.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return \see{MAC} corresponding to the given keyId (MAC::Ptr () if not found).
-            MAC::Ptr GetMAC (
+            /// \return \see{MAC} corresponding to the given keyId (MAC::SharedPtr () if not found).
+            MAC::SharedPtr GetMAC (
                 const ID &keyId,
                 bool recursive);
             /// \brief
@@ -512,8 +512,8 @@ namespace thekogans {
             /// \return true = key added. false = A key with this \see{ID}
             /// already exists in the ring.
             bool AddMACKey (
-                SymmetricKey::Ptr key,
-                MAC::Ptr mac = MAC::Ptr ());
+                SymmetricKey::SharedPtr key,
+                MAC::SharedPtr mac = MAC::SharedPtr ());
             /// \brief
             /// Drop a \see{MAC} \see{SymmetricKey} with the given \see{ID}.
             /// \param[in] keyId \see{ID} of \see{MAC} \see{SymmetricKey} to delete.
@@ -532,8 +532,8 @@ namespace thekogans {
             /// \param[in] id \see{ID} of user data to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return \see{Serializable} corresponding to the given id
-            /// (Serializable::Ptr () if not found).
-            Serializable::Ptr GetUserData (
+            /// (Serializable::SharedPtr () if not found).
+            Serializable::SharedPtr GetUserData (
                 const ID &id,
                 bool recursive) const;
             /// \brief
@@ -541,8 +541,8 @@ namespace thekogans {
             /// \param[in] equalityTest EqualityTest to call for each userDataMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
             /// \return First \see{Serializable} matching the given EqualityTest
-            /// (Serializable::Ptr () if not found).
-            Serializable::Ptr GetUserData (
+            /// (Serializable::SharedPtr () if not found).
+            Serializable::SharedPtr GetUserData (
                 const EqualityTest<Serializable> &equalityTest,
                 bool recursive) const;
             /// \brief
@@ -550,7 +550,7 @@ namespace thekogans {
             /// \param[in] userData \see{Serializable} to add.
             /// \return true = user data added. false = user data with this \see{ID}
             /// already exists in the ring.
-            bool AddUserData (Serializable::Ptr userData);
+            bool AddUserData (Serializable::SharedPtr userData);
             /// \brief
             /// Drop user data with the given \see{ID}.
             /// \param[in] id \see{ID} of user data to delete.
@@ -568,16 +568,16 @@ namespace thekogans {
             /// Return the sub ring with the given id.
             /// \param[in] subringId Id of sub ring to retrieve.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return Sub ring corresponding to the given subringId (Ptr () if not found).
-            Ptr GetSubring (
+            /// \return Sub ring corresponding to the given subringId (SharedPtr () if not found).
+            SharedPtr GetSubring (
                 const ID &subringId,
                 bool recursive = true) const;
             /// \brief
             /// Return the sub ring matching the given EqualityTest.
             /// \param[in] equalityTest EqualityTest to call for each subringMap item.
             /// \param[in] recursive true = if not found locally, descend down to sub rings.
-            /// \return First Sub ring matching the given EqualityTest (Ptr () if not found).
-            Ptr GetSubring (
+            /// \return First Sub ring matching the given EqualityTest (SharedPtr () if not found).
+            SharedPtr GetSubring (
                 const EqualityTest<KeyRing> &equalityTest,
                 bool recursive = true) const;
             /// \brief
@@ -585,7 +585,7 @@ namespace thekogans {
             /// \param[in] subring Sub ring to add.
             /// \return true = sub ring added. false = A sub ring with
             /// this id already exists in the ring.
-            bool AddSubring (Ptr subring);
+            bool AddSubring (SharedPtr subring);
             /// \brief
             /// Drop a sub ring with the given id.
             /// \param[in] subringId Id of sub ring to delete.

@@ -27,7 +27,7 @@ namespace thekogans {
     namespace crypto {
 
         CMAC::CMAC (
-                SymmetricKey::Ptr key_,
+                SymmetricKey::SharedPtr key_,
                 const EVP_CIPHER *cipher_) :
                 key (key_),
                 cipher (cipher_) {

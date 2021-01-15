@@ -41,8 +41,8 @@ namespace thekogans {
             /// \param[in] privateKey Private key.
             /// \param[in] messageDigest Message digest object.
             Ed25519Signer (
-                AsymmetricKey::Ptr privateKey,
-                MessageDigest::Ptr messageDigest);
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest);
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.

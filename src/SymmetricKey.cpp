@@ -50,7 +50,7 @@ namespace thekogans {
             THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 
     #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
-        SymmetricKey::Ptr SymmetricKey::FromArgon2 (
+        SymmetricKey::SharedPtr SymmetricKey::FromArgon2 (
                 argon2_context &context,
                 std::size_t keyLength,
                 argon2_ctx_fptr argon2_ctx,
@@ -67,7 +67,7 @@ namespace thekogans {
                 context.out = out;
                 context.outlen = outlen;
                 if (errorCode == ARGON2_OK) {
-                    return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                    return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_ARGON2_ERROR_CODE_EXCEPTION (errorCode);
@@ -80,7 +80,7 @@ namespace thekogans {
         }
     #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
-        SymmetricKey::Ptr SymmetricKey::FromPBKDF1 (
+        SymmetricKey::SharedPtr SymmetricKey::FromPBKDF1 (
                 const void *password,
                 std::size_t passwordLength,
                 const void *salt,
@@ -114,7 +114,7 @@ namespace thekogans {
                     elapsedSeconds = util::HRTimer::ToSeconds (
                         util::HRTimer::ComputeElapsedTime (start, util::HRTimer::Click ()));
                 }
-                return Ptr (new SymmetricKey (buffer.data (), keyLength, id, name, description));
+                return SharedPtr (new SymmetricKey (buffer.data (), keyLength, id, name, description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -122,7 +122,7 @@ namespace thekogans {
             }
         }
 
-        SymmetricKey::Ptr SymmetricKey::FromPBKDF2 (
+        SymmetricKey::SharedPtr SymmetricKey::FromPBKDF2 (
                 const void *password,
                 std::size_t passwordLength,
                 const void *salt,
@@ -168,7 +168,7 @@ namespace thekogans {
                             (uint32_t)key.size ());
                         break;
                 }
-                return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -176,7 +176,7 @@ namespace thekogans {
             }
         }
 
-        SymmetricKey::Ptr SymmetricKey::FromOpenSSLPBKDF2 (
+        SymmetricKey::SharedPtr SymmetricKey::FromOpenSSLPBKDF2 (
                 const void *password,
                 std::size_t passwordLength,
                 const void *salt,
@@ -199,7 +199,7 @@ namespace thekogans {
                         md,
                         (int)key.size (),
                         key.data ()) == 1) {
-                    return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                    return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -292,7 +292,7 @@ namespace thekogans {
             }
         }
 
-        SymmetricKey::Ptr SymmetricKey::FromHKDF (
+        SymmetricKey::SharedPtr SymmetricKey::FromHKDF (
                 const void *hmacKey,
                 std::size_t hmacKeyLength,
                 const void *salt,
@@ -356,7 +356,7 @@ namespace thekogans {
                         }
                         break;
                 }
-                return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -364,7 +364,7 @@ namespace thekogans {
             }
         }
 
-        SymmetricKey::Ptr SymmetricKey::FromSecretAndSalt (
+        SymmetricKey::SharedPtr SymmetricKey::FromSecretAndSalt (
                 const void *secret,
                 std::size_t secretLength,
                 const void *salt,
@@ -401,7 +401,7 @@ namespace thekogans {
                     memcpy (&key[keyLength], buffer.data (), count);
                     keyLength += count;
                 }
-                return Ptr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -409,7 +409,7 @@ namespace thekogans {
             }
         }
 
-        SymmetricKey::Ptr SymmetricKey::FromRandom (
+        SymmetricKey::SharedPtr SymmetricKey::FromRandom (
                 std::size_t randomLength,
                 const void *salt,
                 std::size_t saltLength,

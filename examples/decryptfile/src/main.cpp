@@ -66,7 +66,7 @@ int main (
     THEKOGANS_UTIL_LOG_INIT (
         util::LoggerMgr::Debug,
         util::LoggerMgr::All);
-    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
+    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::SharedPtr (new util::ConsoleLogger));
     THEKOGANS_UTIL_IMPLEMENT_LOG_FLUSHER;
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
@@ -78,12 +78,12 @@ int main (
             util::SimpleFile::ReadWrite |
             util::SimpleFile::Create |
             util::SimpleFile::Truncate);
-        crypto::Cipher::Ptr cipher (
+        crypto::Cipher::SharedPtr cipher (
             new crypto::Cipher (
                 crypto::SymmetricKey::FromSecretAndSalt (
                     options.password.c_str (),
                     options.password.size ())));
-        crypto::KeyRing::Ptr keyRing;
+        crypto::KeyRing::SharedPtr keyRing;
         if (util::Path (options.path + ".tkr").Exists ()) {
             keyRing = crypto::KeyRing::Load (options.path + ".tkr", cipher.Get ());
         }
@@ -97,7 +97,7 @@ int main (
                 crypto::FrameHeader frameHeader;
                 fromFile >> frameHeader;
                 fromSize -= crypto::FrameHeader::SIZE;
-                crypto::SymmetricKey::Ptr key = keyRing->GetCipherKey (frameHeader.keyId);
+                crypto::SymmetricKey::SharedPtr key = keyRing->GetCipherKey (frameHeader.keyId);
                 if (key.Get () != 0) {
                     cipher = keyRing->GetCipherSuite ().GetCipher (key);
                 }

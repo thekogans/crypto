@@ -68,14 +68,14 @@ int main (
     THEKOGANS_UTIL_LOG_INIT (
         util::LoggerMgr::Debug,
         util::LoggerMgr::All);
-    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::Ptr (new util::ConsoleLogger));
+    THEKOGANS_UTIL_LOG_ADD_LOGGER (util::Logger::SharedPtr (new util::ConsoleLogger));
     THEKOGANS_UTIL_IMPLEMENT_LOG_FLUSHER;
     THEKOGANS_UTIL_TRY {
         crypto::OpenSSLInit openSSLInit;
         std::cout << "Verifying '" << options.path << "'...";
         crypto::Authenticator authenticator (
             crypto::OpenSSLAsymmetricKey::LoadPublicKeyFromFile (options.publicKey),
-            crypto::MessageDigest::Ptr (new crypto::MessageDigest));
+            crypto::MessageDigest::SharedPtr (new crypto::MessageDigest));
         util::ReadOnlyFile signatureFile (util::NetworkEndian, options.path + ".sig");
         util::Buffer encodedSignature (util::NetworkEndian, signatureFile.GetSize ());
         encodedSignature.AdvanceWriteOffset (

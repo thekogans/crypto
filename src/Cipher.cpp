@@ -27,7 +27,7 @@ namespace thekogans {
     namespace crypto {
 
         Cipher::Cipher (
-                SymmetricKey::Ptr key_,
+                SymmetricKey::SharedPtr key_,
                 const EVP_CIPHER *cipher_,
                 const EVP_MD *md_) :
                 key (key_),

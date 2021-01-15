@@ -44,15 +44,15 @@ namespace thekogans {
         /// of Cipher::Encrypt for more information.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Cipher :
-                public virtual util::ThreadSafeRefCounted {
+                public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::ThreadSafeRefCounted::Ptr<Cipher>.
-            typedef util::ThreadSafeRefCounted::Ptr<Cipher> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<Cipher>.
+            typedef util::RefCounted::SharedPtr<Cipher> SharedPtr;
 
         private:
             /// \brief
             /// \see{SymmetricKey} used to encrypt/decrypt.
-            SymmetricKey::Ptr key;
+            SymmetricKey::SharedPtr key;
             /// \brief
             /// OpenSSL cipher object.
             const EVP_CIPHER *cipher;
@@ -67,7 +67,7 @@ namespace thekogans {
             Decryptor decryptor;
             /// \brief
             /// \see{MAC} used to sign ciphertext in CBC mode.
-            MAC::Ptr mac;
+            MAC::SharedPtr mac;
 
         public:
             /// \brief
@@ -76,7 +76,7 @@ namespace thekogans {
             /// \param[in] cipher_ OpenSSL EVP_CIPHER.
             /// \param[in] md_ OpenSSL EVP_MD (CBC mode only, ignored in GCM mode).
             Cipher (
-                SymmetricKey::Ptr key_,
+                SymmetricKey::SharedPtr key_,
                 const EVP_CIPHER *cipher_ = THEKOGANS_CRYPTO_DEFAULT_CIPHER,
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
@@ -111,7 +111,7 @@ namespace thekogans {
             /// \brief
             /// Return the cipher key.
             /// \return Cipher \see{SymmetricKey}.
-            inline SymmetricKey::Ptr GetKey () const {
+            inline SymmetricKey::SharedPtr GetKey () const {
                 return key;
             }
 

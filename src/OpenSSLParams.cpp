@@ -60,7 +60,7 @@ namespace thekogans {
             }
         }
 
-        AsymmetricKey::Ptr OpenSSLParams::CreateKey (
+        AsymmetricKey::SharedPtr OpenSSLParams::CreateKey (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) const {
@@ -70,7 +70,7 @@ namespace thekogans {
             if (ctx.get () != 0 &&
                     EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
                     EVP_PKEY_keygen (ctx.get (), &key) == 1) {
-                return AsymmetricKey::Ptr (
+                return AsymmetricKey::SharedPtr (
                     new OpenSSLAsymmetricKey (EVP_PKEYPtr (key), true, id, name, description));
             }
             else {
@@ -78,7 +78,7 @@ namespace thekogans {
             }
         }
 
-        OpenSSLParams::Ptr OpenSSLParams::LoadFromFile (
+        OpenSSLParams::SharedPtr OpenSSLParams::LoadFromFile (
                 const std::string &path,
                 util::i32 paramsType,
                 pem_password_cb *passwordCallback,
@@ -95,7 +95,7 @@ namespace thekogans {
                         if (params.get () != 0) {
                             if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                                 dhParams.release ();
-                                return Ptr (new OpenSSLParams (std::move (params), id, name, description));
+                                return SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -122,7 +122,7 @@ namespace thekogans {
                         if (params.get () != 0) {
                             if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
                                 dsaParams.release ();
-                                return Ptr (new OpenSSLParams (std::move (params), id, name, description));
+                                return SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -152,7 +152,7 @@ namespace thekogans {
                             if (params.get () != 0) {
                                 if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                     ecParams.release ();
-                                    return Ptr (new OpenSSLParams (std::move (params), id, name, description));
+                                    return SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
                                 }
                                 else {
                                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

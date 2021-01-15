@@ -79,16 +79,16 @@ namespace thekogans {
                 /// over the parameters.
                 /// \param[in] messageDigest Message digest object.
                 virtual void CreateSignature (
-                    AsymmetricKey::Ptr privateKey,
-                    MessageDigest::Ptr messageDigest);
+                    AsymmetricKey::SharedPtr privateKey,
+                    MessageDigest::SharedPtr messageDigest);
                 /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
                 /// \param[in] publicKey Peer's public key used to verify parameters signature.
                 /// \param[in] messageDigest Message digest object.
                 /// \return true == signature is valid, false == signature is invalid.
                 virtual bool ValidateSignature (
-                    AsymmetricKey::Ptr publicKey,
-                    MessageDigest::Ptr messageDigest);
+                    AsymmetricKey::SharedPtr publicKey,
+                    MessageDigest::SharedPtr messageDigest);
 
             protected:
                 // util::Serializable
@@ -142,10 +142,10 @@ namespace thekogans {
         private:
             /// \brief
             /// Private/public \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
-            AsymmetricKey::Ptr key;
+            AsymmetricKey::SharedPtr key;
             /// \brief
             /// Shared \see{SymmetricKey} created by the client and signed by the server.
-            SymmetricKey::Ptr symmetricKey;
+            SymmetricKey::SharedPtr symmetricKey;
 
         public:
             /// \enum
@@ -168,7 +168,7 @@ namespace thekogans {
             /// \param[in] keyDescription Optional key description.
             RSAKeyExchange (
                 const ID &id,
-                AsymmetricKey::Ptr key_,
+                AsymmetricKey::SharedPtr key_,
                 std::size_t secretLength = DEFAULT_SECRET_LENGTH,
                 const void *salt = 0,
                 std::size_t saltLength = 0,
@@ -183,8 +183,8 @@ namespace thekogans {
             /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
             /// \param[in] params \see{RSAParams} containing the encrypted \see{SymmetricKey}.
             RSAKeyExchange (
-                AsymmetricKey::Ptr key_,
-                Params::Ptr params);
+                AsymmetricKey::SharedPtr key_,
+                Params::SharedPtr params);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
@@ -192,15 +192,15 @@ namespace thekogans {
             /// over the parameters.
             /// \param[in] messageDigest Optional message digest used to hash the parameters.
             /// \return \see{RSAParams} to send to the key exchange peer.
-            virtual Params::Ptr GetParams (
-                AsymmetricKey::Ptr privateKey = AsymmetricKey::Ptr (),
-                MessageDigest::Ptr messageDigest = MessageDigest::Ptr ()) const;
+            virtual Params::SharedPtr GetParams (
+                AsymmetricKey::SharedPtr privateKey = AsymmetricKey::SharedPtr (),
+                MessageDigest::SharedPtr messageDigest = MessageDigest::SharedPtr ()) const;
 
             /// \brief
             /// Given the peer's \see{RSAParams}, derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{RSAParams} parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::Ptr DeriveSharedSymmetricKey (Params::Ptr params) const;
+            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr params) const;
 
             /// \brief
             /// RSAKeyExchange is neither copy constructable, nor assignable.

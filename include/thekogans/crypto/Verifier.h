@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <memory>
+#include "thekogans/util/RefCounted.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/MessageDigest.h"
@@ -33,17 +34,17 @@ namespace thekogans {
         /// Verifier is a base for public key signature verification operation. It defines the API
         /// a concrete verifier needs to implement.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Verifier {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Verifier : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for std::unique_ptr<Verifier>.
-            typedef std::unique_ptr<Verifier> Ptr;
+            /// Convenient typedef for util::RefCounted::SharedPtr<Verifier>.
+            typedef util::RefCounted::SharedPtr<Verifier> SharedPtr;
 
         protected:
             /// \brief
             /// typedef for the Verifier factory function.
-            typedef Ptr (*Factory) (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest);
+            typedef SharedPtr (*Factory) (
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest);
             /// \brief
             /// typedef for the Verifier map.
             typedef std::map<std::string, Factory> Map;
@@ -78,10 +79,10 @@ namespace thekogans {
         protected:
             /// \brief
             /// Public key.
-            AsymmetricKey::Ptr publicKey;
+            AsymmetricKey::SharedPtr publicKey;
             /// \brief
             /// Message digest object.
-            MessageDigest::Ptr messageDigest;
+            MessageDigest::SharedPtr messageDigest;
 
         public:
             /// \brief
@@ -89,8 +90,8 @@ namespace thekogans {
             /// \param[in] publicKey_ Public key.
             /// \param[in] messageDigest_ Message digest object.
             Verifier (
-                AsymmetricKey::Ptr publicKey_,
-                MessageDigest::Ptr messageDigest_);
+                AsymmetricKey::SharedPtr publicKey_,
+                MessageDigest::SharedPtr messageDigest_);
             /// \brief
             /// dtor.
             virtual ~Verifier () {}
@@ -100,9 +101,9 @@ namespace thekogans {
             /// \param[in] publicKey Public \see{AsymmetricKey} used for signing.
             /// \param[in] messageDigest Message digest object.
             /// \return A Verifier based on the passed in publicKey type.
-            static Ptr Get (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest);
+            static SharedPtr Get (
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest);
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             /// \brief
             /// Because Verifier uses dynamic initialization, when using
@@ -116,13 +117,13 @@ namespace thekogans {
             /// \brief
             /// Return the verifier public key.
             /// \return \see{AsymmetricKey} public key used for signature verification.
-            inline AsymmetricKey::Ptr GetPublicKey () const {
+            inline AsymmetricKey::SharedPtr GetPublicKey () const {
                 return publicKey;
             }
             /// \brief
             /// Return the verifieer message digest.
             /// \return \see{AsymmetricKey} message digest used for hashing.
-            inline MessageDigest::Ptr GetMessageDigest () const {
+            inline MessageDigest::SharedPtr GetMessageDigest () const {
                 return messageDigest;
             }
 
@@ -150,10 +151,10 @@ namespace thekogans {
         /// Common code used by both Static and Shared builds.
         #define THEKOGANS_CRYPTO_DECLARE_VERIFIER_COMMON(type)\
         public:\
-            static thekogans::crypto::Verifier::Ptr Create (\
-                    thekogans::crypto::AsymmetricKey::Ptr publicKey,\
-                    thekogans::crypto::MessageDigest::Ptr messageDigest) {\
-                return thekogans::crypto::Verifier::Ptr (new type (publicKey, messageDigest));\
+            static thekogans::crypto::Verifier::SharedPtr Create (\
+                    thekogans::crypto::AsymmetricKey::SharedPtr publicKey,\
+                    thekogans::crypto::MessageDigest::SharedPtr messageDigest) {\
+                return thekogans::crypto::Verifier::SharedPtr (new type (publicKey, messageDigest));\
             }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)

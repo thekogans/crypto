@@ -100,7 +100,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
-            static Ptr FromArgon2 (
+            static SharedPtr FromArgon2 (
                 argon2_context &context,
                 std::size_t keyLength = GetCipherKeyLength (),
                 argon2_ctx_fptr argon2_ctx = argon2id_ctx,
@@ -128,7 +128,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
-            static Ptr FromPBKDF1 (
+            static SharedPtr FromPBKDF1 (
                 const void *password,
                 std::size_t passwordLength,
                 const void *salt = 0,
@@ -169,7 +169,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
-            static Ptr FromPBKDF2 (
+            static SharedPtr FromPBKDF2 (
                 const void *password,
                 std::size_t passwordLength,
                 const void *salt = 0,
@@ -195,7 +195,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
-            static Ptr FromOpenSSLPBKDF2 (
+            static SharedPtr FromOpenSSLPBKDF2 (
                 const void *password,
                 std::size_t passwordLength,
                 const void *salt = 0,
@@ -237,7 +237,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
-            static Ptr FromHKDF (
+            static SharedPtr FromHKDF (
                 const void *hmacKey,
                 std::size_t hmacKeyLength,
                 const void *salt,
@@ -265,7 +265,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
-            static Ptr FromSecretAndSalt (
+            static SharedPtr FromSecretAndSalt (
                 const void *secret,
                 std::size_t secretLength,
                 const void *salt = 0,
@@ -297,7 +297,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             /// \return A new symmetric key.
-            static Ptr FromRandom (
+            static SharedPtr FromRandom (
                 std::size_t randomLength = MIN_RANDOM_LENGTH,
                 const void *salt = 0,
                 std::size_t saltLength = 0,

@@ -46,8 +46,8 @@ namespace thekogans {
         }
 
         Verifier::Verifier (
-                AsymmetricKey::Ptr publicKey_,
-                MessageDigest::Ptr messageDigest_) :
+                AsymmetricKey::SharedPtr publicKey_,
+                MessageDigest::SharedPtr messageDigest_) :
                 publicKey (publicKey_),
                 messageDigest (messageDigest_) {
             if (publicKey.Get () == 0 || messageDigest.Get () == 0) {
@@ -56,11 +56,11 @@ namespace thekogans {
             }
         }
 
-        Verifier::Ptr Verifier::Get (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest) {
+        Verifier::SharedPtr Verifier::Get (
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest) {
             Map::iterator it = GetMap ().find (publicKey->GetKeyType ());
-            return it != GetMap ().end () ? it->second (publicKey, messageDigest) : Verifier::Ptr ();
+            return it != GetMap ().end () ? it->second (publicKey, messageDigest) : Verifier::SharedPtr ();
         }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)

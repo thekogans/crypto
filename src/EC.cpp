@@ -30,7 +30,7 @@ namespace thekogans {
         #define OPENSSL_EC_EXPLICIT_CURVE 0x000
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
-        Params::Ptr EC::ParamsFromGFpCurve (
+        Params::SharedPtr EC::ParamsFromGFpCurve (
                 const BIGNUM &p,
                 const BIGNUM &a,
                 const BIGNUM &b,
@@ -58,7 +58,7 @@ namespace thekogans {
                             if (params.get () != 0 &&
                                     EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                 ecParams.release ();
-                                return Params::Ptr (
+                                return Params::SharedPtr (
                                     new OpenSSLParams (std::move (params), id, name, description));
                             }
                             else {
@@ -82,7 +82,7 @@ namespace thekogans {
             }
         }
 
-        Params::Ptr EC::ParamsFromNamedCurve (
+        Params::SharedPtr EC::ParamsFromNamedCurve (
                 util::i32 nid,
                 const ID &id,
                 const std::string &name,
@@ -94,7 +94,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_set_ec_paramgen_curve_nid (ctx.get (), nid) == 1 &&
                     EVP_PKEY_CTX_set_ec_param_enc (ctx.get (), OPENSSL_EC_NAMED_CURVE) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return Params::Ptr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
+                return Params::SharedPtr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -119,7 +119,7 @@ namespace thekogans {
                 util::i32 cLength;
             };
 
-            Params::Ptr ParamsFromEllipticCurve (
+            Params::SharedPtr ParamsFromEllipticCurve (
                     const EllipticCurve &curve,
                     const ID &id,
                     const std::string &name,
@@ -430,7 +430,7 @@ namespace thekogans {
             };
         }
 
-        Params::Ptr EC::ParamsFromRFC5114Curve (
+        Params::SharedPtr EC::ParamsFromRFC5114Curve (
                 RFC5114Curve curve,
                 const ID &id,
                 const std::string &name,
@@ -1247,7 +1247,7 @@ namespace thekogans {
             };
         }
 
-        Params::Ptr EC::ParamsFromRFC5639Curve (
+        Params::SharedPtr EC::ParamsFromRFC5639Curve (
                 RFC5639Curve curve,
                 const ID &id,
                 const std::string &name,
@@ -1255,21 +1255,21 @@ namespace thekogans {
             return ParamsFromEllipticCurve (rfc5639curves[curve], id, name, description);
         }
 
-        Params::Ptr EC::ParamsFromEd25519Curve (
+        Params::SharedPtr EC::ParamsFromEd25519Curve (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return Params::Ptr (new Ed25519Params (id, name, description));
+            return Params::SharedPtr (new Ed25519Params (id, name, description));
         }
 
-        Params::Ptr EC::ParamsFromX25519Curve (
+        Params::SharedPtr EC::ParamsFromX25519Curve (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            return Params::Ptr (new X25519Params (id, name, description));
+            return Params::SharedPtr (new X25519Params (id, name, description));
         }
 
-        Params::Ptr EC::ParamsFromCurveName (
+        Params::SharedPtr EC::ParamsFromCurveName (
                 const std::string &curveName,
                 const ID &id,
                 const std::string &name,

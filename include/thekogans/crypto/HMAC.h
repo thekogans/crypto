@@ -36,7 +36,7 @@ namespace thekogans {
         private:
             /// \brief
             /// Key used in the MAC operation.
-            SymmetricKey::Ptr key;
+            SymmetricKey::SharedPtr key;
             /// \brief
             /// Message digest object.
             const EVP_MD *md;
@@ -50,13 +50,13 @@ namespace thekogans {
             /// \param[in] key_ Key used in the MAC operation.
             /// \param[in] md_ OpenSSL message digest object.
             HMAC (
-                SymmetricKey::Ptr key_,
+                SymmetricKey::SharedPtr key_,
                 const EVP_MD *md_);
 
             /// \brief
             /// Return the mac key.
             /// \return MAC \see{SymmetricKey}.
-            inline SymmetricKey::Ptr GetKey () const {
+            inline SymmetricKey::SharedPtr GetKey () const {
                 return key;
             }
             /// \brief

@@ -25,8 +25,8 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
 
         Ed25519Verifier::Ed25519Verifier (
-                AsymmetricKey::Ptr publicKey,
-                MessageDigest::Ptr messageDigest) :
+                AsymmetricKey::SharedPtr publicKey,
+                MessageDigest::SharedPtr messageDigest) :
                 Verifier (publicKey, messageDigest) {
             if (publicKey.Get () == 0 || publicKey->IsPrivate () ||
                     publicKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE) {
