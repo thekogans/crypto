@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include "thekogans/util/Allocator.h"
+#include "thekogans/util/Exception.h"
 #include "thekogans/crypto/Config.h"
 
 namespace thekogans {
