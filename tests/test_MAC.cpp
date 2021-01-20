@@ -32,7 +32,7 @@ namespace {
 
     bool TestHMAC (
             const char *name,
-            crypto::SymmetricKey::Ptr key,
+            crypto::SymmetricKey::SharedPtr key,
             const EVP_MD *md) {
         THEKOGANS_UTIL_TRY {
             std::cout << name << "...";
@@ -56,7 +56,7 @@ namespace {
 
     bool TestCMAC (
             const char *name,
-            crypto::SymmetricKey::Ptr key,
+            crypto::SymmetricKey::SharedPtr key,
             const EVP_CIPHER *cipher) {
         THEKOGANS_UTIL_TRY {
             std::cout << name << "...";
@@ -81,7 +81,7 @@ namespace {
 
 TEST (thekogans, HMAC) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::SymmetricKey::Ptr key = crypto::SymmetricKey::FromSecretAndSalt (
+    crypto::SymmetricKey::SharedPtr key = crypto::SymmetricKey::FromSecretAndSalt (
         secret.c_str (),
         secret.size ());
     const std::vector<std::string> &messageDigests =

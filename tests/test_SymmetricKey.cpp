@@ -68,7 +68,7 @@ TEST (thekogans, SymmetricKey) {
             0, 0,
             ARGON2_DEFAULT_FLAGS
         };
-        crypto::SymmetricKey::Ptr key1 =
+        crypto::SymmetricKey::SharedPtr key1 =
             crypto::SymmetricKey::FromArgon2 (
                 context,
                 crypto::GetCipherKeyLength (),
@@ -78,7 +78,7 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
-        crypto::SymmetricKey::Ptr key2;
+        crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
         bool result = *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
@@ -87,7 +87,7 @@ TEST (thekogans, SymmetricKey) {
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
     {
         std::cout << "SymmetricKey::FromPBKDF1...";
-        crypto::SymmetricKey::Ptr key1 =
+        crypto::SymmetricKey::SharedPtr key1 =
             crypto::SymmetricKey::FromPBKDF1 (
                 secret.c_str (),
                 secret.size (),
@@ -102,7 +102,7 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
-        crypto::SymmetricKey::Ptr key2;
+        crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
         bool result = *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
@@ -110,7 +110,7 @@ TEST (thekogans, SymmetricKey) {
     }
     {
         std::cout << "SymmetricKey::FromPBKDF2...";
-        crypto::SymmetricKey::Ptr key1 =
+        crypto::SymmetricKey::SharedPtr key1 =
             crypto::SymmetricKey::FromPBKDF2 (
                 secret.c_str (),
                 secret.size (),
@@ -124,7 +124,7 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
-        crypto::SymmetricKey::Ptr key2;
+        crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
         bool result = *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
@@ -132,7 +132,7 @@ TEST (thekogans, SymmetricKey) {
     }
     {
         std::cout << "SymmetricKey::FromOpenSSLPBKDF2...";
-        crypto::SymmetricKey::Ptr key1 =
+        crypto::SymmetricKey::SharedPtr key1 =
             crypto::SymmetricKey::FromOpenSSLPBKDF2 (
                 secret.c_str (),
                 secret.size (),
@@ -146,7 +146,7 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
-        crypto::SymmetricKey::Ptr key2;
+        crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
         bool result = *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
@@ -154,7 +154,7 @@ TEST (thekogans, SymmetricKey) {
     }
     {
         std::cout << "SymmetricKey::FromSecretAndSalt...";
-        crypto::SymmetricKey::Ptr key1 =
+        crypto::SymmetricKey::SharedPtr key1 =
             crypto::SymmetricKey::FromSecretAndSalt (
                 secret.c_str (),
                 secret.size (),
@@ -168,7 +168,7 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
-        crypto::SymmetricKey::Ptr key2;
+        crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
         bool result = *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;
@@ -176,7 +176,7 @@ TEST (thekogans, SymmetricKey) {
     }
     {
         std::cout << "SymmetricKey::FromRandom...";
-        crypto::SymmetricKey::Ptr key1 =
+        crypto::SymmetricKey::SharedPtr key1 =
             crypto::SymmetricKey::FromRandom (
                 crypto::SymmetricKey::MIN_RANDOM_LENGTH,
                 0,
@@ -189,7 +189,7 @@ TEST (thekogans, SymmetricKey) {
                 "test key");
         util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
         serializer << *key1;
-        crypto::SymmetricKey::Ptr key2;
+        crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
         bool result = key2.Get () != 0 && *key1 == *key2;
         std::cout << (result ? "pass" : "fail") << std::endl;

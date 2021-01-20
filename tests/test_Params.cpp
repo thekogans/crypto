@@ -42,14 +42,14 @@ namespace {
 
     bool TestParams (
             const char *paramsName,
-            crypto::Params::Ptr params1) {
+            crypto::Params::SharedPtr params1) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
             util::Buffer buffer (
                 util::NetworkEndian,
                 util::Serializable::Size (*params1));
             buffer << *params1;
-            crypto::Params::Ptr params2;
+            crypto::Params::SharedPtr params2;
             buffer >> params2;
             bool result = *params1 == *params2;
             std::cout << (result ? "pass" : "fail") << std::endl;

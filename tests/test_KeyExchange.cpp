@@ -45,17 +45,17 @@ namespace {
 
     bool TestDHE (
             const char *paramsName,
-            crypto::Params::Ptr params,
-            crypto::AsymmetricKey::Ptr /*privateKey1*/,
-            crypto::AsymmetricKey::Ptr /*privateKey2*/) {
+            crypto::Params::SharedPtr params,
+            crypto::AsymmetricKey::SharedPtr /*privateKey1*/,
+            crypto::AsymmetricKey::SharedPtr /*privateKey2*/) {
         THEKOGANS_UTIL_TRY {
             std::cout << paramsName << "...";
             crypto::DHEKeyExchange keyExchange1 (crypto::ID (), params);
-            crypto::DHEKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
+            crypto::DHEKeyExchange::Params::SharedPtr params1 = keyExchange1.GetParams ();
             crypto::DHEKeyExchange keyExchange2 (params1);
-            crypto::SymmetricKey::Ptr key1 =
+            crypto::SymmetricKey::SharedPtr key1 =
                 keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
-            crypto::SymmetricKey::Ptr key2 =
+            crypto::SymmetricKey::SharedPtr key2 =
                 keyExchange2.DeriveSharedSymmetricKey (params1);
             bool result = *key1 == *key2;
             std::cout << (result ? "pass" : "fail") << std::endl;
@@ -69,16 +69,16 @@ namespace {
 
     bool TestRSA (
             const char *keyName,
-            crypto::AsymmetricKey::Ptr publicKey,
-            crypto::AsymmetricKey::Ptr privateKey) {
+            crypto::AsymmetricKey::SharedPtr publicKey,
+            crypto::AsymmetricKey::SharedPtr privateKey) {
         THEKOGANS_UTIL_TRY {
             std::cout << keyName << "...";
             crypto::RSAKeyExchange keyExchange1 (crypto::ID (), publicKey);
-            crypto::RSAKeyExchange::Params::Ptr params1 = keyExchange1.GetParams ();
+            crypto::RSAKeyExchange::Params::SharedPtr params1 = keyExchange1.GetParams ();
             crypto::RSAKeyExchange keyExchange2 (privateKey, params1);
-            crypto::SymmetricKey::Ptr key1 =
+            crypto::SymmetricKey::SharedPtr key1 =
                 keyExchange1.DeriveSharedSymmetricKey (keyExchange2.GetParams ());
-            crypto::SymmetricKey::Ptr key2 =
+            crypto::SymmetricKey::SharedPtr key2 =
                 keyExchange2.DeriveSharedSymmetricKey (params1);
             bool result = *key1 == *key2;
             std::cout << (result ? "pass" : "fail") << std::endl;
@@ -93,8 +93,8 @@ namespace {
 
 TEST (thekogans, DH) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey1 = crypto::RSA::CreateKey (512);
-    crypto::AsymmetricKey::Ptr privateKey2 = crypto::RSA::CreateKey (512);
+    crypto::AsymmetricKey::SharedPtr privateKey1 = crypto::RSA::CreateKey (512);
+    crypto::AsymmetricKey::SharedPtr privateKey2 = crypto::RSA::CreateKey (512);
     CHECK_EQUAL (
         TestDHE (
             "crypto::DH::ParamsFromPrimeLengthAndGenerator (512)",
@@ -171,8 +171,8 @@ TEST (thekogans, DH) {
 
 TEST (thekogans, EC) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey1 = crypto::RSA::CreateKey (512);
-    crypto::AsymmetricKey::Ptr privateKey2 = crypto::RSA::CreateKey (512);
+    crypto::AsymmetricKey::SharedPtr privateKey1 = crypto::RSA::CreateKey (512);
+    crypto::AsymmetricKey::SharedPtr privateKey2 = crypto::RSA::CreateKey (512);
     // Named curves
     CHECK_EQUAL (
         TestDHE (
@@ -327,7 +327,7 @@ TEST (thekogans, EC) {
 
 TEST (thekogans, RSA) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey = crypto::RSA::CreateKey (512);
+    crypto::AsymmetricKey::SharedPtr privateKey = crypto::RSA::CreateKey (512);
     CHECK_EQUAL (
         TestRSA (
             "crypto::RSA::CreateKey (512)",

@@ -43,7 +43,7 @@ namespace {
 
 TEST (thekogans, AsymmetricKey) {
     crypto::OpenSSLInit openSSLInit;
-    crypto::AsymmetricKey::Ptr privateKey =
+    crypto::AsymmetricKey::SharedPtr privateKey =
         crypto::DSA::ParamsFromKeyLength (512)->CreateKey ();
     {
         std::cout << "AsymmetricKey private key...";
@@ -51,7 +51,7 @@ TEST (thekogans, AsymmetricKey) {
             util::NetworkEndian,
             util::Serializable::Size (*privateKey));
         serializer << *privateKey;
-        crypto::AsymmetricKey::Ptr privateKey2;
+        crypto::AsymmetricKey::SharedPtr privateKey2;
         serializer >> privateKey2;
         bool result = *privateKey == *privateKey2;
         std::cout << (result ? "pass" : "fail") << std::endl;
@@ -59,12 +59,12 @@ TEST (thekogans, AsymmetricKey) {
     }
     {
         std::cout << "AsymmetricKey public key...";
-        crypto::AsymmetricKey::Ptr publicKey = privateKey->GetPublicKey ();
+        crypto::AsymmetricKey::SharedPtr publicKey = privateKey->GetPublicKey ();
         util::Buffer serializer (
             util::NetworkEndian,
             util::Serializable::Size (*publicKey));
         serializer << *publicKey;
-        crypto::AsymmetricKey::Ptr publicKey2;
+        crypto::AsymmetricKey::SharedPtr publicKey2;
         serializer >> publicKey2;
         bool result = *publicKey == *publicKey2;
         std::cout << (result ? "pass" : "fail") << std::endl;

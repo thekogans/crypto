@@ -29,31 +29,31 @@
 using namespace thekogans;
 
 namespace {
-    crypto::KeyExchange::Ptr GetKeyExchange (const std::string &algorithm) {
+    crypto::KeyExchange::SharedPtr GetKeyExchange (const std::string &algorithm) {
         if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_ECDHE) {
-            return crypto::KeyExchange::Ptr (
+            return crypto::KeyExchange::SharedPtr (
                 new crypto::DHEKeyExchange (
                     crypto::ID (),
                     crypto::EC::ParamsFromRFC5114Curve (
                         crypto::EC::RFC5114_CURVE_192)));
         }
         if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_DHE) {
-            return crypto::KeyExchange::Ptr (
+            return crypto::KeyExchange::SharedPtr (
                 new crypto::DHEKeyExchange (
                     crypto::ID (),
                     crypto::DH::ParamsFromRFC3526Prime (
                         crypto::DH::RFC3526_PRIME_1536)));
         }
         if (algorithm == crypto::CipherSuite::KEY_EXCHANGE_RSA) {
-            return crypto::KeyExchange::Ptr (
+            return crypto::KeyExchange::SharedPtr (
                 new crypto::RSAKeyExchange (
                     crypto::ID (),
                     crypto::RSA::CreateKey (512)->GetPublicKey ()));
         }
-        return crypto::KeyExchange::Ptr ();
+        return crypto::KeyExchange::SharedPtr ();
     }
 
-    crypto::AsymmetricKey::Ptr GetKeyForAlgorithm (const std::string &algorithm) {
+    crypto::AsymmetricKey::SharedPtr GetKeyForAlgorithm (const std::string &algorithm) {
         if (algorithm == crypto::CipherSuite::AUTHENTICATOR_ECDSA) {
             return crypto::EC::ParamsFromRFC5114Curve (
                 crypto::EC::RFC5114_CURVE_192)->CreateKey ();
@@ -67,7 +67,7 @@ namespace {
         if (algorithm == crypto::CipherSuite::AUTHENTICATOR_Ed25519) {
             return crypto::EC::ParamsFromEd25519Curve ()->CreateKey ();
         }
-        return crypto::AsymmetricKey::Ptr ();
+        return crypto::AsymmetricKey::SharedPtr ();
     }
 
     bool TestCipherSuite (const crypto::CipherSuite &cipherSuite) {
@@ -83,15 +83,15 @@ namespace {
                     buffer >> cipherSuite_;
                     result = cipherSuite_ == cipherSuite;
                     if (result) {
-                        crypto::KeyExchange::Ptr keyExchange = GetKeyExchange (cipherSuite.keyExchange);
+                        crypto::KeyExchange::SharedPtr keyExchange = GetKeyExchange (cipherSuite.keyExchange);
                         result = keyExchange.Get () != 0;
                         if (result) {
-                            crypto::Authenticator::Ptr authenticator =
+                            crypto::Authenticator::SharedPtr authenticator =
                                 cipherSuite.GetAuthenticator (
                                     GetKeyForAlgorithm (cipherSuite.authenticator));
                             result = authenticator.Get () != 0;
                             if (result) {
-                                crypto::Cipher::Ptr cipher = cipherSuite.GetCipher (
+                                crypto::Cipher::SharedPtr cipher = cipherSuite.GetCipher (
                                     crypto::SymmetricKey::FromRandom (
                                         crypto::SymmetricKey::MIN_RANDOM_LENGTH,
                                         0,
@@ -100,7 +100,7 @@ namespace {
                                             cipherSuite.GetOpenSSLCipherByName (cipherSuite.cipher))));
                                 result = cipher.Get () != 0;
                                 if (result) {
-                                    crypto::MessageDigest::Ptr messageDigest = cipherSuite.GetMessageDigest ();
+                                    crypto::MessageDigest::SharedPtr messageDigest = cipherSuite.GetMessageDigest ();
                                     result = messageDigest.Get () != 0;
                                     if (!result) {
                                         std::cout << "fail messageDigest.Get () == 0" << std::endl;
