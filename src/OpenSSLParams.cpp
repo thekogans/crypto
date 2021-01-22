@@ -254,8 +254,9 @@ namespace thekogans {
             return
                 Params::Size () +
                 util::Serializer::Size (std::string (paramsType)) + // paramsType
-                util::SizeT (paramsLength) + // paramsLength
-                paramsLength;
+                // * 2 is because they get hex encoded.
+                util::SizeT (paramsLength * 2).Size () + // paramsLength
+                paramsLength * 2;
         }
 
         namespace {
