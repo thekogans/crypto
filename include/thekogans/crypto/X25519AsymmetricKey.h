@@ -70,14 +70,14 @@ namespace thekogans {
             /// \brief
             /// Return the key type.
             /// \return Key type.
-            virtual const char *GetKeyType () const {
+            virtual const char *GetKeyType () const override {
                 return KEY_TYPE;
             }
 
             /// \brief
             /// Return the key length (in bits).
             /// \return Key length (in bits).
-            virtual std::size_t GetKeyLength () const {
+            virtual std::size_t GetKeyLength () const override {
                 return X25519::KEY_LENGTH * 8;
             }
 
@@ -91,14 +91,14 @@ namespace thekogans {
             virtual AsymmetricKey::SharedPtr GetPublicKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
-                const std::string &description = std::string ()) const;
+                const std::string &description = std::string ()) const override;
 
         protected:
             // Serializable
             /// \brief
             /// Return the serialized key size.
             /// \return Serialized key size.
-            virtual std::size_t Size () const;
+            virtual std::size_t Size () const override;
 
             /// \brief
             /// Read the key from the given serializer.
@@ -106,11 +106,11 @@ namespace thekogans {
             /// \param[in] serializer \see{util::Serializer} to read the key from.
             virtual void Read (
                 const BinHeader &header,
-                util::Serializer &serializer);
+                util::Serializer &serializer) override;
             /// \brief
             /// Serialize the key to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to serialize the key to.
-            virtual void Write (util::Serializer &serializer) const;
+            virtual void Write (util::Serializer &serializer) const override;
 
             /// \brief
             /// "Key"
@@ -122,22 +122,22 @@ namespace thekogans {
             /// \param[in] node XML DOM representation of a Serializable.
             virtual void Read (
                 const TextHeader &header,
-                const pugi::xml_node &node);
+                const pugi::xml_node &node) override;
             /// \brief
             /// Write the Serializable to the XML DOM.
             /// \param[out] node Parent node.
-            virtual void Write (pugi::xml_node &node) const;
+            virtual void Write (pugi::xml_node &node) const override;
 
             /// \brief
             /// Read a Serializable from an JSON DOM.
             /// \param[in] node JSON DOM representation of a Serializable.
             virtual void Read (
                 const TextHeader &header,
-                const util::JSON::Object &object);
+                const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.
             /// \param[out] node Parent node.
-            virtual void Write (util::JSON::Object &object) const;
+            virtual void Write (util::JSON::Object &object) const override;
 
             /// \brief
             /// X25519AsymmetricKey is neither copy constructable, nor assignable.

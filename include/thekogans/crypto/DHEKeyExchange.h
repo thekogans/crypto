@@ -126,7 +126,7 @@ namespace thekogans {
                 /// \param[in] messageDigest Message digest object.
                 virtual void CreateSignature (
                     AsymmetricKey::SharedPtr privateKey,
-                    MessageDigest::SharedPtr messageDigest);
+                    MessageDigest::SharedPtr messageDigest) override;
                 /// \brief
                 /// Given the peer's public \see{AsymmetricKey}, verify parameters signature.
                 /// \param[in] publicKey Peer's public key used to verify parameters signature.
@@ -134,14 +134,14 @@ namespace thekogans {
                 /// \return true == signature is valid, false == signature is invalid.
                 virtual bool ValidateSignature (
                     AsymmetricKey::SharedPtr publicKey,
-                    MessageDigest::SharedPtr messageDigest);
+                    MessageDigest::SharedPtr messageDigest) override;
 
             protected:
                 // util::Serializable
                 /// \brief
                 /// Return the serializable size.
                 /// \return Serializable size.
-                virtual std::size_t Size () const;
+                virtual std::size_t Size () const override;
 
                 /// \brief
                 /// Read the serializable from the given serializer.
@@ -149,11 +149,11 @@ namespace thekogans {
                 /// \param[in] serializer \see{util::Serializer} to read the serializable from.
                 virtual void Read (
                     const BinHeader &header,
-                    util::Serializer &serializer);
+                    util::Serializer &serializer) override;
                 /// \brief
                 /// Write the serializable to the given serializer.
                 /// \param[out] serializer \see{util::Serializer} to write the serializable to.
-                virtual void Write (util::Serializer &serializer) const;
+                virtual void Write (util::Serializer &serializer) const override;
 
                 /// \brief
                 /// "Params"
@@ -189,22 +189,22 @@ namespace thekogans {
                 /// \param[in] node XML DOM representation of a Serializable.
                 virtual void Read (
                     const TextHeader &header,
-                    const pugi::xml_node &node);
+                    const pugi::xml_node &node) override;
                 /// \brief
                 /// Write a Serializable to the XML DOM.
                 /// \param[out] node Parent node.
-                virtual void Write (pugi::xml_node &node) const;
+                virtual void Write (pugi::xml_node &node) const override;
 
                 /// \brief
                 /// Read a Serializable from an JSON DOM.
                 /// \param[in] node JSON DOM representation of a Serializable.
                 virtual void Read (
                     const TextHeader &header,
-                    const util::JSON::Object &object);
+                    const util::JSON::Object &object) override;
                 /// \brief
                 /// Write a Serializable to the JSON DOM.
                 /// \param[out] node Parent node.
-                virtual void Write (util::JSON::Object &object) const;
+                virtual void Write (util::JSON::Object &object) const override;
             };
 
         private:
@@ -280,14 +280,14 @@ namespace thekogans {
             /// \return \see{DHEParams} to send to the key exchange peer.
             virtual Params::SharedPtr GetParams (
                 AsymmetricKey::SharedPtr privateKey = AsymmetricKey::SharedPtr (),
-                MessageDigest::SharedPtr messageDigest = MessageDigest::SharedPtr ()) const;
+                MessageDigest::SharedPtr messageDigest = MessageDigest::SharedPtr ()) const override;
 
             /// \brief
             /// Given the peer's \see{DHEParams}, use my private key
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{DHEParams} parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr params) const;
+            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr params) const override;
 
             /// \brief
             /// DHEKeyExchange is neither copy constructable, nor assignable.

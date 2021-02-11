@@ -54,7 +54,7 @@ namespace thekogans {
             /// \brief
             /// Return the key type.
             /// \return Key type.
-            virtual const char *GetKeyType () const {
+            virtual const char *GetKeyType () const override {
                 return X25519AsymmetricKey::KEY_TYPE;
             }
 
@@ -67,14 +67,14 @@ namespace thekogans {
             virtual AsymmetricKey::SharedPtr CreateKey (
                 const ID &id = ID (),
                 const std::string &name = std::string (),
-                const std::string &description = std::string ()) const;
+                const std::string &description = std::string ()) const override;
 
         protected:
             // Serializable
             /// \brief
             /// Return the serialized params size.
             /// \return Serialized params size.
-            virtual std::size_t Size () const;
+            virtual std::size_t Size () const override;
 
             /// \brief
             /// Read the parameters from the given serializer.
@@ -82,11 +82,11 @@ namespace thekogans {
             /// \param[in] serializer \see{util::Serializer} to read the parameters from.
             virtual void Read (
                 const BinHeader &header,
-                util::Serializer &serializer);
+                util::Serializer &serializer) override;
             /// \brief
             /// Write the parameters to the given serializer.
             /// \param[out] serializer \see{util::Serializer} to write the parameters to.
-            virtual void Write (util::Serializer &serializer) const;
+            virtual void Write (util::Serializer &serializer) const override;
 
             /// \brief
             /// Read the Serializable from an XML DOM.
@@ -94,22 +94,22 @@ namespace thekogans {
             /// \param[in] node XML DOM representation of a Serializable.
             virtual void Read (
                 const TextHeader &header,
-                const pugi::xml_node &node);
+                const pugi::xml_node &node) override;
             /// \brief
             /// Write the Serializable to the XML DOM.
             /// \param[out] node Parent node.
-            virtual void Write (pugi::xml_node &node) const;
+            virtual void Write (pugi::xml_node &node) const override;
 
             /// \brief
             /// Read a Serializable from an JSON DOM.
             /// \param[in] node JSON DOM representation of a Serializable.
             virtual void Read (
                 const TextHeader &header,
-                const util::JSON::Object &object);
+                const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.
             /// \param[out] node Parent node.
-            virtual void Write (util::JSON::Object &object) const;
+            virtual void Write (util::JSON::Object &object) const override;
 
             /// \brief
             /// X25519Params is neither copy constructable, nor assignable.

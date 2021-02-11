@@ -607,7 +607,7 @@ namespace thekogans {
             /// \brief
             /// Return the serialized key ring size.
             /// \return Serialized key ring size.
-            virtual std::size_t Size () const;
+            virtual std::size_t Size () const override;
 
             /// \brief
             /// Read the key ring from the given serializer.
@@ -615,11 +615,11 @@ namespace thekogans {
             /// \param[in] serializer \see{util::Serializer} to read the key ring from.
             virtual void Read (
                 const BinHeader &header,
-                util::Serializer &serializer);
+                util::Serializer &serializer) override;
             /// \brief
             /// Write the key ring to the given serializer.
             /// \param[in] serializer \see{util::Serializer} to write the key ring to.
-            virtual void Write (util::Serializer &serializer) const;
+            virtual void Write (util::Serializer &serializer) const override;
 
             /// \brief
             /// "KeyRing"
@@ -682,22 +682,22 @@ namespace thekogans {
             /// \param[in] node XML DOM representation of a Serializable.
             virtual void Read (
                 const TextHeader &header,
-                const pugi::xml_node &node);
+                const pugi::xml_node &node) override;
             /// \brief
             /// Write the Serializable to the XML DOM.
             /// \param[out] node Parent node.
-            virtual void Write (pugi::xml_node &node) const;
+            virtual void Write (pugi::xml_node &node) const override;
 
             /// \brief
             /// Read a Serializable from an JSON DOM.
             /// \param[in] node JSON DOM representation of a Serializable.
             virtual void Read (
                 const TextHeader &header,
-                const util::JSON::Object &object);
+                const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.
             /// \param[out] node Parent node.
-            virtual void Write (util::JSON::Object &object) const;
+            virtual void Write (util::JSON::Object &object) const override;
 
             /// \brief
             /// KeyRing is neither copy constructable, nor assignable.
