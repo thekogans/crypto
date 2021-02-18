@@ -38,8 +38,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::Serializable {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<Serializable>.
-            typedef util::RefCounted::SharedPtr<Serializable> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Serializable)
 
         protected:
             /// \brief

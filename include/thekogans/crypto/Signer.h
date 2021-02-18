@@ -37,8 +37,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Signer : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<Signer>.
-            typedef util::RefCounted::SharedPtr<Signer> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Signer)
 
         protected:
             /// \brief

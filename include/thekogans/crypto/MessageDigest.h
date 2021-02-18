@@ -40,8 +40,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL MessageDigest : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<MessageDigest>.
-            typedef util::RefCounted::SharedPtr<MessageDigest> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (MessageDigest)
 
         private:
             /// \brief

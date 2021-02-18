@@ -39,8 +39,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL MAC : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<MAC>.
-            typedef util::RefCounted::SharedPtr<MAC> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (MAC)
 
             /// \brief
             /// dtor.

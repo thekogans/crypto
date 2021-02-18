@@ -46,8 +46,8 @@ namespace thekogans {
         struct _LIB_THEKOGANS_CRYPTO_DECL Cipher :
                 public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<Cipher>.
-            typedef util::RefCounted::SharedPtr<Cipher> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Cipher)
 
         private:
             /// \brief

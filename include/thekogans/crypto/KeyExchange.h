@@ -42,8 +42,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<KeyExchange>.
-            typedef util::RefCounted::SharedPtr<KeyExchange> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (KeyExchange)
 
             /// \struct KeyExchange::Params KeyExchange.h thekogans/crypto/KeyExchange.h
             ///
@@ -51,8 +51,8 @@ namespace thekogans {
             /// Key exchange parameters base.
             struct _LIB_THEKOGANS_CRYPTO_DECL Params : public util::Serializable {
                 /// \brief
-                /// Convenient typedef for util::RefCounted::SharedPtr<Params>.
-                typedef util::RefCounted::SharedPtr<Params> SharedPtr;
+                /// Declare \see{RefCounted} pointers.
+                THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Params)
 
                 /// \brief
                 /// KeyExchange id (see \see{KeyRing::AddKeyExchange}).

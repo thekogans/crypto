@@ -36,8 +36,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<AsymmetricKey>.
-            typedef util::RefCounted::SharedPtr<AsymmetricKey> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (AsymmetricKey)
 
         private:
             /// \brief

@@ -43,8 +43,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Authenticator : public virtual util::RefCounted {
             /// \brief
-            /// Convenient typedef for util::RefCounted::SharedPtr<Authenticator>.
-            typedef util::RefCounted::SharedPtr<Authenticator> SharedPtr;
+            /// Declare \see{RefCounted} pointers.
+            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Authenticator)
 
         private:
             /// \brief
