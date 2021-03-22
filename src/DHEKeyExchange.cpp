@@ -295,7 +295,7 @@ namespace thekogans {
                 KeyExchange (ID::Empty),
                 initiator (false) {
             DHEParams::SharedPtr dheParams =
-                util::dynamic_refcounted_pointer_cast<DHEParams> (params);
+                util::dynamic_refcounted_sharedptr_cast<DHEParams> (params);
             if (dheParams.Get () != 0 &&
                     ValidateParamsKeyType (dheParams->params->GetKeyType ())) {
                 id = dheParams->id;
@@ -354,7 +354,7 @@ namespace thekogans {
 
         SymmetricKey::SharedPtr DHEKeyExchange::DeriveSharedSymmetricKey (Params::SharedPtr params) const {
             DHEParams::SharedPtr dheParams =
-                util::dynamic_refcounted_pointer_cast<DHEParams> (params);
+                util::dynamic_refcounted_sharedptr_cast<DHEParams> (params);
             if (dheParams.Get () != 0) {
                 util::SecureVector<util::ui8> secret;
                 const char *keyType = privateKey->GetKeyType ();

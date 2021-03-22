@@ -417,7 +417,7 @@ namespace thekogans {
                 }
                 else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
                     RSAKeyExchange::RSAParams::SharedPtr rsaParams =
-                        util::dynamic_refcounted_pointer_cast<RSAKeyExchange::RSAParams> (params);
+                        util::dynamic_refcounted_sharedptr_cast<RSAKeyExchange::RSAParams> (params);
                     if (rsaParams.Get () != 0) {
                         AsymmetricKey::SharedPtr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
                         if (key.Get () != 0) {

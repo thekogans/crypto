@@ -196,7 +196,7 @@ namespace thekogans {
                 KeyExchange (ID::Empty),
                 key (key_) {
             RSAParams::SharedPtr rsaParams =
-                util::dynamic_refcounted_pointer_cast<RSAParams> (params);
+                util::dynamic_refcounted_sharedptr_cast<RSAParams> (params);
             if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && key->IsPrivate () &&
                     rsaParams.Get () != 0) {
                 id = rsaParams->id;
@@ -253,7 +253,7 @@ namespace thekogans {
             assert (symmetricKey.Get () != 0);
             if (!key->IsPrivate ()) {
                 RSAParams::SharedPtr rsaParams =
-                    util::dynamic_refcounted_pointer_cast<RSAParams> (params);
+                    util::dynamic_refcounted_sharedptr_cast<RSAParams> (params);
                 if (rsaParams.Get () != 0) {
                     util::SecureBuffer symmetricKeyBuffer (
                         util::NetworkEndian,
