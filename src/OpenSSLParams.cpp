@@ -412,7 +412,9 @@ namespace thekogans {
                 const TextHeader &header,
                 const pugi::xml_node &node) {
             Params::Read (header, node);
-            params = ReadParams (node.attribute (ATTR_PARAMS_TYPE).value (), node.text ().get ());
+            params = ReadParams (
+                node.attribute (ATTR_PARAMS_TYPE).value (),
+                node.attribute (ATTR_PARAMS).value ());
         }
 
         void OpenSSLParams::Write (pugi::xml_node &node) const {
