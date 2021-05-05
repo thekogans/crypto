@@ -52,7 +52,7 @@ namespace thekogans {
             /// if size > 0 and an error occurs, Allocator will throw an exception.
             /// \param[in] size Size of block to allocate.
             /// \return Pointer to the allocated block ((void *)0 if size == 0).
-            virtual void *Alloc (std::size_t size);
+            virtual void *Alloc (std::size_t size) override;
             /// \brief
             /// Free a previously Alloc(ated) block.
             /// NOTE: Allocator policy is to do nothing if ptr == 0.
@@ -60,7 +60,7 @@ namespace thekogans {
             /// \param[in] size Same size parameter previously passed in to Alloc.
             virtual void Free (
                 void *ptr,
-                std::size_t /*size*/);
+                std::size_t /*size*/) override;
 
             /// \brief
             /// OpenSSLAllocator is neither copy constructable, nor assignable.
