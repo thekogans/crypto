@@ -189,7 +189,7 @@ namespace thekogans {
 
             /// \brief
             /// Generate Elliptic Curve (EC) parameters given a curve name (RFC5114Curve, RFC5639Curve).
-            /// \param[in] curveNamw RFC5114Curve or RFC5639Curve curve name.
+            /// \param[in] curveName RFC5114Curve or RFC5639Curve curve name.
             /// \param[in] id Optional parameters id.
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.

@@ -10,7 +10,7 @@ thekogans_crypto exposes a collection of objects that perform high
 level cryptographic tasks like the ones mentioned above.
 
 thekogans_crypto has been tested and verified with OpenSSL versions
-1.0.2n and 1.1.0g.
+1.0.2n, 1.1.0g and 1.1.1k.
 
 libthekogans_crypto has the following required dependencies:
 
