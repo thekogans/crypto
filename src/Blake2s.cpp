@@ -17,6 +17,10 @@
 
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
+#include <openssl/opensslv.h>
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+
 #include <cstring>
 #include <blake2.h>
 #include <openssl/evp.h>
@@ -33,11 +37,9 @@ namespace thekogans {
             "blake2s256");
 
         namespace {
-        #if OPENSSL_VERSION_NUMBER < 0x10100000L
             void *EVP_MD_CTX_md_data (const EVP_MD_CTX *ctx) {
                 return ctx->md_data;
             }
-        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
             int init (EVP_MD_CTX *ctx) {
                 blake2s_param P;
@@ -99,5 +101,7 @@ namespace thekogans {
 
     } // namespace crypto
 } // namespace thekogans
+
+#endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
 #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)

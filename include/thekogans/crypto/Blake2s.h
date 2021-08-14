@@ -21,6 +21,7 @@
 #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
 #include <openssl/evp.h>
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 #include "thekogans/util/Types.h"
 #include "thekogans/crypto/Config.h"
 
@@ -37,6 +38,8 @@ namespace thekogans {
 
     } // namespace crypto
 } // namespace thekogans
+
+#endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
 #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 

@@ -138,8 +138,10 @@ namespace thekogans {
             OpenSSL_add_all_algorithms ();
         #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             EVP_add_digest (EVP_blake2b512 ());
+        #if OPENSSL_VERSION_NUMBER < 0x10100000L
             EVP_add_digest (EVP_blake2b384 ());
             EVP_add_digest (EVP_blake2b256 ());
+        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
             EVP_add_digest (EVP_blake2s256 ());
         #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {

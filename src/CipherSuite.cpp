@@ -156,8 +156,10 @@ namespace thekogans {
             } const messageDigests[] = {
             #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
                 {CipherSuite::MESSAGE_DIGEST_BLAKE2B_512, EVP_blake2b512 ()},
+            #if OPENSSL_VERSION_NUMBER < 0x10100000L
                 {CipherSuite::MESSAGE_DIGEST_BLAKE2B_384, EVP_blake2b384 ()},
                 {CipherSuite::MESSAGE_DIGEST_BLAKE2B_256, EVP_blake2b256 ()},
+            #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
                 {CipherSuite::MESSAGE_DIGEST_BLAKE2S_256, EVP_blake2s256 ()},
             #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
                 {CipherSuite::MESSAGE_DIGEST_SHA2_512, EVP_sha512 ()},
