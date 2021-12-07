@@ -107,7 +107,9 @@ namespace thekogans {
                 bool multiThreaded,
                 util::ui32 entropyNeeded,
                 util::ui64 workingSetSize,
+                const std::string &opensslDir,
                 ENGINE *engine_) {
+            util::SetEnvironmentVariable ("OPENSSLDIR", opensslDir);
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             OpenSSLAllocator::StaticInit ();
             Serializable::StaticInit ();

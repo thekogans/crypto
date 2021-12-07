@@ -61,11 +61,13 @@ namespace thekogans {
             /// \param[in] entropyNeeded Number of entropy bytes to use to seed the PRNG.
             /// \param[in] workingSetSize Physical pages to reserve.
             /// NOTE: All values are in bytes.
+            /// \param[in] opensslDir Path to openssl.cnf.
             /// \param[in] engine_ OpenSSL engine object used to accelerate cryptographic operations.
             OpenSSLInit (
                 bool multiThreaded = true,
                 util::ui32 entropyNeeded = DEFAULT_ENTROPY_NEEDED,
                 util::ui64 workingSetSize = DEFAULT_WORKING_SET_SIZE,
+                const std::string &opensslDir = std::string (),
                 ENGINE *engine_ = 0);
             /// \brief
             /// \dtor.
