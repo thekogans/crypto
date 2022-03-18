@@ -172,7 +172,7 @@ namespace thekogans {
 
         AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPublicKeyFromCertificate (
                 const std::string &path,
-                const std::string &encoding,
+                const std::string & /*encoding*/,
                 pem_password_cb *passwordCallback,
                 void *userData,
                 const ID &id,
@@ -201,7 +201,7 @@ namespace thekogans {
 
         void OpenSSLAsymmetricKey::Save (
                 const std::string &path,
-                const std::string &encoding,
+                const std::string & /*encoding*/,
                 const EVP_CIPHER *cipher,
                 const void *symmetricKey,
                 std::size_t symmetricKeyLength,

@@ -188,7 +188,7 @@ namespace thekogans {
             /// \return Public key.
             static AsymmetricKey::SharedPtr LoadPublicKeyFromCertificate (
                 const std::string &path,
-                const std::string &encoding = DER_ENCODING,
+                const std::string & /*encoding*/ = DER_ENCODING,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
                 const ID &id = ID (),
@@ -213,7 +213,7 @@ namespace thekogans {
             /// will interpret the userData as a NULL terminated password.
             void Save (
                 const std::string &path,
-                const std::string &encoding = DER_ENCODING,
+                const std::string & /*encoding*/ = DER_ENCODING,
                 const EVP_CIPHER *cipher = 0,
                 const void *symmetricKey = 0,
                 std::size_t symmetricKeyLength = 0,
