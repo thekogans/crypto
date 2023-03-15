@@ -37,6 +37,7 @@
 #include <openssl/ssl.h>
 #include "thekogans/util/Array.h"
 #include "thekogans/util/Exception.h"
+#include "thekogans/util/LoggerMgr.h"
 #if defined (TOOLCHAIN_OS_Windows)
     #include "thekogans/util/WindowsUtils.h"
 #endif // defined (TOOLCHAIN_OS_Windows)
@@ -143,7 +144,7 @@ namespace thekogans {
         #endif // defined (TOOLCHAIN_OS_OSX)
         }
 
-        void SystemCACertificates::Load (bool loadSystemRootCACertificatesOnly) {
+        void SystemCACertificates::Load (bool loadSystemRootCACertificatesOnly) throw () {
             util::LockGuard<util::SpinLock> guard (spinLock);
             certificates.clear ();
         #if defined (TOOLCHAIN_OS_Windows)
@@ -152,8 +153,11 @@ namespace thekogans {
                 explicit SystemStore (const wchar_t *storeName) :
                         certStore (CertOpenSystemStoreW (0, storeName)) {
                     if (certStore == 0) {
-                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                            THEKOGANS_UTIL_OS_ERROR_CODE);
+                        THEKOGANS_UTIL_LOG_SUBSYSTEM_EXCEPTION_WITH_MESSAGE (
+                            THEKOGANS_CRYPTO,
+                            THEKOGANS_UTIL_ERROR_CODE_EXCEPTION (THEKOGANS_UTIL_OS_ERROR_CODE),
+                            "\nLoading '%s'",
+                            util::UTF16ToUTF8 (std::wstring (storeName)).c_str ());
                     }
                 }
                 ~SystemStore () {
@@ -168,36 +172,38 @@ namespace thekogans {
                 &caStore,
                 &myStore
             };
-            for (int i = 0, numStores = THEKOGANS_UTIL_ARRAY_SIZE (stores); i < numStores; ++i) {
-                PCCERT_CONTEXT certContext = 0;
-                while ((certContext = CertEnumCertificatesInStore (stores[i]->certStore, certContext)) != 0) {
-                    // Skip expired certificates.
-                    if (CertVerifyTimeValidity (0, certContext->pCertInfo) == 0) {
-                        if (loadSystemRootCACertificatesOnly) {
-                            // We only want to add Root CAs, so make
-                            // sure Subject and Issuer names match.
-                            std::string subject =
-                                GetCertName (
-                                    certContext->dwCertEncodingType,
-                                    &certContext->pCertInfo->Subject);
-                            std::string issuer =
-                                GetCertName (
-                                    certContext->dwCertEncodingType,
-                                    &certContext->pCertInfo->Issuer);
-                            if (subject.empty () || issuer.empty () || subject != issuer) {
-                                continue;
+            for (std::size_t i = 0, numStores = THEKOGANS_UTIL_ARRAY_SIZE (stores); i < numStores; ++i) {
+                if (stores[i]->certStore != 0) {
+                    PCCERT_CONTEXT certContext = 0;
+                    while ((certContext = CertEnumCertificatesInStore (stores[i]->certStore, certContext)) != 0) {
+                        // Skip expired certificates.
+                        if (CertVerifyTimeValidity (0, certContext->pCertInfo) == 0) {
+                            if (loadSystemRootCACertificatesOnly) {
+                                // We only want to add Root CAs, so make
+                                // sure Subject and Issuer names match.
+                                std::string subject =
+                                    GetCertName (
+                                        certContext->dwCertEncodingType,
+                                        &certContext->pCertInfo->Subject);
+                                std::string issuer =
+                                    GetCertName (
+                                        certContext->dwCertEncodingType,
+                                        &certContext->pCertInfo->Issuer);
+                                if (subject.empty () || issuer.empty () || subject != issuer) {
+                                    continue;
+                                }
                             }
-                        }
-                        X509Ptr certificate =
-                            ParseCertificate (
-                                certContext->pbCertEncoded,
-                                certContext->cbCertEncoded,
-                                encodingTostring (certContext->dwCertEncodingType));
-                        if (certificate.get () != 0) {
-                            certificates.push_back (std::move (certificate));
-                        }
-                        else {
-                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                            // Bad certificates are logged and ignored.
+                            THEKOGANS_UTIL_TRY {
+                                X509Ptr certificate =
+                                    ParseCertificate (
+                                        certContext->pbCertEncoded,
+                                        certContext->cbCertEncoded,
+                                        encodingTostring (certContext->dwCertEncodingType));
+                                // ParseCertificate either returns a valid certificate or it will throw.
+                                certificates.push_back (std::move (certificate));
+                            }
+                            THEKOGANS_UTIL_CATCH_AND_LOG_SUBSYSTEM (THEKOGANS_CRYPTO)
                         }
                     }
                 }
@@ -226,12 +232,12 @@ namespace thekogans {
                     (const void **)x509OID,
                     THEKOGANS_UTIL_ARRAY_SIZE (x509OID),
                     &kCFTypeArrayCallBacks));
-            for (util::i32 i = 0, numDomains = THEKOGANS_UTIL_ARRAY_SIZE (domains); i < numDomains; ++i) {
+            for (std::size_t i = 0, numDomains = THEKOGANS_UTIL_ARRAY_SIZE (domains); i < numDomains; ++i) {
                 CFArrayRef certs = 0;
-                OSStatus errorCode = SecTrustSettingsCopyCertificates (domains[i], &certs);
+                /*OSStatus errorCode =*/ SecTrustSettingsCopyCertificates (domains[i], &certs);
                 if (certs != 0) {
                     CFArrayRefPtr certsPtr (certs);
-                    for (util::i32 j = 0, numCerts = (util::i32)CFArrayGetCount (certs); j < numCerts; ++j) {
+                    for (CFIndex j = 0, numCerts = (util::i32)CFArrayGetCount (certs); j < numCerts; ++j) {
                         SecCertificateRef cert = (SecCertificateRef)CFArrayGetValueAtIndex (certs, j);
                         if (cert != 0) {
                             CFErrorRef error = 0;
@@ -272,31 +278,24 @@ namespace thekogans {
                                         }
                                     }
                                     CFDataRef data = 0;
-                                    errorCode =
+                                    /*OSStatus errorCode =*/
                                         SecItemExport (cert, kSecFormatX509Cert, kSecItemPemArmour, 0, &data);
                                     if (data != 0) {
                                         CFDataRefPtr dataPtr (data);
-                                        // Apple certificates are PEM encoded.
-                                        X509Ptr certificate =
-                                            ParseCertificate (
-                                                CFDataGetBytePtr (data),
-                                                CFDataGetLength (data),
-                                                PEM_ENCODING);
-                                        if (certificate.get () != 0) {
+                                        // Bad certificates are logged and ignored.
+                                        THEKOGANS_UTIL_TRY {
+                                            // Apple certificates are PEM encoded.
+                                            X509Ptr certificate =
+                                                ParseCertificate (
+                                                    CFDataGetBytePtr (data),
+                                                    CFDataGetLength (data),
+                                                    PEM_ENCODING);
+                                            // ParseCertificate either returns a valid certificate or it will throw.
                                             certificates.push_back (std::move (certificate));
                                         }
-                                        else {
-                                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                                        }
-                                    }
-                                    else if (errorCode != noErr) {
-                                        THEKOGANS_UTIL_THROW_OSSTATUS_ERROR_CODE_EXCEPTION (errorCode);
+                                        THEKOGANS_UTIL_CATCH_AND_LOG_SUBSYSTEM (THEKOGANS_CRYPTO)
                                     }
                                 }
-                            }
-                            else if (error != 0) {
-                                CFErrorRefPtr errorPtr (error);
-                                THEKOGANS_UTIL_THROW_CFERRORREF_EXCEPTION (error);
                             }
                         }
                     }
