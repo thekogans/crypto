@@ -147,20 +147,10 @@ namespace thekogans {
         #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureBuffer entropy (util::HostEndian, entropyNeeded);
-                // Start by trying to get seed bytes.
-                entropy.AdvanceWriteOffset (
-                    util::GlobalRandomSource::Instance ().GetSeed (
-                        entropy.GetWritePtr (),
-                        entropy.GetDataAvailableForWriting ()));
-                // If entropy couldn't be satisfied with seed bytes,
-                // get random bytes.
-                if (entropy.GetDataAvailableForWriting () > 0) {
-                    entropy.AdvanceWriteOffset (
-                        util::GlobalRandomSource::Instance ().GetBytes (
+                if (entropy.AdvanceWriteOffset (
+                        util::GlobalRandomSource::Instance ().GetSeedOrBytes (
                             entropy.GetWritePtr (),
-                            entropy.GetDataAvailableForWriting ()));
-                }
-                if (entropy.GetDataAvailableForWriting () == 0) {
+                            entropy.GetDataAvailableForWriting ())) == 0) {
                     RAND_seed (
                         entropy.GetReadPtr (),
                         (util::i32)entropy.GetDataAvailableForReading ());

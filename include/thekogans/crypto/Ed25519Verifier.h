@@ -47,14 +47,14 @@ namespace thekogans {
 
             /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.
-            virtual void Init ();
+            virtual void Init () override;
             /// \brief
             /// Call this method 1 or more time to verify the buffers.
             /// \param[in] buffer Buffer whose signature to verify.
             /// \param[in] bufferLength Buffer length.
             virtual void Update (
                 const void *buffer,
-                std::size_t bufferLength);
+                std::size_t bufferLength) override;
             /// \brief
             /// Finalize the verification operation.
             /// \param[in] signature Signature to verify.
@@ -62,7 +62,7 @@ namespace thekogans {
             /// \return true == signature matches, false == signature does not match.
             virtual bool Final (
                 const void *signature,
-                std::size_t signatureLength);
+                std::size_t signatureLength) override;
 
             /// \brief
             /// Ed25519Verifier is neither copy constructable, nor assignable.

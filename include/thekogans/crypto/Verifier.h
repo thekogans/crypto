@@ -217,7 +217,7 @@ namespace thekogans {
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
-    } // namespace crypto
+   } // namespace crypto
 } // namespace thekogans
 
 #endif // !defined (__thekogans_crypto_Verifier_h)

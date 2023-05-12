@@ -43,8 +43,7 @@ namespace thekogans {
         /// https://moxie.org/blog/the-cryptographic-doom-principle/. See the description
         /// of Cipher::Encrypt for more information.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Cipher :
-                public virtual util::RefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Cipher : public virtual util::RefCounted {
             /// \brief
             /// Declare \see{RefCounted} pointers.
             THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Cipher)

@@ -3719,10 +3719,9 @@ namespace thekogans {
             }
         }
 
-        void Ed25519::CreateKey (
-                util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
+        void Ed25519::CreateKey (util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
             if (privateKey != 0) {
-                util::GlobalRandomSource::Instance ().GetBytes (privateKey, PRIVATE_KEY_LENGTH / 2);
+                util::GlobalRandomSource::Instance ().GetSeedOrBytes (privateKey, PRIVATE_KEY_LENGTH / 2);
                 util::ui8 *publicKey = privateKey + PRIVATE_KEY_LENGTH / 2;
                 SHA512 (privateKey, PRIVATE_KEY_LENGTH / 2, publicKey);
                 publicKey[0] &= 248;
@@ -3821,7 +3820,7 @@ namespace thekogans {
         void X25519::CreateKey (
                 util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
             if (privateKey != 0) {
-                util::GlobalRandomSource::Instance ().GetBytes (privateKey, PRIVATE_KEY_LENGTH);
+                util::GlobalRandomSource::Instance ().GetSeedOrBytes (privateKey, PRIVATE_KEY_LENGTH);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

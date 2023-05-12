@@ -45,19 +45,19 @@ namespace thekogans {
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.
-            virtual void Init ();
+            virtual void Init () override;
             /// \brief
             /// Call this method 1 or more time to sign the buffers.
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
             virtual void Update (
                 const void *buffer,
-                std::size_t bufferLength);
+                std::size_t bufferLength) override;
             /// \brief
             /// Finalize the signing operation and return the signature.
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
-            virtual std::size_t Final (util::ui8 *signature);
+            virtual std::size_t Final (util::ui8 *signature) override;
 
             /// \brief
             /// OpenSSLSigner is neither copy constructable, nor assignable.

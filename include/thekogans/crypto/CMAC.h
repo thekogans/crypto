@@ -69,25 +69,25 @@ namespace thekogans {
             /// \brief
             /// Return the length of the mac.
             /// \return Length of the mac.
-            virtual std::size_t GetMACLength () const {
+            virtual std::size_t GetMACLength () const override {
                 return EVP_CIPHER_block_size (cipher);
             }
 
             /// \brief
             /// Initialize the context (ctx) and get it ready for MAC generation.
-            virtual void Init ();
+            virtual void Init () override;
             /// \brief
             /// Call this method 1 or more times to generate a MAC.
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
             virtual void Update (
                 const void *buffer,
-                std::size_t bufferLength);
+                std::size_t bufferLength) override;
             /// \brief
             /// Finalize the MAC and return the signature.
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
-            virtual std::size_t Final (util::ui8 *signature);
+            virtual std::size_t Final (util::ui8 *signature) override;
         };
 
     } // namespace crypto
