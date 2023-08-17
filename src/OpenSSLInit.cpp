@@ -24,6 +24,9 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/objects.h>
+#include <openssl/x509v3.h>
+#include <openssl/dh.h>
+#include <openssl/hmac.h>
 #include "thekogans/util/OwnerVector.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/util/SpinLock.h"
@@ -41,12 +44,16 @@
     #include "thekogans/crypto/Verifier.h"
 #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/OpenSSLUtils.h"
+#include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 
 namespace thekogans {
     namespace crypto {
 
         ENGINE *OpenSSLInit::engine = 0;
+        int OpenSSLInit::SSLSecureSocketIndex = -1;
+        int OpenSSLInit::SSL_SESSIONSessionInfoIndex = -1;
+        util::SpinLock OpenSSLInit::spinLock;
 
     #if OPENSSL_VERSION_NUMBER < 0x10100000L
         namespace {
@@ -100,6 +107,16 @@ namespace thekogans {
                 CRYPTO_THREADID_set_numeric (&threadId, (unsigned long)(unsigned long long)thread);
                 ERR_remove_thread_state (&threadId);
             }
+
+            void DeleteSessionInfo (
+                    void *parent,
+                    void *ptr,
+                    CRYPTO_EX_DATA *ad,
+                    int idx,
+                    long argl,
+                    void *argp) {
+                volatile SessionInfo::SharedPtr sessionInfo ((SessionInfo *)ptr);
+            }
         }
     #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
@@ -108,7 +125,9 @@ namespace thekogans {
                 bool multiThreaded,
                 util::ui32 entropyNeeded,
                 util::ui64 workingSetSize,
-                ENGINE *engine_) {
+                ENGINE *engine_,
+                bool loadSystemCACertificates,
+                bool loadSystemRootCACertificatesOnly) {
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             OpenSSLAllocator::StaticInit ();
             Serializable::StaticInit ();
@@ -168,6 +187,25 @@ namespace thekogans {
                     MIN_ENTROPY_NEEDED);
             }
             engine = engine_;
+            {
+                util::LockGuard<util::SpinLock> guard (spinLock);
+                if (SSLSecureSocketIndex == -1) {
+                    SSLSecureSocketIndex = SSL_get_ex_new_index (0, 0, 0, 0, 0);
+                    if (SSLSecureSocketIndex == -1) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                if (SSL_SESSIONSessionInfoIndex == -1) {
+                    SSL_SESSIONSessionInfoIndex =
+                        SSL_SESSION_get_ex_new_index (0, 0, 0, 0, DeleteSessionInfo);
+                    if (SSL_SESSIONSessionInfoIndex == -1) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+            }
+            if (loadSystemCACertificates) {
+                SystemCACertificates::Instance ().Load (loadSystemRootCACertificatesOnly);
+            }
             // FIXME: load a CRL.
         #if OPENSSL_VERSION_NUMBER < 0x10100000L
             util::Thread::AddExitFunc (ExitFunc);

@@ -20,6 +20,7 @@
 
 #include <openssl/engine.h>
 #include "thekogans/util/Types.h"
+#include "thekogans/util/SpinLock.h"
 #include "thekogans/crypto/Config.h"
 
 namespace thekogans {
@@ -36,6 +37,16 @@ namespace thekogans {
             /// \brief
             /// OpenSSL engine object used to accelerate cryptographic operations.
             static ENGINE *engine;
+            /// \brief
+            /// Used by Secure[TCP | UDP]Socket to associate it's pointer with SSL.
+            static int SSLSecureSocketIndex;
+            /// \brief
+            /// Used by SecureTCPSocket to associate it's SecureTCPSocket::SessionInfo
+            /// pointer with SSL_SESSION.
+            static int SSL_SESSIONSessionInfoIndex;
+            /// \brief
+            /// Synchronization lock.
+            static util::SpinLock spinLock;
 
             enum {
                 /// \brief
@@ -62,11 +73,17 @@ namespace thekogans {
             /// \param[in] workingSetSize Physical pages to reserve.
             /// NOTE: All values are in bytes.
             /// \param[in] engine_ OpenSSL engine object used to accelerate cryptographic operations.
+            /// \param[in] loadSystemCACertificates true == Call
+            /// crypto::SystemCACertificates::Load (loadSystemRootCACertificatesOnly);
+            /// \param[in] loadSystemRootCACertificatesOnly true == load only
+            /// root CA (self signed) certificates.
             OpenSSLInit (
                 bool multiThreaded = true,
                 util::ui32 entropyNeeded = DEFAULT_ENTROPY_NEEDED,
                 util::ui64 workingSetSize = DEFAULT_WORKING_SET_SIZE,
-                ENGINE *engine_ = 0);
+                ENGINE *engine_ = 0,
+                bool loadSystemCACertificates = true,
+                bool loadSystemRootCACertificatesOnly = true);
             /// \brief
             /// \dtor.
             virtual ~OpenSSLInit ();
