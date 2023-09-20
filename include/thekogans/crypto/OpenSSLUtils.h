@@ -741,7 +741,7 @@ namespace thekogans {
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed certificate.
-        _LIB_THEKOGANS_CRYPTO_DECL crypto::X509Ptr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL X509Ptr _LIB_THEKOGANS_CRYPTO_API
             ParseCertificate (
                 const void *buffer,
                 std::size_t length,
@@ -756,7 +756,7 @@ namespace thekogans {
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed public key.
-        _LIB_THEKOGANS_CRYPTO_DECL crypto::EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
             ParsePUBKEY (
                 const void *buffer,
                 std::size_t length,
@@ -771,7 +771,7 @@ namespace thekogans {
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed private key.
-        _LIB_THEKOGANS_CRYPTO_DECL crypto::EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
             ParsePrivateKey (
                 const void *buffer,
                 std::size_t length,
@@ -787,7 +787,7 @@ namespace thekogans {
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed public key.
-        _LIB_THEKOGANS_CRYPTO_DECL crypto::EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL EVP_PKEYPtr _LIB_THEKOGANS_CRYPTO_API
             ParsePublicKey (
                 const void *buffer,
                 std::size_t length,
@@ -802,7 +802,7 @@ namespace thekogans {
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed DH parameters.
-        _LIB_THEKOGANS_CRYPTO_DECL crypto::DHPtr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL DHPtr _LIB_THEKOGANS_CRYPTO_API
             ParseDHParams (
                 const void *buffer,
                 std::size_t length,
@@ -817,7 +817,7 @@ namespace thekogans {
         /// \param[in] passwordCallback Provide a password if PEM is encrypted.
         /// \param[in] userData User data for passwordCallback.
         /// \return Parsed DSA parameters.
-        _LIB_THEKOGANS_CRYPTO_DECL crypto::DSAPtr _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL DSAPtr _LIB_THEKOGANS_CRYPTO_API
             ParseDSAParams (
                 const void *buffer,
                 std::size_t length,

@@ -74,7 +74,7 @@ namespace thekogans {
             /// NOTE: All values are in bytes.
             /// \param[in] engine_ OpenSSL engine object used to accelerate cryptographic operations.
             /// \param[in] loadSystemCACertificates true == Call
-            /// crypto::SystemCACertificates::Load (loadSystemRootCACertificatesOnly);
+            /// SystemCACertificates::Load (loadSystemRootCACertificatesOnly);
             /// \param[in] loadSystemRootCACertificatesOnly true == load only
             /// root CA (self signed) certificates.
             OpenSSLInit (
