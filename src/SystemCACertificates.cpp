@@ -39,7 +39,7 @@
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/LoggerMgr.h"
 #if defined (TOOLCHAIN_OS_Windows)
-    #include "thekogans/util/WindowsUtils.h"
+    #include "thekogans/util/os/windows/WindowsUtils.h"
 #endif // defined (TOOLCHAIN_OS_Windows)
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/OpenSSLException.h"
@@ -73,7 +73,7 @@ namespace thekogans {
                         CERT_SIMPLE_NAME_STR,
                         buffer,
                         size);
-                    return util::UTF16ToUTF8 (buffer, size);
+                    return util::os::windows::UTF16ToUTF8 (buffer, size);
                 }
                 return std::string ();
             }
@@ -157,7 +157,7 @@ namespace thekogans {
                             THEKOGANS_CRYPTO,
                             THEKOGANS_UTIL_ERROR_CODE_EXCEPTION (THEKOGANS_UTIL_OS_ERROR_CODE),
                             "\nLoading '%s'",
-                            util::UTF16ToUTF8 (std::wstring (storeName)).c_str ());
+                            util::os::windows::UTF16ToUTF8 (std::wstring (storeName)).c_str ());
                     }
                 }
                 ~SystemStore () {

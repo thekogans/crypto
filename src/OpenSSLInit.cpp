@@ -45,6 +45,7 @@
 #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/OpenSSLException.h"
+#include "thekogans/crypto/SystemCACertificates.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 
 namespace thekogans {
@@ -55,8 +56,8 @@ namespace thekogans {
         int OpenSSLInit::SSL_SESSIONSessionInfoIndex = -1;
         util::SpinLock OpenSSLInit::spinLock;
 
-    #if OPENSSL_VERSION_NUMBER < 0x10100000L
         namespace {
+        #if OPENSSL_VERSION_NUMBER < 0x10100000L
             util::OwnerVector<util::SpinLock> staticLocks;
 
             void LockingFunction (
@@ -107,6 +108,7 @@ namespace thekogans {
                 CRYPTO_THREADID_set_numeric (&threadId, (unsigned long)(unsigned long long)thread);
                 ERR_remove_thread_state (&threadId);
             }
+        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
             void DeleteSessionInfo (
                     void *parent,
@@ -118,7 +120,6 @@ namespace thekogans {
                 volatile SessionInfo::SharedPtr sessionInfo ((SessionInfo *)ptr);
             }
         }
-    #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
 
         // This is enough entropy to cover 512 bit keys.
         OpenSSLInit::OpenSSLInit (
