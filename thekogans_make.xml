@@ -7,8 +7,8 @@
                 guid = "51807feb568098447581aabaefb41bf0"
                 schema_version = "2">
   <features>
-    <feature>THEKOGANS_CRYPTO_HAVE_ARGON2</feature>
-    <feature>THEKOGANS_CRYPTO_HAVE_BLAKE2</feature>
+    <!--<feature>THEKOGANS_CRYPTO_HAVE_ARGON2</feature>
+    <feature>THEKOGANS_CRYPTO_HAVE_BLAKE2</feature>-->
     <feature>THEKOGANS_CRYPTO_HAVE_TESTS</feature>
   </features>
   <dependencies>
