@@ -2,6 +2,8 @@
 *.dll
 *.exp
 *.pdb
+*.iobj
+*.ipdb
 *.ilk
 *.sdf
 *.suo
