@@ -20,7 +20,6 @@
 #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
     #include <argon2.h>
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
-#include <openssl/x509v3.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include "thekogans/util/SizeT.h"
