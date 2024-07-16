@@ -54,7 +54,7 @@ namespace thekogans {
             struct _LIB_THEKOGANS_CRYPTO_DECL DHEParams : public KeyExchange::Params {
                 /// \brief
                 /// DHEParams is a \see{util::Serializable}.
-                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (DHEParams, util::SpinLock)
+                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (DHEParams)
 
                 /// \brief
                 /// \see{EC} or \see{DH} key exchange params.
@@ -98,16 +98,16 @@ namespace thekogans {
                 /// \param[in] keyDescription_ \see{SymmetricKey} description.
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
                 DHEParams (
-                    const ID &id,
-                    crypto::Params::SharedPtr params_,
-                    const std::vector<util::ui8> &salt_,
-                    std::size_t keyLength_,
-                    const std::string &messageDigestName_,
-                    std::size_t count_,
-                    const ID &keyId_,
-                    const std::string &keyName_,
-                    const std::string &keyDescription_,
-                    AsymmetricKey::SharedPtr publicKey_) :
+                    const ID &id = ID (),
+                    crypto::Params::SharedPtr params_ = crypto::Params::SharedPtr (),
+                    const std::vector<util::ui8> &salt_ = std::vector<util::ui8> (),
+                    std::size_t keyLength_ = 0,
+                    const std::string &messageDigestName_ = std::string (),
+                    std::size_t count_ = 0,
+                    const ID &keyId_ = ID (),
+                    const std::string &keyName_ = std::string (),
+                    const std::string &keyDescription_ = std::string (),
+                    AsymmetricKey::SharedPtr publicKey_ = AsymmetricKey::SharedPtr ()) :
                     Params (id),
                     params (params_),
                     salt (salt_),
@@ -136,7 +136,6 @@ namespace thekogans {
                     AsymmetricKey::SharedPtr publicKey,
                     MessageDigest::SharedPtr messageDigest) override;
 
-            protected:
                 // util::Serializable
                 /// \brief
                 /// Return the serializable size.

@@ -49,14 +49,12 @@ namespace thekogans {
                 params (std::move (params_)) {
             if (params.get () != 0) {
                 const char *paramsType = GetKeyType ();
-                if (paramsType != OPENSSL_PKEY_DH && paramsType != OPENSSL_PKEY_DSA && paramsType != OPENSSL_PKEY_EC) {
+                if (paramsType != OPENSSL_PKEY_DH &&
+                        paramsType != OPENSSL_PKEY_DSA &&
+                        paramsType != OPENSSL_PKEY_EC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Invalid parameters type %s.", paramsType);
                 }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
         }
 

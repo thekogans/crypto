@@ -39,10 +39,6 @@ namespace thekogans {
             if (key_ != 0) {
                 key.Write (key_, X25519::KEY_LENGTH);
             }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
         }
 
         const char * const X25519AsymmetricKey::KEY_TYPE = "X25519";

@@ -50,7 +50,7 @@ namespace thekogans {
             struct _LIB_THEKOGANS_CRYPTO_DECL RSAParams : public KeyExchange::Params {
                 /// \brief
                 /// RSAParams is a \see{util::Serializable}.
-                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (RSAParams, util::SpinLock)
+                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (RSAParams)
 
                 /// \brief
                 /// Private/Public \see{RSA} \see{AsymmetricKey} id.
@@ -66,9 +66,9 @@ namespace thekogans {
                 /// \param[in] buffer_ Encrypted \see{SymmetricKey} (client).
                 /// \see{SymmetricKey} signature (server).
                 RSAParams (
-                    const ID &id,
-                    const ID &keyId_,
-                    const std::vector<util::ui8> &buffer_) :
+                    const ID &id = ID (),
+                    const ID &keyId_ = ID (),
+                    const std::vector<util::ui8> &buffer_ = std::vector<util::ui8> ()) :
                     Params (id),
                     keyId (keyId_),
                     buffer (buffer_) {}
@@ -90,7 +90,6 @@ namespace thekogans {
                     AsymmetricKey::SharedPtr publicKey,
                     MessageDigest::SharedPtr messageDigest) override;
 
-            protected:
                 // util::Serializable
                 /// \brief
                 /// Return the serializable size.

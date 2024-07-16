@@ -38,18 +38,18 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) :
                 AsymmetricKey (isPrivate, id, name, description) {
-            if (key_ != 0) {
+            if (key_ != nullptr) {
                 if (isPrivate) {
                     memcpy (key.privateKey, key_, Ed25519::PRIVATE_KEY_LENGTH);
                 }
                 else {
-                    memset (key.publicKey.pad, 0, Ed25519::PRIVATE_KEY_LENGTH - Ed25519::PUBLIC_KEY_LENGTH);
+                    memset (key.publicKey.pad, 0,
+                        Ed25519::PRIVATE_KEY_LENGTH - Ed25519::PUBLIC_KEY_LENGTH);
                     memcpy (key.publicKey.value, key_, Ed25519::PUBLIC_KEY_LENGTH);
                 }
             }
             else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                memset (&key, 0, sizeof (key));
             }
         }
 
@@ -69,7 +69,8 @@ namespace thekogans {
         }
 
         std::size_t Ed25519AsymmetricKey::Size () const {
-            return AsymmetricKey::Size () + (IsPrivate () ? Ed25519::PRIVATE_KEY_LENGTH : Ed25519::PUBLIC_KEY_LENGTH);
+            return AsymmetricKey::Size () +
+                (IsPrivate () ? Ed25519::PRIVATE_KEY_LENGTH : Ed25519::PUBLIC_KEY_LENGTH);
         }
 
         void Ed25519AsymmetricKey::Read (
@@ -77,7 +78,8 @@ namespace thekogans {
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
             if (IsPrivate ()) {
-                if (serializer.Read (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
+                if (serializer.Read (key.privateKey,
+                        Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Read (key.privateKey, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PRIVATE_KEY_LENGTH,
@@ -85,7 +87,8 @@ namespace thekogans {
                 }
             }
             else {
-                if (serializer.Read (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
+                if (serializer.Read (key.publicKey.value,
+                        Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Read (key.publicKey.value, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PUBLIC_KEY_LENGTH,
@@ -97,7 +100,8 @@ namespace thekogans {
         void Ed25519AsymmetricKey::Write (util::Serializer &serializer) const {
             AsymmetricKey::Write (serializer);
             if (IsPrivate ()) {
-                if (serializer.Write (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
+                if (serializer.Write (key.privateKey,
+                        Ed25519::PRIVATE_KEY_LENGTH) != Ed25519::PRIVATE_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Write (key.privateKey, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PRIVATE_KEY_LENGTH,
@@ -105,7 +109,8 @@ namespace thekogans {
                 }
             }
             else {
-                if (serializer.Write (key.publicKey.value, Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
+                if (serializer.Write (key.publicKey.value,
+                        Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Write (key.publicKey.value, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                         Ed25519::PUBLIC_KEY_LENGTH,

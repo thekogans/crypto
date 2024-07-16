@@ -89,7 +89,6 @@ namespace thekogans {
                 const std::string & /*name*/ = std::string (),
                 const std::string & /*description*/ = std::string ()) const = 0;
 
-        protected:
             // Serializable
             /// \brief
             /// Return the serialized key size.

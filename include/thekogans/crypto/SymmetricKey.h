@@ -322,7 +322,6 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t length);
 
-        protected:
             // Serializable
             /// \brief
             /// Return the serialized key size.

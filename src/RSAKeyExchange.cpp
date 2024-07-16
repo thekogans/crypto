@@ -31,12 +31,7 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
-            RSAKeyExchange::RSAParams,
-            1,
-            util::SpinLock,
-            16,
-            util::DefaultAllocator::Instance ())
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (RSAKeyExchange::RSAParams, 1)
 
         void RSAKeyExchange::RSAParams::CreateSignature (
                 AsymmetricKey::SharedPtr privateKey,
@@ -164,7 +159,7 @@ namespace thekogans {
             if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && !key->IsPrivate () &&
                     secretLength > 0 && md != 0 && count > 0) {
                 util::SecureVector<util::ui8> secret (secretLength);
-                if (util::GlobalRandomSource::Instance ().GetSeedOrBytes (
+                if (util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
                         secret.data (), secretLength) == secretLength) {
                     symmetricKey = SymmetricKey::FromSecretAndSalt (
                         secret.data (),
@@ -219,9 +214,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) const {
             Params::SharedPtr rsaParams;
-            util::SecureBuffer symmetricKeyBuffer (
-                util::NetworkEndian,
-                util::Serializable::Size (*symmetricKey));
+            util::SecureBuffer symmetricKeyBuffer (util::NetworkEndian, symmetricKey->Size ());
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
                 Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
@@ -257,7 +250,7 @@ namespace thekogans {
                 if (rsaParams.Get () != 0) {
                     util::SecureBuffer symmetricKeyBuffer (
                         util::NetworkEndian,
-                        util::Serializable::Size (*symmetricKey));
+                        symmetricKey->Size ());
                     symmetricKeyBuffer << *symmetricKey;
                     Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
                     if (!authenticator.VerifyBufferSignature (

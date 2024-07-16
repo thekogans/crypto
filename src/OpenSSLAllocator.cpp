@@ -21,12 +21,8 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_ALLOCATOR (OpenSSLAllocator)
 
-        OpenSSLAllocator &OpenSSLAllocator::Instance () {
-            static OpenSSLAllocator *instance = new OpenSSLAllocator;
-            return *instance;
-        }
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_SINGLETON (OpenSSLAllocator)
 
         void *OpenSSLAllocator::Alloc (std::size_t size) {
             return size > 0 ? OPENSSL_malloc (size) : 0;

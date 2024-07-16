@@ -168,7 +168,7 @@ namespace thekogans {
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureBuffer entropy (util::HostEndian, entropyNeeded);
                 if (entropy.AdvanceWriteOffset (
-                        util::GlobalRandomSource::Instance ().GetSeedOrBytes (
+                        util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
                             entropy.GetWritePtr (),
                             entropy.GetDataAvailableForWriting ())) == 0) {
                     RAND_seed (
@@ -205,7 +205,7 @@ namespace thekogans {
                 }
             }
             if (loadSystemCACertificates) {
-                SystemCACertificates::Instance ().Load (loadSystemRootCACertificatesOnly);
+                SystemCACertificates::Instance ()->Load (loadSystemRootCACertificatesOnly);
             }
             // FIXME: load a CRL.
         #if OPENSSL_VERSION_NUMBER < 0x10100000L

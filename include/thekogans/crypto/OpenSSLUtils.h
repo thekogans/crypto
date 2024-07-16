@@ -500,7 +500,7 @@ namespace thekogans {
             /// \brief
             /// SessionInfo has a private heap to help with memory
             /// management, performance, and global heap fragmentation.
-            THEKOGANS_UTIL_DECLARE_HEAP_WITH_LOCK (SessionInfo, util::SpinLock)
+            THEKOGANS_UTIL_DECLARE_STD_ALLOCATOR_FUNCTIONS
 
             enum {
                 /// \brief

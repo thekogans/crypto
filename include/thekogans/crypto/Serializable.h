@@ -39,7 +39,7 @@ namespace thekogans {
         struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::Serializable {
             /// \brief
             /// Declare \see{RefCounted} pointers.
-            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Serializable)
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Serializable)
 
         protected:
             /// \brief
@@ -110,10 +110,9 @@ namespace thekogans {
                 description = description_;
             }
 
-        protected:
             // util::Serializable
             /// \brief
-            /// Return the serializable size.
+            /// Return the serializable size (without the header).
             /// \return Serializable size.
             virtual std::size_t Size () const override;
 
@@ -163,42 +162,25 @@ namespace thekogans {
             virtual void Write (util::JSON::Object &object) const override;
         };
 
-        /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)
-        /// Dynamic discovery macro. Add this to your class declaration.
-        /// Example:
-        /// \code{.cpp}
-        /// struct _LIB_THEKOGANS_CRYPTO_DECL SymmetricKey : public Serializable {
-        ///     THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (SymmetricKey)
-        ///     ...
-        /// };
-        /// \endcode
-        #define THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(type)\
-            THEKOGANS_UTIL_DECLARE_SERIALIZABLE (type, thekogans::util::SpinLock)
-
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, version, minSerializablesInPage)
-        /// Dynamic discovery macro. Instantiate one of these in the class cpp file.
-        /// Example:
-        /// \code{.cpp}
-        /// #if !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
-        ///     #define THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE 16
-        /// #endif // !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
-        ///
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-        ///     SymmetricKey,
-        ///     1,
-        ///     THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
-        /// \endcode
-        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(type, version, minSerializablesInPage)\
-            THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (\
-                type,\
-                version,\
-                thekogans::util::SpinLock,\
-                minSerializablesInPage,\
-                thekogans::util::SecureAllocator::Instance ())
-
         /// \brief
         /// Implement Serializable::SharedPtr extraction operators.
         THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (Serializable)
+
+        /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(_T)
+        /// Common declarations used by all Serializable derivatives.
+        #define THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(_T)\
+            THEKOGANS_UTIL_DECLARE_SERIALIZABLE (_T)\
+            THEKOGANS_UTIL_DECLARE_STD_ALLOCATOR_FUNCTIONS
+
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(_T, version)
+        /// Common implementations used by all Value derivatives.
+        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(_T, version, minItemsInPage)\
+            THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (_T, version)\
+            THEKOGANS_UTIL_IMPLEMENT_HEAP_FUNCTIONS_EX (\
+                _T,\
+                thekogans::util::SpinLock,\
+                minItemsInPage,\
+                thekogans::util::SecureAllocator::Instance ().Get ())
 
     } // namespace crypto
 

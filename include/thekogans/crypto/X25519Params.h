@@ -69,7 +69,6 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 
-        protected:
             // Serializable
             /// \brief
             /// Return the serialized params size.

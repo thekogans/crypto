@@ -62,7 +62,7 @@ namespace thekogans {
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             OpenSSLParams (
-                EVP_PKEYPtr params_,
+                EVP_PKEYPtr params_ = EVP_PKEYPtr (),
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
@@ -117,7 +117,6 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 
-        protected:
             // Serializable
             /// \brief
             /// Return the serialized params size.

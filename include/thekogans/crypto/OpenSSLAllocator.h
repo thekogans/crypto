@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include "thekogans/util/Allocator.h"
+#include "thekogans/util/Singleton.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/crypto/Config.h"
 
@@ -32,19 +33,17 @@ namespace thekogans {
         /// Wraps OPENSSL_malloc/free to allow OpenSSL allocated objects
         /// to be used with thekogans.net allocator machinery.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLAllocator : public util::Allocator {
+        struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLAllocator :
+                public util::Allocator,
+                public util::Singleton<
+                    OpenSSLAllocator,
+                    util::SpinLock,
+                    util::RefCountedInstanceCreator<OpenSSLAllocator>,
+                    util::RefCountedInstanceDestroyer<OpenSSLAllocator>> {
             /// \brief
-            /// OpenSSLAllocator participates in the \see{util::Allocator} dynamic
-            /// discovery and creation.
-            THEKOGANS_UTIL_DECLARE_ALLOCATOR (OpenSSLAllocator)
-
-            /// \brief
-            /// Global OpenSSLAllocator.
-            static OpenSSLAllocator &Instance ();
-
-            /// \brief
-            /// ctor.
-            OpenSSLAllocator () {}
+            /// DefaultAllocator participates in the \see{DynamicCreatable}
+            /// dynamic discovery and creation.
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE (OpenSSLAllocator)
 
             /// \brief
             /// Allocate a block.
@@ -61,40 +60,36 @@ namespace thekogans {
             virtual void Free (
                 void *ptr,
                 std::size_t /*size*/) override;
-
-            /// \brief
-            /// OpenSSLAllocator is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (OpenSSLAllocator)
         };
 
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_OPEN_SSL_ALLOCATOR_FUNCTIONS(type)
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_OPEN_SSL_ALLOCATOR_FUNCTIONS(_T)
         /// Macro to implement OpenSSLAllocator functions.
-        #define THEKOGANS_CRYPTO_IMPLEMENT_OPEN_SSL_ALLOCATOR_FUNCTIONS(type)\
-        void *type::operator new (std::size_t size) {\
-            assert (size == sizeof (type));\
-            return thekogans::crypto::OpenSSLAllocator::Global.Alloc (size);\
+        #define THEKOGANS_CRYPTO_IMPLEMENT_OPEN_SSL_ALLOCATOR_FUNCTIONS(_T)\
+        void *_T::operator new (std::size_t size) {\
+            assert (size == sizeof (_T));\
+            return thekogans::crypto::OpenSSLAllocator::Instance ().Alloc (size);\
         }\
-        void *type::operator new (\
+        void *_T::operator new (\
                 std::size_t size,\
                 std::nothrow_t) throw () {\
-            assert (size == sizeof (type));\
-            return thekogans::crypto::OpenSSLAllocator::Global.Alloc (size);\
+            assert (size == sizeof (_T));\
+            return thekogans::crypto::OpenSSLAllocator::Instance ().Alloc (size);\
         }\
-        void *type::operator new (\
+        void *_T::operator new (\
                 std::size_t size,\
                 void *ptr) {\
-            assert (size == sizeof (type));\
+            assert (size == sizeof (_T));\
             return ptr;\
         }\
-        void type::operator delete (void *ptr) {\
-            thekogans::crypto::OpenSSLAllocator::Global.Free (ptr, sizeof (type));\
+        void _T::operator delete (void *ptr) {\
+            thekogans::crypto::OpenSSLAllocator::Instance ().Free (ptr, sizeof (_T));\
         }\
-        void type::operator delete (\
+        void _T::operator delete (\
                 void *ptr,\
                 std::nothrow_t) throw () {\
-            thekogans::crypto::OpenSSLAllocator::Global.Free (ptr, sizeof (type));\
+            thekogans::crypto::OpenSSLAllocator::Instance ().Free (ptr, sizeof (_T));\
         }\
-        void type::operator delete (\
+        void _T::operator delete (\
             void *,\
             void *) {}
 

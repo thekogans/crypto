@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include <iterator>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/File.h"
 #include "thekogans/util/ByteSwap.h"
@@ -69,7 +70,7 @@ namespace thekogans {
                 std::size_t associatedDataLength) {
             util::Buffer buffer (
                 util::NetworkEndian,
-                util::Serializable::Size (*this));
+                GetSize ());
             buffer << *this;
             if (cipher != 0) {
                 buffer = cipher->Encrypt (
@@ -141,7 +142,7 @@ namespace thekogans {
                 if (keyExchangeParamsMap.size () > 1) {
                     std::advance (
                         it,
-                        util::GlobalRandomSource::Instance ().Getui32 () % keyExchangeParamsMap.size ());
+                        util::GlobalRandomSource::Instance ()->Getui32 () % keyExchangeParamsMap.size ());
                 }
                 params = it->second;
             }
@@ -433,7 +434,7 @@ namespace thekogans {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Incorrect key exchange parameters type: %s, "
                             "expected RSAKeyExchange::RSAParams.",
-                            params->GetType ().c_str ());
+                            params->Type ());
                     }
                 }
                 else {
@@ -790,7 +791,7 @@ namespace thekogans {
                 if (cipherKeyMap.size () > 1) {
                     std::advance (
                         keyIt,
-                        util::GlobalRandomSource::Instance ().Getui32 () % cipherKeyMap.size ());
+                        util::GlobalRandomSource::Instance ()->Getui32 () % cipherKeyMap.size ());
                 }
                 CipherMap::iterator cipherIt = cipherMap.find (keyIt->second->GetId ());
                 if (cipherIt == cipherMap.end ()) {
@@ -1201,49 +1202,49 @@ namespace thekogans {
             for (ParamsMap::const_iterator
                     it = keyExchangeParamsMap.begin (),
                     end = keyExchangeParamsMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             size += util::SizeT (keyExchangeKeyMap.size ()).Size ();
             for (AsymmetricKeyMap::const_iterator
                     it = keyExchangeKeyMap.begin (),
                     end = keyExchangeKeyMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             size += util::SizeT (authenticatorParamsMap.size ()).Size ();
             for (ParamsMap::const_iterator
                     it = authenticatorParamsMap.begin (),
                     end = authenticatorParamsMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             size += util::SizeT (authenticatorKeyMap.size ()).Size ();
             for (AsymmetricKeyMap::const_iterator
                     it = authenticatorKeyMap.begin (),
                     end = authenticatorKeyMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             size += util::SizeT (cipherKeyMap.size ()).Size ();
             for (SymmetricKeyMap::const_iterator
                     it = cipherKeyMap.begin (),
                     end = cipherKeyMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             size += util::SizeT (macKeyMap.size ()).Size ();
             for (SymmetricKeyMap::const_iterator
                     it = macKeyMap.begin (),
                     end = macKeyMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             size += util::SizeT (userDataMap.size ()).Size ();
             for (SerializableMap::const_iterator
                     it = userDataMap.begin (),
                     end = userDataMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             size += util::SizeT (subringMap.size ()).Size ();
             for (KeyRingMap::const_iterator
                     it = subringMap.begin (),
                     end = subringMap.end (); it != end; ++it) {
-                size += util::Serializable::Size (*it->second);
+                size += it->second->GetSize ();
             }
             return size;
         }

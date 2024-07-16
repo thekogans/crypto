@@ -72,8 +72,8 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             Ed25519AsymmetricKey (
-                const util::ui8 *key_,
-                bool isPrivate,
+                const util::ui8 *key_ = 0,
+                bool isPrivate = false,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
@@ -108,7 +108,6 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 
-        protected:
             // Serializable
             /// \brief
             /// Return the serialized key size.

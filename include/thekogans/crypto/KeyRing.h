@@ -136,7 +136,7 @@ namespace thekogans {
             /// \param[in] name Optional key ring name.
             /// \param[in] description Optional key ring description.
             KeyRing (
-                const CipherSuite &cipherSuite_,
+                const CipherSuite &cipherSuite_ = CipherSuite::Strongest,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
@@ -602,7 +602,6 @@ namespace thekogans {
             /// Drop all params, keys, user data and sub rings.
             void Clear ();
 
-        protected:
             // Serializable
             /// \brief
             /// Return the serialized key ring size.

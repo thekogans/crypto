@@ -17,7 +17,7 @@
 
 #include "thekogans/util/Environment.h"
 #if defined (TOOLCHAIN_OS_Windows)
-    #include "thekogans/util/WindowsHeader.h"
+    #include "thekogans/util/os/windows/WindowsHeader.h"
     #include <winsock2.h>
     #include <wincrypt.h>
 #elif defined (TOOLCHAIN_OS_OSX)

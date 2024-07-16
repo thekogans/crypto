@@ -73,8 +73,8 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             OpenSSLAsymmetricKey (
-                EVP_PKEYPtr key_,
-                bool isPrivate,
+                EVP_PKEYPtr key_ = EVP_PKEYPtr (),
+                bool isPrivate = false,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
@@ -246,7 +246,6 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 
-        protected:
             // Serializable
             /// \brief
             /// Return the serialized key size.
@@ -291,6 +290,8 @@ namespace thekogans {
             /// Write a Serializable to the JSON DOM.
             /// \param[out] node Parent node.
             virtual void Write (util::JSON::Object &object) const override;
+
+            void ValidateKey ();
 
             /// \brief
             /// OpenSSLAsymmetricKey is neither copy constructable, nor assignable.

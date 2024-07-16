@@ -147,7 +147,7 @@ namespace thekogans {
             }
         }
 
-        THEKOGANS_UTIL_IMPLEMENT_HEAP_WITH_LOCK (SessionInfo, util::SpinLock)
+        THEKOGANS_UTIL_IMPLEMENT_HEAP_FUNCTIONS (SessionInfo)
 
         const char * const SessionInfo::TAG_SESSION_INFO =
             "SessionInfo";

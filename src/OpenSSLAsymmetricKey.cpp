@@ -48,22 +48,7 @@ namespace thekogans {
                 const std::string &description) :
                 AsymmetricKey (isPrivate, id, name, description),
                 key (std::move (key_)) {
-            if (key.get () != 0) {
-                const char *type = GetKeyType ();
-                if (type != OPENSSL_PKEY_DH &&
-                        type != OPENSSL_PKEY_DSA &&
-                        type != OPENSSL_PKEY_EC &&
-                        type != OPENSSL_PKEY_RSA &&
-                        type != OPENSSL_PKEY_HMAC &&
-                        type != OPENSSL_PKEY_CMAC) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid key type %s.", type);
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
+            ValidateKey ();
         }
 
         AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPrivateKeyFromBuffer (
@@ -250,30 +235,33 @@ namespace thekogans {
         namespace {
             util::SecureString WriteKey (
                     bool isPrivate,
-                    EVP_PKEY &key) {
-                BIOPtr bio (BIO_new (BIO_s_mem ()));
-                if (bio.get () != 0 && (isPrivate ?
-                        PEM_write_bio_PrivateKey (bio.get (), &key, 0, 0, 0, 0, 0) :
-                        PEM_write_bio_PUBKEY (bio.get (), &key)) == 1) {
-                    char *buffer = 0;
-                    long length = BIO_get_mem_data (bio.get (), &buffer);
-                    if (buffer != 0 && length > 0) {
-                        return util::SecureString (buffer, buffer + length);
+                    EVP_PKEY *key) {
+                if (key != nullptr) {
+                    BIOPtr bio (BIO_new (BIO_s_mem ()));
+                    if (bio.get () != 0 && (isPrivate ?
+                            PEM_write_bio_PrivateKey (bio.get (), key, 0, 0, 0, 0, 0) :
+                            PEM_write_bio_PUBKEY (bio.get (), key)) == 1) {
+                        char *buffer = 0;
+                        long length = BIO_get_mem_data (bio.get (), &buffer);
+                        if (buffer != 0 && length > 0) {
+                            return util::SecureString (buffer, buffer + length);
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                return util::SecureString ();
             }
         }
 
         std::size_t OpenSSLAsymmetricKey::Size () const {
             return
                 AsymmetricKey::Size () +
-                util::Serializer::Size (WriteKey (IsPrivate (), *key)); // key
+                util::Serializer::Size (WriteKey (IsPrivate (), key.get ())); // key
         }
 
         namespace {
@@ -281,20 +269,24 @@ namespace thekogans {
                     bool isPrivate,
                     const char *keyBuffer,
                     std::size_t keyBufferLength) {
-                BIOPtr bio (BIO_new (BIO_s_mem ()));
-                if (bio.get () != 0) {
-                    if (BIO_write (bio.get (), keyBuffer, (int)keyBufferLength) == (int)keyBufferLength) {
-                        return EVP_PKEYPtr (isPrivate ?
-                            PEM_read_bio_PrivateKey (bio.get (), 0, 0, 0) :
-                            PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
+                if (keyBuffer != nullptr && keyBufferLength > 0) {
+                    BIOPtr bio (BIO_new (BIO_s_mem ()));
+                    if (bio.get () != 0) {
+                        if (BIO_write (bio.get (), keyBuffer, (int)keyBufferLength) ==
+                                (int)keyBufferLength) {
+                            return EVP_PKEYPtr (isPrivate ?
+                                PEM_read_bio_PrivateKey (bio.get (), 0, 0, 0) :
+                                PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
+                        }
+                        else {
+                            THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        }
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                return EVP_PKEYPtr ();
             }
         }
 
@@ -305,11 +297,12 @@ namespace thekogans {
             util::SecureString keyBuffer;
             serializer >> keyBuffer;
             key = ReadKey (IsPrivate (), keyBuffer.data (), keyBuffer.size ());
+            ValidateKey ();
         }
 
         void OpenSSLAsymmetricKey::Write (util::Serializer &serializer) const {
             AsymmetricKey::Write (serializer);
-            serializer << WriteKey (IsPrivate (), *key);
+            serializer << WriteKey (IsPrivate (), key.get ());
         }
 
         void OpenSSLAsymmetricKey::Read (
@@ -317,11 +310,13 @@ namespace thekogans {
                 const pugi::xml_node &node) {
             AsymmetricKey::Read (header, node);
             key = ReadKey (IsPrivate (), node.text ().get (), strlen (node.text ().get ()));
+            ValidateKey ();
         }
 
         void OpenSSLAsymmetricKey::Write (pugi::xml_node &node) const {
             AsymmetricKey::Write (node);
-            node.append_child (pugi::node_pcdata).set_value (WriteKey (IsPrivate (), *key).c_str ());
+            node.append_child (pugi::node_pcdata).set_value (
+                WriteKey (IsPrivate (), key.get ()).c_str ());
         }
 
         const char * const OpenSSLAsymmetricKey::TAG_KEY = "Key";
@@ -330,15 +325,32 @@ namespace thekogans {
                 const TextHeader &header,
                 const util::JSON::Object &object) {
             AsymmetricKey::Read (header, object);
-            std::string keyBuffer = object.Get<util::JSON::Array> (TAG_KEY)->ToString ();
+            util::SecureString keyBuffer =
+                object.Get<util::JSON::Array> (TAG_KEY)->ToString ().c_str ();
             key = ReadKey (IsPrivate (), keyBuffer.data (), keyBuffer.size ());
+            ValidateKey ();
         }
 
         void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
             AsymmetricKey::Write (object);
             object.Add (TAG_KEY,
                 util::JSON::Value::SharedPtr (
-                    new util::JSON::Array (WriteKey (IsPrivate (), *key).c_str ())));
+                    new util::JSON::Array (WriteKey (IsPrivate (), key.get ()).c_str ())));
+        }
+
+        void OpenSSLAsymmetricKey::ValidateKey () {
+            if (key.get () != 0) {
+                const char *type = GetKeyType ();
+                if (type != OPENSSL_PKEY_DH &&
+                        type != OPENSSL_PKEY_DSA &&
+                        type != OPENSSL_PKEY_EC &&
+                        type != OPENSSL_PKEY_RSA &&
+                        type != OPENSSL_PKEY_HMAC &&
+                        type != OPENSSL_PKEY_CMAC) {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "Invalid key type %s.", type);
+                }
+            }
         }
 
     } // namespace crypto

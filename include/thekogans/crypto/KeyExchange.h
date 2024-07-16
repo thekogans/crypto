@@ -91,7 +91,6 @@ namespace thekogans {
                     AsymmetricKey::SharedPtr /*publicKey*/,
                     MessageDigest::SharedPtr /*messageDigest*/) = 0;
 
-            protected:
                 // util::Serializable
                 /// \brief
                 /// Return the serializable size.
