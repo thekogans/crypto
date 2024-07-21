@@ -29,11 +29,12 @@ namespace {
     bool operator == (
             const crypto::Params &params1,
             const crypto::Params &params2) {
-        util::Buffer params1Buffer (util::HostEndian, util::Serializable::Size (params1));
+        util::Buffer params1Buffer (util::HostEndian, params1.GetSize ());
         params1Buffer << params1;
-        util::Buffer params2Buffer (util::HostEndian, util::Serializable::Size (params2));
+        util::Buffer params2Buffer (util::HostEndian, params2.GetSize ());
         params2Buffer << params2;
-        return params1Buffer.GetDataAvailableForReading () == params2Buffer.GetDataAvailableForReading () &&
+        return params1Buffer.GetDataAvailableForReading () ==
+            params2Buffer.GetDataAvailableForReading () &&
             memcmp (
                 params1Buffer.GetReadPtr (),
                 params2Buffer.GetReadPtr (),
@@ -47,7 +48,7 @@ namespace {
             std::cout << paramsName << "...";
             util::Buffer buffer (
                 util::NetworkEndian,
-                util::Serializable::Size (*params1));
+                params1->GetSize ());
             buffer << *params1;
             crypto::Params::SharedPtr params2;
             buffer >> params2;

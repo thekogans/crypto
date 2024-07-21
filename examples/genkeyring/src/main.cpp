@@ -137,7 +137,7 @@ int main (
             {
                 util::FixedBuffer<256> originalPlaintext;
                 originalPlaintext.AdvanceWriteOffset (
-                    util::GlobalRandomSource::Instance ().GetBytes (
+                    util::GlobalRandomSource::Instance ()->GetBytes (
                         originalPlaintext.GetWritePtr (),
                         originalPlaintext.GetDataAvailableForWriting ()));
                 crypto::Cipher cipher (
