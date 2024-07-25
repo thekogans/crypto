@@ -275,7 +275,7 @@ namespace thekogans {
 
             /// \brief
             /// Cipher is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Cipher)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Cipher)
         };
 
     } // namespace crypto

@@ -61,7 +61,7 @@ namespace thekogans {
 
             /// \brief
             /// OpenSSLSigner is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (OpenSSLSigner)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (OpenSSLSigner)
         };
 
     } // namespace crypto

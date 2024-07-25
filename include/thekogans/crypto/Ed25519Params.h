@@ -109,7 +109,7 @@ namespace thekogans {
 
             /// \brief
             /// Ed25519Params is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Ed25519Params)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Ed25519Params)
         };
 
         /// \brief

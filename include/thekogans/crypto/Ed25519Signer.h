@@ -62,7 +62,7 @@ namespace thekogans {
 
             /// \brief
             /// Ed25519Signer is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Ed25519Signer)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Ed25519Signer)
         };
 
     } // namespace crypto

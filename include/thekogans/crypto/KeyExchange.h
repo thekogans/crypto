@@ -184,7 +184,7 @@ namespace thekogans {
 
             /// \brief
             /// KeyExchange is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (KeyExchange)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (KeyExchange)
         };
 
         /// \brief

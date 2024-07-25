@@ -64,7 +64,7 @@ namespace thekogans {
 
             /// \brief
             /// OpenSSLVerifier is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (OpenSSLVerifier)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (OpenSSLVerifier)
         };
 
     } // namespace crypto

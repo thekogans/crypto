@@ -66,7 +66,7 @@ namespace thekogans {
 
             /// \brief
             /// Ed25519Verifier is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Ed25519Verifier)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Ed25519Verifier)
         };
 
     } // namespace crypto

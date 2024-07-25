@@ -64,7 +64,7 @@ namespace thekogans {
 
             /// \brief
             /// SystemCACertificates is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (SystemCACertificates)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (SystemCACertificates)
         };
 
     } // namespace crypto

@@ -119,7 +119,7 @@ namespace thekogans {
 
             /// \brief
             /// MessageDigest is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (MessageDigest)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (MessageDigest)
         };
 
     } // namespace crypto

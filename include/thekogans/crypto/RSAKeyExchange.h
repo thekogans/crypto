@@ -203,7 +203,7 @@ namespace thekogans {
 
             /// \brief
             /// RSAKeyExchange is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (RSAKeyExchange)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (RSAKeyExchange)
         };
 
         /// \brief

@@ -369,7 +369,7 @@ namespace thekogans {
 
             /// \brief
             /// SymmetricKey is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (SymmetricKey)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (SymmetricKey)
         };
 
         /// \brief

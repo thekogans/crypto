@@ -155,7 +155,7 @@ namespace thekogans {
 
             /// \brief
             /// Ed25519AsymmetricKey is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Ed25519AsymmetricKey)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Ed25519AsymmetricKey)
         };
 
         /// \brief

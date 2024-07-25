@@ -295,7 +295,7 @@ namespace thekogans {
 
             /// \brief
             /// OpenSSLAsymmetricKey is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (OpenSSLAsymmetricKey)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (OpenSSLAsymmetricKey)
         };
 
         /// \brief

@@ -115,7 +115,7 @@ namespace thekogans {
 
             /// \brief
             /// Authenticator is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (Authenticator)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Authenticator)
         };
 
     } // namespace crypto

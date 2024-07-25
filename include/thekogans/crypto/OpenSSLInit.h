@@ -90,7 +90,7 @@ namespace thekogans {
 
             /// \brief
             /// OpenSSLInit is neither copy constructable, nor assignable.
-            THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN (OpenSSLInit)
+            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (OpenSSLInit)
         };
 
     } // namespace crypto

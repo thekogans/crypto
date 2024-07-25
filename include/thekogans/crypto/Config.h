@@ -44,13 +44,6 @@
     #define _LIB_THEKOGANS_CRYPTO_DECL
 #endif // defined (TOOLCHAIN_OS_Windows)
 
-/// \def THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN(type)
-/// A convenient macro to suppress copy construction and assignment.
-#define THEKOGANS_CRYPTO_DISALLOW_COPY_AND_ASSIGN(type)\
-private:\
-    type (const type &);\
-    type &operator = (const type &);
-
 /// \def THEKOGANS_CRYPTO
 /// Logging subsystem name.
 #define THEKOGANS_CRYPTO "thekogans_crypto"
