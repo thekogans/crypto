@@ -91,7 +91,7 @@ namespace thekogans {
             /// \param[in] publicKey Public key used for encryption.
             /// \param[in] padding RSA padding type.
             /// \return Encrypted plaintext.
-            static util::Buffer Encrypt (
+            static util::Buffer::SharedPtr Encrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 AsymmetricKey::SharedPtr publicKey,
@@ -119,7 +119,7 @@ namespace thekogans {
             /// \param[in] publicKey Public key used for encryption.
             /// \param[in] padding RSA padding type.
             /// \return Encrypted plaintext.
-            static util::Buffer EncryptAndEnlengthen (
+            static util::Buffer::SharedPtr EncryptAndEnlengthen (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 AsymmetricKey::SharedPtr publicKey,
@@ -147,7 +147,7 @@ namespace thekogans {
             /// \param[in] publicKey Public key used for encryption.
             /// \param[in] padding RSA padding type.
             /// \return Encrypted plaintext.
-            static util::Buffer EncryptAndFrame (
+            static util::Buffer::SharedPtr EncryptAndFrame (
                 const void *plaintext,
                 std::size_t plaintextLength,
                 AsymmetricKey::SharedPtr publicKey,
@@ -176,7 +176,7 @@ namespace thekogans {
             /// \param[in] secure true == return util::SecureBuffer.
             /// \param[in] endianness Endianness type of the resulting plaintext.
             /// \return Decrypted ciphertext.
-            static util::Buffer Decrypt (
+            static util::Buffer::SharedPtr Decrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,
                 AsymmetricKey::SharedPtr privateKey,
@@ -223,7 +223,7 @@ namespace thekogans {
         /// \see{SymmetricKey} encryption.
         /// \param[in] padding RSA padding type.
         /// \return Encrypted plaintext.
-        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::SharedPtr _LIB_THEKOGANS_CRYPTO_API
             RSAEncrypt (
                 const void *plaintext,
                 std::size_t plaintextLength,
@@ -254,7 +254,7 @@ namespace thekogans {
         /// \param[in] secure true == return util::SecureBuffer.
         /// \param[in] endianness Endianness type of the resulting plaintext.
         /// \return Decrypted ciphertext.
-        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer _LIB_THEKOGANS_CRYPTO_API
+        _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::SharedPtr _LIB_THEKOGANS_CRYPTO_API
             RSADecrypt (
                 const void *ciphertext,
                 std::size_t ciphertextLength,

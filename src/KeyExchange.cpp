@@ -58,8 +58,10 @@ namespace thekogans {
             node.append_attribute (ATTR_ID).set_value (id.ToHexString ().c_str ());
             node.append_attribute (ATTR_SIGNATURE).set_value (
                 util::HexEncodeBuffer (signature.data (), signature.size ()).c_str ());
-            node.append_attribute (ATTR_SIGNATURE_KEY_ID).set_value (signatureKeyId.ToHexString ().c_str ());
-            node.append_attribute (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME).set_value (signatureMessageDigestName.c_str ());
+            node.append_attribute (ATTR_SIGNATURE_KEY_ID).set_value (
+                signatureKeyId.ToHexString ().c_str ());
+            node.append_attribute (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME).set_value (
+                signatureMessageDigestName.c_str ());
         }
 
         void KeyExchange::Params::Read (

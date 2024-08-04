@@ -147,7 +147,7 @@ namespace thekogans {
             /// \brief
             /// Finalize the signing operation and return the signature.
             /// \return Signature.
-            util::Buffer Final ();
+            util::Buffer::SharedPtr Final ();
         };
 
         /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON(type)

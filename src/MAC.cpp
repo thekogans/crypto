@@ -38,20 +38,24 @@ namespace thekogans {
             }
         }
 
-        util::Buffer MAC::SignBuffer (
+        util::Buffer::SharedPtr MAC::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
-                util::Buffer signature (util::HostEndian, GetMACLength ());
-                if (signature.AdvanceWriteOffset (
-                        SignBuffer (buffer, bufferLength, signature.GetWritePtr ())) == GetMACLength ()) {
+                util::Buffer::SharedPtr signature (
+                    new util::Buffer (util::HostEndian, GetMACLength ()));
+                if (signature->AdvanceWriteOffset (
+                        SignBuffer (
+                            buffer,
+                            bufferLength,
+                            signature->GetWritePtr ())) == GetMACLength ()) {
                     return signature;
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Incorrect signature length: " THEKOGANS_UTIL_SIZE_T_FORMAT
                         " (expecting " THEKOGANS_UTIL_SIZE_T_FORMAT ").",
-                        signature.GetDataAvailableForReading (),
+                        signature->GetDataAvailableForReading (),
                         GetMACLength ());
                 }
             }

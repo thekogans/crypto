@@ -45,21 +45,22 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength) {
             util::ReadOnlyFile file (util::NetworkEndian, path);
-            util::Buffer buffer (util::NetworkEndian, (std::size_t)file.GetSize ());
-            buffer.AdvanceWriteOffset (
+            util::Buffer::SharedPtr buffer (
+                new util::Buffer (util::NetworkEndian, (std::size_t)file.GetSize ()));
+            buffer->AdvanceWriteOffset (
                 file.Read (
-                    buffer.GetWritePtr (),
-                    buffer.GetDataAvailableForWriting ()));
+                    buffer->GetWritePtr (),
+                    buffer->GetDataAvailableForWriting ()));
             if (cipher != 0) {
                 buffer = cipher->Decrypt (
-                    buffer.GetReadPtr (),
-                    buffer.GetDataAvailableForReading (),
+                    buffer->GetReadPtr (),
+                    buffer->GetDataAvailableForReading (),
                     associatedData,
                     associatedDataLength,
                     true);
             }
             SharedPtr keyRing;
-            buffer >> keyRing;
+            *buffer >> keyRing;
             return keyRing;
         }
 
@@ -68,14 +69,13 @@ namespace thekogans {
                 Cipher *cipher,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
-            util::Buffer buffer (
-                util::NetworkEndian,
-                GetSize ());
-            buffer << *this;
+            util::Buffer::SharedPtr buffer (
+                new util::Buffer (util::NetworkEndian, GetSize ()));
+            *buffer << *this;
             if (cipher != 0) {
                 buffer = cipher->Encrypt (
-                    buffer.GetReadPtr (),
-                    buffer.GetDataAvailableForReading (),
+                    buffer->GetReadPtr (),
+                    buffer->GetDataAvailableForReading (),
                     associatedData,
                     associatedDataLength);
             }
@@ -86,8 +86,8 @@ namespace thekogans {
                 util::SimpleFile::Create |
                 util::SimpleFile::Truncate);
             file.Write (
-                buffer.GetReadPtr (),
-                buffer.GetDataAvailableForReading ());
+                buffer->GetReadPtr (),
+                buffer->GetDataAvailableForReading ());
         }
 
         Params::SharedPtr KeyRing::GetKeyExchangeParams (

@@ -23,7 +23,6 @@
 #include <openssl/dh.h>
 #include <openssl/bn.h>
 #include "thekogans/util/Serializer.h"
-#include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Params.h"
 

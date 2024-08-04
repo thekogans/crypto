@@ -83,7 +83,7 @@ namespace thekogans {
             /// \param[in] buffer Buffer whose signature to create.
             /// \param[in] bufferLength Buffer length.
             /// \return Buffer signature.
-            util::Buffer SignBuffer (
+            util::Buffer::SharedPtr SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength);
             /// \brief

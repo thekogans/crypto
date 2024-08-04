@@ -80,9 +80,10 @@ namespace thekogans {
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
-        util::Buffer Signer::Final () {
-            util::Buffer signature (util::HostEndian, privateKey->GetKeyLength ());
-            signature.AdvanceWriteOffset (Final (signature.GetWritePtr ()));
+        util::Buffer::SharedPtr Signer::Final () {
+            util::Buffer::SharedPtr signature (
+                new util::Buffer (util::HostEndian, privateKey->GetKeyLength ()));
+            signature->AdvanceWriteOffset (Final (signature->GetWritePtr ()));
             return signature;
         }
 

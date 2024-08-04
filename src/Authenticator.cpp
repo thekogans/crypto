@@ -57,7 +57,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer Authenticator::SignBuffer (
+        util::Buffer::SharedPtr Authenticator::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != 0 && bufferLength > 0) {
@@ -100,7 +100,7 @@ namespace thekogans {
             }
         }
 
-        util::Buffer Authenticator::SignFile (const std::string &path) {
+        util::Buffer::SharedPtr Authenticator::SignFile (const std::string &path) {
             if (signer.Get () != 0) {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);

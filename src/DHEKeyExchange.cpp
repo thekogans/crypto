@@ -62,7 +62,7 @@ namespace thekogans {
                 Authenticator authenticator (privateKey, messageDigest);
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
-                    paramsBuffer.GetDataAvailableForReading ()).Tovector ();
+                    paramsBuffer.GetDataAvailableForReading ())->Tovector ();
                 signatureKeyId = privateKey->GetId ();
                 signatureMessageDigestName = messageDigest->GetName ();
             }
@@ -194,13 +194,20 @@ namespace thekogans {
 
         void DHEKeyExchange::DHEParams::Write (pugi::xml_node &node) const {
             Params::Write (node);
-            node.append_attribute (ATTR_SALT).set_value (util::HexEncodeBuffer (salt.data (), salt.size ()).c_str ());
-            node.append_attribute (ATTR_KEY_LENGTH).set_value (util::ui64Tostring (keyLength).c_str ());
-            node.append_attribute (ATTR_MESSAGE_DIGEST_NAME).set_value (messageDigestName.c_str ());
-            node.append_attribute (ATTR_COUNT).set_value (util::ui64Tostring (count).c_str ());
-            node.append_attribute (ATTR_KEY_ID).set_value (keyId.ToHexString ().c_str ());
-            node.append_attribute (ATTR_KEY_NAME).set_value (keyName.c_str ());
-            node.append_attribute (ATTR_KEY_DESCRIPTION).set_value (keyDescription.c_str ());
+            node.append_attribute (ATTR_SALT).set_value (
+                util::HexEncodeBuffer (salt.data (), salt.size ()).c_str ());
+            node.append_attribute (ATTR_KEY_LENGTH).set_value (
+                util::ui64Tostring (keyLength).c_str ());
+            node.append_attribute (ATTR_MESSAGE_DIGEST_NAME).set_value (
+                messageDigestName.c_str ());
+            node.append_attribute (ATTR_COUNT).set_value (
+                util::ui64Tostring (count).c_str ());
+            node.append_attribute (ATTR_KEY_ID).set_value (
+                keyId.ToHexString ().c_str ());
+            node.append_attribute (ATTR_KEY_NAME).set_value (
+                keyName.c_str ());
+            node.append_attribute (ATTR_KEY_DESCRIPTION).set_value (
+                keyDescription.c_str ());
             pugi::xml_node paramsNode = node.append_child (TAG_PARAMS);
             paramsNode << *params;
             pugi::xml_node publicKeyNode = node.append_child (TAG_PUBLIC_KEY);
@@ -218,15 +225,18 @@ namespace thekogans {
             keyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_KEY_ID)->value);
             keyName = object.Get<util::JSON::String> (ATTR_KEY_NAME)->value;
             keyDescription = object.Get<util::JSON::String> (ATTR_KEY_DESCRIPTION)->value;
-            util::JSON::Object::SharedPtr paramsObject = object.Get<util::JSON::Object> (TAG_PARAMS);
+            util::JSON::Object::SharedPtr paramsObject =
+                object.Get<util::JSON::Object> (TAG_PARAMS);
             *paramsObject >> params;
-            util::JSON::Object::SharedPtr publicKeyObject = object.Get<util::JSON::Object> (TAG_PUBLIC_KEY);
+            util::JSON::Object::SharedPtr publicKeyObject =
+                object.Get<util::JSON::Object> (TAG_PUBLIC_KEY);
             *publicKeyObject >> publicKey;
         }
 
         void DHEKeyExchange::DHEParams::Write (util::JSON::Object &object) const {
             Params::Write (object);
-            object.Add<const std::string &> (ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
+            object.Add<const std::string &> (
+                ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
             object.Add<const util::SizeT &> (ATTR_KEY_LENGTH, keyLength);
             object.Add<const std::string &> (ATTR_MESSAGE_DIGEST_NAME, messageDigestName);
             object.Add<const util::SizeT &> (ATTR_COUNT, count);
@@ -333,21 +343,23 @@ namespace thekogans {
         }
 
         namespace {
-            util::Buffer GetSalt (
+            util::Buffer::SharedPtr GetSalt (
                     const std::vector<util::ui8> &salt,
                     const AsymmetricKey &publicKey1,
                     const AsymmetricKey &publicKey2) {
-                util::Buffer buffer (
-                    util::NetworkEndian,
-                    util::Serializer::Size (salt) +
-                    publicKey1.Size () +
-                    publicKey2.Size ());
-                buffer << salt << publicKey1 << publicKey2;
+                util::Buffer::SharedPtr buffer (
+                    new util::Buffer (
+                        util::NetworkEndian,
+                        util::Serializer::Size (salt) +
+                        publicKey1.Size () +
+                        publicKey2.Size ()));
+                *buffer << salt << publicKey1 << publicKey2;
                 return buffer;
             }
         }
 
-        SymmetricKey::SharedPtr DHEKeyExchange::DeriveSharedSymmetricKey (Params::SharedPtr params) const {
+        SymmetricKey::SharedPtr DHEKeyExchange::DeriveSharedSymmetricKey (
+                Params::SharedPtr params) const {
             DHEParams::SharedPtr dheParams =
                 util::dynamic_refcounted_sharedptr_cast<DHEParams> (params);
             if (dheParams.Get () != 0) {
@@ -383,14 +395,14 @@ namespace thekogans {
                         ((X25519AsymmetricKey *)dheParams->publicKey.Get ())->key.GetReadPtr (),
                         secret.data ());
                 }
-                util::Buffer salt = initiator ?
+                util::Buffer::SharedPtr salt = initiator ?
                     GetSalt (dheParams->salt, *publicKey, *dheParams->publicKey) :
                     GetSalt (dheParams->salt, *dheParams->publicKey, *publicKey);
                 return SymmetricKey::FromSecretAndSalt (
                     secret.data (),
                     secret.size (),
-                    salt.GetReadPtr (),
-                    salt.GetDataAvailableForReading (),
+                    salt->GetReadPtr (),
+                    salt->GetDataAvailableForReading (),
                     dheParams->keyLength,
                     CipherSuite::GetOpenSSLMessageDigestByName (dheParams->messageDigestName),
                     dheParams->count,

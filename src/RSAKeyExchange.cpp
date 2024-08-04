@@ -46,7 +46,7 @@ namespace thekogans {
                 Authenticator authenticator (privateKey, messageDigest);
                 signature = authenticator.SignBuffer (
                     paramsBuffer.GetReadPtr (),
-                    paramsBuffer.GetDataAvailableForReading ()).Tovector ();
+                    paramsBuffer.GetDataAvailableForReading ())->Tovector ();
                 signatureKeyId = privateKey->GetId ();
                 signatureMessageDigestName = messageDigest->GetName ();
             }
@@ -120,8 +120,10 @@ namespace thekogans {
 
         void RSAKeyExchange::RSAParams::Write (pugi::xml_node &node) const {
             Params::Write (node);
-            node.append_attribute (ATTR_KEY_ID).set_value (keyId.ToHexString ().c_str ());
-            node.append_attribute (ATTR_BUFFER).set_value (util::HexEncodeBuffer (buffer.data (), buffer.size ()).c_str ());
+            node.append_attribute (ATTR_KEY_ID).set_value (
+                keyId.ToHexString ().c_str ());
+            node.append_attribute (ATTR_BUFFER).set_value (
+                util::HexEncodeBuffer (buffer.data (), buffer.size ()).c_str ());
         }
 
         void RSAKeyExchange::RSAParams::Read (
@@ -195,14 +197,14 @@ namespace thekogans {
             if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && key->IsPrivate () &&
                     rsaParams.Get () != 0) {
                 id = rsaParams->id;
-                util::Buffer symmetricKeyBuffer =
+                util::Buffer::SharedPtr symmetricKeyBuffer =
                     RSADecrypt (
                         rsaParams->buffer.data (),
                         rsaParams->buffer.size (),
                         key,
                         RSA_PKCS1_OAEP_PADDING,
                         true);
-                symmetricKeyBuffer >> symmetricKey;
+                *symmetricKeyBuffer >> symmetricKey;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -224,7 +226,7 @@ namespace thekogans {
                         key->GetId (),
                         authenticator.SignBuffer (
                             symmetricKeyBuffer.GetReadPtr (),
-                            symmetricKeyBuffer.GetDataAvailableForReading ()).Tovector ()));
+                            symmetricKeyBuffer.GetDataAvailableForReading ())->Tovector ()));
             }
             else {
                 rsaParams.Reset (
@@ -234,7 +236,7 @@ namespace thekogans {
                         RSAEncrypt (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),
-                            key).Tovector ()));
+                            key)->Tovector ()));
             }
             if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
                 rsaParams->CreateSignature (privateKey, messageDigest);

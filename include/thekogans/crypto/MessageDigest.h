@@ -108,14 +108,14 @@ namespace thekogans {
             /// \param[in] buffer Buffer whose hash to create.
             /// \param[in] bufferLength Buffer length.
             /// \return Buffer hash.
-            util::Buffer HashBuffer (
+            util::Buffer::SharedPtr HashBuffer (
                 const void *buffer,
                 std::size_t bufferLength);
             /// \brief
             /// Create a file hash (message digest).
             /// \param[in] path File whose hash to create.
             /// \return File hash.
-            util::Buffer HashFile (const std::string &path);
+            util::Buffer::SharedPtr HashFile (const std::string &path);
 
             /// \brief
             /// MessageDigest is neither copy constructable, nor assignable.
