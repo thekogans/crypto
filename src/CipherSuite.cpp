@@ -423,7 +423,7 @@ namespace thekogans {
                 const ID &keyId,
                 const std::string &keyName,
                 const std::string &keyDescription) const {
-            if (params.Get () != 0 && VerifyKeyExchangeParams (*params)) {
+            if (params != nullptr && VerifyKeyExchangeParams (*params)) {
                 return KeyExchange::SharedPtr (
                     new DHEKeyExchange (
                         keyExchangeId,
@@ -453,7 +453,7 @@ namespace thekogans {
                 const ID &keyId,
                 const std::string &keyName,
                 const std::string &keyDescription) const {
-            if (key.Get () != 0 && VerifyKeyExchangeKey (*key)) {
+            if (key != nullptr && VerifyKeyExchangeKey (*key)) {
                 return KeyExchange::SharedPtr (
                     new RSAKeyExchange (
                         keyExchangeId,
@@ -475,7 +475,7 @@ namespace thekogans {
         }
 
         Authenticator::SharedPtr CipherSuite::GetAuthenticator (AsymmetricKey::SharedPtr key) const {
-            if (key.Get () != 0 && VerifyAuthenticatorKey (*key)) {
+            if (key != nullptr && VerifyAuthenticatorKey (*key)) {
                 return Authenticator::SharedPtr (
                     new Authenticator (key, GetMessageDigest ()));
             }
@@ -486,7 +486,7 @@ namespace thekogans {
         }
 
         Cipher::SharedPtr CipherSuite::GetCipher (SymmetricKey::SharedPtr key) const {
-            if (key.Get () != 0 && VerifyCipherKey (*key)) {
+            if (key != nullptr && VerifyCipherKey (*key)) {
                 return Cipher::SharedPtr (
                     new Cipher (
                         key,
@@ -500,7 +500,7 @@ namespace thekogans {
         }
 
         MAC::SharedPtr CipherSuite::GetHMAC (SymmetricKey::SharedPtr key) const {
-            if (key.Get () != 0 && VerifyMACKey (*key, true)) {
+            if (key != nullptr && VerifyMACKey (*key, true)) {
                 return MAC::SharedPtr (new HMAC (key, GetOpenSSLMessageDigest ()));
             }
             else {
@@ -510,7 +510,7 @@ namespace thekogans {
         }
 
         MAC::SharedPtr CipherSuite::GetCMAC (SymmetricKey::SharedPtr key) const {
-            if (key.Get () != 0 && VerifyMACKey (*key, false)) {
+            if (key != nullptr && VerifyMACKey (*key, false)) {
                 return MAC::SharedPtr (new CMAC (key, GetOpenSSLCipher ()));
             }
             else {
@@ -520,8 +520,7 @@ namespace thekogans {
         }
 
         MessageDigest::SharedPtr CipherSuite::GetMessageDigest () const {
-            return MessageDigest::SharedPtr (
-                new MessageDigest (GetOpenSSLMessageDigestByName (messageDigest)));
+            return new MessageDigest (GetOpenSSLMessageDigestByName (messageDigest));
         }
 
         AsymmetricKey::SharedPtr CipherSuite::CreateAuthenticatorKey (
@@ -532,7 +531,8 @@ namespace thekogans {
                 const std::string &description) const {
             if (!IsAuthenticatorEC ()) {
                 if (authenticator == AUTHENTICATOR_DSA) {
-                    return crypto::DSA::ParamsFromKeyLength (keyLength, id, name, description)->CreateKey ();
+                    return crypto::DSA::ParamsFromKeyLength (
+                        keyLength, id, name, description)->CreateKey ();
                 }
                 else if (authenticator == AUTHENTICATOR_RSA) {
                     return crypto::RSA::CreateKey (keyLength,

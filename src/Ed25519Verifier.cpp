@@ -28,7 +28,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Verifier (publicKey, messageDigest) {
-            if (publicKey.Get () == 0 || publicKey->IsPrivate () ||
+            if (publicKey == nullptr || publicKey->IsPrivate () ||
                     publicKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);

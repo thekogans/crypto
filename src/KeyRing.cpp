@@ -103,7 +103,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Params::SharedPtr params =
                         it->second->GetKeyExchangeParams (paramsId, recursive);
-                    if (params.Get () != 0) {
+                    if (params != nullptr) {
                         return params;
                     }
                 }
@@ -127,7 +127,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Params::SharedPtr params =
                         it->second->GetKeyExchangeParams (equalityTest, recursive);
-                    if (params.Get () != 0) {
+                    if (params != nullptr) {
                         return params;
                     }
                 }
@@ -150,7 +150,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddKeyExchangeParams (Params::SharedPtr params) {
-            if (params.Get () != 0 &&
+            if (params != nullptr &&
                     cipherSuite.VerifyKeyExchangeParams (*params)) {
                 std::pair<ParamsMap::iterator, bool> result =
                     keyExchangeParamsMap.insert (
@@ -207,7 +207,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::SharedPtr key =
                         it->second->GetKeyExchangeKey (keyId, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -231,7 +231,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::SharedPtr key =
                         it->second->GetKeyExchangeKey (equalityTest, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -240,7 +240,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddKeyExchangeKey (AsymmetricKey::SharedPtr key) {
-            if (key.Get () != 0 && cipherSuite.VerifyKeyExchangeKey (*key)) {
+            if (key != nullptr && cipherSuite.VerifyKeyExchangeKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result =
                     keyExchangeKeyMap.insert (
                         AsymmetricKeyMap::value_type (key->GetId (), key));
@@ -299,7 +299,7 @@ namespace thekogans {
                 crypto::Params::SharedPtr params = paramsOrKeyId != ID::Empty ?
                     GetKeyExchangeParams (paramsOrKeyId) :
                     GetRandomKeyExchangeParams ();
-                if (params.Get () != 0) {
+                if (params != nullptr) {
                     keyExchange.Reset (
                         new DHEKeyExchange (
                             ID (),
@@ -321,7 +321,7 @@ namespace thekogans {
             }
             else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
                 crypto::AsymmetricKey::SharedPtr key = GetKeyExchangeKey (paramsOrKeyId);
-                if (key.Get () != 0 && !key->IsPrivate ()) {
+                if (key != nullptr && !key->IsPrivate ()) {
                     keyExchange.Reset (
                         new RSAKeyExchange (
                             ID (),
@@ -347,7 +347,7 @@ namespace thekogans {
                     "Unknown key exchange type: %s",
                     cipherSuite.keyExchange.c_str ());
             }
-            if (keyExchange.Get () != 0) {
+            if (keyExchange != nullptr) {
                 std::pair<KeyExchangeMap::iterator, bool> result =
                     keyExchangeMap.insert (
                         KeyExchangeMap::value_type (keyExchange->GetId (), keyExchange));
@@ -372,7 +372,7 @@ namespace thekogans {
                             name,
                             description,
                             recursive);
-                    if (keyExchange.Get () != 0) {
+                    if (keyExchange != nullptr) {
                         break;
                     }
                 }
@@ -383,17 +383,17 @@ namespace thekogans {
         KeyExchange::SharedPtr KeyRing::CreateKeyExchange (
                 KeyExchange::Params::SharedPtr params,
                 bool recursive) {
-            if (params.Get () != 0) {
+            if (params != nullptr) {
                 // Validate the parameters signature (if one was provided).
                 if (!params->signature.empty ()) {
                     AsymmetricKey::SharedPtr publicKey =
                         GetAuthenticatorKey (params->signatureKeyId, recursive);
-                    if (publicKey.Get () != 0 && !publicKey->IsPrivate ()) {
+                    if (publicKey != nullptr && !publicKey->IsPrivate ()) {
                         MessageDigest::SharedPtr messageDigest (
                             new MessageDigest (
                                 CipherSuite::GetOpenSSLMessageDigestByName (
                                     params->signatureMessageDigestName)));
-                        if (messageDigest.Get () != 0) {
+                        if (messageDigest != nullptr) {
                             if (!params->ValidateSignature (publicKey, messageDigest)) {
                                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                                     "Params failed signature validation: %s",
@@ -419,9 +419,9 @@ namespace thekogans {
                 else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
                     RSAKeyExchange::RSAParams::SharedPtr rsaParams =
                         util::dynamic_refcounted_sharedptr_cast<RSAKeyExchange::RSAParams> (params);
-                    if (rsaParams.Get () != 0) {
+                    if (rsaParams != nullptr) {
                         AsymmetricKey::SharedPtr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
-                        if (key.Get () != 0) {
+                        if (key != nullptr) {
                             return KeyExchange::SharedPtr (new RSAKeyExchange (key, params));
                         }
                         else {
@@ -457,7 +457,7 @@ namespace thekogans {
             if (it != keyExchangeMap.end ()) {
                 keyExchange = it->second;
             }
-            if (keyExchange.Get () != 0) {
+            if (keyExchange != nullptr) {
                 keyExchangeMap.erase (it);
             }
             else if (recursive) {
@@ -466,7 +466,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     keyExchange =
                         it->second->GetKeyExchange (keyExchangeId, recursive);
-                    if (keyExchange.Get () != 0) {
+                    if (keyExchange != nullptr) {
                         break;
                     }
                 }
@@ -487,7 +487,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Params::SharedPtr params =
                         it->second->GetAuthenticatorParams (paramsId, recursive);
-                    if (params.Get () != 0) {
+                    if (params != nullptr) {
                         return params;
                     }
                 }
@@ -511,7 +511,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Params::SharedPtr params =
                         it->second->GetAuthenticatorParams (equalityTest, recursive);
-                    if (params.Get () != 0) {
+                    if (params != nullptr) {
                         return params;
                     }
                 }
@@ -520,7 +520,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddAuthenticatorParams (Params::SharedPtr params) {
-            if (params.Get () != 0 && cipherSuite.VerifyAuthenticatorParams (*params)) {
+            if (params != nullptr && cipherSuite.VerifyAuthenticatorParams (*params)) {
                 std::pair<ParamsMap::iterator, bool> result =
                     authenticatorParamsMap.insert (
                         ParamsMap::value_type (params->GetId (), params));
@@ -576,7 +576,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::SharedPtr key =
                         it->second->GetAuthenticatorKey (keyId, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -600,7 +600,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     AsymmetricKey::SharedPtr key =
                         it->second->GetAuthenticatorKey (equalityTest, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -616,7 +616,7 @@ namespace thekogans {
                 return it->second;
             }
             AsymmetricKey::SharedPtr key = GetAuthenticatorKey (keyId, false);
-            if (key.Get () != 0) {
+            if (key != nullptr) {
                 Authenticator::SharedPtr authenticator =
                     cipherSuite.GetAuthenticator (key);
                 std::pair<AuthenticatorMap::iterator, bool> result =
@@ -635,7 +635,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Authenticator::SharedPtr authenticator =
                         it->second->GetAuthenticator (keyId, recursive);
-                    if (authenticator.Get () != 0) {
+                    if (authenticator != nullptr) {
                         return authenticator;
                     }
                 }
@@ -646,11 +646,11 @@ namespace thekogans {
         bool KeyRing::AddAuthenticatorKey (
                 AsymmetricKey::SharedPtr key,
                 Authenticator::SharedPtr authenticator) {
-            if (key.Get () != 0 && cipherSuite.VerifyAuthenticatorKey (*key)) {
+            if (key != nullptr && cipherSuite.VerifyAuthenticatorKey (*key)) {
                 std::pair<AsymmetricKeyMap::iterator, bool> result =
                     authenticatorKeyMap.insert (
                         AsymmetricKeyMap::value_type (key->GetId (), key));
-                if (result.second && authenticator.Get () != 0) {
+                if (result.second && authenticator != nullptr) {
                     std::pair<AuthenticatorMap::iterator, bool> result =
                         authenticatorMap.insert (
                             AuthenticatorMap::value_type (
@@ -718,7 +718,7 @@ namespace thekogans {
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
                     SymmetricKey::SharedPtr key = it->second->GetCipherKey (keyId, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -741,7 +741,7 @@ namespace thekogans {
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
                     SymmetricKey::SharedPtr key = it->second->GetCipherKey (equalityTest, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -757,7 +757,7 @@ namespace thekogans {
                 return it->second;
             }
             SymmetricKey::SharedPtr key = GetCipherKey (keyId, false);
-            if (key.Get () != 0) {
+            if (key != nullptr) {
                 Cipher::SharedPtr cipher =
                     cipherSuite.GetCipher (key);
                 std::pair<CipherMap::iterator, bool> result =
@@ -776,7 +776,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Cipher::SharedPtr cipher =
                         it->second->GetCipher (keyId, recursive);
-                    if (cipher.Get () != 0) {
+                    if (cipher != nullptr) {
                         return cipher;
                     }
                 }
@@ -815,11 +815,11 @@ namespace thekogans {
         bool KeyRing::AddCipherKey (
                 SymmetricKey::SharedPtr key,
                 Cipher::SharedPtr cipher) {
-            if (key.Get () != 0 && cipherSuite.VerifyCipherKey (*key)) {
+            if (key != nullptr && cipherSuite.VerifyCipherKey (*key)) {
                 std::pair<SymmetricKeyMap::iterator, bool> result =
                     cipherKeyMap.insert (
                         SymmetricKeyMap::value_type (key->GetId (), key));
-                if (result.second && cipher.Get () != 0) {
+                if (result.second && cipher != nullptr) {
                     std::pair<CipherMap::iterator, bool> result =
                         cipherMap.insert (
                             CipherMap::value_type (key->GetId (), cipher));
@@ -886,7 +886,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     SymmetricKey::SharedPtr key =
                         it->second->GetMACKey (keyId, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -910,7 +910,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     SymmetricKey::SharedPtr key =
                         it->second->GetMACKey (equalityTest, recursive);
-                    if (key.Get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                 }
@@ -926,7 +926,7 @@ namespace thekogans {
                 return it->second;
             }
             SymmetricKey::SharedPtr key = GetMACKey (keyId, false);
-            if (key.Get () != 0) {
+            if (key != nullptr) {
                 MAC::SharedPtr mac = cipherSuite.GetHMAC (key);
                 std::pair<MACMap::iterator, bool> result =
                     macMap.insert (
@@ -944,7 +944,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     MAC::SharedPtr mac =
                         it->second->GetMAC (keyId, recursive);
-                    if (mac.Get () != 0) {
+                    if (mac != nullptr) {
                         return mac;
                     }
                 }
@@ -955,11 +955,11 @@ namespace thekogans {
         bool KeyRing::AddMACKey (
                 SymmetricKey::SharedPtr key,
                 MAC::SharedPtr mac) {
-            if (key.Get () != 0 && cipherSuite.VerifyMACKey (*key, true)) {
+            if (key != nullptr && cipherSuite.VerifyMACKey (*key, true)) {
                 std::pair<SymmetricKeyMap::iterator, bool> result =
                     macKeyMap.insert (
                         SymmetricKeyMap::value_type (key->GetId (), key));
-                if (result.second && mac.Get () != 0) {
+                if (result.second && mac != nullptr) {
                     std::pair<MACMap::iterator, bool> result =
                         macMap.insert (MACMap::value_type (key->GetId (), mac));
                     if (!result.second) {
@@ -1025,7 +1025,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Serializable::SharedPtr userData =
                         it->second->GetUserData (id, recursive);
-                    if (userData.Get () != 0) {
+                    if (userData != nullptr) {
                         return userData;
                     }
                 }
@@ -1049,7 +1049,7 @@ namespace thekogans {
                         end = subringMap.end (); it != end; ++it) {
                     Serializable::SharedPtr userData =
                         it->second->GetUserData (equalityTest, recursive);
-                    if (userData.Get () != 0) {
+                    if (userData != nullptr) {
                         return userData;
                     }
                 }
@@ -1058,7 +1058,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddUserData (Serializable::SharedPtr userData) {
-            if (userData.Get () != 0) {
+            if (userData != nullptr) {
                 std::pair<SerializableMap::iterator, bool> result =
                     userDataMap.insert (
                         SerializableMap::value_type (userData->GetId (), userData));
@@ -1113,7 +1113,7 @@ namespace thekogans {
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
                     SharedPtr subring = it->second->GetSubring (subringId, recursive);
-                    if (subring.Get () != 0) {
+                    if (subring != nullptr) {
                         return subring;
                     }
                 }
@@ -1136,7 +1136,7 @@ namespace thekogans {
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
                     SharedPtr subring = it->second->GetSubring (equalityTest, recursive);
-                    if (subring.Get () != 0) {
+                    if (subring != nullptr) {
                         return subring;
                     }
                 }
@@ -1145,7 +1145,7 @@ namespace thekogans {
         }
 
         bool KeyRing::AddSubring (SharedPtr subring) {
-            if (subring.Get () != 0) {
+            if (subring != nullptr) {
                 std::pair<KeyRingMap::iterator, bool> result =
                     subringMap.insert (
                         KeyRingMap::value_type (subring->GetId (), subring));
@@ -1708,7 +1708,7 @@ namespace thekogans {
             keyExchangeParamsMap.clear ();
             util::JSON::Array::SharedPtr keyExchangeParams =
                 object.Get<util::JSON::Array> (TAG_KEY_EXCHANGE_PARAMS);
-            if (keyExchangeParams.Get () != 0) {
+            if (keyExchangeParams != nullptr) {
                 for (std::size_t i = 0, count = keyExchangeParams->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr keyExchangeParam =
                         keyExchangeParams->Get<util::JSON::Object> (i);
@@ -1727,7 +1727,7 @@ namespace thekogans {
             keyExchangeKeyMap.clear ();
             util::JSON::Array::SharedPtr keyExchangeKeys =
                 object.Get<util::JSON::Array> (TAG_KEY_EXCHANGE_KEYS);
-            if (keyExchangeKeys.Get () != 0) {
+            if (keyExchangeKeys != nullptr) {
                 for (std::size_t i = 0, count = keyExchangeKeys->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr keyExchangeKey =
                         keyExchangeKeys->Get<util::JSON::Object> (i);
@@ -1746,7 +1746,7 @@ namespace thekogans {
             authenticatorParamsMap.clear ();
             util::JSON::Array::SharedPtr authenticatorParams =
                 object.Get<util::JSON::Array> (TAG_AUTHENTICATOR_PARAMS);
-            if (authenticatorParams.Get () != 0) {
+            if (authenticatorParams != nullptr) {
                 for (std::size_t i = 0, count = authenticatorParams->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr authenticatorParam =
                         authenticatorParams->Get<util::JSON::Object> (i);
@@ -1765,7 +1765,7 @@ namespace thekogans {
             authenticatorKeyMap.clear ();
             util::JSON::Array::SharedPtr authenticatorKeys =
                 object.Get<util::JSON::Array> (TAG_AUTHENTICATOR_KEYS);
-            if (authenticatorKeys.Get () != 0) {
+            if (authenticatorKeys != nullptr) {
                 for (std::size_t i = 0, count = authenticatorKeys->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr authenticatorKey =
                         authenticatorKeys->Get<util::JSON::Object> (i);
@@ -1784,7 +1784,7 @@ namespace thekogans {
             cipherKeyMap.clear ();
             util::JSON::Array::SharedPtr cipherKeys =
                 object.Get<util::JSON::Array> (TAG_CIPHER_KEYS);
-            if (cipherKeys.Get () != 0) {
+            if (cipherKeys != nullptr) {
                 for (std::size_t i = 0, count = cipherKeys->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr cipherKey =
                         cipherKeys->Get<util::JSON::Object> (i);
@@ -1802,7 +1802,7 @@ namespace thekogans {
             }
             macKeyMap.clear ();
             util::JSON::Array::SharedPtr macKeys = object.Get<util::JSON::Array> (TAG_MAC_KEYS);
-            if (macKeys.Get () != 0) {
+            if (macKeys != nullptr) {
                 for (std::size_t i = 0, count = macKeys->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr macKey = macKeys->Get<util::JSON::Object> (i);
                     SymmetricKey::SharedPtr key;
@@ -1819,7 +1819,7 @@ namespace thekogans {
             }
             userDataMap.clear ();
             util::JSON::Array::SharedPtr userDatas = object.Get<util::JSON::Array> (TAG_USER_DATAS);
-            if (userDatas.Get () != 0) {
+            if (userDatas != nullptr) {
                 for (std::size_t i = 0, count = userDatas->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr userData = userDatas->Get<util::JSON::Object> (i);
                     Serializable::SharedPtr data;
@@ -1836,7 +1836,7 @@ namespace thekogans {
             }
             subringMap.clear ();
             util::JSON::Array::SharedPtr subrings = object.Get<util::JSON::Array> (TAG_SUB_RINGS);
-            if (subrings.Get () != 0) {
+            if (subrings != nullptr) {
                 for (std::size_t i = 0, count = subrings->GetValueCount (); i < count; ++i) {
                     util::JSON::Object::SharedPtr subring = subrings->Get<util::JSON::Object> (i);
                     SharedPtr keyRing;

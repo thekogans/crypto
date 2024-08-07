@@ -50,7 +50,7 @@ namespace thekogans {
                 MessageDigest::SharedPtr messageDigest_) :
                 privateKey (privateKey_),
                 messageDigest (messageDigest_) {
-            if (privateKey.Get () == 0 || messageDigest.Get () == 0) {
+            if (privateKey == nullptr || messageDigest == nullptr) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
@@ -60,7 +60,9 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
             Map::iterator it = GetMap ().find (privateKey->GetKeyType ());
-            return it != GetMap ().end () ? it->second (privateKey, messageDigest) : Signer::SharedPtr ();
+            return it != GetMap ().end () ?
+                it->second (privateKey, messageDigest) :
+                Signer::SharedPtr ();
         }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)

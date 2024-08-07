@@ -35,10 +35,10 @@ namespace thekogans {
                 md (md_),
                 encryptor (key, cipher),
                 decryptor (key, cipher) {
-            if (key.Get () != 0 && cipher != 0 &&
+            if (key != nullptr && cipher != nullptr &&
                     key->GetKeyLength () == GetCipherKeyLength (cipher)) {
                 if (GetCipherMode (cipher) != EVP_CIPH_GCM_MODE) {
-                    if (md != 0) {
+                    if (md != nullptr) {
                         mac.Reset (
                             new HMAC (
                                 SymmetricKey::FromSecretAndSalt (
@@ -77,14 +77,15 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
+                    plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
-                    ciphertext != 0) {
+                    ciphertext != nullptr) {
                 util::ui8 *ivCiphertextAndMAC = ciphertext + CiphertextHeader::SIZE;
                 CiphertextHeader ciphertextHeader;
                 ciphertextHeader.ivLength =
                     (util::ui16)encryptor.Init (ivCiphertextAndMAC);
-                if (associatedData != 0) {
+                if (associatedData != nullptr) {
                     encryptor.SetAssociatedData (
                         associatedData,
                         associatedDataLength);
@@ -97,7 +98,7 @@ namespace thekogans {
                     ivCiphertextAndMAC + ciphertextHeader.ivLength + updateLength);
                 ciphertextHeader.ciphertextLength =
                     (util::ui32)(updateLength + finalLength);
-                if (mac.Get () != 0) {
+                if (mac != nullptr) {
                     ciphertextHeader.macLength =
                         (util::ui16)mac->SignBuffer (
                             ivCiphertextAndMAC,
@@ -114,7 +115,10 @@ namespace thekogans {
                             ciphertextHeader.ivLength +
                             ciphertextHeader.ciphertextLength);
                 }
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, CiphertextHeader::SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian,
+                    ciphertext,
+                    CiphertextHeader::SIZE);
                 buffer << ciphertextHeader;
                 return CiphertextHeader::SIZE + ciphertextHeader.GetTotalLength ();
             }
@@ -129,7 +133,8 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
-            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
+                    plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
                     new util::Buffer (util::NetworkEndian, GetMaxBufferLength (plaintextLength)));
@@ -154,9 +159,10 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
+                    plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
-                    ciphertext != 0) {
+                    ciphertext != nullptr) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
                     plaintextLength,
@@ -178,7 +184,7 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
-            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+            if (plaintext != nullptr && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
                     new util::Buffer (util::NetworkEndian, GetMaxBufferLength (plaintextLength)));
@@ -203,9 +209,9 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+            if (plaintext != nullptr && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
-                    ciphertext != 0) {
+                    ciphertext != nullptr) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
                     plaintextLength,
@@ -227,7 +233,7 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
-            if (plaintext != 0 && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
+            if (plaintext != nullptr && plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
                     new util::Buffer (util::NetworkEndian, GetMaxBufferLength (plaintextLength)));
@@ -252,16 +258,16 @@ namespace thekogans {
                 const void *associatedData,
                 std::size_t associatedDataLength,
                 util::ui8 *plaintext) {
-            if (ciphertext != 0 && ciphertextLength > 0 &&
+            if (ciphertext != nullptr && ciphertextLength > 0 &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0)) &&
-                    plaintext != 0) {
-                util::TenantReadBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
+                    plaintext != nullptr) {
+                util::TenantBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
                 CiphertextHeader ciphertextHeader;
                 buffer >> ciphertextHeader;
                 // If we're in CBC mode, verify the MAC before attempting to
                 // decrypt, as per the Cryptographic Doom Principle:
                 // https://moxie.org/blog/the-cryptographic-doom-principle/
-                if (mac.Get () != 0 &&
+                if (mac != nullptr &&
                         !mac->VerifyBufferSignature (
                             buffer.GetReadPtr (),
                             ciphertextHeader.ivLength +
@@ -275,7 +281,7 @@ namespace thekogans {
                 }
                 decryptor.Init (buffer.GetReadPtr ());
                 buffer.AdvanceReadOffset (ciphertextHeader.ivLength);
-                if (associatedData != 0 && associatedDataLength > 0) {
+                if (associatedData != nullptr && associatedDataLength > 0) {
                     decryptor.SetAssociatedData (associatedData, associatedDataLength);
                 }
                 std::size_t updateLength = decryptor.Update (
@@ -283,7 +289,7 @@ namespace thekogans {
                     ciphertextHeader.ciphertextLength,
                     plaintext);
                 buffer.AdvanceReadOffset (ciphertextHeader.ciphertextLength);
-                if (mac.Get () == 0) {
+                if (mac == nullptr) {
                     decryptor.SetTag (
                         buffer.GetReadPtr (),
                         ciphertextHeader.macLength);
@@ -304,7 +310,7 @@ namespace thekogans {
                 std::size_t associatedDataLength,
                 bool secure,
                 util::Endianness endianness) {
-            if (ciphertext != 0 && ciphertextLength > 0 &&
+            if (ciphertext != nullptr && ciphertextLength > 0 &&
                     (IsCipherAEAD (cipher) || (associatedData == 0 && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr plaintext (secure ?
                     new util::SecureBuffer (endianness, ciphertextLength) :

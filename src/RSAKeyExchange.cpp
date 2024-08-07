@@ -36,7 +36,7 @@ namespace thekogans {
         void RSAKeyExchange::RSAParams::CreateSignature (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
-            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
+            if (privateKey != nullptr && messageDigest != nullptr) {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
                     util::Serializer::Size (id) +
@@ -59,7 +59,7 @@ namespace thekogans {
         bool RSAKeyExchange::RSAParams::ValidateSignature (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
-            if (publicKey.Get () != 0 && messageDigest.Get () != 0 &&
+            if (publicKey != nullptr && messageDigest != nullptr &&
                     publicKey->GetId () == signatureKeyId &&
                     messageDigest->GetName () == signatureMessageDigestName) {
                 if (!signature.empty ()) {
@@ -158,7 +158,7 @@ namespace thekogans {
                 const std::string &keyDescription) :
                 KeyExchange (id),
                 key (key_) {
-            if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && !key->IsPrivate () &&
+            if (key != nullptr && key->GetKeyType () == OPENSSL_PKEY_RSA && !key->IsPrivate () &&
                     secretLength > 0 && md != 0 && count > 0) {
                 util::SecureVector<util::ui8> secret (secretLength);
                 if (util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
@@ -194,8 +194,8 @@ namespace thekogans {
                 key (key_) {
             RSAParams::SharedPtr rsaParams =
                 util::dynamic_refcounted_sharedptr_cast<RSAParams> (params);
-            if (key.Get () != 0 && key->GetKeyType () == OPENSSL_PKEY_RSA && key->IsPrivate () &&
-                    rsaParams.Get () != 0) {
+            if (key != nullptr && key->GetKeyType () == OPENSSL_PKEY_RSA && key->IsPrivate () &&
+                    rsaParams != nullptr) {
                 id = rsaParams->id;
                 util::Buffer::SharedPtr symmetricKeyBuffer =
                     RSADecrypt (
@@ -238,18 +238,18 @@ namespace thekogans {
                             symmetricKeyBuffer.GetDataAvailableForReading (),
                             key)->Tovector ()));
             }
-            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
+            if (privateKey != nullptr && messageDigest != nullptr) {
                 rsaParams->CreateSignature (privateKey, messageDigest);
             }
             return rsaParams;
         }
 
         SymmetricKey::SharedPtr RSAKeyExchange::DeriveSharedSymmetricKey (Params::SharedPtr params) const {
-            assert (symmetricKey.Get () != 0);
+            assert (symmetricKey != nullptr);
             if (!key->IsPrivate ()) {
                 RSAParams::SharedPtr rsaParams =
                     util::dynamic_refcounted_sharedptr_cast<RSAParams> (params);
-                if (rsaParams.Get () != 0) {
+                if (rsaParams != nullptr) {
                     util::SecureBuffer symmetricKeyBuffer (
                         util::NetworkEndian,
                         symmetricKey->Size ());

@@ -31,10 +31,10 @@ namespace thekogans {
         Authenticator::Authenticator (
                 AsymmetricKey::SharedPtr key,
                 MessageDigest::SharedPtr messageDigest) {
-            if (key.Get () != 0 && messageDigest.Get () != 0) {
+            if (key != nullptr && messageDigest != nullptr) {
                 if (key->IsPrivate ()) {
                     signer = Signer::Get (key, messageDigest);
-                    if (signer.Get () == 0) {
+                    if (signer == nullptr) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Signer for key: %s and digest: %s.",
                             key->GetKeyType (),
@@ -43,7 +43,7 @@ namespace thekogans {
                 }
                 else {
                     verifier = Verifier::Get (key, messageDigest);
-                    if (verifier.Get () == 0) {
+                    if (verifier == nullptr) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Verifier for key: %s and digest: %s.",
                             key->GetKeyType (),
@@ -60,8 +60,8 @@ namespace thekogans {
         util::Buffer::SharedPtr Authenticator::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
-                if (signer.Get () != 0) {
+            if (buffer != nullptr && bufferLength > 0) {
+                if (signer != nullptr) {
                     signer->Init ();
                     signer->Update (buffer, bufferLength);
                     return signer->Final ();
@@ -82,9 +82,9 @@ namespace thekogans {
                 std::size_t bufferLength,
                 const void *signature,
                 std::size_t signatureLength) {
-            if (buffer != 0 && bufferLength > 0 &&
-                    signature != 0 && signatureLength > 0) {
-                if (verifier.Get () != 0) {
+            if (buffer != nullptr && bufferLength > 0 &&
+                    signature != nullptr && signatureLength > 0) {
+                if (verifier != nullptr) {
                     verifier->Init ();
                     verifier->Update (buffer, bufferLength);
                     return verifier->Final (signature, signatureLength);
@@ -101,7 +101,7 @@ namespace thekogans {
         }
 
         util::Buffer::SharedPtr Authenticator::SignFile (const std::string &path) {
-            if (signer.Get () != 0) {
+            if (signer != nullptr) {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 util::FixedArray<util::ui8, 4096> buffer;
@@ -122,8 +122,8 @@ namespace thekogans {
                 const std::string &path,
                 const void *signature,
                 std::size_t signatureLength) {
-            if (signature != 0 && signatureLength > 0) {
-                if (verifier.Get () != 0) {
+            if (signature != nullptr && signatureLength > 0) {
+                if (verifier != nullptr) {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;

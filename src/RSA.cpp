@@ -92,7 +92,7 @@ namespace thekogans {
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     ciphertext != 0) {
@@ -130,7 +130,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr ciphertext (
@@ -157,7 +157,7 @@ namespace thekogans {
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     ciphertext != 0) {
@@ -189,7 +189,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr ciphertext (
@@ -218,7 +218,7 @@ namespace thekogans {
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     ciphertext != 0) {
@@ -244,7 +244,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr ciphertext (
@@ -273,7 +273,7 @@ namespace thekogans {
                 util::i32 padding,
                 util::ui8 *plaintext) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    privateKey.Get () != 0 && privateKey->IsPrivate () &&
+                    privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     plaintext != 0) {
@@ -311,7 +311,7 @@ namespace thekogans {
                 bool secure,
                 util::Endianness endianness) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    privateKey.Get () != 0 && privateKey->IsPrivate () &&
+                    privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr plaintext (secure ?
@@ -425,7 +425,7 @@ namespace thekogans {
                 util::i32 padding,
                 util::ui8 *ciphertext) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     ciphertext != 0) {
@@ -476,7 +476,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
             if (plaintext != 0 && plaintextLength > 0 &&
-                    publicKey.Get () != 0 && !publicKey->IsPrivate () &&
+                    publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr buffer (
@@ -507,11 +507,11 @@ namespace thekogans {
                 util::i32 padding,
                 util::ui8 *plaintext) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    privateKey.Get () != 0 && privateKey->IsPrivate () &&
+                    privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     plaintext != 0) {
-                util::TenantReadBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
+                util::TenantBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
                 util::ui32 headerLength;
                 buffer >> headerLength;
                 util::SecureBuffer headerBuffer (
@@ -555,7 +555,7 @@ namespace thekogans {
                 bool secure,
                 util::Endianness endianness) {
             if (ciphertext != 0 && ciphertextLength > 0 &&
-                    privateKey.Get () != 0 && privateKey->IsPrivate () &&
+                    privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr buffer (secure ?

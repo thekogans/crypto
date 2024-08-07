@@ -32,12 +32,12 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Signer (privateKey, messageDigest) {
-            if (privateKey.Get () != 0 &&
+            if (privateKey != nullptr &&
                     privateKey->IsPrivate () &&
                     (privateKey->GetKeyType () == OPENSSL_PKEY_RSA ||
                         privateKey->GetKeyType () == OPENSSL_PKEY_DSA ||
                         privateKey->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    messageDigest.Get () != 0) {
+                    messageDigest != nullptr) {
                 if (EVP_DigestSignInit (
                         &messageDigest->ctx,
                         0,

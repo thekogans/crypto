@@ -180,7 +180,7 @@ namespace thekogans {
                 _T,\
                 thekogans::util::SpinLock,\
                 minItemsInPage,\
-                thekogans::util::SecureAllocator::Instance ().Get ())
+                thekogans::util::SecureAllocator::Instance ())
 
     } // namespace crypto
 

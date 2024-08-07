@@ -35,7 +35,7 @@ namespace thekogans {
         void DHEKeyExchange::DHEParams::CreateSignature (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
-            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
+            if (privateKey != nullptr && messageDigest != nullptr) {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
                     util::Serializer::Size (id) +
@@ -75,7 +75,7 @@ namespace thekogans {
         bool DHEKeyExchange::DHEParams::ValidateSignature (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
-            if (publicKey.Get () != 0 && messageDigest.Get () != 0 &&
+            if (publicKey != nullptr && messageDigest != nullptr &&
                     publicKey->GetId () == signatureKeyId &&
                     messageDigest->GetName () == signatureMessageDigestName) {
                 if (!signature.empty ()) {
@@ -286,7 +286,7 @@ namespace thekogans {
                 keyId (keyId_),
                 keyName (keyName_),
                 keyDescription (keyDescription_) {
-            if (params.Get () != 0 && ValidateParamsKeyType (params->GetKeyType ())) {
+            if (params != nullptr && ValidateParamsKeyType (params->GetKeyType ())) {
                 privateKey = params->CreateKey ();
                 publicKey = privateKey->GetPublicKey ();
             }
@@ -301,7 +301,7 @@ namespace thekogans {
                 initiator (false) {
             DHEParams::SharedPtr dheParams =
                 util::dynamic_refcounted_sharedptr_cast<DHEParams> (params);
-            if (dheParams.Get () != 0 &&
+            if (dheParams != nullptr &&
                     ValidateParamsKeyType (dheParams->params->GetKeyType ())) {
                 id = dheParams->id;
                 this->params = dheParams->params;
@@ -336,7 +336,7 @@ namespace thekogans {
                     keyName,
                     keyDescription,
                     publicKey));
-            if (privateKey.Get () != 0 && messageDigest.Get () != 0) {
+            if (privateKey != nullptr && messageDigest != nullptr) {
                 dheParams->CreateSignature (privateKey, messageDigest);
             }
             return dheParams;
@@ -362,7 +362,7 @@ namespace thekogans {
                 Params::SharedPtr params) const {
             DHEParams::SharedPtr dheParams =
                 util::dynamic_refcounted_sharedptr_cast<DHEParams> (params);
-            if (dheParams.Get () != 0) {
+            if (dheParams != nullptr) {
                 util::SecureVector<util::ui8> secret;
                 const char *keyType = privateKey->GetKeyType ();
                 if (keyType == OPENSSL_PKEY_DH || keyType == OPENSSL_PKEY_EC) {

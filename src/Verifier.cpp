@@ -50,7 +50,7 @@ namespace thekogans {
                 MessageDigest::SharedPtr messageDigest_) :
                 publicKey (publicKey_),
                 messageDigest (messageDigest_) {
-            if (publicKey.Get () == 0 || messageDigest.Get () == 0) {
+            if (publicKey == nullptr || messageDigest == nullptr) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }

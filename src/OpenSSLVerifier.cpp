@@ -32,12 +32,12 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Verifier (publicKey, messageDigest) {
-            if (publicKey.Get () != 0 &&
+            if (publicKey != nullptr &&
                     !publicKey->IsPrivate () &&
                     (publicKey->GetKeyType () == OPENSSL_PKEY_RSA ||
                         publicKey->GetKeyType () == OPENSSL_PKEY_DSA ||
                         publicKey->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    messageDigest.Get () != 0) {
+                    messageDigest != nullptr) {
                 if (EVP_DigestVerifyInit (
                         &messageDigest->ctx,
                         0,

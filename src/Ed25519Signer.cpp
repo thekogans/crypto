@@ -30,9 +30,9 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Signer (privateKey, messageDigest) {
-            if (privateKey.Get () == 0 || !privateKey->IsPrivate () ||
+            if (privateKey == nullptr || !privateKey->IsPrivate () ||
                     privateKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE ||
-                    messageDigest.Get () == 0) {
+                    messageDigest == nullptr) {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }

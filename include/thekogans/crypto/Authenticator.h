@@ -67,13 +67,13 @@ namespace thekogans {
             /// Return the key associated with this authenticator.
             /// \return \see{Signer} or \see{Verifier} key (depending on op).
             inline AsymmetricKey::SharedPtr GetKey () const {
-                return signer.Get () != 0 ? signer->GetPrivateKey () : verifier->GetPublicKey ();
+                return signer != nullptr ? signer->GetPrivateKey () : verifier->GetPublicKey ();
             }
             /// \brief
             /// Return the message digest associated with this authenticator.
             /// \return \see{AsymmetricKey} message digest used for hashing.
             inline MessageDigest::SharedPtr GetMessageDigest () const {
-                return signer.Get () != 0 ? signer->GetMessageDigest () : verifier->GetMessageDigest ();
+                return signer != nullptr ? signer->GetMessageDigest () : verifier->GetMessageDigest ();
             }
 
             /// \brief

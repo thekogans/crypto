@@ -30,7 +30,7 @@ namespace thekogans {
                 const EVP_MD *md_) :
                 key (key_),
                 md (md_) {
-            if (key.Get () != 0 && md != 0) {
+            if (key != nullptr && md != 0) {
                 if (HMAC_Init_ex (
                         &ctx,
                         key->Get ().GetReadPtr (),

@@ -31,7 +31,7 @@ namespace thekogans {
                 const EVP_CIPHER *cipher_) :
                 key (key_),
                 cipher (cipher_) {
-            if (key.Get () != 0 && cipher != 0) {
+            if (key != nullptr && cipher != nullptr) {
                 if (CMAC_Init (
                         &ctx,
                         key->Get ().GetReadPtr (),
@@ -56,7 +56,7 @@ namespace thekogans {
         void CMAC::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 if (CMAC_Update (&ctx, buffer, bufferLength) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -68,7 +68,7 @@ namespace thekogans {
         }
 
         std::size_t CMAC::Final (util::ui8 *signature) {
-            if (signature != 0) {
+            if (signature != nullptr) {
                 std::size_t signatureLength = 0;
                 if (CMAC_Final (&ctx, signature, &signatureLength) == 1) {
                     return signatureLength;
