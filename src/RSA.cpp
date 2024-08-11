@@ -167,7 +167,7 @@ namespace thekogans {
                     publicKey,
                     padding,
                     ciphertext + util::UI32_SIZE);
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, util::UI32_SIZE);
+                util::TenantBuffer buffer (util::NetworkEndian, ciphertext, util::UI32_SIZE, 0, 0);
                 buffer << (util::ui32)ciphertextLength;
                 return util::UI32_SIZE + ciphertextLength;
             }
@@ -228,7 +228,7 @@ namespace thekogans {
                     publicKey,
                     padding,
                     ciphertext + FrameHeader::SIZE);
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, FrameHeader::SIZE);
+                util::TenantBuffer buffer (util::NetworkEndian, ciphertext, FrameHeader::SIZE, 0, 0);
                 buffer << FrameHeader (publicKey->GetId (), (util::ui32)ciphertextLength);
                 return FrameHeader::SIZE + ciphertextLength;
             }
@@ -511,7 +511,7 @@ namespace thekogans {
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
                     plaintext != 0) {
-                util::TenantBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
+                util::TenantBuffer buffer (util::NetworkEndian, (void *)ciphertext, ciphertextLength);
                 util::ui32 headerLength;
                 buffer >> headerLength;
                 util::SecureBuffer headerBuffer (

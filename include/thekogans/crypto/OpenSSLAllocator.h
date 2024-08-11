@@ -67,13 +67,13 @@ namespace thekogans {
         #define THEKOGANS_CRYPTO_IMPLEMENT_OPEN_SSL_ALLOCATOR_FUNCTIONS(_T)\
         void *_T::operator new (std::size_t size) {\
             assert (size == sizeof (_T));\
-            return thekogans::crypto::OpenSSLAllocator::Instance ().Alloc (size);\
+            return thekogans::crypto::OpenSSLAllocator::Instance ()->Alloc (size);\
         }\
         void *_T::operator new (\
                 std::size_t size,\
                 std::nothrow_t) throw () {\
             assert (size == sizeof (_T));\
-            return thekogans::crypto::OpenSSLAllocator::Instance ().Alloc (size);\
+            return thekogans::crypto::OpenSSLAllocator::Instance ()->Alloc (size);\
         }\
         void *_T::operator new (\
                 std::size_t size,\
@@ -82,12 +82,12 @@ namespace thekogans {
             return ptr;\
         }\
         void _T::operator delete (void *ptr) {\
-            thekogans::crypto::OpenSSLAllocator::Instance ().Free (ptr, sizeof (_T));\
+            thekogans::crypto::OpenSSLAllocator::Instance ()->Free (ptr, sizeof (_T));\
         }\
         void _T::operator delete (\
                 void *ptr,\
                 std::nothrow_t) throw () {\
-            thekogans::crypto::OpenSSLAllocator::Instance ().Free (ptr, sizeof (_T));\
+            thekogans::crypto::OpenSSLAllocator::Instance ()->Free (ptr, sizeof (_T));\
         }\
         void _T::operator delete (\
             void *,\
