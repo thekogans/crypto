@@ -142,7 +142,7 @@ namespace thekogans {
                 if (keyExchangeParamsMap.size () > 1) {
                     std::advance (
                         it,
-                        util::GlobalRandomSource::Instance ()->Getui32 () % keyExchangeParamsMap.size ());
+                        util::RandomSource::Instance ()->Getui32 () % keyExchangeParamsMap.size ());
                 }
                 params = it->second;
             }
@@ -791,7 +791,7 @@ namespace thekogans {
                 if (cipherKeyMap.size () > 1) {
                     std::advance (
                         keyIt,
-                        util::GlobalRandomSource::Instance ()->Getui32 () % cipherKeyMap.size ());
+                        util::RandomSource::Instance ()->Getui32 () % cipherKeyMap.size ());
                 }
                 CipherMap::iterator cipherIt = cipherMap.find (keyIt->second->GetId ());
                 if (cipherIt == cipherMap.end ()) {

@@ -3720,7 +3720,7 @@ namespace thekogans {
 
         void Ed25519::CreateKey (util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
             if (privateKey != 0) {
-                util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
+                util::RandomSource::Instance ()->GetSeedOrBytes (
                     privateKey, PRIVATE_KEY_LENGTH / 2);
                 util::ui8 *publicKey = privateKey + PRIVATE_KEY_LENGTH / 2;
                 SHA512 (privateKey, PRIVATE_KEY_LENGTH / 2, publicKey);
@@ -3820,7 +3820,7 @@ namespace thekogans {
         void X25519::CreateKey (
                 util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
             if (privateKey != 0) {
-                util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
+                util::RandomSource::Instance ()->GetSeedOrBytes (
                     privateKey, PRIVATE_KEY_LENGTH);
             }
             else {

@@ -34,7 +34,7 @@ namespace thekogans {
         const ID ID::Empty (emptyIdData);
 
         ID::ID () {
-            if (util::GlobalRandomSource::Instance ()->GetBytes (data, SIZE) != SIZE) {
+            if (util::RandomSource::Instance ()->GetBytes (data, SIZE) != SIZE) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Unable to get " THEKOGANS_UTIL_SIZE_T_FORMAT " random bytes for ID.", SIZE);
             }

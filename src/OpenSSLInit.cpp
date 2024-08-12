@@ -168,7 +168,7 @@ namespace thekogans {
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureBuffer entropy (util::HostEndian, entropyNeeded);
                 if (entropy.AdvanceWriteOffset (
-                        util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
+                        util::RandomSource::Instance ()->GetSeedOrBytes (
                             entropy.GetWritePtr (),
                             entropy.GetDataAvailableForWriting ())) == 0) {
                     RAND_seed (

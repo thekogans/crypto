@@ -422,7 +422,7 @@ namespace thekogans {
                 randomLength = MIN_RANDOM_LENGTH;
             }
             util::SecureVector<util::ui8> random (randomLength);
-            if (util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
+            if (util::RandomSource::Instance ()->GetSeedOrBytes (
                     random.data (), randomLength) == randomLength) {
                 return FromSecretAndSalt (
                     random.data (),

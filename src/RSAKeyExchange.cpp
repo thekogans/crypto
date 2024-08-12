@@ -161,7 +161,7 @@ namespace thekogans {
             if (key != nullptr && key->GetKeyType () == OPENSSL_PKEY_RSA && !key->IsPrivate () &&
                     secretLength > 0 && md != 0 && count > 0) {
                 util::SecureVector<util::ui8> secret (secretLength);
-                if (util::GlobalRandomSource::Instance ()->GetSeedOrBytes (
+                if (util::RandomSource::Instance ()->GetSeedOrBytes (
                         secret.data (), secretLength) == secretLength) {
                     symmetricKey = SymmetricKey::FromSecretAndSalt (
                         secret.data (),
