@@ -137,7 +137,7 @@ int main (
             {
                 util::FixedBuffer<256> originalPlaintext;
                 originalPlaintext.AdvanceWriteOffset (
-                    util::GlobalRandomSource::Instance ()->GetBytes (
+                    util::RandomSource::Instance ()->GetBytes (
                         originalPlaintext.GetWritePtr (),
                         originalPlaintext.GetDataAvailableForWriting ()));
                 crypto::Cipher cipher (
@@ -147,17 +147,17 @@ int main (
                         0,
                         crypto::GetCipherKeyLength (
                             keyRing->GetCipherSuite ().GetOpenSSLCipher ())));
-                util::Buffer ciphertext = cipher.Encrypt (
+                util::Buffer::SharedPtr ciphertext = cipher.Encrypt (
                     originalPlaintext.GetReadPtr (),
                     originalPlaintext.GetDataAvailableForReading ());
-                util::Buffer decryptedPlaintext = cipher.Decrypt (
-                    ciphertext.GetReadPtr (),
-                    ciphertext.GetDataAvailableForReading ());
+                util::Buffer::SharedPtr decryptedPlaintext = cipher.Decrypt (
+                    ciphertext->GetReadPtr (),
+                    ciphertext->GetDataAvailableForReading ());
                 if (originalPlaintext.GetDataAvailableForReading () ==
-                        decryptedPlaintext.GetDataAvailableForReading () &&
+                        decryptedPlaintext->GetDataAvailableForReading () &&
                         memcmp (
                             originalPlaintext.GetReadPtr (),
-                            decryptedPlaintext.GetReadPtr (),
+                            decryptedPlaintext->GetReadPtr (),
                             originalPlaintext.GetDataAvailableForReading ()) == 0) {
                     std::cout << "Passed" << std::endl;
                 }

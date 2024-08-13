@@ -82,11 +82,11 @@ int main (
             crypto::Authenticator signer (
                 crypto::OpenSSLAsymmetricKey::LoadPrivateKeyFromFile (options.prefix + "private_key.pem"),
                 crypto::MessageDigest::SharedPtr (new crypto::MessageDigest));
-            util::Buffer signature = signer.SignFile (options.path);
-            util::Buffer encodedSignature =
+            util::Buffer::SharedPtr signature = signer.SignFile (options.path);
+            util::Buffer::SharedPtr encodedSignature =
                 util::Base64::Encode (
-                    signature.GetReadPtr (),
-                    signature.GetDataAvailableForReading (),
+                    signature->GetReadPtr (),
+                    signature->GetDataAvailableForReading (),
                     64);
             util::SimpleFile signatureFile (
                 util::NetworkEndian,
@@ -95,8 +95,8 @@ int main (
                 util::SimpleFile::Create |
                 util::SimpleFile::Truncate);
             signatureFile.Write (
-                encodedSignature.GetReadPtr (),
-                encodedSignature.GetDataAvailableForReading ());
+                encodedSignature->GetReadPtr (),
+                encodedSignature->GetDataAvailableForReading ());
             std::cout << "Done" << std::endl;
         }
         if (options.verify) {
@@ -110,14 +110,14 @@ int main (
                 signatureFile.Read (
                     encodedSignature.GetWritePtr (),
                     encodedSignature.GetDataAvailableForWriting ()));
-            util::Buffer signature =
+            util::Buffer::SharedPtr signature =
                 util::Base64::Decode (
                     encodedSignature.GetReadPtr (),
                     encodedSignature.GetDataAvailableForReading ());
             bool result = verifier.VerifyFileSignature (
                 options.path,
-                signature.GetReadPtr (),
-                signature.GetDataAvailableForReading ());
+                signature->GetReadPtr (),
+                signature->GetDataAvailableForReading ());
             std::cout << (result ? "Passed" : "Failed") << std::endl;
         }
     }
