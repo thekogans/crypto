@@ -29,9 +29,9 @@ namespace {
     bool operator == (
             const crypto::AsymmetricKey &key1,
             const crypto::AsymmetricKey &key2) {
-        util::Buffer key1Buffer (util::HostEndian, util::Serializable::Size (key1));
+        util::Buffer key1Buffer (util::HostEndian, key1.GetSize ());
         key1Buffer << key1;
-        util::Buffer key2Buffer (util::HostEndian, util::Serializable::Size (key2));
+        util::Buffer key2Buffer (util::HostEndian, key2.GetSize ());
         key2Buffer << key2;
         return key1Buffer.GetDataAvailableForReading () == key2Buffer.GetDataAvailableForReading () &&
             memcmp (
@@ -49,7 +49,7 @@ TEST (thekogans, AsymmetricKey) {
         std::cout << "AsymmetricKey private key...";
         util::Buffer serializer (
             util::NetworkEndian,
-            util::Serializable::Size (*privateKey));
+            privateKey->GetSize ());
         serializer << *privateKey;
         crypto::AsymmetricKey::SharedPtr privateKey2;
         serializer >> privateKey2;
@@ -62,7 +62,7 @@ TEST (thekogans, AsymmetricKey) {
         crypto::AsymmetricKey::SharedPtr publicKey = privateKey->GetPublicKey ();
         util::Buffer serializer (
             util::NetworkEndian,
-            util::Serializable::Size (*publicKey));
+            publicKey->GetSize ());
         serializer << *publicKey;
         crypto::AsymmetricKey::SharedPtr publicKey2;
         serializer >> publicKey2;

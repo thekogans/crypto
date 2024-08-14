@@ -100,7 +100,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, key1->GetSize ());
         serializer << *key1;
         crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
@@ -122,7 +122,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, key1->GetSize ());
         serializer << *key1;
         crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
@@ -144,7 +144,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, key1->GetSize ());
         serializer << *key1;
         crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
@@ -166,7 +166,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, key1->GetSize ());
         serializer << *key1;
         crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;
@@ -187,7 +187,7 @@ TEST (thekogans, SymmetricKey) {
                 crypto::ID (),
                 "test",
                 "test key");
-        util::Buffer serializer (util::NetworkEndian, util::Serializable::Size (*key1));
+        util::Buffer serializer (util::NetworkEndian, key1->GetSize ());
         serializer << *key1;
         crypto::SymmetricKey::SharedPtr key2;
         serializer >> key2;

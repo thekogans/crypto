@@ -38,13 +38,13 @@ namespace {
             std::cout << name << "...";
             crypto::HMAC mac (key, md);
             util::ui8 buffer[1024];
-            util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
-            util::Buffer signature = mac.SignBuffer (buffer, 1024);
+            util::RandomSource::Instance ()->GetBytes (buffer, 1024);
+            util::Buffer::SharedPtr signature = mac.SignBuffer (buffer, 1024);
             bool result = mac.VerifyBufferSignature (
                 buffer,
                 1024,
-                signature.GetReadPtr (),
-                signature.GetDataAvailableForReading ());
+                signature->GetReadPtr (),
+                signature->GetDataAvailableForReading ());
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }
@@ -62,13 +62,13 @@ namespace {
             std::cout << name << "...";
             crypto::CMAC mac (key, cipher);
             util::ui8 buffer[1024];
-            util::GlobalRandomSource::Instance ().GetBytes (buffer, 1024);
-            util::Buffer signature = mac.SignBuffer (buffer, 1024);
+            util::RandomSource::Instance ()->GetBytes (buffer, 1024);
+            util::Buffer::SharedPtr signature = mac.SignBuffer (buffer, 1024);
             bool result = mac.VerifyBufferSignature (
                 buffer,
                 1024,
-                signature.GetReadPtr (),
-                signature.GetDataAvailableForReading ());
+                signature->GetReadPtr (),
+                signature->GetDataAvailableForReading ());
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }

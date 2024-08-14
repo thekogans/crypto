@@ -39,14 +39,14 @@ namespace {
             std::size_t associatedDataLength = 0) {
         THEKOGANS_UTIL_TRY {
             std::cout << name << "...";
-            util::Buffer ciphertext = cipher.Encrypt (
+            util::Buffer::SharedPtr ciphertext = cipher.Encrypt (
                 plaintext,
                 plaintextLength,
                 associatedData,
                 associatedDataLength);
-            util::Buffer decryptedPlaintext = cipher.Decrypt (
-                ciphertext.GetReadPtr (),
-                ciphertext.GetDataAvailableForReading (),
+            util::Buffer::SharedPtr decryptedPlaintext = cipher.Decrypt (
+                ciphertext->GetReadPtr (),
+                ciphertext->GetDataAvailableForReading (),
                 associatedData,
                 associatedDataLength);
             bool result = message ==
@@ -54,8 +54,8 @@ namespace {
                     (const char *)plaintext,
                     (const char *)plaintext + plaintextLength);
                 std::string (
-                    decryptedPlaintext.GetReadPtr (),
-                    decryptedPlaintext.GetReadPtrEnd ());
+                    decryptedPlaintext->GetReadPtr (),
+                    decryptedPlaintext->GetReadPtrEnd ());
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }
