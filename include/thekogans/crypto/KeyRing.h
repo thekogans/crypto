@@ -44,16 +44,17 @@ namespace thekogans {
         /// \brief
         /// KeyRing is a container for \see{Params}, \see{AsymmetricKey}, \see{SymmetricKey} and
         /// user data (\see{Serializable}) suitable for use with a particular \see{CipherSuite}.
-        /// KeyRings design makes it perfectly suitable for both duties of securing data on the wire
-        /// as well as data at rest. In the former case, create a KeyRing containing an appropriate
-        /// \see{CipherSuite}, \see{KeyExchange} \see{Params} or \see{AsymmetricKey}s, \see{Authenticator}
-        /// \see{Params} or \see{AsymmetricKey}, and user data (\see{Serializable}), call KeyRing::Save
-        /// and distribute it to the communicating peers. Have both peers call KeyRing::Load and use
-        /// the enclosed keys and parameters to authenticate each other and perform key exchange to
-        /// generate temporary \see{Cipher} \see{SymmetricKey} session keys. Once the session is over,
-        /// destroy the KeyRing without calling KeyRing::Save. In the later case, create a KeyRing, use
-        /// it to generate permanent encryption keys, then call KeyRing::Save. Later call KeyRing::Load and
-        /// use it to decrypt the data at rest. See encryptfile and decryptfile examples.
+        /// KeyRings design makes it perfectly suitable for both duties of securing data on the
+        /// wire as well as data at rest. In the former case, create a KeyRing containing an
+        /// appropriate \see{CipherSuite}, \see{KeyExchange} \see{Params} or \see{AsymmetricKey}s,
+        /// \see{Authenticator} \see{Params} or \see{AsymmetricKey}, and user data (\see{Serializable}),
+        /// call KeyRing::Save and distribute it to the communicating peers. Have both peers call
+        /// KeyRing::Load and use the enclosed keys and parameters to authenticate each other and
+        /// perform key exchange to generate temporary \see{Cipher} \see{SymmetricKey} session keys.
+        /// Once the session is over, destroy the KeyRing without calling KeyRing::Save. In the
+        /// later case, create a KeyRing, use it to generate permanent encryption keys, then call
+        /// KeyRing::Save. Later call KeyRing::Load and use it to decrypt the data at rest. See
+        /// encryptfile and decryptfile examples.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyRing : public Serializable {
             /// \brief

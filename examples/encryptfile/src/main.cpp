@@ -105,8 +105,9 @@ int main (
     options.Parse (argc, argv, "hcindbp");
     if (options.help || options.password.empty () || options.path.empty ()) {
         std::cout << "usage: " << argv[0] << " [-h] [-c:'" << GetCipherSuites () << "'] "
-            "[-n:'optional key ring name'] [-d:'optional key ring description'] "
-            "[-b:'block size (in MB)'] -p:password path" << std::endl;
+            "[-i:'optional key ring id'] [-n:'optional key ring name'] "
+            "[-d:'optional key ring description'] [-b:'block size (in MB)'] "
+            "-p:password path" << std::endl;
         return 1;
     }
     THEKOGANS_UTIL_LOG_INIT (
