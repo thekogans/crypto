@@ -170,7 +170,7 @@ namespace thekogans {
                 if (entropy.AdvanceWriteOffset (
                         util::RandomSource::Instance ()->GetSeedOrBytes (
                             entropy.GetWritePtr (),
-                            entropy.GetDataAvailableForWriting ())) == 0) {
+                            entropy.GetDataAvailableForWriting ())) == entropyNeeded) {
                     RAND_seed (
                         entropy.GetReadPtr (),
                         (util::i32)entropy.GetDataAvailableForReading ());

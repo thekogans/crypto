@@ -39,7 +39,7 @@ namespace thekogans {
                 util::Buffer paramsBuffer (
                     util::NetworkEndian,
                     util::Serializer::Size (id) +
-                    params->Size () +
+                    params->GetSize () +
                     util::Serializer::Size (salt) +
                     util::Serializer::Size (keyLength) +
                     util::Serializer::Size (messageDigestName) +
@@ -47,7 +47,7 @@ namespace thekogans {
                     util::Serializer::Size (keyId) +
                     util::Serializer::Size (keyName) +
                     util::Serializer::Size (keyDescription) +
-                    publicKey->Size ());
+                    publicKey->GetSize ());
                 paramsBuffer <<
                     id <<
                     *params <<
@@ -82,7 +82,7 @@ namespace thekogans {
                     util::Buffer paramsBuffer (
                         util::NetworkEndian,
                         util::Serializer::Size (id) +
-                        params->Size () +
+                        params->GetSize () +
                         util::Serializer::Size (salt) +
                         util::Serializer::Size (keyLength) +
                         util::Serializer::Size (messageDigestName) +
@@ -90,7 +90,7 @@ namespace thekogans {
                         util::Serializer::Size (keyId) +
                         util::Serializer::Size (keyName) +
                         util::Serializer::Size (keyDescription) +
-                        this->publicKey->Size ());
+                        this->publicKey->GetSize ());
                     paramsBuffer <<
                         id <<
                         *params <<
@@ -124,7 +124,7 @@ namespace thekogans {
         std::size_t DHEKeyExchange::DHEParams::Size () const {
             return
                 Params::Size () +
-                params->Size () +
+                params->GetSize () +
                 util::Serializer::Size (salt) +
                 util::Serializer::Size (keyLength) +
                 util::Serializer::Size (messageDigestName) +
@@ -132,7 +132,7 @@ namespace thekogans {
                 util::Serializer::Size (keyId) +
                 util::Serializer::Size (keyName) +
                 util::Serializer::Size (keyDescription) +
-                publicKey->Size ();
+                publicKey->GetSize ();
         }
 
         void DHEKeyExchange::DHEParams::Read (
@@ -351,8 +351,8 @@ namespace thekogans {
                     new util::Buffer (
                         util::NetworkEndian,
                         util::Serializer::Size (salt) +
-                        publicKey1.Size () +
-                        publicKey2.Size ()));
+                        publicKey1.GetSize () +
+                        publicKey2.GetSize ()));
                 *buffer << salt << publicKey1 << publicKey2;
                 return buffer;
             }

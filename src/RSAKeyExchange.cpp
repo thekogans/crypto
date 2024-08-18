@@ -216,7 +216,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) const {
             Params::SharedPtr rsaParams;
-            util::SecureBuffer symmetricKeyBuffer (util::NetworkEndian, symmetricKey->Size ());
+            util::SecureBuffer symmetricKeyBuffer (util::NetworkEndian, symmetricKey->GetSize ());
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
                 Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
@@ -252,7 +252,7 @@ namespace thekogans {
                 if (rsaParams != nullptr) {
                     util::SecureBuffer symmetricKeyBuffer (
                         util::NetworkEndian,
-                        symmetricKey->Size ());
+                        symmetricKey->GetSize ());
                     symmetricKeyBuffer << *symmetricKey;
                     Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
                     if (!authenticator.VerifyBufferSignature (
