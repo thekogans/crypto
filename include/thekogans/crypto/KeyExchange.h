@@ -38,7 +38,7 @@ namespace thekogans {
         /// and is not reusable. Multiple calls to \see{DeriveSharedSymmetricKey}
         /// will return the same \see{SymmetricKey}. If you need to exchange multiple
         /// keys, you need to instantiate multiple KeyExchange (\see{DHEKeyExchange}
-        /// or/and \see{RSAKeyExchange}) instances.
+        /// and/or \see{RSAKeyExchange}) instances.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange : public virtual util::RefCounted {
             /// \brief
@@ -110,19 +110,6 @@ namespace thekogans {
                 virtual void Write (util::Serializer &serializer) const override;
 
                 /// \brief
-                /// "Id"
-                static const char * const ATTR_ID;
-                /// \brief
-                /// "Signature"
-                static const char * const ATTR_SIGNATURE;
-                /// \brief
-                /// "SignatureKeyId"
-                static const char * const ATTR_SIGNATURE_KEY_ID;
-                /// \brief
-                /// "SignatureMessageDigestName"
-                static const char * const ATTR_SIGNATURE_MESSAGE_DIGEST_NAME;
-
-                /// \brief
                 /// Read the Serializable from an XML DOM.
                 /// \param[in] header \see{util::Serializable::TextHeader}.
                 /// \param[in] node XML DOM representation of a Serializable.
@@ -167,10 +154,12 @@ namespace thekogans {
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
-            /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to create a signature
-            /// over the parameters.
-            /// \param[in] messageDigest Optional message digest object to hash the signature parameters.
-            /// \return Parameters (\see{DHEParams} or \see{RSAParams}) to send to the key exchange peer.
+            /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to
+            /// create a signature over the parameters.
+            /// \param[in] messageDigest Optional message digest object to hash the
+            /// signature parameters.
+            /// \return Parameters (\see{DHEParams} or \see{RSAParams}) to send to the
+            /// key exchange peer.
             virtual Params::SharedPtr GetParams (
                 AsymmetricKey::SharedPtr /*privateKey*/ = AsymmetricKey::SharedPtr (),
                 MessageDigest::SharedPtr /*messageDigest*/ = MessageDigest::SharedPtr ()) const = 0;
@@ -180,7 +169,8 @@ namespace thekogans {
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr /*params*/) const = 0;
+            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (
+                Params::SharedPtr /*params*/) const = 0;
 
             /// \brief
             /// KeyExchange is neither copy constructable, nor assignable.

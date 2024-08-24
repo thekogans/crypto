@@ -92,7 +92,8 @@ namespace thekogans {
                 /// \param[in] salt_ Salt for \see{SymmetricKey} derivation.
                 /// \param[in] keyLength_ Length of the resulting \see{SymmetricKey} (in bytes).
                 /// \param[in] messageDigestName_ OpenSSL message digest to use for hashing.
-                /// \param[in] count_ A security counter. Increment the count to slow down \see{SymmetricKey} derivation.
+                /// \param[in] count_ A security counter. Increment the count to slow
+                /// down \see{SymmetricKey} derivation.
                 /// \param[in] keyId_ \see{SymmetricKey} id.
                 /// \param[in] keyName_ \see{SymmetricKey} name.
                 /// \param[in] keyDescription_ \see{SymmetricKey} description.
@@ -153,34 +154,6 @@ namespace thekogans {
                 /// Write the serializable to the given serializer.
                 /// \param[out] serializer \see{util::Serializer} to write the serializable to.
                 virtual void Write (util::Serializer &serializer) const override;
-
-                /// \brief
-                /// "Params"
-                static const char * const TAG_PARAMS;
-                /// \brief
-                /// "Salt"
-                static const char * const ATTR_SALT;
-                /// \brief
-                /// "KeyLength"
-                static const char * const ATTR_KEY_LENGTH;
-                /// \brief
-                /// "MessageDigestName"
-                static const char * const ATTR_MESSAGE_DIGEST_NAME;
-                /// \brief
-                /// "Count"
-                static const char * const ATTR_COUNT;
-                /// \brief
-                /// "KeyId"
-                static const char * const ATTR_KEY_ID;
-                /// \brief
-                /// "KeyName"
-                static const char * const ATTR_KEY_NAME;
-                /// \brief
-                /// "KeyDescription"
-                static const char * const ATTR_KEY_DESCRIPTION;
-                /// \brief
-                /// "PublicKey"
-                static const char * const TAG_PUBLIC_KEY;
 
                 /// \brief
                 /// Read a Serializable from an XML DOM.
@@ -246,12 +219,14 @@ namespace thekogans {
             /// \brief
             /// ctor. Used by the initiator of the key exchange request (client).
             /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).
-            /// \param[in] params_ \see{DH}/\see{EC} \see{Params} used for DHE \see{SymmetricKey} derivation.
+            /// \param[in] params_ \see{DH}/\see{EC} \see{Params} used for DHE
+            /// \see{SymmetricKey} derivation.
             /// \param[in] salt An optional buffer containing salt.
             /// \param[in] saltLength Salt length.
             /// \param[in] keyLength Length of the resulting \see{SymmetricKey} (in bytes).
             /// \param[in] md OpenSSL message digest to use for hashing.
-            /// \param[in] count A security counter. Increment the count to slow down \see{SymmetricKey} derivation.
+            /// \param[in] count A security counter. Increment the count to slow down
+            /// \see{SymmetricKey} derivation.
             /// \param[in] keyId Optional \see{SymmetricKey} id.
             /// \param[in] keyName Optional \see{SymmetricKey} name.
             /// \param[in] keyDescription Optional \see{SymmetricKey} description.
@@ -268,14 +243,16 @@ namespace thekogans {
                 const std::string &keyDescription_ = std::string ());
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
-            /// \param[in] params \see{DHEParams} containing info to create a shared \see{SymmetricKey}.
+            /// \param[in] params \see{DHEParams} containing info to create a
+            /// shared \see{SymmetricKey}.
             explicit DHEKeyExchange (Params::SharedPtr params);
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
-            /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to create a signature
-            /// over the parameters.
-            /// \param[in] messageDigest Optional message digest used to hash the parameters.
+            /// \param[in] privateKey Optional my private \see{AsymmetricKey}
+            /// used to create a signature over the parameters.
+            /// \param[in] messageDigest Optional message digest used to hash
+            /// the parameters.
             /// \return \see{DHEParams} to send to the key exchange peer.
             virtual Params::SharedPtr GetParams (
                 AsymmetricKey::SharedPtr privateKey = AsymmetricKey::SharedPtr (),
@@ -286,7 +263,8 @@ namespace thekogans {
             /// to derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{DHEParams} parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr params) const override;
+            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (
+                Params::SharedPtr params) const override;
 
             /// \brief
             /// DHEKeyExchange is neither copy constructable, nor assignable.

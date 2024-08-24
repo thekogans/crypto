@@ -40,10 +40,12 @@ namespace thekogans {
             serializer << id << signature << signatureKeyId << signatureMessageDigestName;
         }
 
-        const char * const KeyExchange::Params::ATTR_ID = "Id";
-        const char * const KeyExchange::Params::ATTR_SIGNATURE = "Signature";
-        const char * const KeyExchange::Params::ATTR_SIGNATURE_KEY_ID = "SignatureKeyId";
-        const char * const KeyExchange::Params::ATTR_SIGNATURE_MESSAGE_DIGEST_NAME = "SignatureMessageDigestName";
+        namespace {
+            const char * const ATTR_ID = "Id";
+            const char * const ATTR_SIGNATURE = "Signature";
+            const char * const ATTR_SIGNATURE_KEY_ID = "SignatureKeyId";
+            const char * const ATTR_SIGNATURE_MESSAGE_DIGEST_NAME = "SignatureMessageDigestName";
+        }
 
         void KeyExchange::Params::Read (
                 const TextHeader & /*header*/,
@@ -68,9 +70,12 @@ namespace thekogans {
                 const TextHeader & /*header*/,
                 const util::JSON::Object &object) {
             id = ID::FromHexString (object.Get<util::JSON::String> (ATTR_ID)->value);
-            signature = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_SIGNATURE)->value);
-            signatureKeyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_SIGNATURE_KEY_ID)->value);
-            signatureMessageDigestName = object.Get<util::JSON::String> (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME)->value;
+            signature = util::HexDecodestring (
+                object.Get<util::JSON::String> (ATTR_SIGNATURE)->value);
+            signatureKeyId = ID::FromHexString (
+                object.Get<util::JSON::String> (ATTR_SIGNATURE_KEY_ID)->value);
+            signatureMessageDigestName =
+                object.Get<util::JSON::String> (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME)->value;
         }
 
         void KeyExchange::Params::Write (util::JSON::Object &object) const {

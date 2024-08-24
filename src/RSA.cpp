@@ -38,11 +38,11 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (keyLength > 0 && (keyLength & ~3) == keyLength && publicExponent.get () != 0) {
-                EVP_PKEY *key = 0;
+            if (keyLength > 0 && (keyLength & ~3) == keyLength && publicExponent.get () != nullptr) {
+                EVP_PKEY *key = nullptr;
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new_id (EVP_PKEY_RSA, OpenSSLInit::engine));
-                if (ctx.get () != 0 &&
+                if (ctx.get () != nullptr &&
                         EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_keygen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
                         EVP_PKEY_CTX_set_rsa_keygen_pubexp (ctx.get (), publicExponent.get ()) == 1 &&
@@ -91,11 +91,11 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
-                    ciphertext != 0) {
+                    ciphertext != nullptr) {
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new (
                         ((OpenSSLAsymmetricKey *)publicKey.Get ())->key.get (),
@@ -129,7 +129,7 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
@@ -156,11 +156,11 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
-                    ciphertext != 0) {
+                    ciphertext != nullptr) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
                     plaintextLength,
@@ -188,7 +188,7 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
@@ -217,11 +217,11 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
-                    ciphertext != 0) {
+                    ciphertext != nullptr) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
                     plaintextLength,
@@ -243,7 +243,7 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
@@ -272,11 +272,11 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 util::ui8 *plaintext) {
-            if (ciphertext != 0 && ciphertextLength > 0 &&
+            if (ciphertext != nullptr && ciphertextLength > 0 &&
                     privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
-                    plaintext != 0) {
+                    plaintext != nullptr) {
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new (
                         ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get (),
@@ -310,7 +310,7 @@ namespace thekogans {
                 util::i32 padding,
                 bool secure,
                 util::Endianness endianness) {
-            if (ciphertext != 0 && ciphertextLength > 0 &&
+            if (ciphertext != nullptr && ciphertextLength > 0 &&
                     privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
@@ -360,7 +360,7 @@ namespace thekogans {
                 if (header.cipherIndex < CipherSuite::GetCiphers ().size () &&
                         header.keyLength == GetCipherKeyLength (
                             CipherSuite::GetOpenSSLCipherByIndex (header.cipherIndex)) &&
-                        header.key != 0) {
+                        header.key != nullptr) {
                     serializer << header.cipherIndex << header.keyLength;
                     serializer.Write (header.key, header.keyLength);
                     return serializer;
@@ -424,11 +424,11 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
-                    ciphertext != 0) {
+                    ciphertext != nullptr) {
                 std::size_t cipherIndex = GetCipherIndex (publicKey->GetKeyLength (), padding);
                 SymmetricKey::SharedPtr key =
                     SymmetricKey::FromRandom (
@@ -475,7 +475,7 @@ namespace thekogans {
                 std::size_t plaintextLength,
                 AsymmetricKey::SharedPtr publicKey,
                 util::i32 padding) {
-            if (plaintext != 0 && plaintextLength > 0 &&
+            if (plaintext != nullptr && plaintextLength > 0 &&
                     publicKey != nullptr && !publicKey->IsPrivate () &&
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
@@ -506,11 +506,11 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 util::i32 padding,
                 util::ui8 *plaintext) {
-            if (ciphertext != 0 && ciphertextLength > 0 &&
+            if (ciphertext != nullptr && ciphertextLength > 0 &&
                     privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding) &&
-                    plaintext != 0) {
+                    plaintext != nullptr) {
                 util::TenantReadBuffer buffer (
                     util::NetworkEndian, ciphertext, ciphertextLength);
                 util::ui32 headerLength;
@@ -555,7 +555,7 @@ namespace thekogans {
                 util::i32 padding,
                 bool secure,
                 util::Endianness endianness) {
-            if (ciphertext != 0 && ciphertextLength > 0 &&
+            if (ciphertext != nullptr && ciphertextLength > 0 &&
                     privateKey != nullptr && privateKey->IsPrivate () &&
                     privateKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {

@@ -107,8 +107,10 @@ namespace thekogans {
             serializer << keyId << buffer;
         }
 
-        const char * const RSAKeyExchange::RSAParams::ATTR_KEY_ID = "KeyId";
-        const char * const RSAKeyExchange::RSAParams::ATTR_BUFFER = "Buffer";
+        namespace {
+            const char * const ATTR_KEY_ID = "KeyId";
+            const char * const ATTR_BUFFER = "Buffer";
+        }
 
         void RSAKeyExchange::RSAParams::Read (
                 const TextHeader &header,
@@ -159,7 +161,7 @@ namespace thekogans {
                 KeyExchange (id),
                 key (key_) {
             if (key != nullptr && key->GetKeyType () == OPENSSL_PKEY_RSA && !key->IsPrivate () &&
-                    secretLength > 0 && md != 0 && count > 0) {
+                    secretLength > 0 && md != nullptr && count > 0) {
                 util::SecureVector<util::ui8> secret (secretLength);
                 if (util::RandomSource::Instance ()->GetSeedOrBytes (
                         secret.data (), secretLength) == secretLength) {
@@ -216,10 +218,12 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) const {
             Params::SharedPtr rsaParams;
-            util::SecureBuffer symmetricKeyBuffer (util::NetworkEndian, symmetricKey->GetSize ());
+            util::SecureBuffer symmetricKeyBuffer (
+                util::NetworkEndian, symmetricKey->GetSize ());
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
-                Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
+                Authenticator authenticator (
+                    key, MessageDigest::SharedPtr (new MessageDigest));
                 rsaParams.Reset (
                     new RSAParams (
                         id,
@@ -244,7 +248,8 @@ namespace thekogans {
             return rsaParams;
         }
 
-        SymmetricKey::SharedPtr RSAKeyExchange::DeriveSharedSymmetricKey (Params::SharedPtr params) const {
+        SymmetricKey::SharedPtr RSAKeyExchange::DeriveSharedSymmetricKey (
+                Params::SharedPtr params) const {
             assert (symmetricKey != nullptr);
             if (!key->IsPrivate ()) {
                 RSAParams::SharedPtr rsaParams =
@@ -254,7 +259,8 @@ namespace thekogans {
                         util::NetworkEndian,
                         symmetricKey->GetSize ());
                     symmetricKeyBuffer << *symmetricKey;
-                    Authenticator authenticator (key, MessageDigest::SharedPtr (new MessageDigest));
+                    Authenticator authenticator (
+                        key, MessageDigest::SharedPtr (new MessageDigest));
                     if (!authenticator.VerifyBufferSignature (
                             symmetricKeyBuffer.GetReadPtr (),
                             symmetricKeyBuffer.GetDataAvailableForReading (),

@@ -165,15 +165,17 @@ namespace thekogans {
                 *publicKey;
         }
 
-        const char * const DHEKeyExchange::DHEParams::TAG_PARAMS = "Params";
-        const char * const DHEKeyExchange::DHEParams::ATTR_SALT = "Salt";
-        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_LENGTH = "KeyLength";
-        const char * const DHEKeyExchange::DHEParams::ATTR_MESSAGE_DIGEST_NAME = "MessageDigestName";
-        const char * const DHEKeyExchange::DHEParams::ATTR_COUNT = "Count";
-        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_ID = "KeyId";
-        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_NAME = "KeyName";
-        const char * const DHEKeyExchange::DHEParams::ATTR_KEY_DESCRIPTION = "KeyDescription";
-        const char * const DHEKeyExchange::DHEParams::TAG_PUBLIC_KEY = "PublicKey";
+        namespace {
+            const char * const TAG_PARAMS = "Params";
+            const char * const ATTR_SALT = "Salt";
+            const char * const ATTR_KEY_LENGTH = "KeyLength";
+            const char * const ATTR_MESSAGE_DIGEST_NAME = "MessageDigestName";
+            const char * const ATTR_COUNT = "Count";
+            const char * const ATTR_KEY_ID = "KeyId";
+            const char * const ATTR_KEY_NAME = "KeyName";
+            const char * const ATTR_KEY_DESCRIPTION = "KeyDescription";
+            const char * const TAG_PUBLIC_KEY = "PublicKey";
+        }
 
         void DHEKeyExchange::DHEParams::Read (
                 const TextHeader &header,
@@ -275,11 +277,11 @@ namespace thekogans {
                 initiator (true),
                 params (params_),
                 salt (
-                    salt_ != 0 && saltLength_ > 0 ?
+                    salt_ != nullptr && saltLength_ > 0 ?
                         std::vector<util::ui8> (
                             (const util::ui8 *)salt_,
                             (const util::ui8 *)salt_ + saltLength_) :
-                    std::vector<util::ui8> ()),
+                        std::vector<util::ui8> ()),
                 keyLength (keyLength_),
                 messageDigestName (CipherSuite::GetOpenSSLMessageDigestName (md_)),
                 count (count_),
@@ -370,7 +372,7 @@ namespace thekogans {
                         EVP_PKEY_CTX_new (
                             ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get (),
                             OpenSSLInit::engine));
-                    if (ctx.get () != 0) {
+                    if (ctx.get () != nullptr) {
                         std::size_t secretLength = 0;
                         if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
                                 EVP_PKEY_derive_set_peer (

@@ -108,13 +108,6 @@ namespace thekogans {
                 virtual void Write (util::Serializer &serializer) const override;
 
                 /// \brief
-                /// "KeyId"
-                static const char * const ATTR_KEY_ID;
-                /// \brief
-                /// "Buffer"
-                static const char * const ATTR_BUFFER;
-
-                /// \brief
                 /// Read the Serializable from an XML DOM.
                 /// \param[in] header \see{util::Serializable::TextHeader}.
                 /// \param[in] node XML DOM representation of a Serializable.
