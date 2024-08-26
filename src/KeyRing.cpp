@@ -51,7 +51,7 @@ namespace thekogans {
                 file.Read (
                     buffer->GetWritePtr (),
                     buffer->GetDataAvailableForWriting ()));
-            if (cipher != 0) {
+            if (cipher != nullptr) {
                 buffer = cipher->Decrypt (
                     buffer->GetReadPtr (),
                     buffer->GetDataAvailableForReading (),
@@ -72,7 +72,7 @@ namespace thekogans {
             util::Buffer::SharedPtr buffer (
                 new util::Buffer (util::NetworkEndian, GetSize ()));
             *buffer << *this;
-            if (cipher != 0) {
+            if (cipher != nullptr) {
                 buffer = cipher->Encrypt (
                     buffer->GetReadPtr (),
                     buffer->GetDataAvailableForReading (),
@@ -420,7 +420,8 @@ namespace thekogans {
                     RSAKeyExchange::RSAParams::SharedPtr rsaParams =
                         util::dynamic_refcounted_sharedptr_cast<RSAKeyExchange::RSAParams> (params);
                     if (rsaParams != nullptr) {
-                        AsymmetricKey::SharedPtr key = GetKeyExchangeKey (rsaParams->keyId, recursive);
+                        AsymmetricKey::SharedPtr key =
+                            GetKeyExchangeKey (rsaParams->keyId, recursive);
                         if (key != nullptr) {
                             return KeyExchange::SharedPtr (new RSAKeyExchange (key, params));
                         }

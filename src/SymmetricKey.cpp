@@ -56,7 +56,7 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (keyLength > 0 && argon2_ctx != 0) {
+            if (keyLength > 0 && argon2_ctx != nullptr) {
                 uint8_t *out = context.out;
                 uint32_t outlen = context.outlen;
                 util::SecureVector<util::ui8> key (keyLength);
@@ -91,13 +91,13 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (password != 0 && passwordLength > 0 &&
-                    (salt == 0 || saltLength == 8) &&
+            if (password != nullptr && passwordLength > 0 &&
+                    (salt == nullptr || saltLength == 8) &&
                     keyLength > 0 && keyLength <= GetMDLength (md) &&
-                    md != 0 && count > 0) {
+                    md != nullptr && count > 0) {
                 MessageDigest messageDigest (md);
                 messageDigest.Update (password, passwordLength);
-                if (salt != 0 && saltLength > 0) {
+                if (salt != nullptr && saltLength > 0) {
                     messageDigest.Update (salt, saltLength);
                 }
                 util::SecureVector<util::ui8> buffer (EVP_MAX_MD_SIZE);
@@ -132,7 +132,7 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (password != 0 && passwordLength > 0 &&
+            if (password != nullptr && passwordLength > 0 &&
                     keyLength > 0 && count > 0) {
                 util::SecureVector<util::ui8> key (keyLength);
                 switch (hash) {
@@ -186,8 +186,8 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (password != 0 && passwordLength > 0 &&
-                    keyLength > 0 && md != 0 && count > 0) {
+            if (password != nullptr && passwordLength > 0 &&
+                    keyLength > 0 && md != nullptr && count > 0) {
                 util::SecureVector<util::ui8> key (keyLength);
                 if (PKCS5_PBKDF2_HMAC (
                         (const char *)password,
@@ -304,11 +304,11 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (hmacKey != 0 && hmacKeyLength > 0 && keyLength > 0 && md != 0) {
+            if (hmacKey != nullptr && hmacKeyLength > 0 && keyLength > 0 && md != nullptr) {
                 util::SecureVector<util::ui8> key (keyLength);
                 switch (mode) {
                     case HKDF_MODE_EXTRACT_AND_EXPAND:
-                        if (salt != 0 && saltLength > 0 && info != 0 && infoLength > 0) {
+                        if (salt != nullptr && saltLength > 0 && info != nullptr && infoLength > 0) {
                             HKDF (
                                 hmacKey,
                                 hmacKeyLength,
@@ -325,7 +325,7 @@ namespace thekogans {
                         }
                         break;
                     case HKDF_MODE_EXTRACT_ONLY:
-                        if (salt != 0 && saltLength > 0) {
+                        if (salt != nullptr && saltLength > 0) {
                             HKDF_Extract (
                                 hmacKey,
                                 hmacKeyLength,
@@ -340,7 +340,7 @@ namespace thekogans {
                         }
                         break;
                     case HKDF_MODE_EXPAND_ONLY:
-                        if (info != 0 && infoLength > 0) {
+                        if (info != nullptr && infoLength > 0) {
                             HKDF_Expand (
                                 hmacKey,
                                 hmacKeyLength,
@@ -374,8 +374,8 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (secret != 0 && secretLength > 0 &&
-                    keyLength > 0 && md != 0 && count > 0) {
+            if (secret != nullptr && secretLength > 0 &&
+                    keyLength > 0 && md != nullptr && count > 0) {
                 util::SecureVector<util::ui8> key (keyLength);
                 keyLength = 0;
                 util::SecureVector<util::ui8> buffer (EVP_MAX_MD_SIZE);
@@ -387,7 +387,7 @@ namespace thekogans {
                         messageDigest.Update (buffer.data (), bufferLength);
                     }
                     messageDigest.Update (secret, secretLength);
-                    if (salt != 0 && saltLength > 0) {
+                    if (salt != nullptr && saltLength > 0) {
                         messageDigest.Update (salt, saltLength);
                     }
                     bufferLength = messageDigest.Final (buffer.data ());
@@ -446,7 +446,7 @@ namespace thekogans {
         void SymmetricKey::Set (
                 const void *buffer,
                 std::size_t length) {
-            if (buffer != 0 && length <= key.GetLength ()) {
+            if (buffer != nullptr && length <= key.GetLength ()) {
                 key.Rewind ();
                 if (key.Write (buffer, length) == length) {
                     if (length < key.GetLength ()) {

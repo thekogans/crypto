@@ -28,7 +28,8 @@ namespace thekogans {
                 util::ui32 line,
                 const char *buildTime,
                 const char *message) {
-            if (file != 0 && function != 0 && buildTime != 0 && message != 0) {
+            if (file != nullptr && function != nullptr &&
+                    buildTime != nullptr && message != nullptr) {
                 THEKOGANS_UTIL_ERROR_CODE errorCode = ERR_get_error ();
                 char buffer[256];
                 ERR_error_string_n (errorCode, buffer, sizeof (buffer));

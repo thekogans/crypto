@@ -29,7 +29,7 @@ namespace thekogans {
 
         MessageDigest::MessageDigest (const EVP_MD *md_) :
                 md (md_) {
-            if (md != 0) {
+            if (md != nullptr) {
                 if (EVP_DigestInit_ex (&ctx, md, OpenSSLInit::engine) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -42,7 +42,7 @@ namespace thekogans {
 
         MessageDigest::SharedPtr MessageDigest::GetByName (const std::string &name) {
             const EVP_MD *md = CipherSuite::GetOpenSSLMessageDigestByName (name);
-            if (md != 0) {
+            if (md != nullptr) {
                 return SharedPtr (new MessageDigest (md));
             }
             else {
@@ -64,7 +64,7 @@ namespace thekogans {
         void MessageDigest::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 if (EVP_DigestUpdate (&ctx, buffer, bufferLength) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -76,7 +76,7 @@ namespace thekogans {
         }
 
         std::size_t MessageDigest::Final (util::ui8 *digest) {
-            if (digest != 0) {
+            if (digest != nullptr) {
                 util::ui32 digestLength = 0;
                 if (EVP_DigestFinal_ex (&ctx, digest, &digestLength) == 1) {
                     return digestLength;
@@ -94,7 +94,7 @@ namespace thekogans {
         util::Buffer::SharedPtr MessageDigest::HashBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 Init ();
                 Update (buffer, bufferLength);
                 util::Buffer::SharedPtr hash (

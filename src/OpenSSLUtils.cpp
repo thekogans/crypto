@@ -35,114 +35,114 @@ namespace thekogans {
         _LIB_THEKOGANS_CRYPTO_DECL const char * const PEM_ENCODING = "PEM";
 
         void BN_CTXDeleter::operator () (BN_CTX *ctx) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 BN_CTX_free (ctx);
             }
         }
 
         void BIGNUMDeleter::operator () (BIGNUM *bn) {
-            if (bn != 0) {
+            if (bn != nullptr) {
                 BN_free (bn);
             }
         }
 
         void EVP_PKEY_CTXDeleter::operator () (EVP_PKEY_CTX *ctx) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 EVP_PKEY_CTX_free (ctx);
             }
         }
 
         void EVP_PKEYDeleter::operator () (EVP_PKEY *key) {
-            if (key != 0) {
+            if (key != nullptr) {
                 EVP_PKEY_free (key);
             }
         }
 
         void EC_GROUPDeleter::operator () (EC_GROUP *group) {
-            if (group != 0) {
+            if (group != nullptr) {
                 EC_GROUP_free (group);
             }
         }
 
         void EC_POINTDeleter::operator () (EC_POINT *point) {
-            if (point != 0) {
+            if (point != nullptr) {
                 EC_POINT_free (point);
             }
         }
 
         void EC_KEYDeleter::operator () (EC_KEY *key) {
-            if (key != 0) {
+            if (key != nullptr) {
                 EC_KEY_free (key);
             }
         }
 
         void EVP_CIPHER_CTXDeleter::operator () (EVP_CIPHER_CTX *ctx) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 EVP_CIPHER_CTX_free (ctx);
             }
         }
 
         void EVP_MD_CTXDeleter::operator () (EVP_MD_CTX *ctx) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 EVP_MD_CTX_destroy (ctx);
             }
         }
 
         void BIODeleter::operator () (BIO *bio) {
-            if (bio != 0) {
+            if (bio != nullptr) {
                 BIO_free (bio);
             }
         }
 
         void X509_STOREDeleter::operator () (X509_STORE *store) {
-            if (store != 0) {
+            if (store != nullptr) {
                 X509_STORE_free (store);
             }
         }
 
         void X509_CRLDeleter::operator () (X509_CRL *crl) {
-            if (crl != 0) {
+            if (crl != nullptr) {
                 X509_CRL_free (crl);
             }
         }
 
         void X509Deleter::operator () (X509 *x509) {
-            if (x509 != 0) {
+            if (x509 != nullptr) {
                 X509_free (x509);
             }
         }
 
         void DHDeleter::operator () (DH *dh) {
-            if (dh != 0) {
+            if (dh != nullptr) {
                 DH_free (dh);
             }
         }
 
         void DSADeleter::operator () (DSA *dsa) {
-            if (dsa != 0) {
+            if (dsa != nullptr) {
                 DSA_free (dsa);
             }
         }
 
         void RSADeleter::operator () (RSA *rsa) {
-            if (rsa != 0) {
+            if (rsa != nullptr) {
                 RSA_free (rsa);
             }
         }
         void SSL_CTXDeleter::operator () (SSL_CTX *ctx) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 SSL_CTX_free (ctx);
             }
         }
 
         void SSLDeleter::operator () (SSL *ssl) {
-            if (ssl != 0) {
+            if (ssl != nullptr) {
                 SSL_free (ssl);
             }
         }
 
         void SSL_SESSIONDeleter::operator () (SSL_SESSION *session) {
-            if (session != 0) {
+            if (session != nullptr) {
                 SSL_SESSION_free (session);
             }
         }
@@ -168,7 +168,7 @@ namespace thekogans {
                 bidirectionalShutdown (sessionInfo.bidirectionalShutdown),
                 countTransfered (sessionInfo.countTransfered),
                 session (sessionInfo.session.get ()) {
-            if (session.get () != 0) {
+            if (session != nullptr) {
             #if OPENSSL_VERSION_NUMBER < 0x10100000L
                 CRYPTO_add (&session->references, 1, CRYPTO_LOCK_SSL_SESSION);
             #else // OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -185,7 +185,7 @@ namespace thekogans {
                 bidirectionalShutdown = sessionInfo.bidirectionalShutdown;
                 countTransfered = sessionInfo.countTransfered;
                 session.reset (sessionInfo.session.get ());
-                if (session.get () != 0) {
+                if (session != nullptr) {
                 #if OPENSSL_VERSION_NUMBER < 0x10100000L
                     CRYPTO_add (&session->references, 1, CRYPTO_LOCK_SSL_SESSION);
                 #else // OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -198,15 +198,18 @@ namespace thekogans {
 
         void SessionInfo::Parse (const pugi::xml_node &node) {
             serverName = util::Decodestring (node.attribute (ATTR_SERVER_NAME).value ());
-            renegotiationFrequency = util::stringToui32 (node.attribute (ATTR_RENEGOTIATION_FREQUENCY).value ());
-            bidirectionalShutdown = std::string (node.attribute (ATTR_BIDIRECTIONAL_SHUTDOWN).value ()) == util::XML_TRUE;
-            countTransfered = util::stringToui32 (node.attribute (ATTR_COUNT_TRANSFERED).value ());
+            renegotiationFrequency = util::stringToui32 (
+                node.attribute (ATTR_RENEGOTIATION_FREQUENCY).value ());
+            bidirectionalShutdown = std::string (
+                node.attribute (ATTR_BIDIRECTIONAL_SHUTDOWN).value ()) == util::XML_TRUE;
+            countTransfered = util::stringToui32 (
+                node.attribute (ATTR_COUNT_TRANSFERED).value ());
         }
 
         std::string SessionInfo::ToString (
                 std::size_t indentationLevel,
                 const char *tagName) const {
-            if (tagName != 0) {
+            if (tagName != nullptr) {
                 util::Attributes attributes;
                 attributes.push_back (
                     util::Attribute (
@@ -234,7 +237,7 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
         GetCipherIVLength (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
+            if (cipher != nullptr) {
                 return EVP_CIPHER_iv_length (cipher);
             }
             else {
@@ -245,7 +248,7 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
         GetCipherKeyLength (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
+            if (cipher != nullptr) {
                 return EVP_CIPHER_key_length (cipher);
             }
             else {
@@ -256,7 +259,7 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL util::i32 _LIB_THEKOGANS_CRYPTO_API
         GetCipherMode (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
+            if (cipher != nullptr) {
                 return EVP_CIPHER_mode (cipher);
             }
             else {
@@ -267,7 +270,7 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API
         IsCipherAEAD (const EVP_CIPHER *cipher) {
-            if (cipher != 0) {
+            if (cipher != nullptr) {
                 return util::Flags<unsigned long> (EVP_CIPHER_flags (cipher)).Test (
                     EVP_CIPH_FLAG_AEAD_CIPHER);
             }
@@ -279,7 +282,7 @@ namespace thekogans {
 
         _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
         GetMDLength (const EVP_MD *md) {
-            if (md != 0) {
+            if (md != nullptr) {
                 return (std::size_t)EVP_MD_size (md);
             }
             else {
@@ -335,15 +338,19 @@ namespace thekogans {
         GetCRLDistributionPoints (
                 X509 *cert,
                 std::vector<std::string> &crlDistributionPoints) {
-            if (cert != 0) {
+            if (cert != nullptr) {
                 const STACK_OF (DIST_POINT) *distributionPoints =
-                    (STACK_OF (DIST_POINT) *)X509_get_ext_d2i (cert, NID_crl_distribution_points, 0, 0);
+                    (STACK_OF (DIST_POINT) *)X509_get_ext_d2i (
+                        cert, NID_crl_distribution_points, 0, 0);
                 for (int i = 0, count = sk_DIST_POINT_num (distributionPoints); i < count; ++i) {
-                    const DIST_POINT_NAME *distributionPoint = sk_DIST_POINT_value (distributionPoints, i)->distpoint;
+                    const DIST_POINT_NAME *distributionPoint =
+                        sk_DIST_POINT_value (distributionPoints, i)->distpoint;
                     if (distributionPoint->type == 0) {
-                        for (int j = 0, count = sk_GENERAL_NAME_num (distributionPoint->name.fullname); j < count; ++j) {
+                        for (int j = 0, count = sk_GENERAL_NAME_num (
+                                distributionPoint->name.fullname); j < count; ++j) {
                             const ASN1_IA5STRING *url =
-                                sk_GENERAL_NAME_value (distributionPoint->name.fullname, j)->d.uniformResourceIdentifier;
+                                sk_GENERAL_NAME_value (
+                                    distributionPoint->name.fullname, j)->d.uniformResourceIdentifier;
                             crlDistributionPoints.push_back (
                                 std::string (
                                     (const char *)ASN1_STRING_get0_data (url),
@@ -351,10 +358,13 @@ namespace thekogans {
                         }
                     }
                     else if (distributionPoint->type == 1) {
-                        const STACK_OF (X509_NAME_ENTRY) *relativeNames = distributionPoint->name.relativename;
-                        for (int j = 0, count = sk_X509_NAME_ENTRY_num (relativeNames); j < count; ++j) {
+                        const STACK_OF (X509_NAME_ENTRY) *relativeNames =
+                            distributionPoint->name.relativename;
+                        for (int j = 0, count = sk_X509_NAME_ENTRY_num (
+                                relativeNames); j < count; ++j) {
                             const ASN1_STRING *url =
-                                X509_NAME_ENTRY_get_data (sk_X509_NAME_ENTRY_value (relativeNames, j));
+                                X509_NAME_ENTRY_get_data (
+                                    sk_X509_NAME_ENTRY_value (relativeNames, j));
                             crlDistributionPoints.push_back (
                                 std::string(
                                     (const char *)ASN1_STRING_get0_data (url),
@@ -377,11 +387,11 @@ namespace thekogans {
                 void *userData) {
             if (!path.empty () && (encoding == DER_ENCODING || encoding == PEM_ENCODING)) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
-                if (bio.get () != 0) {
+                if (bio != nullptr) {
                     X509_CRLPtr crl (encoding == DER_ENCODING ?
                         d2i_X509_CRL_bio (bio.get (), 0) :
                         PEM_read_bio_X509_CRL (bio.get (), 0, passwordCallback, userData));
-                    if (crl.get () != 0) {
+                    if (crl != nullptr) {
                         return crl;
                     }
                     else {
@@ -403,9 +413,10 @@ namespace thekogans {
                 X509_CRL *crl,
                 const std::string &path,
                 const std::string &encoding) {
-            if (!path.empty () && crl != 0 && (encoding == DER_ENCODING || encoding == PEM_ENCODING)) {
+            if (!path.empty () && crl != nullptr &&
+                   (encoding == DER_ENCODING || encoding == PEM_ENCODING)) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
-                if (bio.get () != 0 ||
+                if (bio != nullptr ||
                         (encoding == DER_ENCODING ?
                             PEM_write_bio_X509_CRL (bio.get (), crl) :
                             i2d_X509_CRL_bio (bio.get (), crl)) != 1) {
@@ -422,10 +433,10 @@ namespace thekogans {
         CheckCRL (
                 X509_CRL *crl,
                 X509 *cert) {
-            if (cert != 0 && crl != 0) {
+            if (crl != nullptr && cert != nullptr) {
                 X509_REVOKED *entry = 0;
                 X509_CRL_get0_by_cert (crl, &entry, cert);
-                return entry != 0;
+                return entry != nullptr;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -440,11 +451,11 @@ namespace thekogans {
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (buffer != 0 && length > 0) {
+            if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     X509Ptr certificate (
                         d2i_X509 (0, (const util::ui8 **)&buffer, (long)length));
-                    if (certificate.get () != 0) {
+                    if (certificate != nullptr) {
                         return certificate;
                     }
                     else {
@@ -457,10 +468,10 @@ namespace thekogans {
                     // wants an util::ui8 *, it marks the bio as read only,
                     // and therefore will not alter the buffer.
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
-                    if (bio.get () != 0) {
+                    if (bio != nullptr) {
                         X509Ptr certificate (
                             PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
-                        if (certificate.get () != 0) {
+                        if (certificate != nullptr) {
                             return certificate;
                         }
                         else {
@@ -489,11 +500,11 @@ namespace thekogans {
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (buffer != 0 && length > 0) {
+            if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     EVP_PKEYPtr key (
                         d2i_PUBKEY (0, (const util::ui8 **)&buffer, (long)length));
-                    if (key.get () != 0) {
+                    if (key != nullptr) {
                         return key;
                     }
                     else {
@@ -506,10 +517,10 @@ namespace thekogans {
                     // wants an util::ui8 *, it marks the bio as read only,
                     // and therefore will not alter the buffer.
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
-                    if (bio.get () != 0) {
+                    if (bio != nullptr) {
                         EVP_PKEYPtr key (
                             PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData));
-                        if (key.get () != 0) {
+                        if (key != nullptr) {
                             return key;
                         }
                         else {
@@ -538,10 +549,11 @@ namespace thekogans {
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (buffer != 0 && length > 0) {
+            if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
-                    EVP_PKEYPtr key (d2i_AutoPrivateKey (0, (const util::ui8 **)&buffer, (long)length));
-                    if (key.get () != 0) {
+                    EVP_PKEYPtr key (
+                        d2i_AutoPrivateKey (0, (const util::ui8 **)&buffer, (long)length));
+                    if (key != nullptr) {
                         return key;
                     }
                     else {
@@ -554,10 +566,10 @@ namespace thekogans {
                     // wants an util::ui8 *, it marks the bio as read only,
                     // and therefore will not alter the buffer.
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
-                    if (bio.get () != 0) {
+                    if (bio != nullptr) {
                         EVP_PKEYPtr key (
                             PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData));
-                        if (key.get () != 0) {
+                        if (key != nullptr) {
                             return key;
                         }
                         else {
@@ -586,15 +598,16 @@ namespace thekogans {
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (buffer != 0 && length > 0) {
+            if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     {
                         const util::ui8 **ptr = (const util::ui8 **)&buffer;
                         // RSA is most common. Try it first.
                         RSAPtr rsa (d2i_RSAPublicKey (0, ptr, (long)length));
-                        if (rsa.get () != 0) {
+                        if (rsa != nullptr) {
                             EVP_PKEYPtr key (EVP_PKEY_new ());
-                            if (key.get () != 0 && EVP_PKEY_assign_RSA (key.get (), rsa.get ()) == 1) {
+                            if (key != nullptr &&
+                                    EVP_PKEY_assign_RSA (key.get (), rsa.get ()) == 1) {
                                 rsa.release ();
                                 return key;
                             }
@@ -607,9 +620,10 @@ namespace thekogans {
                         const util::ui8 **ptr = (const util::ui8 **)&buffer;
                         // If not RSA, try DSA.
                         DSAPtr dsa (d2i_DSAPublicKey (0, ptr, (long)length));
-                        if (dsa.get () != 0) {
+                        if (dsa != nullptr) {
                             EVP_PKEYPtr key (EVP_PKEY_new ());
-                            if (key.get () != 0 && EVP_PKEY_assign_DSA (key.get (), dsa.get ()) == 1) {
+                            if (key != nullptr &&
+                                    EVP_PKEY_assign_DSA (key.get (), dsa.get ()) == 1) {
                                 dsa.release ();
                                 return key;
                             }
@@ -622,9 +636,10 @@ namespace thekogans {
                         const util::ui8 **ptr = (const util::ui8 **)&buffer;
                         // Finally, try an Elliptic curve public key.
                         EC_KEYPtr ec (o2i_ECPublicKey (0, ptr, (long)length));
-                        if (ec.get () != 0) {
+                        if (ec != nullptr) {
                             EVP_PKEYPtr key (EVP_PKEY_new ());
-                            if (key.get () != 0 && EVP_PKEY_assign_EC_KEY (key.get (), ec.get ()) == 1) {
+                            if (key != nullptr &&
+                                    EVP_PKEY_assign_EC_KEY (key.get (), ec.get ()) == 1) {
                                 ec.release ();
                                 return key;
                             }
@@ -646,16 +661,16 @@ namespace thekogans {
                     // wants an util::ui8 *, it marks the bio as read only,
                     // and therefore will not alter the buffer.
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
-                    if (bio.get () != 0) {
+                    if (bio != nullptr) {
                         RSAPtr rsa (
                             PEM_read_bio_RSAPublicKey (
                                 bio.get (),
                                 0,
                                 passwordCallback,
                                 userData));
-                        if (rsa.get () != 0) {
+                        if (rsa != nullptr) {
                             EVP_PKEYPtr key (EVP_PKEY_new ());
-                            if (key.get () != 0 &&
+                            if (key != nullptr &&
                                     EVP_PKEY_assign_RSA (key.get (), rsa.get ()) == 1) {
                                 rsa.release ();
                                 return key;
@@ -690,11 +705,11 @@ namespace thekogans {
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (buffer != 0 && length > 0) {
+            if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     DHPtr dhParams (
                         d2i_DHparams (0, (const util::ui8 **)&buffer, (long)length));
-                    if (dhParams.get () != 0) {
+                    if (dhParams != nullptr) {
                         return dhParams;
                     }
                     else {
@@ -707,10 +722,10 @@ namespace thekogans {
                     // wants an util::ui8 *, it marks the bio as read only,
                     // and therefore will not alter the buffer.
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
-                    if (bio.get () != 0) {
+                    if (bio != nullptr) {
                         DHPtr dh (
                             PEM_read_bio_DHparams (bio.get (), 0, passwordCallback, userData));
-                        if (dh.get () != 0) {
+                        if (dh != nullptr) {
                             return dh;
                         }
                         else {
@@ -739,11 +754,11 @@ namespace thekogans {
                 const std::string &encoding,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (buffer != 0 && length > 0) {
+            if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     DSAPtr dsaParams (
                         d2i_DSAparams (0, (const util::ui8 **)&buffer, (long)length));
-                    if (dsaParams.get () != 0) {
+                    if (dsaParams != nullptr) {
                         return dsaParams;
                     }
                     else {
@@ -756,10 +771,10 @@ namespace thekogans {
                     // wants an util::ui8 *, it marks the bio as read only,
                     // and therefore will not alter the buffer.
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
-                    if (bio.get () != 0) {
+                    if (bio != nullptr) {
                         DSAPtr dsa (
                             PEM_read_bio_DSAparams (bio.get (), 0, passwordCallback, userData));
-                        if (dsa.get () != 0) {
+                        if (dsa != nullptr) {
                             return dsa;
                         }
                         else {
@@ -786,7 +801,7 @@ namespace thekogans {
                 const void *buffer1,
                 const void *buffer2,
                 std::size_t length) {
-            if (buffer1 != 0 && buffer2 != 0 && length > 0) {
+            if (buffer1 != nullptr && buffer2 != nullptr && length > 0) {
                 const util::ui8 *ptr1 = (const util::ui8 *)buffer1;
                 const util::ui8 *ptr2 = (const util::ui8 *)buffer2;
                 util::ui32 total = 0;
@@ -808,8 +823,8 @@ namespace thekogans {
                 std::size_t bufferLength,
                 std::size_t passwordLength,
                 const EVP_MD *md) {
-            if (key != 0 && keyLength > 0 &&
-                    buffer != 0 && bufferLength > 0 && passwordLength <= 8 && md != 0) {
+            if (key != nullptr && keyLength > 0 &&
+                    buffer != nullptr && bufferLength > 0 && passwordLength <= 8 && md != nullptr) {
                 util::ui8 hash[EVP_MAX_MD_SIZE];
                 util::ui32 hashLength = 0;
                 if (HMAC (md, key, (util::i32)keyLength, (const util::ui8 *)buffer,
@@ -846,8 +861,8 @@ namespace thekogans {
                 util::ui64 value,
                 std::size_t passwordLength,
                 const EVP_MD *md) {
-            if (key != 0 && keyLength > 0 &&
-                    passwordLength <= 8 && md != 0) {
+            if (key != nullptr && keyLength > 0 &&
+                    passwordLength <= 8 && md != nullptr) {
                 util::ui8 buffer[8];
                 for (std::size_t i = 8; i-- > 0;) {
                     buffer[i] = (util::ui8)(value & 0xff);
@@ -906,7 +921,7 @@ namespace thekogans {
                 char issuer[MAX_NAME_LENGTH] = {0};
                 char subject[MAX_NAME_LENGTH] = {0};
                 X509 *cert = X509_STORE_CTX_get_current_cert (store);
-                if (cert != 0) {
+                if (cert != nullptr) {
                     X509_NAME_oneline (X509_get_issuer_name (cert), issuer, sizeof (issuer));
                     X509_NAME_oneline (X509_get_subject_name (cert), subject, sizeof (subject));
                 }
@@ -924,7 +939,7 @@ namespace thekogans {
                         "  subject = %s\n"
                         "  error %i:%s\n",
                         depth, issuer, subject, error,
-                        message != 0 ? message : "Unknown error.").c_str ());
+                        message != nullptr ? message : "Unknown error.").c_str ());
             }
             return ok;
         }
@@ -949,7 +964,8 @@ namespace thekogans {
                     }
                     return std::regex_match (serverName, std::regex (patern));
                 }
-                return util::StringCompareIgnoreCase (serverName.c_str (), certificateName.c_str ()) == 0;
+                return util::StringCompareIgnoreCase (
+                    serverName.c_str (), certificateName.c_str ()) == 0;
             }
 
             bool CheckSubjectName (
@@ -958,7 +974,7 @@ namespace thekogans {
                 char commonName[256] = {0};
                 {
                     X509_NAME *subjectName = X509_get_subject_name (cert);
-                    if (subjectName != 0) {
+                    if (subjectName != nullptr) {
                         X509_NAME_get_text_by_NID (
                             subjectName, NID_commonName, commonName, sizeof (commonName));
                     }
@@ -979,14 +995,14 @@ namespace thekogans {
                     X509_EXTENSION *extension = X509_get_ext (cert, i);
                     if (GetExtensionName (extension) == "subjectAltName") {
                         const X509V3_EXT_METHOD *method = X509V3_EXT_get (extension);
-                        if (method != 0) {
+                        if (method != nullptr) {
                             void *extensionData = 0;
                         #if OPENSSL_VERSION_NUMBER < 0x10100000L
                             const void *data = extension->value->data;
                         #else // OPENSSL_VERSION_NUMBER < 0x10100000L
                             const ASN1_OCTET_STRING *data = X509_EXTENSION_get_data (extension);
                         #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
-                            if (method->it != 0) {
+                            if (method->it != nullptr) {
                                 extensionData = ASN1_item_d2i (0,
                                 #if OPENSSL_VERSION_NUMBER < 0x10100000L
                                     (const util::ui8 **)&data,
@@ -1007,11 +1023,13 @@ namespace thekogans {
                                     data->length);
                                 #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
                             }
-                            STACK_OF (CONF_VALUE) *nameValues = method->i2v (method, extensionData, 0);
-                            if (nameValues != 0) {
-                                for (int j = 0, count = sk_CONF_VALUE_num (nameValues); j < count; ++j) {
+                            STACK_OF (CONF_VALUE) *nameValues =
+                                method->i2v (method, extensionData, 0);
+                            if (nameValues != nullptr) {
+                                for (int j = 0, count = sk_CONF_VALUE_num (
+                                        nameValues); j < count; ++j) {
                                     CONF_VALUE *nameValue = sk_CONF_VALUE_value (nameValues, j);
-                                    if (nameValue != 0) {
+                                    if (nameValue != nullptr) {
                                         if (std::string ("DNS") == nameValue->name &&
                                                 CompareServerName (serverName, nameValue->value)) {
                                             return true;
@@ -1031,7 +1049,7 @@ namespace thekogans {
                 SSL *ssl,
                 const std::string &serverName) {
             crypto::X509Ptr cert (SSL_get_peer_certificate (ssl));
-            return cert.get () != 0 &&
+            return cert != nullptr &&
                 (CheckSubjectName (cert.get (), serverName) ||
                     CheckSubjectAltName (cert.get (), serverName)) ?
                 X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
@@ -1043,12 +1061,12 @@ namespace thekogans {
                 const std::list<std::string> &caCertificates,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (ctx != 0 && !caCertificates.empty ()) {
+            if (ctx != nullptr && !caCertificates.empty ()) {
                 crypto::X509_STOREPtr newStore;
                 X509_STORE *store = SSL_CTX_get_cert_store (ctx);
-                if (store == 0) {
+                if (store == nullptr) {
                     newStore.reset (X509_STORE_new ());
-                    if (newStore.get () != 0) {
+                    if (newStore != nullptr) {
                         store = newStore.get ();
                     }
                     else {
@@ -1068,7 +1086,7 @@ namespace thekogans {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                if (newStore.get () != 0) {
+                if (newStore != nullptr) {
                     SSL_CTX_set_cert_store (ctx, newStore.release ());
                 }
             }
@@ -1084,7 +1102,7 @@ namespace thekogans {
                 const std::list<std::string> &certificateChain,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (ctx != 0 && !certificateChain.empty ()) {
+            if (ctx != nullptr && !certificateChain.empty ()) {
                 std::list<std::string>::const_iterator it = certificateChain.begin ();
                 const std::string &certificate = *it++;
                 if (SSL_CTX_use_certificate (ctx,
@@ -1125,7 +1143,7 @@ namespace thekogans {
                 const std::string &privateKey,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (ctx != 0 && !privateKey.empty ()) {
+            if (ctx != nullptr && !privateKey.empty ()) {
                 if (SSL_CTX_use_PrivateKey (ctx,
                         crypto::ParsePrivateKey (
                             privateKey.data (),
@@ -1147,7 +1165,7 @@ namespace thekogans {
                 SSL_CTX *ctx,
                 const std::string &cipherList) {
             std::string trimmedCipherList = util::TrimSpaces (cipherList.c_str ());
-            if (ctx != 0 && !trimmedCipherList.empty ()) {
+            if (ctx != nullptr && !trimmedCipherList.empty ()) {
                 if (SSL_CTX_set_cipher_list (ctx, trimmedCipherList.c_str ()) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -1164,7 +1182,7 @@ namespace thekogans {
                 const std::string &dhParams,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 // DH params are optional.
                 if (!dhParams.empty ()) {
                     SSL_CTX_set_options (ctx, SSL_CTX_get_options (ctx) | SSL_OP_SINGLE_DH_USE);
@@ -1192,7 +1210,7 @@ namespace thekogans {
                 const std::string &ecdhParams,
                 pem_password_cb *passwordCallback,
                 void *userData) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 // ECDH params are optional.
                 if (ecdhParamsType == "auto") {
                     SSL_CTX_set_ecdh_auto (ctx, 1);
@@ -1200,7 +1218,7 @@ namespace thekogans {
                 else if (ecdhParamsType == "curve") {
                     crypto::EC_KEYPtr ecdh (
                         EC_KEY_new_by_curve_name (OBJ_sn2nid (ecdhParams.c_str ())));
-                    if (ecdh.get () == 0 || SSL_CTX_set_tmp_ecdh (ctx, ecdh.get ()) != 1) {
+                    if (ecdh == nullptr || SSL_CTX_set_tmp_ecdh (ctx, ecdh.get ()) != 1) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
@@ -1211,9 +1229,9 @@ namespace thekogans {
                         crypto::PEM_ENCODING,
                         passwordCallback,
                         userData);
-                    if (key.get () != 0) {
+                    if (key != nullptr) {
                         crypto::EC_KEYPtr ecdh (EVP_PKEY_get1_EC_KEY (key.get ()));
-                        if (ecdh.get () == 0 || SSL_CTX_set_tmp_ecdh (ctx, ecdh.get ()) != 1) {
+                        if (ecdh == nullptr || SSL_CTX_set_tmp_ecdh (ctx, ecdh.get ()) != 1) {
                             THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                         }
                     }

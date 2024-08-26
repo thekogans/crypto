@@ -42,7 +42,7 @@ namespace thekogans {
 
         ID::ID (const void *buffer,
                 std::size_t length) {
-            if (buffer != 0 && length > 0) {
+            if (buffer != nullptr && length > 0) {
                 MessageDigest messageDigest (EVP_sha256 ());
                 messageDigest.Init ();
                 messageDigest.Update (buffer, length);

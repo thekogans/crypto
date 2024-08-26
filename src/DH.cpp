@@ -33,12 +33,15 @@ namespace thekogans {
             EVP_PKEY *params = 0;
             EVP_PKEY_CTXPtr ctx (
                 EVP_PKEY_CTX_new_id (EVP_PKEY_DH, OpenSSLInit::engine));
-            if (ctx.get () != 0 &&
+            if (ctx != nullptr &&
                     EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
-                    EVP_PKEY_CTX_set_dh_paramgen_prime_len (ctx.get (), (util::i32)primeLength) == 1 &&
-                    EVP_PKEY_CTX_set_dh_paramgen_generator (ctx.get (), (util::i32)generator) == 1 &&
+                    EVP_PKEY_CTX_set_dh_paramgen_prime_len (
+                        ctx.get (), (util::i32)primeLength) == 1 &&
+                    EVP_PKEY_CTX_set_dh_paramgen_generator (
+                        ctx.get (), (util::i32)generator) == 1 &&
                     EVP_PKEY_paramgen (ctx.get (), &params) == 1) {
-                return Params::SharedPtr (new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
+                return Params::SharedPtr (
+                    new OpenSSLParams (EVP_PKEYPtr (params), id, name, description));
             }
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -52,7 +55,7 @@ namespace thekogans {
                     BIGNUM *p,
                     BIGNUM *q,
                     BIGNUM *g) {
-                if (p != 0 && g != 0) {
+                if (p != nullptr && g != nullptr) {
                     dh->p = p;
                     dh->q = q;
                     dh->g = g;
@@ -73,13 +76,14 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             DHPtr dhParams (DH_new ());
-            if (dhParams.get () != 0) {
+            if (dhParams != nullptr) {
                 if (DH_set0_pqg (dhParams.get (), BN_dup (&prime), 0, BN_dup (&generator)) == 1) {
                     EVP_PKEYPtr params (EVP_PKEY_new ());
-                    if (params.get () != 0 &&
+                    if (params != nullptr &&
                             EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                         dhParams.release ();
-                        return Params::SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
+                        return Params::SharedPtr (
+                            new OpenSSLParams (std::move (params), id, name, description));
                     }
                     else {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -109,10 +113,11 @@ namespace thekogans {
                     const std::string &description) {
                 BIGNUMPtr prime (BN_new ());
                 BIGNUMPtr generator (BN_new ());
-                if (prime.get () != 0 && generator.get () != 0) {
+                if (prime != nullptr && generator != nullptr) {
                     BN_bin2bn (params.prime, params.primeLength, prime.get ());
                     BN_bin2bn (params.generator, params.generatorLength, generator.get ());
-                    return DH::ParamsFromPrimeAndGenerator (*prime, *generator, id, name, description);
+                    return DH::ParamsFromPrimeAndGenerator (
+                        *prime, *generator, id, name, description);
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

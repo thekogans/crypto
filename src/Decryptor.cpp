@@ -27,7 +27,7 @@ namespace thekogans {
         Decryptor::Decryptor (
                 SymmetricKey::SharedPtr key,
                 const EVP_CIPHER *cipher) {
-            if (key != nullptr && cipher != 0 &&
+            if (key != nullptr && cipher != nullptr &&
                     key->GetKeyLength () == GetCipherKeyLength (cipher)) {
                 if (EVP_DecryptInit_ex (
                             &context,
@@ -51,7 +51,7 @@ namespace thekogans {
         }
 
         void Decryptor::Init (const util::ui8 *iv) {
-            if (iv != 0) {
+            if (iv != nullptr) {
                 if (EVP_DecryptInit_ex (&context, 0, 0, 0, iv) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -65,7 +65,7 @@ namespace thekogans {
         void Decryptor::SetAssociatedData (
                 const void *associatedData,
                 std::size_t associatedDataLength) {
-            if (associatedData != 0 && associatedDataLength > 0) {
+            if (associatedData != nullptr && associatedDataLength > 0) {
                 util::i32 updateLength = 0;
                 if (EVP_DecryptUpdate (
                         &context,
@@ -86,7 +86,7 @@ namespace thekogans {
                 const void *ciphertext,
                 std::size_t ciphertextLength,
                 util::ui8 *plaintext) {
-            if (ciphertext != 0 && ciphertextLength > 0 && plaintext != 0) {
+            if (ciphertext != nullptr && ciphertextLength > 0 && plaintext != nullptr) {
                 util::i32 updateLength = 0;
                 if (EVP_DecryptUpdate (
                         &context,
@@ -110,7 +110,7 @@ namespace thekogans {
         bool Decryptor::SetTag (
                 const void *tag,
                 std::size_t tagLength) {
-            if (tag != 0 && tagLength > 0) {
+            if (tag != nullptr && tagLength > 0) {
                 if (EVP_CIPHER_CTX_ctrl (
                         &context,
                         EVP_CTRL_GCM_SET_TAG,
@@ -129,7 +129,7 @@ namespace thekogans {
         }
 
         std::size_t Decryptor::Final (util::ui8 *plaintext) {
-            if (plaintext != 0) {
+            if (plaintext != nullptr) {
                 util::i32 finalLength = 0;
                 if (EVP_DecryptFinal_ex (
                         &context,

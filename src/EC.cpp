@@ -42,20 +42,20 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             BN_CTXPtr ctx (BN_CTX_new ());
-            if (ctx.get () != 0) {
+            if (ctx != nullptr) {
                 EC_GROUPPtr curve (EC_GROUP_new_curve_GFp (&p, &a, &b, ctx.get ()));
-                if (curve.get () != 0) {
+                if (curve != nullptr) {
                     EC_GROUP_set_asn1_flag (curve.get (), OPENSSL_EC_EXPLICIT_CURVE);
                     EC_POINTPtr generator (EC_POINT_new (curve.get ()));
-                    if (generator.get () != 0 &&
+                    if (generator != nullptr &&
                             EC_POINT_set_affine_coordinates_GFp (curve.get (),
                                 generator.get (), &gx, &gy, ctx.get ()) == 1 &&
                             EC_GROUP_set_generator (curve.get (), generator.get (), &n, &c) == 1) {
                         EC_KEYPtr ecParams (EC_KEY_new ());
-                        if (ecParams.get () != 0) {
+                        if (ecParams != nullptr) {
                             EC_KEY_set_group (ecParams.get (), curve.get ());
                             EVP_PKEYPtr params (EVP_PKEY_new ());
-                            if (params.get () != 0 &&
+                            if (params != nullptr &&
                                     EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                 ecParams.release ();
                                 return Params::SharedPtr (
@@ -89,7 +89,7 @@ namespace thekogans {
                 const std::string &description) {
             EVP_PKEY *params = 0;
             EVP_PKEY_CTXPtr ctx (EVP_PKEY_CTX_new_id (EVP_PKEY_EC, OpenSSLInit::engine));
-            if (ctx.get () != 0 &&
+            if (ctx != nullptr &&
                     EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
                     EVP_PKEY_CTX_set_ec_paramgen_curve_nid (ctx.get (), nid) == 1 &&
                     EVP_PKEY_CTX_set_ec_param_enc (ctx.get (), OPENSSL_EC_NAMED_CURVE) == 1 &&
@@ -131,11 +131,11 @@ namespace thekogans {
                 BIGNUMPtr gy (BN_new ());
                 BIGNUMPtr n (BN_new ());
                 BIGNUMPtr c (BN_new ());
-                if (p.get () != 0 &&
-                        a.get () != 0 && b.get () != 0 &&
-                        gx.get () != 0 && gy.get () != 0 &&
-                        n.get () != 0 &&
-                        c.get () != 0) {
+                if (p != nullptr &&
+                        a != nullptr && b != nullptr &&
+                        gx != nullptr && gy != nullptr &&
+                        n != nullptr &&
+                        c != nullptr) {
                     BN_bin2bn (curve.p, curve.pLength, p.get ());
                     BN_bin2bn (curve.a, curve.aLength, a.get ());
                     BN_bin2bn (curve.b, curve.bLength, b.get ());

@@ -28,7 +28,7 @@ namespace thekogans {
         Encryptor::Encryptor (
                 SymmetricKey::SharedPtr key,
                 const EVP_CIPHER *cipher) {
-            if (key != nullptr && cipher != 0 &&
+            if (key != nullptr && cipher != nullptr &&
                     key->GetKeyLength () == GetCipherKeyLength (cipher)) {
                 if (EVP_EncryptInit_ex (
                             &context,
@@ -52,7 +52,7 @@ namespace thekogans {
         }
 
         std::size_t Encryptor::Init (util::ui8 *iv) {
-            if (iv != 0) {
+            if (iv != nullptr) {
                 // An explicit iv for each frame will thwart BEAST.
                 // http://www.slideshare.net/danrlde/20120418-luedtke-ssltlscbcbeast
                 std::size_t ivLength = GetIVLength ();
@@ -76,7 +76,7 @@ namespace thekogans {
         void Encryptor::SetAssociatedData (
                 const void *associatedData,
                 std::size_t associatedDataLength) {
-            if (associatedData != 0 && associatedDataLength > 0) {
+            if (associatedData != nullptr && associatedDataLength > 0) {
                 util::i32 updateLength = 0;
                 if (EVP_EncryptUpdate (
                         &context,
@@ -97,7 +97,7 @@ namespace thekogans {
                 const void *plaintext,
                 std::size_t plaintextLength,
                 util::ui8 *ciphertext) {
-            if (plaintext != 0 && plaintextLength > 0 && ciphertext != 0) {
+            if (plaintext != nullptr && plaintextLength > 0 && ciphertext != nullptr) {
                 util::i32 updateLength = 0;
                 if (EVP_EncryptUpdate (
                         &context,
@@ -119,7 +119,7 @@ namespace thekogans {
         }
 
         std::size_t Encryptor::Final (util::ui8 *ciphertext) {
-            if (ciphertext != 0) {
+            if (ciphertext != nullptr) {
                 util::i32 finalLength = 0;
                 if (EVP_EncryptFinal_ex (
                         &context,
@@ -139,7 +139,7 @@ namespace thekogans {
         }
 
         std::size_t Encryptor::GetTag (util::ui8 *tag) {
-            if (tag != 0) {
+            if (tag != nullptr) {
                 if (EVP_CIPHER_CTX_ctrl (
                         &context,
                         EVP_CTRL_GCM_GET_TAG,

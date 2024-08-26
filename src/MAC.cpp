@@ -27,7 +27,7 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength,
                 util::ui8 *signature) {
-            if (buffer != 0 && bufferLength > 0 && signature != 0) {
+            if (buffer != nullptr && bufferLength > 0 && signature != nullptr) {
                 Init ();
                 Update (buffer, bufferLength);
                 return Final (signature);
@@ -41,7 +41,7 @@ namespace thekogans {
         util::Buffer::SharedPtr MAC::SignBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 util::Buffer::SharedPtr signature (
                     new util::Buffer (util::HostEndian, GetMACLength ()));
                 if (signature->AdvanceWriteOffset (
@@ -70,8 +70,8 @@ namespace thekogans {
                 std::size_t bufferLength,
                 const void *signature,
                 std::size_t signatureLength) {
-            if (buffer != 0 && bufferLength > 0 &&
-                    signature != 0 && signatureLength > 0) {
+            if (buffer != nullptr && bufferLength > 0 &&
+                    signature != nullptr && signatureLength > 0) {
                 util::ui8 computedSignature[EVP_MAX_MD_SIZE];
                 std::size_t computedSignatureLength =
                     SignBuffer (buffer, bufferLength, computedSignature);

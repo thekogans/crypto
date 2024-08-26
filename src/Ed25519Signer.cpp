@@ -45,7 +45,7 @@ namespace thekogans {
         void Ed25519Signer::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 messageDigest->Update (buffer, bufferLength);
             }
             else {
@@ -55,7 +55,7 @@ namespace thekogans {
         }
 
         std::size_t Ed25519Signer::Final (util::ui8 *signature) {
-            if (signature != 0) {
+            if (signature != nullptr) {
                 std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
                 messageDigest->Final (digest.data ());
                 return Ed25519::SignBuffer (

@@ -67,7 +67,7 @@ namespace thekogans {
         void OpenSSLVerifier::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 if (EVP_DigestVerifyUpdate (
                         &messageDigest->ctx,
                         buffer,
@@ -84,7 +84,7 @@ namespace thekogans {
         bool OpenSSLVerifier::Final (
                 const void *signature,
                 std::size_t signatureLength) {
-            if (signature != 0 && signatureLength > 0) {
+            if (signature != nullptr && signatureLength > 0) {
                 return EVP_DigestVerifyFinal (
                     &messageDigest->ctx,
                     (const util::ui8 *)signature,

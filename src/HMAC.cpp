@@ -30,7 +30,7 @@ namespace thekogans {
                 const EVP_MD *md_) :
                 key (key_),
                 md (md_) {
-            if (key != nullptr && md != 0) {
+            if (key != nullptr && md != nullptr) {
                 if (HMAC_Init_ex (
                         &ctx,
                         key->Get ().GetReadPtr (),
@@ -55,7 +55,7 @@ namespace thekogans {
         void HMAC::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 if (HMAC_Update (&ctx, (const util::ui8 *)buffer, bufferLength) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
@@ -67,7 +67,7 @@ namespace thekogans {
         }
 
         std::size_t HMAC::Final (util::ui8 *signature) {
-            if (signature != 0) {
+            if (signature != nullptr) {
                 util::ui32 signatureLength = 0;
                 if (HMAC_Final (&ctx, signature, &signatureLength) == 1) {
                     return signatureLength;

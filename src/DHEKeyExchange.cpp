@@ -372,7 +372,7 @@ namespace thekogans {
                         EVP_PKEY_CTX_new (
                             ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get (),
                             OpenSSLInit::engine));
-                    if (ctx.get () != nullptr) {
+                    if (ctx != nullptr) {
                         std::size_t secretLength = 0;
                         if (EVP_PKEY_derive_init (ctx.get ()) == 1 &&
                                 EVP_PKEY_derive_set_peer (

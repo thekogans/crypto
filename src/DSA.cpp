@@ -34,7 +34,7 @@ namespace thekogans {
                 EVP_PKEY *params = 0;
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new_id (EVP_PKEY_DSA, OpenSSLInit::engine));
-                if (ctx.get () != 0 &&
+                if (ctx != nullptr &&
                         EVP_PKEY_paramgen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_dsa_paramgen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
                         EVP_PKEY_paramgen (ctx.get (), &params) == 1) {

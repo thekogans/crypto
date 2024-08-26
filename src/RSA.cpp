@@ -38,11 +38,11 @@ namespace thekogans {
                 const ID &id,
                 const std::string &name,
                 const std::string &description) {
-            if (keyLength > 0 && (keyLength & ~3) == keyLength && publicExponent.get () != nullptr) {
+            if (keyLength > 0 && (keyLength & ~3) == keyLength && publicExponent != nullptr) {
                 EVP_PKEY *key = nullptr;
                 EVP_PKEY_CTXPtr ctx (
                     EVP_PKEY_CTX_new_id (EVP_PKEY_RSA, OpenSSLInit::engine));
-                if (ctx.get () != nullptr &&
+                if (ctx != nullptr &&
                         EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_keygen_bits (ctx.get (), (util::i32)keyLength) == 1 &&
                         EVP_PKEY_CTX_set_rsa_keygen_pubexp (ctx.get (), publicExponent.get ()) == 1 &&
@@ -100,7 +100,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_new (
                         ((OpenSSLAsymmetricKey *)publicKey.Get ())->key.get (),
                         OpenSSLInit::engine));
-                if (ctx.get () != 0 &&
+                if (ctx != nullptr &&
                         EVP_PKEY_encrypt_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_padding (ctx.get (), padding) == 1) {
                     size_t ciphertextLength = 0;
@@ -281,7 +281,7 @@ namespace thekogans {
                     EVP_PKEY_CTX_new (
                         ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get (),
                         OpenSSLInit::engine));
-                if (ctx.get () != 0 &&
+                if (ctx != nullptr &&
                         EVP_PKEY_decrypt_init (ctx.get ()) == 1 &&
                         EVP_PKEY_CTX_set_rsa_padding (ctx.get (), padding) == 1) {
                     size_t plaintextLength = privateKey->GetKeyLength ();

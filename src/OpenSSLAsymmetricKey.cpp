@@ -164,9 +164,9 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             BIOPtr bio (BIO_new_file (path.c_str (), "r"));
-            if (bio.get () != 0) {
+            if (bio != nullptr) {
                 X509Ptr certificate (PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
-                if (certificate.get () != 0) {
+                if (certificate != nullptr) {
                     return AsymmetricKey::SharedPtr (
                         new OpenSSLAsymmetricKey (
                             EVP_PKEYPtr (X509_get_pubkey (certificate.get ())),
@@ -193,7 +193,7 @@ namespace thekogans {
                 pem_password_cb *passwordCallback,
                 void *userData) {
             BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
-            if (bio.get () == 0 || (IsPrivate () ?
+            if (bio == nullptr || (IsPrivate () ?
                     PEM_write_bio_PrivateKey (
                         bio.get (),
                         key.get (),
@@ -214,7 +214,7 @@ namespace thekogans {
             BIOPtr bio (BIO_new (BIO_s_mem ()));
             if (PEM_write_bio_PUBKEY (bio.get (), key.get ()) == 1) {
                 EVP_PKEYPtr publicKey (PEM_read_bio_PUBKEY (bio.get (), 0, 0, 0));
-                if (publicKey.get () != 0) {
+                if (publicKey != nullptr) {
                     return AsymmetricKey::SharedPtr (
                         new OpenSSLAsymmetricKey (
                             std::move (publicKey),
@@ -238,12 +238,12 @@ namespace thekogans {
                     EVP_PKEY *key) {
                 if (key != nullptr) {
                     BIOPtr bio (BIO_new (BIO_s_mem ()));
-                    if (bio.get () != 0 && (isPrivate ?
+                    if (bio != nullptr && (isPrivate ?
                             PEM_write_bio_PrivateKey (bio.get (), key, 0, 0, 0, 0, 0) :
                             PEM_write_bio_PUBKEY (bio.get (), key)) == 1) {
                         char *buffer = 0;
                         long length = BIO_get_mem_data (bio.get (), &buffer);
-                        if (buffer != 0 && length > 0) {
+                        if (buffer != nullptr && length > 0) {
                             return util::SecureString (buffer, buffer + length);
                         }
                         else {
@@ -271,7 +271,7 @@ namespace thekogans {
                     std::size_t keyBufferLength) {
                 if (keyBuffer != nullptr && keyBufferLength > 0) {
                     BIOPtr bio (BIO_new (BIO_s_mem ()));
-                    if (bio.get () != 0) {
+                    if (bio != nullptr) {
                         if (BIO_write (bio.get (), keyBuffer, (int)keyBufferLength) ==
                                 (int)keyBufferLength) {
                             return EVP_PKEYPtr (isPrivate ?
@@ -339,7 +339,7 @@ namespace thekogans {
         }
 
         void OpenSSLAsymmetricKey::ValidateKey () {
-            if (key.get () != 0) {
+            if (key != nullptr) {
                 const char *type = GetKeyType ();
                 if (type != OPENSSL_PKEY_DH &&
                         type != OPENSSL_PKEY_DSA &&

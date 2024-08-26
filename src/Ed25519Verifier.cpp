@@ -42,7 +42,7 @@ namespace thekogans {
         void Ed25519Verifier::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 messageDigest->Update (buffer, bufferLength);
             }
             else {
@@ -54,7 +54,7 @@ namespace thekogans {
         bool Ed25519Verifier::Final (
                 const void *signature,
                 std::size_t signatureLength) {
-            if (signature != 0 && signatureLength == Ed25519::SIGNATURE_LENGTH) {
+            if (signature != nullptr && signatureLength == Ed25519::SIGNATURE_LENGTH) {
                 std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
                 messageDigest->Final (digest.data ());
                 return Ed25519::VerifyBufferSignature (

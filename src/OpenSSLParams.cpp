@@ -47,7 +47,7 @@ namespace thekogans {
                 const std::string &description) :
                 Params (id, name, description),
                 params (std::move (params_)) {
-            if (params.get () != 0) {
+            if (params != nullptr) {
                 const char *paramsType = GetKeyType ();
                 if (paramsType != OPENSSL_PKEY_DH &&
                         paramsType != OPENSSL_PKEY_DSA &&
@@ -65,7 +65,7 @@ namespace thekogans {
             EVP_PKEY *key = 0;
             EVP_PKEY_CTXPtr ctx (
                 EVP_PKEY_CTX_new (params.get (), OpenSSLInit::engine));
-            if (ctx.get () != 0 &&
+            if (ctx != nullptr &&
                     EVP_PKEY_keygen_init (ctx.get ()) == 1 &&
                     EVP_PKEY_keygen (ctx.get (), &key) == 1) {
                 return AsymmetricKey::SharedPtr (
@@ -86,14 +86,16 @@ namespace thekogans {
                 const std::string &description) {
             if (paramsType == EVP_PKEY_DH) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
-                if (bio.get () != 0) {
-                    DHPtr dhParams (PEM_read_bio_DHparams (bio.get (), 0, passwordCallback, userData));
-                    if (dhParams.get () != 0) {
+                if (bio != nullptr) {
+                    DHPtr dhParams (
+                        PEM_read_bio_DHparams (bio.get (), 0, passwordCallback, userData));
+                    if (dhParams != nullptr) {
                         EVP_PKEYPtr params (EVP_PKEY_new ());
-                        if (params.get () != 0) {
+                        if (params != nullptr) {
                             if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                                 dhParams.release ();
-                                return SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
+                                return SharedPtr (
+                                    new OpenSSLParams (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -113,14 +115,16 @@ namespace thekogans {
             }
             else if (paramsType == EVP_PKEY_DSA) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
-                if (bio.get () != 0) {
-                    DSAPtr dsaParams (PEM_read_bio_DSAparams (bio.get (), 0, passwordCallback, userData));
-                    if (dsaParams.get () != 0) {
+                if (bio != nullptr) {
+                    DSAPtr dsaParams (
+                        PEM_read_bio_DSAparams (bio.get (), 0, passwordCallback, userData));
+                    if (dsaParams != nullptr) {
                         EVP_PKEYPtr params (EVP_PKEY_new ());
-                        if (params.get () != 0) {
+                        if (params != nullptr) {
                             if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
                                 dsaParams.release ();
-                                return SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
+                                return SharedPtr (
+                                    new OpenSSLParams (std::move (params), id, name, description));
                             }
                             else {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -140,17 +144,20 @@ namespace thekogans {
             }
             else if (paramsType == EVP_PKEY_EC) {
                 BIOPtr bio (BIO_new_file (path.c_str (), "r"));
-                if (bio.get () != 0) {
-                    EC_GROUPPtr curve (PEM_read_bio_ECPKParameters (bio.get (), 0, passwordCallback, userData));
-                    if (curve.get () != 0) {
+                if (bio != nullptr) {
+                    EC_GROUPPtr curve (
+                        PEM_read_bio_ECPKParameters (bio.get (), 0, passwordCallback, userData));
+                    if (curve != nullptr) {
                         EC_KEYPtr ecParams (EC_KEY_new ());
-                        if (ecParams.get () != 0) {
+                        if (ecParams != nullptr) {
                             EC_KEY_set_group (ecParams.get (), curve.get ());
                             EVP_PKEYPtr params (EVP_PKEY_new ());
-                            if (params.get () != 0) {
+                            if (params != nullptr) {
                                 if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                     ecParams.release ();
-                                    return SharedPtr (new OpenSSLParams (std::move (params), id, name, description));
+                                    return SharedPtr (
+                                        new OpenSSLParams (
+                                            std::move (params), id, name, description));
                                 }
                                 else {
                                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -180,25 +187,25 @@ namespace thekogans {
 
         void OpenSSLParams::Save (const std::string &path) const {
             BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
-            if (bio.get () != 0) {
+            if (bio != nullptr) {
                 const char *paramsType = GetKeyType ();
                 if (paramsType == OPENSSL_PKEY_DH) {
                     DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
-                    if (dhParams.get () == 0 ||
+                    if (dhParams == nullptr ||
                             PEM_write_bio_DHparams (bio.get (), dhParams.get ()) == 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
                 else if (paramsType == OPENSSL_PKEY_DSA) {
                     DSAPtr dsaParams (EVP_PKEY_get1_DSA (params.get ()));
-                    if (dsaParams.get () == 0 ||
+                    if (dsaParams == nullptr ||
                             PEM_write_bio_DSAparams (bio.get (), dsaParams.get ()) == 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
                 else if (paramsType == OPENSSL_PKEY_EC) {
                     EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (params.get ()));
-                    if (ecParams.get () == 0 ||
+                    if (ecParams == nullptr ||
                             PEM_write_bio_ECPKParameters (bio.get (),
                                 EC_KEY_get0_group (ecParams.get ())) == 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -215,7 +222,7 @@ namespace thekogans {
             util::i32 paramsLength = 0;
             if (paramsType == OPENSSL_PKEY_DH) {
                 DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
-                if (dhParams.get () != 0) {
+                if (dhParams != nullptr) {
                     paramsLength = i2d_DHparams (dhParams.get (), 0);
                     if (paramsLength <= 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -227,7 +234,7 @@ namespace thekogans {
             }
             else if (paramsType == OPENSSL_PKEY_DSA) {
                 DSAPtr dsaParams (EVP_PKEY_get1_DSA (params.get ()));
-                if (dsaParams.get () != 0) {
+                if (dsaParams != nullptr) {
                     paramsLength = i2d_DSAparams (dsaParams.get (), 0);
                     if (paramsLength <= 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -239,7 +246,7 @@ namespace thekogans {
             }
             else if (paramsType == OPENSSL_PKEY_EC) {
                 EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (params.get ()));
-                if (ecParams.get () != 0) {
+                if (ecParams != nullptr) {
                     paramsLength = i2d_ECParameters (ecParams.get (), 0);
                     if (paramsLength <= 0) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -262,14 +269,20 @@ namespace thekogans {
                     const std::string &paramsType,
                     const util::SecureString &paramsBuffer) {
                 EVP_PKEYPtr params (EVP_PKEY_new ());
-                if (params.get () != 0) {
-                    if (paramsType == OPENSSL_PKEY_DH || paramsType == OPENSSL_PKEY_DSA || paramsType == OPENSSL_PKEY_EC) {
+                if (params != nullptr) {
+                    if (paramsType == OPENSSL_PKEY_DH ||
+                            paramsType == OPENSSL_PKEY_DSA ||
+                            paramsType == OPENSSL_PKEY_EC) {
                         util::SecureVector<util::ui8> decodedParams (paramsBuffer.size () / 2);
-                        util::HexDecodeBuffer (paramsBuffer.data (), paramsBuffer.size (), decodedParams.data ());
+                        util::HexDecodeBuffer (
+                            paramsBuffer.data (),
+                            paramsBuffer.size (),
+                            decodedParams.data ());
                         const util::ui8 *paramsData = decodedParams.data ();
                         if (paramsType == OPENSSL_PKEY_DH) {
-                            DHPtr dhParams (d2i_DHparams (0, &paramsData, (long)decodedParams.size ()));
-                            if (dhParams.get () != 0) {
+                            DHPtr dhParams (
+                                d2i_DHparams (0, &paramsData, (long)decodedParams.size ()));
+                            if (dhParams != nullptr) {
                                 if (EVP_PKEY_assign_DH (params.get (), dhParams.get ()) == 1) {
                                     dhParams.release ();
                                 }
@@ -282,8 +295,9 @@ namespace thekogans {
                             }
                         }
                         else if (paramsType == OPENSSL_PKEY_DSA) {
-                            DSAPtr dsaParams (d2i_DSAparams (0, &paramsData, (long)decodedParams.size ()));
-                            if (dsaParams.get () != 0) {
+                            DSAPtr dsaParams (
+                                d2i_DSAparams (0, &paramsData, (long)decodedParams.size ()));
+                            if (dsaParams != nullptr) {
                                 if (EVP_PKEY_assign_DSA (params.get (), dsaParams.get ()) == 1) {
                                     dsaParams.release ();
                                 }
@@ -296,8 +310,9 @@ namespace thekogans {
                             }
                         }
                         else if (paramsType == OPENSSL_PKEY_EC) {
-                            EC_KEYPtr ecParams (d2i_ECParameters (0, &paramsData, (long)decodedParams.size ()));
-                            if (ecParams.get () != 0) {
+                            EC_KEYPtr ecParams (
+                                d2i_ECParameters (0, &paramsData, (long)decodedParams.size ()));
+                            if (ecParams != nullptr) {
                                 if (EVP_PKEY_assign_EC_KEY (params.get (), ecParams.get ()) == 1) {
                                     ecParams.release ();
                                 }
@@ -338,7 +353,7 @@ namespace thekogans {
                 util::i32 paramsType = EVP_PKEY_base_id (&params);
                 if (paramsType == EVP_PKEY_DH) {
                     DHPtr dhParams (EVP_PKEY_get1_DH (&params));
-                    if (dhParams.get () != 0) {
+                    if (dhParams != nullptr) {
                         util::i32 paramsLength = i2d_DHparams (dhParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
@@ -355,7 +370,7 @@ namespace thekogans {
                 }
                 else if (paramsType == EVP_PKEY_DSA) {
                     DSAPtr dsaParams (EVP_PKEY_get1_DSA (&params));
-                    if (dsaParams.get () != 0) {
+                    if (dsaParams != nullptr) {
                         util::i32 paramsLength = i2d_DSAparams (dsaParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);
@@ -372,7 +387,7 @@ namespace thekogans {
                 }
                 else if (paramsType == EVP_PKEY_EC) {
                     EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (&params));
-                    if (ecParams.get () != 0) {
+                    if (ecParams != nullptr) {
                         util::i32 paramsLength = i2d_ECParameters (ecParams.get (), 0);
                         if (paramsLength > 0) {
                             paramsBuffer.resize (paramsLength);

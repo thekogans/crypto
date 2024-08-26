@@ -36,7 +36,7 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) :
                 AsymmetricKey (isPrivate, id, name, description) {
-            if (key_ != 0) {
+            if (key_ != nullptr) {
                 key.Write (key_, X25519::KEY_LENGTH);
             }
         }

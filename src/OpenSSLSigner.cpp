@@ -67,7 +67,7 @@ namespace thekogans {
         void OpenSSLSigner::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
-            if (buffer != 0 && bufferLength > 0) {
+            if (buffer != nullptr && bufferLength > 0) {
                 if (EVP_DigestSignUpdate (
                         &messageDigest->ctx,
                         buffer,
@@ -82,7 +82,7 @@ namespace thekogans {
         }
 
         std::size_t OpenSSLSigner::Final (util::ui8 *signature) {
-            if (signature != 0) {
+            if (signature != nullptr) {
                 std::size_t signatureLength = privateKey->GetKeyLength ();
                 if (EVP_DigestSignFinal (
                         &messageDigest->ctx,

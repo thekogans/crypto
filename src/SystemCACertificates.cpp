@@ -72,7 +72,7 @@ namespace thekogans {
         #elif defined (TOOLCHAIN_OS_OSX)
             struct CFArrayRefDeleter {
                 void operator () (CFArrayRef arrayRef) {
-                    if (arrayRef != 0) {
+                    if (arrayRef != nullptr) {
                         CFRelease (arrayRef);
                     }
                 }
@@ -81,7 +81,7 @@ namespace thekogans {
 
             struct CFDictionaryRefDeleter {
                 void operator () (CFDictionaryRef dictionaryRef) {
-                    if (dictionaryRef != 0) {
+                    if (dictionaryRef != nullptr) {
                         CFRelease (dictionaryRef);
                     }
                 }
@@ -90,7 +90,7 @@ namespace thekogans {
 
             struct CFErrorRefDeleter {
                 void operator () (CFErrorRef errorRef) {
-                    if (errorRef != 0) {
+                    if (errorRef != nullptr) {
                         CFRelease (errorRef);
                     }
                 }
@@ -99,7 +99,7 @@ namespace thekogans {
 
             struct CFDataRefDeleter {
                 void operator () (CFDataRef dataRef) {
-                    if (dataRef != 0) {
+                    if (dataRef != nullptr) {
                         CFRelease (dataRef);
                     }
                 }
@@ -108,7 +108,7 @@ namespace thekogans {
 
             struct CFDateRefDeleter {
                 void operator () (CFDateRef dateRef) {
-                    if (dateRef != 0) {
+                    if (dateRef != nullptr) {
                         CFRelease (dateRef);
                     }
                 }
@@ -119,14 +119,14 @@ namespace thekogans {
                     CFNumberRef notBefore,
                     CFNumberRef notAfter) {
                 CFDateRefPtr now (CFDateCreate (0, CFAbsoluteTimeGetCurrent ()));
-                if (now.get () != 0) {
+                if (now != nullptr) {
                     CFAbsoluteTime validityNotBefore;
                     CFAbsoluteTime validityNotAfter;
                     if (CFNumberGetValue (notBefore, kCFNumberDoubleType, &validityNotBefore) &&
                             CFNumberGetValue (notAfter, kCFNumberDoubleType, &validityNotAfter)) {
                         CFDateRefPtr notBeforeDate (CFDateCreate (0, validityNotBefore));
                         CFDateRefPtr notAfterDate (CFDateCreate (0, validityNotAfter));
-                        return notBeforeDate.get () != 0 && notAfterDate.get () != 0 &&
+                        return notBeforeDate != nullptr && notAfterDate != nullptr &&
                             CFDateCompare (notBeforeDate.get (), now.get (), 0) == kCFCompareLessThan &&
                             CFDateCompare (now.get (), notAfterDate.get (), 0) == kCFCompareLessThan;
                     }
@@ -165,9 +165,9 @@ namespace thekogans {
                 &myStore
             };
             for (std::size_t i = 0, numStores = THEKOGANS_UTIL_ARRAY_SIZE (stores); i < numStores; ++i) {
-                if (stores[i]->certStore != 0) {
+                if (stores[i]->certStore != nullptr) {
                     PCCERT_CONTEXT certContext = 0;
-                    while ((certContext = CertEnumCertificatesInStore (stores[i]->certStore, certContext)) != 0) {
+                    while ((certContext = CertEnumCertificatesInStore (stores[i]->certStore, certContext)) != nullptr) {
                         // Skip expired certificates.
                         if (CertVerifyTimeValidity (0, certContext->pCertInfo) == 0) {
                             if (loadSystemRootCACertificatesOnly) {
@@ -227,15 +227,15 @@ namespace thekogans {
             for (std::size_t i = 0, numDomains = THEKOGANS_UTIL_ARRAY_SIZE (domains); i < numDomains; ++i) {
                 CFArrayRef certs = 0;
                 /*OSStatus errorCode =*/ SecTrustSettingsCopyCertificates (domains[i], &certs);
-                if (certs != 0) {
+                if (certs != nullptr) {
                     CFArrayRefPtr certsPtr (certs);
                     for (CFIndex j = 0, numCerts = (util::i32)CFArrayGetCount (certs); j < numCerts; ++j) {
                         SecCertificateRef cert = (SecCertificateRef)CFArrayGetValueAtIndex (certs, j);
-                        if (cert != 0) {
+                        if (cert != nullptr) {
                             CFErrorRef error = 0;
                             CFDictionaryRefPtr names (
                                 SecCertificateCopyValues (cert, x509Keys.get (), &error));
-                            if (names != 0) {
+                            if (names != nullptr) {
                                 // Check if the certificate expired.
                                 CFNumberRef notBefore =
                                     (CFNumberRef)CFDictionaryGetValue (
@@ -249,7 +249,7 @@ namespace thekogans {
                                             names.get (),
                                             kSecOIDX509V1ValidityNotAfter),
                                         kSecPropertyKeyValue);
-                                if (notBefore != 0 && notAfter != 0 && CheckDateRange (notBefore, notAfter)) {
+                                if (notBefore != nullptr && notAfter != nullptr && CheckDateRange (notBefore, notAfter)) {
                                     if (loadSystemRootCACertificatesOnly) {
                                         // We only want to add Root CAs, so make
                                         // sure Subject and Issuer names match.
@@ -265,14 +265,14 @@ namespace thekogans {
                                                     names.get (),
                                                     kSecOIDX509V1SubjectName),
                                                 kSecPropertyKeyValue);
-                                        if (issuer == 0 || subject == 0 || !CFEqual (subject, issuer)) {
+                                        if (issuer == nullptr || subject == nullptr || !CFEqual (subject, issuer)) {
                                             continue;
                                         }
                                     }
                                     CFDataRef data = 0;
                                     /*OSStatus errorCode =*/
                                         SecItemExport (cert, kSecFormatX509Cert, kSecItemPemArmour, 0, &data);
-                                    if (data != 0) {
+                                    if (data != nullptr) {
                                         CFDataRefPtr dataPtr (data);
                                         // Bad certificates are logged and ignored.
                                         THEKOGANS_UTIL_TRY {
@@ -297,13 +297,13 @@ namespace thekogans {
         }
 
         void SystemCACertificates::Use (SSL_CTX *ctx) {
-            if (ctx != 0) {
+            if (ctx != nullptr) {
                 util::LockGuard<util::SpinLock> guard (spinLock);
                 X509_STOREPtr newStore;
                 X509_STORE *store = SSL_CTX_get_cert_store (ctx);
-                if (store == 0) {
+                if (store == nullptr) {
                     newStore.reset (X509_STORE_new ());
-                    if (newStore.get () != 0) {
+                    if (newStore != nullptr) {
                         store = newStore.get ();
                     }
                     else {
@@ -317,7 +317,7 @@ namespace thekogans {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                if (newStore.get () != 0) {
+                if (newStore != nullptr) {
                     SSL_CTX_set_cert_store (ctx, newStore.release ());
                 }
             }

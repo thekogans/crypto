@@ -3719,7 +3719,7 @@ namespace thekogans {
         }
 
         void Ed25519::CreateKey (util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
-            if (privateKey != 0) {
+            if (privateKey != nullptr) {
                 util::RandomSource::Instance ()->GetSeedOrBytes (
                     privateKey, PRIVATE_KEY_LENGTH / 2);
                 util::ui8 *publicKey = privateKey + PRIVATE_KEY_LENGTH / 2;
@@ -3740,7 +3740,7 @@ namespace thekogans {
         void Ed25519::GetPublicKey (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 util::ui8 publicKey[PUBLIC_KEY_LENGTH]) {
-            if (privateKey != 0 && publicKey != 0) {
+            if (privateKey != nullptr && publicKey != nullptr) {
                 memcpy (publicKey, privateKey + PRIVATE_KEY_LENGTH / 2, PUBLIC_KEY_LENGTH);
             }
             else {
@@ -3754,7 +3754,8 @@ namespace thekogans {
                 std::size_t bufferLength,
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 util::ui8 signature[SIGNATURE_LENGTH]) {
-            if (buffer != 0 && bufferLength > 0 && privateKey != 0 && signature != 0) {
+            if (buffer != nullptr && bufferLength > 0 &&
+                    privateKey != nullptr && signature != nullptr) {
                 util::ui8 az[SHA512_DIGEST_LENGTH];
                 SHA512 (privateKey, 32, az);
                 az[0] &= 248;
@@ -3791,7 +3792,8 @@ namespace thekogans {
                 std::size_t bufferLength,
                 const util::ui8 publicKey[PUBLIC_KEY_LENGTH],
                 const util::ui8 signature[SIGNATURE_LENGTH]) {
-            if (buffer != 0 && bufferLength > 0 && publicKey != 0 && signature != 0) {
+            if (buffer != nullptr && bufferLength > 0 &&
+                    publicKey != nullptr && signature != nullptr) {
                 ge_p3 A;
                 if ((signature[63] & 224) != 0 ||
                         ge_frombytes_negate_vartime (&A, publicKey) != 0) {
@@ -3819,7 +3821,7 @@ namespace thekogans {
 
         void X25519::CreateKey (
                 util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
-            if (privateKey != 0) {
+            if (privateKey != nullptr) {
                 util::RandomSource::Instance ()->GetSeedOrBytes (
                     privateKey, PRIVATE_KEY_LENGTH);
             }
@@ -3832,7 +3834,7 @@ namespace thekogans {
         void X25519::GetPublicKey (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 util::ui8 publicKey[PUBLIC_KEY_LENGTH]) {
-            if (privateKey != 0 && publicKey != 0) {
+            if (privateKey != nullptr && publicKey != nullptr) {
                 util::ui8 e[PRIVATE_KEY_LENGTH];
                 memcpy (e, privateKey, PRIVATE_KEY_LENGTH);
                 e[0] &= 248;
@@ -3910,7 +3912,7 @@ namespace thekogans {
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 const util::ui8 peerPublicKey[PUBLIC_KEY_LENGTH],
                 util::ui8 sharedSecret[SHARED_SECRET_LENGTH]) {
-            if (privateKey != 0 && peerPublicKey != 0 && sharedSecret != 0) {
+            if (privateKey != nullptr && peerPublicKey != nullptr && sharedSecret != nullptr) {
                 static const util::ui8 zero[SHARED_SECRET_LENGTH] = {0};
                 x25519_scalar_mult (sharedSecret, privateKey, peerPublicKey);
                 // The all-zero output results when the input is a point of small order.
