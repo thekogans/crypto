@@ -35,11 +35,7 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLAllocator :
                 public util::Allocator,
-                public util::Singleton<
-                    OpenSSLAllocator,
-                    util::SpinLock,
-                    util::RefCountedInstanceCreator<OpenSSLAllocator>,
-                    util::RefCountedInstanceDestroyer<OpenSSLAllocator>> {
+                public util::RefCountedSingleton<OpenSSLAllocator> {
             /// \brief
             /// DefaultAllocator participates in the \see{DynamicCreatable}
             /// dynamic discovery and creation.
