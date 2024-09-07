@@ -37,7 +37,7 @@ namespace thekogans {
         struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
             /// \brief
             /// Declare \see{RefCounted} pointers.
-            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (AsymmetricKey)
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (AsymmetricKey)
 
         private:
             /// \brief

@@ -31,13 +31,13 @@ namespace thekogans {
         /// \struct Params Params.h thekogans/crypto/Params.h
         ///
         /// \brief
-        /// AsymmetricKey is the base for all PKI key parameters. It defines the base API
+        /// Params is the base for all PKI key parameters. It defines the base API
         /// that all concrete parameters must implement.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Params : public Serializable {
             /// \brief
             /// Declare \see{RefCounted} pointers.
-            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Params)
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Params)
 
             /// \brief
             /// ctor.

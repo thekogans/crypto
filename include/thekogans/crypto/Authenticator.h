@@ -73,7 +73,9 @@ namespace thekogans {
             /// Return the message digest associated with this authenticator.
             /// \return \see{AsymmetricKey} message digest used for hashing.
             inline MessageDigest::SharedPtr GetMessageDigest () const {
-                return signer != nullptr ? signer->GetMessageDigest () : verifier->GetMessageDigest ();
+                return signer != nullptr ?
+                    signer->GetMessageDigest () :
+                    verifier->GetMessageDigest ();
             }
 
             /// \brief

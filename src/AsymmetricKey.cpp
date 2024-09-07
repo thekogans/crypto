@@ -21,6 +21,8 @@
 namespace thekogans {
     namespace crypto {
 
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (AsymmetricKey)
+
         std::size_t AsymmetricKey::Size () const {
             return
                 Serializable::Size () +

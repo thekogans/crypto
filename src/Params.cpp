@@ -20,6 +20,8 @@
 namespace thekogans {
     namespace crypto {
 
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (Params)
+
         std::size_t Params::Size () const {
             return Serializable::Size ();
         }

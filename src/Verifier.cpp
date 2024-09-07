@@ -60,23 +60,16 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
             Map::iterator it = GetMap ().find (publicKey->GetKeyType ());
-            return it != GetMap ().end () ? it->second (publicKey, messageDigest) : Verifier::SharedPtr ();
+            return it != GetMap ().end () ?
+                it->second (publicKey, messageDigest) : Verifier::SharedPtr ();
         }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Verifier::StaticInit () {
-            static volatile bool registered = false;
-            static util::SpinLock spinLock;
-            if (!registered) {
-                util::LockGuard<util::SpinLock> guard (spinLock);
-                if (!registered) {
-                    OpenSSLVerifier::StaticInit (OPENSSL_PKEY_RSA);
-                    OpenSSLVerifier::StaticInit (OPENSSL_PKEY_DSA);
-                    OpenSSLVerifier::StaticInit (OPENSSL_PKEY_EC);
-                    Ed25519Verifier::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
-                    registered = true;
-                }
-            }
+            OpenSSLVerifier::StaticInit (OPENSSL_PKEY_RSA);
+            OpenSSLVerifier::StaticInit (OPENSSL_PKEY_DSA);
+            OpenSSLVerifier::StaticInit (OPENSSL_PKEY_EC);
+            Ed25519Verifier::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 

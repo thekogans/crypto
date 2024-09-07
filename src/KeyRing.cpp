@@ -142,7 +142,8 @@ namespace thekogans {
                 if (keyExchangeParamsMap.size () > 1) {
                     std::advance (
                         it,
-                        util::RandomSource::Instance ()->Getui32 () % keyExchangeParamsMap.size ());
+                        util::RandomSource::Instance ()->Getui32 () %
+                            keyExchangeParamsMap.size ());
                 }
                 params = it->second;
             }
@@ -718,7 +719,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    SymmetricKey::SharedPtr key = it->second->GetCipherKey (keyId, recursive);
+                    SymmetricKey::SharedPtr key =
+                        it->second->GetCipherKey (keyId, recursive);
                     if (key != nullptr) {
                         return key;
                     }
@@ -741,7 +743,8 @@ namespace thekogans {
                 for (KeyRingMap::const_iterator
                         it = subringMap.begin (),
                         end = subringMap.end (); it != end; ++it) {
-                    SymmetricKey::SharedPtr key = it->second->GetCipherKey (equalityTest, recursive);
+                    SymmetricKey::SharedPtr key =
+                        it->second->GetCipherKey (equalityTest, recursive);
                     if (key != nullptr) {
                         return key;
                     }

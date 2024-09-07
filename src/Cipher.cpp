@@ -79,7 +79,8 @@ namespace thekogans {
                 util::ui8 *ciphertext) {
             if (plaintext != nullptr && plaintextLength > 0 &&
                     plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0)) &&
                     ciphertext != nullptr) {
                 util::ui8 *ivCiphertextAndMAC = ciphertext + CiphertextHeader::SIZE;
                 CiphertextHeader ciphertextHeader;
@@ -115,7 +116,8 @@ namespace thekogans {
                             ciphertextHeader.ivLength +
                             ciphertextHeader.ciphertextLength);
                 }
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, CiphertextHeader::SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian, ciphertext, CiphertextHeader::SIZE);
                 buffer << ciphertextHeader;
                 return CiphertextHeader::SIZE + ciphertextHeader.GetTotalLength ();
             }
@@ -132,7 +134,8 @@ namespace thekogans {
                 std::size_t associatedDataLength) {
             if (plaintext != nullptr && plaintextLength > 0 &&
                     plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
@@ -160,7 +163,8 @@ namespace thekogans {
                 util::ui8 *ciphertext) {
             if (plaintext != nullptr && plaintextLength > 0 &&
                     plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0)) &&
                     ciphertext != nullptr) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
@@ -168,7 +172,8 @@ namespace thekogans {
                     associatedData,
                     associatedDataLength,
                     ciphertext + util::UI32_SIZE);
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, util::UI32_SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian, ciphertext, util::UI32_SIZE);
                 buffer << (util::ui32)ciphertextLength;
                 return util::UI32_SIZE + ciphertextLength;
             }
@@ -185,7 +190,8 @@ namespace thekogans {
                 std::size_t associatedDataLength) {
             if (plaintext != nullptr &&
                     plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
@@ -213,7 +219,8 @@ namespace thekogans {
                 util::ui8 *ciphertext) {
             if (plaintext != nullptr &&
                     plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0)) &&
                     ciphertext != nullptr) {
                 std::size_t ciphertextLength = Encrypt (
                     plaintext,
@@ -221,7 +228,8 @@ namespace thekogans {
                     associatedData,
                     associatedDataLength,
                     ciphertext + FrameHeader::SIZE);
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, FrameHeader::SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian, ciphertext, FrameHeader::SIZE);
                 buffer << FrameHeader (key->GetId (), (util::ui32)ciphertextLength);
                 return FrameHeader::SIZE + ciphertextLength;
             }
@@ -238,7 +246,8 @@ namespace thekogans {
                 std::size_t associatedDataLength) {
             if (plaintext != nullptr &&
                     plaintextLength > 0 && plaintextLength < MAX_PLAINTEXT_LENGTH &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
                     new util::Buffer (
                         util::NetworkEndian,
@@ -265,9 +274,11 @@ namespace thekogans {
                 std::size_t associatedDataLength,
                 util::ui8 *plaintext) {
             if (ciphertext != nullptr && ciphertextLength > 0 &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0)) &&
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0)) &&
                     plaintext != nullptr) {
-                util::TenantReadBuffer buffer (util::NetworkEndian, ciphertext, ciphertextLength);
+                util::TenantReadBuffer buffer (
+                    util::NetworkEndian, ciphertext, ciphertextLength);
                 CiphertextHeader ciphertextHeader;
                 buffer >> ciphertextHeader;
                 // If we're in CBC mode, verify the MAC before attempting to
@@ -317,7 +328,8 @@ namespace thekogans {
                 bool secure,
                 util::Endianness endianness) {
             if (ciphertext != nullptr && ciphertextLength > 0 &&
-                    (IsCipherAEAD (cipher) || (associatedData == nullptr && associatedDataLength == 0))) {
+                    (IsCipherAEAD (cipher) ||
+                        (associatedData == nullptr && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr plaintext (secure ?
                     new util::SecureBuffer (endianness, ciphertextLength) :
                     new util::Buffer (endianness, ciphertextLength));
