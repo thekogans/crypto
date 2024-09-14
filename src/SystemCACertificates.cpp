@@ -164,10 +164,12 @@ namespace thekogans {
                 &caStore,
                 &myStore
             };
-            for (std::size_t i = 0, numStores = THEKOGANS_UTIL_ARRAY_SIZE (stores); i < numStores; ++i) {
+            for (std::size_t i = 0,
+                    numStores = THEKOGANS_UTIL_ARRAY_SIZE (stores); i < numStores; ++i) {
                 if (stores[i]->certStore != nullptr) {
                     PCCERT_CONTEXT certContext = 0;
-                    while ((certContext = CertEnumCertificatesInStore (stores[i]->certStore, certContext)) != nullptr) {
+                    while ((certContext = CertEnumCertificatesInStore (
+                                stores[i]->certStore, certContext)) != nullptr) {
                         // Skip expired certificates.
                         if (CertVerifyTimeValidity (0, certContext->pCertInfo) == 0) {
                             if (loadSystemRootCACertificatesOnly) {
