@@ -137,9 +137,7 @@ namespace thekogans {
                     (IsCipherAEAD (cipher) ||
                         (associatedData == nullptr && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
+                    new util::NetworkBuffer (GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
                     Encrypt (
                         plaintext,
@@ -193,9 +191,7 @@ namespace thekogans {
                     (IsCipherAEAD (cipher) ||
                         (associatedData == nullptr && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
+                    new util::NetworkBuffer (GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
                     EncryptAndEnlengthen (
                         plaintext,
@@ -249,9 +245,7 @@ namespace thekogans {
                     (IsCipherAEAD (cipher) ||
                         (associatedData == nullptr && associatedDataLength == 0))) {
                 util::Buffer::SharedPtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
+                    new util::NetworkBuffer (GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
                     EncryptAndFrame (
                         plaintext,

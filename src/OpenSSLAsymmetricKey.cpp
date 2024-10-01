@@ -78,7 +78,7 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             util::ReadOnlyFile file (util::NetworkEndian, path);
-            util::SecureBuffer buffer (util::NetworkEndian, (std::size_t)file.GetSize ());
+            util::SecureNetworkBuffer buffer ((std::size_t)file.GetSize ());
             if (buffer.AdvanceWriteOffset (
                     file.Read (
                         buffer.GetWritePtr (),
@@ -130,7 +130,7 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description) {
             util::ReadOnlyFile file (util::NetworkEndian, path);
-            util::SecureBuffer buffer (util::NetworkEndian, (std::size_t)file.GetSize ());
+            util::SecureNetworkBuffer buffer ((std::size_t)file.GetSize ());
             if (buffer.AdvanceWriteOffset (
                     file.Read (
                         buffer.GetWritePtr (),

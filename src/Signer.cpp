@@ -76,7 +76,7 @@ namespace thekogans {
 
         util::Buffer::SharedPtr Signer::Final () {
             util::Buffer::SharedPtr signature (
-                new util::Buffer (util::HostEndian, privateKey->GetKeyLength ()));
+                new util::HostBuffer (privateKey->GetKeyLength ()));
             signature->AdvanceWriteOffset (Final (signature->GetWritePtr ()));
             return signature;
         }

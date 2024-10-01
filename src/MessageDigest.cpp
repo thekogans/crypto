@@ -98,7 +98,7 @@ namespace thekogans {
                 Init ();
                 Update (buffer, bufferLength);
                 util::Buffer::SharedPtr hash (
-                    new util::Buffer (util::HostEndian, GetMDLength (md)));
+                    new util::HostBuffer (GetMDLength (md)));
                 hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
                 assert (hash->GetDataAvailableForWriting () == 0);
                 return hash;
@@ -118,8 +118,7 @@ namespace thekogans {
                     count = file.Read (buffer, 4096)) {
                 Update (buffer, count);
             }
-            util::Buffer::SharedPtr hash (
-                new util::Buffer (util::HostEndian, GetMDLength (md)));
+            util::Buffer::SharedPtr hash (new util::HostBuffer (GetMDLength (md)));
             hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));
             assert (hash->GetDataAvailableForWriting () == 0);
             return hash;

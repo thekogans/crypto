@@ -166,7 +166,7 @@ namespace thekogans {
             EVP_add_digest (EVP_blake2s256 ());
         #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
-                util::SecureBuffer entropy (util::HostEndian, entropyNeeded);
+                util::SecureHostBuffer entropy (entropyNeeded);
                 if (entropy.AdvanceWriteOffset (
                         util::RandomSource::Instance ()->GetSeedOrBytes (
                             entropy.GetWritePtr (),

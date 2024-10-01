@@ -134,7 +134,7 @@ namespace thekogans {
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr ciphertext (
-                    new util::Buffer (util::NetworkEndian, publicKey->GetKeyLength ()));
+                    new util::NetworkBuffer (publicKey->GetKeyLength ()));
                 ciphertext->AdvanceWriteOffset (
                     Encrypt (
                         plaintext,
@@ -167,7 +167,8 @@ namespace thekogans {
                     publicKey,
                     padding,
                     ciphertext + util::UI32_SIZE);
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, util::UI32_SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian, ciphertext, util::UI32_SIZE);
                 buffer << (util::ui32)ciphertextLength;
                 return util::UI32_SIZE + ciphertextLength;
             }
@@ -193,9 +194,7 @@ namespace thekogans {
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
+                    new util::NetworkBuffer (GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
                     EncryptAndEnlengthen (
                         plaintext,
@@ -228,7 +227,8 @@ namespace thekogans {
                     publicKey,
                     padding,
                     ciphertext + FrameHeader::SIZE);
-                util::TenantWriteBuffer buffer (util::NetworkEndian, ciphertext, FrameHeader::SIZE);
+                util::TenantWriteBuffer buffer (
+                    util::NetworkEndian, ciphertext, FrameHeader::SIZE);
                 buffer << FrameHeader (publicKey->GetId (), (util::ui32)ciphertextLength);
                 return FrameHeader::SIZE + ciphertextLength;
             }
@@ -248,9 +248,7 @@ namespace thekogans {
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr ciphertext (
-                    new util::Buffer (
-                        util::NetworkEndian,
-                        GetMaxBufferLength (plaintextLength)));
+                    new util::NetworkBuffer (GetMaxBufferLength (plaintextLength)));
                 ciphertext->AdvanceWriteOffset (
                     EncryptAndFrame (
                         plaintext,
@@ -437,9 +435,7 @@ namespace thekogans {
                         0,
                         GetCipherKeyLength (
                             CipherSuite::GetOpenSSLCipherByIndex (cipherIndex)));
-                util::SecureBuffer headerBuffer (
-                    util::NetworkEndian,
-                    RSAHeader::Size (cipherIndex));
+                util::SecureNetworkBuffer headerBuffer (RSAHeader::Size (cipherIndex));
                 headerBuffer << RSAHeader (
                     (util::ui8)cipherIndex,
                     (util::ui8)key->GetKeyLength (),
@@ -480,8 +476,7 @@ namespace thekogans {
                     publicKey->GetKeyType () == OPENSSL_PKEY_RSA &&
                     IsValidPadding (padding)) {
                 util::Buffer::SharedPtr buffer (
-                    new util::Buffer (
-                        util::NetworkEndian,
+                    new util::NetworkBuffer (
                         GetMaxBufferLength (publicKey->GetKeyLength ()) +
                         Cipher::GetMaxBufferLength (plaintextLength)));
                 buffer->AdvanceWriteOffset (
@@ -515,9 +510,7 @@ namespace thekogans {
                     util::NetworkEndian, ciphertext, ciphertextLength);
                 util::ui32 headerLength;
                 buffer >> headerLength;
-                util::SecureBuffer headerBuffer (
-                    util::NetworkEndian,
-                    headerLength);
+                util::SecureNetworkBuffer headerBuffer (headerLength);
                 headerBuffer.AdvanceWriteOffset (
                     RSA::Decrypt (
                         buffer.GetReadPtr (),

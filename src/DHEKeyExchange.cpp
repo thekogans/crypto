@@ -36,8 +36,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
             if (privateKey != nullptr && messageDigest != nullptr) {
-                util::Buffer paramsBuffer (
-                    util::NetworkEndian,
+                util::NetworkBuffer paramsBuffer (
                     util::Serializer::Size (id) +
                     params->GetSize () +
                     util::Serializer::Size (salt) +
@@ -79,8 +78,7 @@ namespace thekogans {
                     publicKey->GetId () == signatureKeyId &&
                     messageDigest->GetName () == signatureMessageDigestName) {
                 if (!signature.empty ()) {
-                    util::Buffer paramsBuffer (
-                        util::NetworkEndian,
+                    util::NetworkBuffer paramsBuffer (
                         util::Serializer::Size (id) +
                         params->GetSize () +
                         util::Serializer::Size (salt) +
@@ -349,8 +347,7 @@ namespace thekogans {
                     const AsymmetricKey &publicKey1,
                     const AsymmetricKey &publicKey2) {
                 util::Buffer::SharedPtr buffer (
-                    new util::Buffer (
-                        util::NetworkEndian,
+                    new util::NetworkBuffer (
                         util::Serializer::Size (salt) +
                         publicKey1.GetSize () +
                         publicKey2.GetSize ()));

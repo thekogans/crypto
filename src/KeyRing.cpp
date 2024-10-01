@@ -46,7 +46,7 @@ namespace thekogans {
                 std::size_t associatedDataLength) {
             util::ReadOnlyFile file (util::NetworkEndian, path);
             util::Buffer::SharedPtr buffer (
-                new util::Buffer (util::NetworkEndian, (std::size_t)file.GetSize ()));
+                new util::NetworkBuffer ((std::size_t)file.GetSize ()));
             buffer->AdvanceWriteOffset (
                 file.Read (
                     buffer->GetWritePtr (),
@@ -69,8 +69,7 @@ namespace thekogans {
                 Cipher *cipher,
                 const void *associatedData,
                 std::size_t associatedDataLength) {
-            util::Buffer::SharedPtr buffer (
-                new util::Buffer (util::NetworkEndian, GetSize ()));
+            util::Buffer::SharedPtr buffer (new util::NetworkBuffer (GetSize ()));
             *buffer << *this;
             if (cipher != nullptr) {
                 buffer = cipher->Encrypt (

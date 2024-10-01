@@ -37,8 +37,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
             if (privateKey != nullptr && messageDigest != nullptr) {
-                util::Buffer paramsBuffer (
-                    util::NetworkEndian,
+                util::NetworkBuffer paramsBuffer (
                     util::Serializer::Size (id) +
                     util::Serializer::Size (keyId) +
                     util::Serializer::Size (buffer));
@@ -63,8 +62,7 @@ namespace thekogans {
                     publicKey->GetId () == signatureKeyId &&
                     messageDigest->GetName () == signatureMessageDigestName) {
                 if (!signature.empty ()) {
-                    util::Buffer paramsBuffer (
-                        util::NetworkEndian,
+                    util::NetworkBuffer paramsBuffer (
                         util::Serializer::Size (id) +
                         util::Serializer::Size (keyId) +
                         util::Serializer::Size (buffer));
@@ -218,8 +216,7 @@ namespace thekogans {
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) const {
             Params::SharedPtr rsaParams;
-            util::SecureBuffer symmetricKeyBuffer (
-                util::NetworkEndian, symmetricKey->GetSize ());
+            util::SecureNetworkBuffer symmetricKeyBuffer (symmetricKey->GetSize ());
             symmetricKeyBuffer << *symmetricKey;
             if (key->IsPrivate ()) {
                 Authenticator authenticator (
@@ -255,9 +252,7 @@ namespace thekogans {
                 RSAParams::SharedPtr rsaParams =
                     util::dynamic_refcounted_sharedptr_cast<RSAParams> (params);
                 if (rsaParams != nullptr) {
-                    util::SecureBuffer symmetricKeyBuffer (
-                        util::NetworkEndian,
-                        symmetricKey->GetSize ());
+                    util::SecureNetworkBuffer symmetricKeyBuffer (symmetricKey->GetSize ());
                     symmetricKeyBuffer << *symmetricKey;
                     Authenticator authenticator (
                         key, MessageDigest::SharedPtr (new MessageDigest));

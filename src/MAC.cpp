@@ -43,7 +43,7 @@ namespace thekogans {
                 std::size_t bufferLength) {
             if (buffer != nullptr && bufferLength > 0) {
                 util::Buffer::SharedPtr signature (
-                    new util::Buffer (util::HostEndian, GetMACLength ()));
+                    new util::HostBuffer (GetMACLength ()));
                 if (signature->AdvanceWriteOffset (
                         SignBuffer (
                             buffer,
