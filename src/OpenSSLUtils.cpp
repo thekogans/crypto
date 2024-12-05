@@ -824,7 +824,9 @@ namespace thekogans {
                 std::size_t passwordLength,
                 const EVP_MD *md) {
             if (key != nullptr && keyLength > 0 &&
-                    buffer != nullptr && bufferLength > 0 && passwordLength <= 8 && md != nullptr) {
+                    buffer != nullptr && bufferLength > 0 &&
+                    passwordLength <= 8 &&
+                    md != nullptr) {
                 util::ui8 hash[EVP_MAX_MD_SIZE];
                 util::ui32 hashLength = 0;
                 if (HMAC (md, key, (util::i32)keyLength, (const util::ui8 *)buffer,
