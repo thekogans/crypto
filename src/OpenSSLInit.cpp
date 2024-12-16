@@ -51,6 +51,15 @@
 namespace thekogans {
     namespace crypto {
 
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+        void StaticInit () {
+            OpenSSLAllocator::StaticInit ();
+            Serializable::StaticInit ();
+            Signer::StaticInit ();
+            Verifier::StaticInit ();
+        }
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+
         ENGINE *OpenSSLInit::engine = 0;
         int OpenSSLInit::SSLSecureSocketIndex = -1;
         int OpenSSLInit::SSL_SESSIONSessionInfoIndex = -1;
@@ -130,10 +139,7 @@ namespace thekogans {
                 bool loadSystemCACertificates,
                 bool loadSystemRootCACertificatesOnly) {
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
-            OpenSSLAllocator::StaticInit ();
-            Serializable::StaticInit ();
-            Signer::StaticInit ();
-            Verifier::StaticInit ();
+            StaticInit ();
         #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
             util::SecureAllocator::ReservePages (workingSetSize, workingSetSize);
         #if OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -183,7 +189,8 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Not enough entropy: " THEKOGANS_UTIL_SIZE_T_FORMAT " < " THEKOGANS_UTIL_SIZE_T_FORMAT,
+                    "Not enough entropy: "
+                    THEKOGANS_UTIL_SIZE_T_FORMAT " < " THEKOGANS_UTIL_SIZE_T_FORMAT,
                     entropyNeeded,
                     MIN_ENTROPY_NEEDED);
             }

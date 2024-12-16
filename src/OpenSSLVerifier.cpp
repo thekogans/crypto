@@ -24,43 +24,61 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_RSA)
-        THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_DSA)
-        THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (OpenSSLVerifier, OPENSSL_PKEY_EC)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (OpenSSLVerifier)
 
         OpenSSLVerifier::OpenSSLVerifier (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Verifier (publicKey, messageDigest) {
-            if (publicKey != nullptr &&
-                    !publicKey->IsPrivate () &&
-                    (publicKey->GetKeyType () == OPENSSL_PKEY_RSA ||
-                        publicKey->GetKeyType () == OPENSSL_PKEY_DSA ||
-                        publicKey->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    messageDigest != nullptr) {
+            if (publicKey != nullptr && messageDigest != nullptr) {
+                Init (publicKey, messageDigest);
+            }
+        }
+
+        bool OpenSSLVerifier::HasKeyType (const std::string &keyType) {
+            return
+                keyType == OPENSSL_PKEY_RSA ||
+                keyType == OPENSSL_PKEY_DSA ||
+                keyType == OPENSSL_PKEY_EC;
+        }
+
+        void OpenSSLVerifier::Init (
+                AsymmetricKey::SharedPtr publicKey_,
+                MessageDigest::SharedPtr messageDigest_) {
+            if (publicKey_ != nullptr && messageDigest_ != nullptr) {
+                OpenSSLAsymmetricKey::SharedPtr key = publicKey_;
+                if (key != nullptr) {
+                    if (EVP_DigestVerifyInit (
+                            &messageDigest_->ctx,
+                            0,
+                            messageDigest_->md,
+                            OpenSSLInit::engine,
+                            key->key.get ()) == 1) {
+                        publicKey = publicKey_;
+                        messageDigest = messageDigest_;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else if (publicKey != nullptr && messageDigest != nullptr) {
                 if (EVP_DigestVerifyInit (
                         &messageDigest->ctx,
                         0,
                         messageDigest->md,
-                        OpenSSLInit::engine,
-                        ((OpenSSLAsymmetricKey *)publicKey.Get ())->key.get ()) != 1) {
+                        0,
+                        0) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
             else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        void OpenSSLVerifier::Init () {
-            if (EVP_DigestVerifyInit (
-                    &messageDigest->ctx,
-                    0,
-                    messageDigest->md,
-                    0,
-                    0) != 1) {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "%s", "OpenSSLVerifier is not initialized.");
             }
         }
 
@@ -68,11 +86,17 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != nullptr && bufferLength > 0) {
-                if (EVP_DigestVerifyUpdate (
-                        &messageDigest->ctx,
-                        buffer,
-                        bufferLength) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                if (publicKey != nullptr && messageDigest != nullptr) {
+                    if (EVP_DigestVerifyUpdate (
+                            &messageDigest->ctx,
+                            buffer,
+                            bufferLength) != 1) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "OpenSSLVerifier is not initialized.");
                 }
             }
             else {
@@ -85,10 +109,16 @@ namespace thekogans {
                 const void *signature,
                 std::size_t signatureLength) {
             if (signature != nullptr && signatureLength > 0) {
-                return EVP_DigestVerifyFinal (
-                    &messageDigest->ctx,
-                    (const util::ui8 *)signature,
-                    signatureLength) == 1;
+                if (publicKey != nullptr && messageDigest != nullptr) {
+                    return EVP_DigestVerifyFinal (
+                        &messageDigest->ctx,
+                        (const util::ui8 *)signature,
+                        signatureLength) == 1;
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "OpenSSLVerifier is not initialized.");
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

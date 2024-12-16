@@ -185,8 +185,8 @@ namespace thekogans {
             /// \param[in] messageDigest Optional message digest used to hash the parameters.
             /// \return \see{RSAParams} to send to the key exchange peer.
             virtual Params::SharedPtr GetParams (
-                AsymmetricKey::SharedPtr privateKey = AsymmetricKey::SharedPtr (),
-                MessageDigest::SharedPtr messageDigest = MessageDigest::SharedPtr ()) const override;
+                AsymmetricKey::SharedPtr privateKey = nullptr,
+                MessageDigest::SharedPtr messageDigest = nullptr) const override;
 
             /// \brief
             /// Given the peer's \see{RSAParams}, derive the shared \see{SymmetricKey}.

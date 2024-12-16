@@ -55,4 +55,20 @@
 /// Default message digest.
 #define THEKOGANS_CRYPTO_DEFAULT_MD EVP_sha256 ()
 
+namespace thekogans {
+    namespace crypto {
+
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+        /// \brief
+        /// If you're linking to thekogans_crypto statically, call this
+        /// method early on in main to initialize dynamically creatable
+        /// (\see{DynamicCreatable}) types. If you don't call this method
+        /// the only available types that will be available to your
+        /// application are the ones you explicitly link to.
+        void StaticInit ();
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+
+    } // namespace crypto
+} // namespace thekogans
+
 #endif // !defined (__thekogans_crypto_Config_h)

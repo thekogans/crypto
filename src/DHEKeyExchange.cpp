@@ -252,7 +252,7 @@ namespace thekogans {
         }
 
         namespace {
-            inline bool ValidateParamsKeyType (const char *keyType) {
+            inline bool ValidateParamsKeyType (const std::string &keyType) {
                 return
                     keyType == OPENSSL_PKEY_DH ||
                     keyType == OPENSSL_PKEY_EC ||
@@ -361,7 +361,7 @@ namespace thekogans {
             DHEParams::SharedPtr dheParams = params;
             if (dheParams != nullptr) {
                 util::SecureVector<util::ui8> secret;
-                const char *keyType = privateKey->GetKeyType ();
+                std::string keyType = privateKey->GetKeyType ();
                 if (keyType == OPENSSL_PKEY_DH || keyType == OPENSSL_PKEY_EC) {
                     EVP_PKEY_CTXPtr ctx (
                         EVP_PKEY_CTX_new (

@@ -15,61 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (THEKOGANS_CRYPTO_TYPE_Static)
-    #include "thekogans/util/SpinLock.h"
-    #include "thekogans/util/LockGuard.h"
-#endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/OpenSSLVerifier.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/Ed25519Verifier.h"
-#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/Verifier.h"
 
 namespace thekogans {
     namespace crypto {
 
-        Verifier::Map &Verifier::GetMap () {
-            static Map *map = new Map;
-            return *map;
-        }
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (Verifier)
 
-        Verifier::MapInitializer::MapInitializer (
-                const std::string &keyType,
-                Factory factory) {
-            std::pair<Map::iterator, bool> result =
-                GetMap ().insert (Map::value_type (keyType, factory));
-            assert (result.second);
-            if (!result.second) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s is already registered.", keyType.c_str ());
-            }
-        }
-
-        Verifier::Verifier (
-                AsymmetricKey::SharedPtr publicKey_,
-                MessageDigest::SharedPtr messageDigest_) :
-                publicKey (publicKey_),
-                messageDigest (messageDigest_) {
-            if (publicKey == nullptr || messageDigest == nullptr) {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        Verifier::SharedPtr Verifier::Get (
+        Verifier::SharedPtr Verifier::CreateVerifier (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
-            Map::iterator it = GetMap ().find (publicKey->GetKeyType ());
-            return it != GetMap ().end () ?
-                it->second (publicKey, messageDigest) : Verifier::SharedPtr ();
+            std::list<std::string> verifiers;
+            GetTypes (verifiers);
+            for (std::list<std::string>::const_iterator
+                     it = verifiers.begin (),
+                     end = verifiers.end (); it != end; ++it) {
+                SharedPtr verifier = CreateType (*it);
+                if (verifier->HasKeyType (publicKey->GetKeyType ())) {
+                    verifier->Init (publicKey, messageDigest);
+                    return verifier;
+                }
+            }
+            return nullptr;
         }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Verifier::StaticInit () {
-            OpenSSLVerifier::StaticInit (OPENSSL_PKEY_RSA);
-            OpenSSLVerifier::StaticInit (OPENSSL_PKEY_DSA);
-            OpenSSLVerifier::StaticInit (OPENSSL_PKEY_EC);
-            Ed25519Verifier::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
+            OpenSSLVerifier::StaticInit ();
+            Ed25519Verifier::StaticInit ();
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 

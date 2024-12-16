@@ -24,43 +24,61 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_RSA)
-        THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_DSA)
-        THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (OpenSSLSigner)
 
         OpenSSLSigner::OpenSSLSigner (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Signer (privateKey, messageDigest) {
-            if (privateKey != nullptr &&
-                    privateKey->IsPrivate () &&
-                    (privateKey->GetKeyType () == OPENSSL_PKEY_RSA ||
-                        privateKey->GetKeyType () == OPENSSL_PKEY_DSA ||
-                        privateKey->GetKeyType () == OPENSSL_PKEY_EC) &&
-                    messageDigest != nullptr) {
+            if (privateKey != nullptr && messageDigest != nullptr) {
+                Init (privateKey, messageDigest);
+            }
+        }
+
+        bool OpenSSLSigner::HasKeyType (const std::string &keyType) {
+            return
+                keyType == OPENSSL_PKEY_RSA ||
+                keyType == OPENSSL_PKEY_DSA ||
+                keyType == OPENSSL_PKEY_EC;
+        }
+
+        void OpenSSLSigner::Init (
+                AsymmetricKey::SharedPtr privateKey_,
+                MessageDigest::SharedPtr messageDigest_) {
+            if (privateKey_ != nullptr && messageDigest_ != nullptr) {
+                OpenSSLAsymmetricKey::SharedPtr key = privateKey_;
+                if (key != nullptr && key->IsPrivate ()) {
+                    if (EVP_DigestSignInit (
+                            &messageDigest_->ctx,
+                            0,
+                            messageDigest_->md,
+                            OpenSSLInit::engine,
+                            key->key.get ()) == 1) {
+                        privateKey = privateKey_;
+                        messageDigest = messageDigest_;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else if (privateKey != nullptr && messageDigest != nullptr) {
                 if (EVP_DigestSignInit (
                         &messageDigest->ctx,
                         0,
                         messageDigest->md,
-                        OpenSSLInit::engine,
-                        ((OpenSSLAsymmetricKey *)privateKey.Get ())->key.get ()) != 1) {
+                        0,
+                        0) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
             else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        void OpenSSLSigner::Init () {
-            if (EVP_DigestSignInit (
-                    &messageDigest->ctx,
-                    0,
-                    messageDigest->md,
-                    0,
-                    0) != 1) {
-                THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "%s", "OpenSSLSigner is not initialized.");
             }
         }
 
@@ -68,11 +86,17 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != nullptr && bufferLength > 0) {
-                if (EVP_DigestSignUpdate (
-                        &messageDigest->ctx,
-                        buffer,
-                        bufferLength) != 1) {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                if (privateKey != nullptr && messageDigest != nullptr) {
+                    if (EVP_DigestSignUpdate (
+                            &messageDigest->ctx,
+                            buffer,
+                            bufferLength) != 1) {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "OpenSSLSigner is not initialized.");
                 }
             }
             else {
@@ -83,15 +107,21 @@ namespace thekogans {
 
         std::size_t OpenSSLSigner::Final (util::ui8 *signature) {
             if (signature != nullptr) {
-                std::size_t signatureLength = privateKey->GetKeyLength ();
-                if (EVP_DigestSignFinal (
-                        &messageDigest->ctx,
-                        signature,
-                        &signatureLength) == 1) {
-                    return signatureLength;
+                if (privateKey != nullptr && messageDigest != nullptr) {
+                    std::size_t signatureLength = privateKey->GetKeyLength ();
+                    if (EVP_DigestSignFinal (
+                            &messageDigest->ctx,
+                            signature,
+                            &signatureLength) == 1) {
+                        return signatureLength;
+                    }
+                    else {
+                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    }
                 }
                 else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "OpenSSLSigner is not initialized.");
                 }
             }
             else {

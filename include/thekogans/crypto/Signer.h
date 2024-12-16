@@ -20,7 +20,7 @@
 
 #include <cstddef>
 #include <memory>
-#include "thekogans/util/RefCounted.h"
+#include "thekogans/util/DynamicCreatable.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
@@ -35,46 +35,39 @@ namespace thekogans {
         /// Signer is a base for public key sign operation. It defines the API
         /// a concrete signer needs to implement.
 
-        struct _LIB_THEKOGANS_CRYPTO_DECL Signer : public virtual util::RefCounted {
+        struct _LIB_THEKOGANS_CRYPTO_DECL Signer : public util::DynamicCreatable {
             /// \brief
             /// Declare \see{RefCounted} pointers.
-            THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (Signer)
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Signer)
 
-        protected:
-            /// \brief
-            /// typedef for the Signer factory method.
-            typedef SharedPtr (*Factory) (
-                AsymmetricKey::SharedPtr privateKey,
-                MessageDigest::SharedPtr messageDigest);
-            /// \brief
-            /// typedef for the Signer map.
-            typedef std::map<std::string, Factory> Map;
-            /// \brief
-            /// Controls Map's lifetime.
-            /// \return Signer map.
-            static Map &GetMap ();
-
-        public:
-            /// \struct Signer::MapInitializer Signer.h thekogans/crypto/Signer.h
-            ///
-            /// \brief
-            /// MapInitializer is used to initialize the Signer::map.
-            /// It should not be used directly, and instead is included
-            /// in THEKOGANS_CRYPTO_DECLARE_SIGNER/THEKOGANS_CRYPTO_IMPLEMENT_SIGNER.
-            /// If you are deriving a signerer from Signer, and you want
-            /// it to be dynamically discoverable/creatable, add
-            /// THEKOGANS_CRYPTO_DECLARE_SIGNER to it's declaration,
-            /// and one or more THEKOGANS_CRYPTO_IMPLEMENT_SIGNER to
-            /// it's definition.
-            struct _LIB_THEKOGANS_CRYPTO_DECL MapInitializer {
+            struct Parameters : public util::DynamicCreatable::Parameters {
                 /// \brief
-                /// ctor. Add signer of type, and factory for creating it
-                /// to the Signer::map
-                /// \param[in] keyType Signer key type.
-                /// \param[in] factory Signer creation factory.
-                MapInitializer (
-                    const std::string &keyType,
-                    Factory factory);
+                /// Private key.
+                AsymmetricKey::SharedPtr privateKey;
+                /// \brief
+                /// Message digest.
+                MessageDigest::SharedPtr messageDigest;
+
+                /// \brief
+                /// ctor.
+                /// \param[in] privateKey_ Private key.
+                /// \param[in] messageDigest_ Message digest.
+                Parameters (
+                    AsymmetricKey::SharedPtr privateKey_,
+                    MessageDigest::SharedPtr messageDigest_) :
+                    privateKey (privateKey_),
+                    messageDigest (messageDigest_) {}
+
+                /// \brief
+                /// The Create method below will call this method if
+                /// a Parameters derived class is passed to CreateType.
+                /// Here's where you apply encapsulated parameters to
+                /// the passed in instance.
+                /// \param[in] dynamicCreatable Signer to apply the
+                /// encapsulated parameters to.
+                virtual void Apply (DynamicCreatable &dynamicCreatable) override {
+                    static_cast<Signer *> (&dynamicCreatable)->Init (privateKey, messageDigest);
+                }
             };
 
         protected:
@@ -91,18 +84,20 @@ namespace thekogans {
             /// \param[in] privateKey_ Private key.
             /// \param[in] messageDigest_ Message digest.
             Signer (
-                AsymmetricKey::SharedPtr privateKey_,
-                MessageDigest::SharedPtr messageDigest_);
+                AsymmetricKey::SharedPtr privateKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr) :
+                privateKey (privateKey_),
+                messageDigest (messageDigest_) {}
             /// \brief
             /// dtor.
             virtual ~Signer () {}
 
             /// \brief
-            /// Used for Signer dynamic discovery and creation.
-            /// \param[in] privateKey Private \see{AsymmetricKey} used for signing.
-            /// \param[in] messageDigest Message digest.
-            /// \return A Signer based on the passed in privateKey type.
-            static SharedPtr Get (
+            /// Used for Verifier dynamic discovery and creation.
+            /// \param[in] publicKey Public \see{AsymmetricKey} used for signing.
+            /// \param[in] messageDigest Message digest object.
+            /// \return A Verifier based on the passed in publicKey type.
+            static SharedPtr CreateSigner (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest);
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
@@ -128,9 +123,15 @@ namespace thekogans {
                 return messageDigest;
             }
 
+            virtual bool HasKeyType (const std::string &keyType) = 0;
+
             /// \brief
             /// Initialize the signer and get it ready for the next signature.
-            virtual void Init () = 0;
+            /// \param[in] privateKey_ Private key.
+            /// \param[in] messageDigest_ Message digest.
+            virtual void Init (
+                AsymmetricKey::SharedPtr privateKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr) = 0;
             /// \brief
             /// Call this method 1 or more time to sign the buffers.
             /// \param[in] buffer Buffer whose signature to create.
@@ -146,79 +147,9 @@ namespace thekogans {
 
             /// \brief
             /// Finalize the signing operation and return the signature.
-            /// \return Signature.
+            /// \return \see{util::Buffer} containing the signature.
             util::Buffer::SharedPtr Final ();
         };
-
-        /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON(type)
-        /// Common code used by both Static and Shared builds.
-        #define THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON(type)\
-        public:\
-            static thekogans::crypto::Signer::SharedPtr Create (\
-                    thekogans::crypto::AsymmetricKey::SharedPtr privateKey,\
-                    thekogans::crypto::MessageDigest::SharedPtr messageDigest) {\
-                return thekogans::crypto::Signer::SharedPtr (new type (privateKey, messageDigest));\
-            }
-
-    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
-        /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER(type)
-        /// Dynamic discovery macro. Add this to your class declaration.
-        /// Example:
-        /// \code{.cpp}
-        /// struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLSigner : public Signer {
-        ///     THEKOGANS_CRYPTO_DECLARE_SIGNER (OpenSSLSigner)
-        ///     ...
-        /// };
-        /// \endcode
-        #define THEKOGANS_CRYPTO_DECLARE_SIGNER(type)\
-            THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON (type)\
-            static void StaticInit (const char *keyType) {\
-                std::pair<Map::iterator, bool> result =\
-                    GetMap ().insert (Map::value_type (keyType, type::Create));\
-                if (!result.second) {\
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (\
-                        "'%s' is already registered.", keyType);\
-                }\
-            }
-
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)
-        /// Dynamic discovery macro. Instantiate one or more of these in the class cpp file.
-        /// Example:
-        /// \code{.cpp}
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_RSA)
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_DSA)
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
-        /// \endcode
-        #define THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)
-    #else // defined (THEKOGANS_CRYPTO_TYPE_Static)
-        /// \def THEKOGANS_CRYPTO_DECLARE_SIGNER(type)
-        /// Dynamic discovery macro. Add this to your class declaration.
-        /// Example:
-        /// \code{.cpp}
-        /// struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLSigner : public Signer {
-        ///     THEKOGANS_CRYPTO_DECLARE_SIGNER (OpenSSLSigner)
-        ///     ...
-        /// };
-        /// \endcode
-        #define THEKOGANS_CRYPTO_DECLARE_SIGNER(type)\
-            THEKOGANS_CRYPTO_DECLARE_SIGNER_COMMON (type)
-
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)
-        /// Dynamic discovery macro. Instantiate one or more of these in the class cpp file.
-        /// Example:
-        /// \code{.cpp}
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_RSA)
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_DSA)
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (OpenSSLSigner, OPENSSL_PKEY_EC)
-        /// THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
-        /// \endcode
-        #define THEKOGANS_CRYPTO_IMPLEMENT_SIGNER(type, keyType)\
-        namespace {\
-            const thekogans::crypto::Signer::MapInitializer THEKOGANS_UTIL_UNIQUE_NAME (mapInitializer) (\
-                keyType, type::Create);\
-        }
-    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans

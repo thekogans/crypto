@@ -33,7 +33,7 @@ namespace thekogans {
                 MessageDigest::SharedPtr messageDigest) {
             if (key != nullptr && messageDigest != nullptr) {
                 if (key->IsPrivate ()) {
-                    signer = Signer::Get (key, messageDigest);
+                    signer = Signer::CreateSigner (key, messageDigest);
                     if (signer == nullptr) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Signer for key: %s and digest: %s.",
@@ -42,7 +42,7 @@ namespace thekogans {
                     }
                 }
                 else {
-                    verifier = Verifier::Get (key, messageDigest);
+                    verifier = Verifier::CreateVerifier (key, messageDigest);
                     if (verifier == nullptr) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Verifier for key: %s and digest: %s.",

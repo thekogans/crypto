@@ -102,14 +102,14 @@ namespace thekogans {
             /// \brief
             /// Call this method to finalize encryption.
             /// \param[out] ciphertext Where to write the ciphertext.
-            /// \return Count of bytest written to ciphertext.
+            /// \return Number of bytes written to ciphertext.
             std::size_t Final (util::ui8 *ciphertext);
             /// \brief
             /// In GCM mode the cipher creates the mac for us. After
             /// calling Final, call this method to get the mac (tag
             /// in GCM parlance).
             /// \param[out] tag Where to write the tag.
-            /// \return Size of tag (in bytes).
+            /// \return Number of bytes written to tag.
             std::size_t GetTag (util::ui8 *tag);
 
             /// \brief

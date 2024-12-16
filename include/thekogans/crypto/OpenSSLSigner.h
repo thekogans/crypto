@@ -32,20 +32,26 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLSigner : public Signer {
             /// \brief
-            /// OpenSSLSigner is a \see{Signer}.
-            THEKOGANS_CRYPTO_DECLARE_SIGNER (OpenSSLSigner)
+            /// OpenSSLSigner is a \see{util::DynamicCreatable}.
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE (OpenSSLSigner)
 
             /// \brief
             /// ctor.
             /// \param[in] privateKey Private key.
             /// \param[in] messageDigest Message digest object.
             OpenSSLSigner (
-                AsymmetricKey::SharedPtr privateKey,
-                MessageDigest::SharedPtr messageDigest);
+                AsymmetricKey::SharedPtr privateKey = nullptr,
+                MessageDigest::SharedPtr messageDigest = nullptr);
+
+            virtual bool HasKeyType (const std::string &keyType) override;
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.
-            virtual void Init () override;
+            /// \param[in] privateKey_ Private key.
+            /// \param[in] messageDigest_ Message digest object.
+            virtual void Init (
+                AsymmetricKey::SharedPtr privateKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr) override;
             /// \brief
             /// Call this method 1 or more time to sign the buffers.
             /// \param[in] buffer Buffer whose signature to create.
@@ -58,10 +64,6 @@ namespace thekogans {
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
             virtual std::size_t Final (util::ui8 *signature) override;
-
-            /// \brief
-            /// OpenSSLSigner is neither copy constructable, nor assignable.
-            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (OpenSSLSigner)
         };
 
     } // namespace crypto

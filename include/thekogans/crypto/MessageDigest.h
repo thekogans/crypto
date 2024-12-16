@@ -43,10 +43,11 @@ namespace thekogans {
             /// Declare \see{RefCounted} pointers.
             THEKOGANS_UTIL_DECLARE_REF_COUNTED_POINTERS (MessageDigest)
 
-        private:
             /// \brief
             /// OpenSSL message digest object.
             const EVP_MD *md;
+
+        private:
             /// \brief
             /// EVP_MD_CTX wrapper.
             MDContext ctx;
@@ -102,6 +103,10 @@ namespace thekogans {
             /// \param[out] digest Where to write the digest.
             /// \return Number of bytes written to digest.
             std::size_t Final (util::ui8 *digest);
+            /// \brief
+            /// Finalize the digest computation and return it.
+            /// \return \see{util::Buffer} containing the digest.
+            util::Buffer::SharedPtr Final ();
 
             /// \brief
             /// Create a buffer hash (message digest).

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include <vector>
 #include "thekogans/util/Types.h"
 #include "thekogans/crypto/Curve25519.h"
 #include "thekogans/crypto/Ed25519AsymmetricKey.h"
@@ -24,29 +23,41 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_CRYPTO_IMPLEMENT_SIGNER (Ed25519Signer, Ed25519AsymmetricKey::KEY_TYPE)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (Ed25519Signer)
 
         Ed25519Signer::Ed25519Signer (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Signer (privateKey, messageDigest) {
-            if (privateKey == nullptr || !privateKey->IsPrivate () ||
-                    privateKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE ||
-                    messageDigest == nullptr) {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
+            Init (privateKey, messageDigest);
         }
 
-        void Ed25519Signer::Init () {
-            messageDigest->Init ();
+
+        bool Ed25519Signer::HasKeyType (const std::string &keyType) {
+            return keyType == Ed25519AsymmetricKey::KEY_TYPE;
+        }
+
+        void Ed25519Signer::Init (
+                AsymmetricKey::SharedPtr privateKey_,
+                MessageDigest::SharedPtr messageDigest_) {
+            privateKey = privateKey_;
+            messageDigest = messageDigest_;
+            if (messageDigest != nullptr) {
+                messageDigest->Init ();
+            }
         }
 
         void Ed25519Signer::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != nullptr && bufferLength > 0) {
-                messageDigest->Update (buffer, bufferLength);
+                if (messageDigest != nullptr) {
+                    messageDigest->Update (buffer, bufferLength);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "Ed25519Signer is not initialized.");
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -56,13 +67,19 @@ namespace thekogans {
 
         std::size_t Ed25519Signer::Final (util::ui8 *signature) {
             if (signature != nullptr) {
-                std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
-                messageDigest->Final (digest.data ());
-                return Ed25519::SignBuffer (
-                    digest.data (),
-                    digest.size (),
-                    ((Ed25519AsymmetricKey *)privateKey.Get ())->key.privateKey,
-                    signature);
+                if (privateKey != nullptr && messageDigest != nullptr) {
+                    util::Buffer::SharedPtr digest = messageDigest->Final ();
+                    Ed25519AsymmetricKey::SharedPtr key = privateKey;
+                    return Ed25519::SignBuffer (
+                        digest->GetReadPtr (),
+                        digest->GetDataAvailableForReading (),
+                        key->key.privateKey,
+                        signature);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "Ed25519Signer is not initialized.");
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

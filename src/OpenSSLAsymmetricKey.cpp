@@ -340,7 +340,7 @@ namespace thekogans {
 
         void OpenSSLAsymmetricKey::ValidateKey () {
             if (key != nullptr) {
-                const char *type = GetKeyType ();
+                std::string type = GetKeyType ();
                 if (type != OPENSSL_PKEY_DH &&
                         type != OPENSSL_PKEY_DSA &&
                         type != OPENSSL_PKEY_EC &&

@@ -48,7 +48,7 @@ namespace thekogans {
                 Params (id, name, description),
                 params (std::move (params_)) {
             if (params != nullptr) {
-                const char *paramsType = GetKeyType ();
+                std::string paramsType = GetKeyType ();
                 if (paramsType != OPENSSL_PKEY_DH &&
                         paramsType != OPENSSL_PKEY_DSA &&
                         paramsType != OPENSSL_PKEY_EC) {
@@ -188,7 +188,7 @@ namespace thekogans {
         void OpenSSLParams::Save (const std::string &path) const {
             BIOPtr bio (BIO_new_file (path.c_str (), "w+"));
             if (bio != nullptr) {
-                const char *paramsType = GetKeyType ();
+                std::string paramsType = GetKeyType ();
                 if (paramsType == OPENSSL_PKEY_DH) {
                     DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
                     if (dhParams == nullptr ||
@@ -218,7 +218,7 @@ namespace thekogans {
         }
 
         std::size_t OpenSSLParams::Size () const {
-            const char *paramsType = GetKeyType ();
+            std::string paramsType = GetKeyType ();
             util::i32 paramsLength = 0;
             if (paramsType == OPENSSL_PKEY_DH) {
                 DHPtr dhParams (EVP_PKEY_get1_DH (params.get ()));
@@ -432,7 +432,7 @@ namespace thekogans {
 
         void OpenSSLParams::Write (pugi::xml_node &node) const {
             Params::Write (node);
-            node.append_attribute (ATTR_PARAMS_TYPE).set_value (GetKeyType ());
+            node.append_attribute (ATTR_PARAMS_TYPE).set_value (GetKeyType ().c_str ());
             node.append_attribute (ATTR_PARAMS).set_value (WriteParams (*params).c_str ());
         }
 

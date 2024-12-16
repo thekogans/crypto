@@ -35,19 +35,25 @@ namespace thekogans {
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Verifier : public Verifier {
             /// \brief
             /// Ed25519Verifier is a \see{Verifier}.
-            THEKOGANS_CRYPTO_DECLARE_VERIFIER (Ed25519Verifier)
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE (Ed25519Verifier)
 
             /// \brief
             /// ctor.
-            /// \param[in] publicKey Public key.
-            /// \param[in] messageDigest Message digest object.
+            /// \param[in] publicKey_ Public key.
+            /// \param[in] messageDigest_ Message digest object.
             Ed25519Verifier (
-                AsymmetricKey::SharedPtr publicKey,
-                MessageDigest::SharedPtr messageDigest);
+                AsymmetricKey::SharedPtr publicKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr);
+
+            virtual bool HasKeyType (const std::string &keyType) override;
 
             /// \brief
             /// Initialize the verifier and get it ready for the next signature verification.
-            virtual void Init () override;
+            /// \param[in] publicKey_ Public key.
+            /// \param[in] messageDigest_ Message digest object.
+            virtual void Init (
+                AsymmetricKey::SharedPtr publicKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr) override;
             /// \brief
             /// Call this method 1 or more time to verify the buffers.
             /// \param[in] buffer Buffer whose signature to verify.
@@ -63,10 +69,6 @@ namespace thekogans {
             virtual bool Final (
                 const void *signature,
                 std::size_t signatureLength) override;
-
-            /// \brief
-            /// Ed25519Verifier is neither copy constructable, nor assignable.
-            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Ed25519Verifier)
         };
 
     } // namespace crypto

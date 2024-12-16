@@ -15,62 +15,37 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#if defined (THEKOGANS_CRYPTO_TYPE_Static)
-    #include "thekogans/util/SpinLock.h"
-    #include "thekogans/util/LockGuard.h"
-#endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+#include "thekogans/util/Buffer.h"
 #include "thekogans/crypto/OpenSSLSigner.h"
-#include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/Ed25519Signer.h"
-#include "thekogans/crypto/Ed25519AsymmetricKey.h"
 #include "thekogans/crypto/Signer.h"
 
 namespace thekogans {
     namespace crypto {
 
-        Signer::Map &Signer::GetMap () {
-            static Map *map = new Map;
-            return *map;
-        }
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (Signer)
 
-        Signer::MapInitializer::MapInitializer (
-                const std::string &keyType,
-                Factory factory) {
-            std::pair<Map::iterator, bool> result =
-                GetMap ().insert (Map::value_type (keyType, factory));
-            assert (result.second);
-            if (!result.second) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s is already registered.", keyType.c_str ());
-            }
-        }
-
-        Signer::Signer (
-                AsymmetricKey::SharedPtr privateKey_,
-                MessageDigest::SharedPtr messageDigest_) :
-                privateKey (privateKey_),
-                messageDigest (messageDigest_) {
-            if (privateKey == nullptr || messageDigest == nullptr) {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
-        }
-
-        Signer::SharedPtr Signer::Get (
+        Signer::SharedPtr Signer::CreateSigner (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
-            Map::iterator it = GetMap ().find (privateKey->GetKeyType ());
-            return it != GetMap ().end () ?
-                it->second (privateKey, messageDigest) :
-                Signer::SharedPtr ();
+            std::list<std::string> signers;
+            GetTypes (signers);
+            for (std::list<std::string>::const_iterator
+                     it = signers.begin (),
+                     end = signers.end (); it != end; ++it) {
+                SharedPtr signer = CreateType (*it);
+                if (signer->HasKeyType (privateKey->GetKeyType ())) {
+                    signer->Init (privateKey, messageDigest);
+                    return signer;
+                }
+            }
+            return nullptr;
         }
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Signer::StaticInit () {
-            OpenSSLSigner::StaticInit (OPENSSL_PKEY_RSA);
-            OpenSSLSigner::StaticInit (OPENSSL_PKEY_DSA);
-            OpenSSLSigner::StaticInit (OPENSSL_PKEY_EC);
-            Ed25519Signer::StaticInit (Ed25519AsymmetricKey::KEY_TYPE);
+            OpenSSLSigner::StaticInit ();
+            Ed25519Signer::StaticInit ();
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 

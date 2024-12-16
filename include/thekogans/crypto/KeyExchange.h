@@ -161,8 +161,8 @@ namespace thekogans {
             /// \return Parameters (\see{DHEParams} or \see{RSAParams}) to send to the
             /// key exchange peer.
             virtual Params::SharedPtr GetParams (
-                AsymmetricKey::SharedPtr /*privateKey*/ = AsymmetricKey::SharedPtr (),
-                MessageDigest::SharedPtr /*messageDigest*/ = MessageDigest::SharedPtr ()) const = 0;
+                AsymmetricKey::SharedPtr /*privateKey*/ = nullptr,
+                MessageDigest::SharedPtr /*messageDigest*/ = nullptr) const = 0;
 
             /// \brief
             /// Given the peer's (see \see{DHEParams} and \see{RSAParams}), use my private key

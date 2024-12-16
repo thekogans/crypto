@@ -51,7 +51,7 @@ namespace thekogans {
             /// \brief
             /// Return the key type.
             /// \return Key type.
-            virtual const char *GetKeyType () const override {
+            virtual std::string GetKeyType () const override {
                 return Ed25519AsymmetricKey::KEY_TYPE;
             }
 

@@ -22,28 +22,40 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_CRYPTO_IMPLEMENT_VERIFIER (Ed25519Verifier, Ed25519AsymmetricKey::KEY_TYPE)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (Ed25519Verifier)
 
         Ed25519Verifier::Ed25519Verifier (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) :
                 Verifier (publicKey, messageDigest) {
-            if (publicKey == nullptr || publicKey->IsPrivate () ||
-                    publicKey->GetKeyType () != Ed25519AsymmetricKey::KEY_TYPE) {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-            }
+            Init (publicKey, messageDigest);
         }
 
-        void Ed25519Verifier::Init () {
-            messageDigest->Init ();
+        bool Ed25519Verifier::HasKeyType (const std::string &keyType) {
+            return keyType == Ed25519AsymmetricKey::KEY_TYPE;
+        }
+
+        void Ed25519Verifier::Init (
+                AsymmetricKey::SharedPtr publicKey_,
+                MessageDigest::SharedPtr messageDigest_) {
+            publicKey = publicKey_;
+            messageDigest = messageDigest_;
+            if (messageDigest != nullptr) {
+                messageDigest->Init ();
+            }
         }
 
         void Ed25519Verifier::Update (
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != nullptr && bufferLength > 0) {
-                messageDigest->Update (buffer, bufferLength);
+                if (messageDigest != nullptr) {
+                    messageDigest->Update (buffer, bufferLength);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "Ed25519Verifier is not initialized.");
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -55,13 +67,19 @@ namespace thekogans {
                 const void *signature,
                 std::size_t signatureLength) {
             if (signature != nullptr && signatureLength == Ed25519::SIGNATURE_LENGTH) {
-                std::vector<util::ui8> digest (messageDigest->GetDigestLength ());
-                messageDigest->Final (digest.data ());
-                return Ed25519::VerifyBufferSignature (
-                    digest.data (),
-                    digest.size (),
-                    ((Ed25519AsymmetricKey *)publicKey.Get ())->key.publicKey.value,
-                    (const util::ui8 *)signature);
+                if (privateKey != nullptr && messageDigest != nullptr) {
+                    util::Buffer::SharedPtr digest = messageDigest->Final ();
+                    Ed25519AsymmetricKey::SharedPtr key = publicKey;
+                    return Ed25519::VerifyBufferSignature (
+                        digest.data (),
+                        digest.size (),
+                        key->key.publicKey.value,
+                        (const util::ui8 *)signature);
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                        "%s", "Ed25519Verifier is not initialized.");
+                }
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

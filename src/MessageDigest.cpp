@@ -91,6 +91,13 @@ namespace thekogans {
             }
         }
 
+        util::Buffer::SharedPtr MessageDigest::Final () {
+            util::Buffer::SharedPtr digest (
+                new util::HostBuffer (GetDigestLength ()));
+            digest->AdvanceWriteOffset (Final (digest->GetWritePtr ()));
+            return digest;
+        }
+
         util::Buffer::SharedPtr MessageDigest::HashBuffer (
                 const void *buffer,
                 std::size_t bufferLength) {

@@ -374,7 +374,7 @@ namespace thekogans {
         }
 
         bool CipherSuite::VerifyKeyExchangeParams (const Params &params) const {
-            const char *type = params.GetKeyType ();
+            std::string type = params.GetKeyType ();
             return
                 (keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE &&
                     (type == OPENSSL_PKEY_EC || type == X25519AsymmetricKey::KEY_TYPE)) ||
@@ -382,12 +382,12 @@ namespace thekogans {
         }
 
         bool CipherSuite::VerifyKeyExchangeKey (const AsymmetricKey &key) const {
-            const char *type = key.GetKeyType ();
+            std::string type = key.GetKeyType ();
             return keyExchange == CipherSuite::KEY_EXCHANGE_RSA && type == OPENSSL_PKEY_RSA;
         }
 
         bool CipherSuite::VerifyAuthenticatorParams (const Params &params) const {
-            const char *type = params.GetKeyType ();
+            std::string type = params.GetKeyType ();
             return
                 (authenticator == CipherSuite::AUTHENTICATOR_ECDSA &&
                     (type == OPENSSL_PKEY_EC || type == Ed25519AsymmetricKey::KEY_TYPE)) ||
@@ -395,13 +395,14 @@ namespace thekogans {
         }
 
         bool CipherSuite::VerifyAuthenticatorKey (const AsymmetricKey &key) const {
-            const char *type = key.GetKeyType ();
+            std::string type = key.GetKeyType ();
             return
                 (authenticator == CipherSuite::AUTHENTICATOR_ECDSA &&
                     (type == OPENSSL_PKEY_EC || type == Ed25519AsymmetricKey::KEY_TYPE)) ||
                 (authenticator == CipherSuite::AUTHENTICATOR_DSA && type == OPENSSL_PKEY_DSA) ||
                 (authenticator == CipherSuite::AUTHENTICATOR_RSA && type == OPENSSL_PKEY_RSA) ||
-                (authenticator == CipherSuite::AUTHENTICATOR_Ed25519 && type == Ed25519AsymmetricKey::KEY_TYPE);
+                (authenticator == CipherSuite::AUTHENTICATOR_Ed25519 &&
+                    type == Ed25519AsymmetricKey::KEY_TYPE);
         }
 
         bool CipherSuite::VerifyCipherKey (const SymmetricKey &key) const {

@@ -53,7 +53,7 @@ namespace thekogans {
             /// \brief
             /// Return the key type.
             /// \return Key type.
-            virtual const char *GetKeyType () const = 0;
+            virtual std::string GetKeyType () const = 0;
 
             /// \brief
             /// Create an \see{AsymmetricKey} based on parameters.

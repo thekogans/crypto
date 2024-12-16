@@ -107,7 +107,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Params::SharedPtr ();
+            return nullptr;
         }
 
         Params::SharedPtr KeyRing::GetKeyExchangeParams (
@@ -131,7 +131,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Params::SharedPtr ();
+            return nullptr;
         }
 
         Params::SharedPtr KeyRing::GetRandomKeyExchangeParams () const {
@@ -212,7 +212,7 @@ namespace thekogans {
                     }
                 }
             }
-            return AsymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         AsymmetricKey::SharedPtr KeyRing::GetKeyExchangeKey (
@@ -236,7 +236,7 @@ namespace thekogans {
                     }
                 }
             }
-            return AsymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         bool KeyRing::AddKeyExchangeKey (AsymmetricKey::SharedPtr key) {
@@ -493,7 +493,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Params::SharedPtr ();
+            return nullptr;
         }
 
         Params::SharedPtr KeyRing::GetAuthenticatorParams (
@@ -517,7 +517,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Params::SharedPtr ();
+            return nullptr;
         }
 
         bool KeyRing::AddAuthenticatorParams (Params::SharedPtr params) {
@@ -582,7 +582,7 @@ namespace thekogans {
                     }
                 }
             }
-            return AsymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         AsymmetricKey::SharedPtr KeyRing::GetAuthenticatorKey (
@@ -606,7 +606,7 @@ namespace thekogans {
                     }
                 }
             }
-            return AsymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         Authenticator::SharedPtr KeyRing::GetAuthenticator (
@@ -641,7 +641,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Authenticator::SharedPtr ();
+            return nullptr;
         }
 
         bool KeyRing::AddAuthenticatorKey (
@@ -725,7 +725,7 @@ namespace thekogans {
                     }
                 }
             }
-            return SymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         SymmetricKey::SharedPtr KeyRing::GetCipherKey (
@@ -749,7 +749,7 @@ namespace thekogans {
                     }
                 }
             }
-            return SymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         Cipher::SharedPtr KeyRing::GetCipher (
@@ -784,7 +784,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Cipher::SharedPtr ();
+            return nullptr;
         }
 
         Cipher::SharedPtr KeyRing::GetRandomCipher () {
@@ -894,7 +894,7 @@ namespace thekogans {
                     }
                 }
             }
-            return SymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         SymmetricKey::SharedPtr KeyRing::GetMACKey (
@@ -918,7 +918,7 @@ namespace thekogans {
                     }
                 }
             }
-            return SymmetricKey::SharedPtr ();
+            return nullptr;
         }
 
         MAC::SharedPtr KeyRing::GetMAC (
@@ -952,7 +952,7 @@ namespace thekogans {
                     }
                 }
             }
-            return MAC::SharedPtr ();
+            return nullptr;
         }
 
         bool KeyRing::AddMACKey (
@@ -1033,7 +1033,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Serializable::SharedPtr ();
+            return nullptr;
         }
 
         Serializable::SharedPtr KeyRing::GetUserData (
@@ -1057,7 +1057,7 @@ namespace thekogans {
                     }
                 }
             }
-            return Serializable::SharedPtr ();
+            return nullptr;
         }
 
         bool KeyRing::AddUserData (Serializable::SharedPtr userData) {
@@ -1121,7 +1121,7 @@ namespace thekogans {
                     }
                 }
             }
-            return SharedPtr ();
+            return nullptr;
         }
 
         KeyRing::SharedPtr KeyRing::GetSubring (
@@ -1144,7 +1144,7 @@ namespace thekogans {
                     }
                 }
             }
-            return SharedPtr ();
+            return nullptr;
         }
 
         bool KeyRing::AddSubring (SharedPtr subring) {

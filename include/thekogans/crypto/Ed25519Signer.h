@@ -20,8 +20,6 @@
 
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Signer.h"
-#include "thekogans/crypto/AsymmetricKey.h"
-#include "thekogans/crypto/MessageDigest.h"
 
 namespace thekogans {
     namespace crypto {
@@ -33,20 +31,26 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Signer : public Signer {
             /// \brief
-            /// Ed25519Signer is a \see{Signer}.
-            THEKOGANS_CRYPTO_DECLARE_SIGNER (Ed25519Signer)
+            /// Ed25519Signer is a \see{util::DynamicCreatable}.
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE (Ed25519Signer)
 
             /// \brief
             /// ctor.
             /// \param[in] privateKey Private key.
             /// \param[in] messageDigest Message digest object.
             Ed25519Signer (
-                AsymmetricKey::SharedPtr privateKey,
-                MessageDigest::SharedPtr messageDigest);
+                AsymmetricKey::SharedPtr privateKey = nullptr,
+                MessageDigest::SharedPtr messageDigest = nullptr);
+
+            virtual bool HasKeyType (const std::string &keyType) override;
 
             /// \brief
             /// Initialize the signer and get it ready for the next signature.
-            virtual void Init () override;
+            /// \param[in] privateKey_ Private key.
+            /// \param[in] messageDigest_ Message digest object.
+            virtual void Init (
+                AsymmetricKey::SharedPtr privateKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr) override;
             /// \brief
             /// Call this method 1 or more times to sign the buffers.
             /// \param[in] buffer Buffer whose signature to create.
@@ -59,10 +63,6 @@ namespace thekogans {
             /// \param[out] signature Where to write the signature.
             /// \return Number of bytes written to signature.
             virtual std::size_t Final (util::ui8 *signature) override;
-
-            /// \brief
-            /// Ed25519Signer is neither copy constructable, nor assignable.
-            THEKOGANS_UTIL_DISALLOW_COPY_AND_ASSIGN (Ed25519Signer)
         };
 
     } // namespace crypto

@@ -100,7 +100,7 @@ namespace thekogans {
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
                 DHEParams (
                     const ID &id = ID (),
-                    crypto::Params::SharedPtr params_ = crypto::Params::SharedPtr (),
+                    crypto::Params::SharedPtr params_ = nullptr,
                     const std::vector<util::ui8> &salt_ = std::vector<util::ui8> (),
                     std::size_t keyLength_ = 0,
                     const std::string &messageDigestName_ = std::string (),
@@ -108,7 +108,7 @@ namespace thekogans {
                     const ID &keyId_ = ID (),
                     const std::string &keyName_ = std::string (),
                     const std::string &keyDescription_ = std::string (),
-                    AsymmetricKey::SharedPtr publicKey_ = AsymmetricKey::SharedPtr ()) :
+                    AsymmetricKey::SharedPtr publicKey_ = nullptr) :
                     Params (id),
                     params (params_),
                     salt (salt_),
@@ -255,8 +255,8 @@ namespace thekogans {
             /// the parameters.
             /// \return \see{DHEParams} to send to the key exchange peer.
             virtual Params::SharedPtr GetParams (
-                AsymmetricKey::SharedPtr privateKey = AsymmetricKey::SharedPtr (),
-                MessageDigest::SharedPtr messageDigest = MessageDigest::SharedPtr ()) const override;
+                AsymmetricKey::SharedPtr privateKey = nullptr,
+                MessageDigest::SharedPtr messageDigest = nullptr) const override;
 
             /// \brief
             /// Given the peer's \see{DHEParams}, use my private key

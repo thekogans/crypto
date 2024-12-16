@@ -85,7 +85,7 @@ namespace thekogans {
             /// \brief
             /// Return the key type.
             /// \return Key type.
-            virtual const char *GetKeyType () const override {
+            virtual std::string GetKeyType () const override {
                 return KEY_TYPE;
             }
 
