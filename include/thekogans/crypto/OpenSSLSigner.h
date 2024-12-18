@@ -37,11 +37,11 @@ namespace thekogans {
 
             /// \brief
             /// ctor.
-            /// \param[in] privateKey Private key.
-            /// \param[in] messageDigest Message digest object.
+            /// \param[in] privateKey_ Private key.
+            /// \param[in] messageDigest_ Message digest object.
             OpenSSLSigner (
-                AsymmetricKey::SharedPtr privateKey = nullptr,
-                MessageDigest::SharedPtr messageDigest = nullptr);
+                AsymmetricKey::SharedPtr privateKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr);
 
             virtual bool HasKeyType (const std::string &keyType) override;
 

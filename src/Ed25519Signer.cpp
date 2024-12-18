@@ -26,10 +26,11 @@ namespace thekogans {
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (Ed25519Signer)
 
         Ed25519Signer::Ed25519Signer (
-                AsymmetricKey::SharedPtr privateKey,
-                MessageDigest::SharedPtr messageDigest) :
-                Signer (privateKey, messageDigest) {
-            Init (privateKey, messageDigest);
+                AsymmetricKey::SharedPtr privateKey_,
+                MessageDigest::SharedPtr messageDigest_) {
+            if (privateKey_ != nullptr && messageDigest_ != nullptr) {
+                Init (privateKey_, messageDigest_);
+            }
         }
 
 
@@ -40,10 +41,24 @@ namespace thekogans {
         void Ed25519Signer::Init (
                 AsymmetricKey::SharedPtr privateKey_,
                 MessageDigest::SharedPtr messageDigest_) {
-            privateKey = privateKey_;
-            messageDigest = messageDigest_;
-            if (messageDigest != nullptr) {
+            if (privateKey_ != nullptr && messageDigest_ != nullptr) {
+                Ed25519AsymmetricKey::SharedPtr key = privateKey_;
+                if (key != nullptr && key->IsPrivate ()) {
+                    privateKey = privateKey_;
+                    messageDigest = messageDigest_;
+                    messageDigest->Init ();
+                }
+                else {
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                }
+            }
+            else if (privateKey != nullptr && messageDigest != nullptr) {
                 messageDigest->Init ();
+            }
+            else {
+                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                    "%s", "Ed25519Signer is not initialized.");
             }
         }
 
@@ -51,7 +66,7 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != nullptr && bufferLength > 0) {
-                if (messageDigest != nullptr) {
+                if (privateKey != nullptr && messageDigest != nullptr) {
                     messageDigest->Update (buffer, bufferLength);
                 }
                 else {

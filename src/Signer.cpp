@@ -28,12 +28,11 @@ namespace thekogans {
         Signer::SharedPtr Signer::CreateSigner (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
-            std::list<std::string> signers;
-            GetTypes (signers);
-            for (std::list<std::string>::const_iterator
+            ListType signers = GetTypes ();
+            for (ListType::const_iterator
                      it = signers.begin (),
                      end = signers.end (); it != end; ++it) {
-                SharedPtr signer = CreateType (*it);
+                SharedPtr signer = it->second (nullptr);
                 if (signer->HasKeyType (privateKey->GetKeyType ())) {
                     signer->Init (privateKey, messageDigest);
                     return signer;

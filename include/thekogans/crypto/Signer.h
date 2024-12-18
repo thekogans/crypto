@@ -20,8 +20,9 @@
 
 #include <cstddef>
 #include <memory>
-#include "thekogans/util/DynamicCreatable.h"
+#include "thekogans/util/Exception.h"
 #include "thekogans/util/Buffer.h"
+#include "thekogans/util/DynamicCreatable.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/MessageDigest.h"
@@ -37,9 +38,14 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Signer : public util::DynamicCreatable {
             /// \brief
-            /// Declare \see{RefCounted} pointers.
+            /// Signer is a \see{util::DynamicCreatable} base.
             THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Signer)
 
+            /// \struct Signer::Parameters Signer.h thekogans/crypto/Signer.h
+            ///
+            /// \brief
+            /// Pass these parameters to DynamicCreatable::CreateType to
+            /// parametarize the new instance.
             struct Parameters : public util::DynamicCreatable::Parameters {
                 /// \brief
                 /// Private key.
@@ -53,20 +59,30 @@ namespace thekogans {
                 /// \param[in] privateKey_ Private key.
                 /// \param[in] messageDigest_ Message digest.
                 Parameters (
-                    AsymmetricKey::SharedPtr privateKey_,
-                    MessageDigest::SharedPtr messageDigest_) :
-                    privateKey (privateKey_),
-                    messageDigest (messageDigest_) {}
+                        AsymmetricKey::SharedPtr privateKey_,
+                        MessageDigest::SharedPtr messageDigest_) :
+                        privateKey (privateKey_),
+                        messageDigest (messageDigest_) {
+                    if (privateKey == nullptr || !privateKey->IsPrivate () ||
+                            messageDigest == nullptr) {
+                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                    }
+                }
 
                 /// \brief
-                /// The Create method below will call this method if
-                /// a Parameters derived class is passed to CreateType.
-                /// Here's where you apply encapsulated parameters to
-                /// the passed in instance.
-                /// \param[in] dynamicCreatable Signer to apply the
+                /// Apply the encapsulated parameters to the passed in instance.
+                /// \param[in] dynamicCreatable Signer instance to apply the
                 /// encapsulated parameters to.
-                virtual void Apply (DynamicCreatable &dynamicCreatable) override {
-                    static_cast<Signer *> (&dynamicCreatable)->Init (privateKey, messageDigest);
+                virtual void Apply (DynamicCreatable::SharedPtr dynamicCreatable) override {
+                    Signer::SharedPtr signer = dynamicCreatable;
+                    if (signer != nullptr) {
+                        signer->Init (privateKey, messageDigest);
+                    }
+                    else {
+                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                    }
                 }
             };
 
@@ -123,6 +139,10 @@ namespace thekogans {
                 return messageDigest;
             }
 
+            /// \brief
+            /// Return true if the given keyType is supported by the signer.
+            /// \param[in] keyType Key type to check for support.
+            /// \return true if keyType is supported.
             virtual bool HasKeyType (const std::string &keyType) = 0;
 
             /// \brief

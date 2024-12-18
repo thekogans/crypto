@@ -27,11 +27,10 @@ namespace thekogans {
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (OpenSSLVerifier)
 
         OpenSSLVerifier::OpenSSLVerifier (
-                AsymmetricKey::SharedPtr publicKey,
-                MessageDigest::SharedPtr messageDigest) :
-                Verifier (publicKey, messageDigest) {
-            if (publicKey != nullptr && messageDigest != nullptr) {
-                Init (publicKey, messageDigest);
+                AsymmetricKey::SharedPtr publicKey_,
+                MessageDigest::SharedPtr messageDigest_) {
+            if (publicKey_ != nullptr && messageDigest_ != nullptr) {
+                Init (publicKey_, messageDigest_);
             }
         }
 
@@ -47,7 +46,7 @@ namespace thekogans {
                 MessageDigest::SharedPtr messageDigest_) {
             if (publicKey_ != nullptr && messageDigest_ != nullptr) {
                 OpenSSLAsymmetricKey::SharedPtr key = publicKey_;
-                if (key != nullptr) {
+                if (key != nullptr && !key->IsPrivate ()) {
                     if (EVP_DigestVerifyInit (
                             &messageDigest_->ctx,
                             0,

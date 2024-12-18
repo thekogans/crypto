@@ -27,11 +27,10 @@ namespace thekogans {
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (OpenSSLSigner)
 
         OpenSSLSigner::OpenSSLSigner (
-                AsymmetricKey::SharedPtr privateKey,
-                MessageDigest::SharedPtr messageDigest) :
-                Signer (privateKey, messageDigest) {
-            if (privateKey != nullptr && messageDigest != nullptr) {
-                Init (privateKey, messageDigest);
+                AsymmetricKey::SharedPtr privateKey_,
+                MessageDigest::SharedPtr messageDigest_) {
+            if (privateKey_ != nullptr && messageDigest_ != nullptr) {
+                Init (privateKey_, messageDigest_);
             }
         }
 

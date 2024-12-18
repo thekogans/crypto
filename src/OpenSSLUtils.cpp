@@ -804,11 +804,39 @@ namespace thekogans {
             if (buffer1 != nullptr && buffer2 != nullptr && length > 0) {
                 const util::ui8 *ptr1 = (const util::ui8 *)buffer1;
                 const util::ui8 *ptr2 = (const util::ui8 *)buffer2;
-                util::ui32 total = 0;
-                while (length-- > 0) {
-                    total += *ptr1++ ^ *ptr2++;
+                // Prime the return value.
+                bool equal = (*ptr1++ ^ *ptr2++) == 0;
+                --length;
+                // Process 64 bit chunks.
+                while (length >= util::UI64_SIZE) {
+                    equal &= (*(const util::ui64 *)ptr1 ^ *(const util::ui64 *)ptr2) == 0;
+                    ptr1 += util::UI64_SIZE;
+                    ptr2 += util::UI64_SIZE;
+                    length -= util::UI64_SIZE;
                 }
-                return total == 0;
+                // After the above loop is done,
+                // at most 7 butes are left untested.
+                // Process the last util::UI32_SIZE.
+                if (length >= util::UI32_SIZE) {
+                    equal &= (*(const util::ui32 *)ptr1 ^ *(const util::ui32 *)ptr2) == 0;
+                    ptr1 += util::UI32_SIZE;
+                    ptr2 += util::UI32_SIZE;
+                    length -= util::UI32_SIZE;
+                }
+                // Process the last util::UI16_SIZE.
+                if (length >= util::UI16_SIZE) {
+                    equal &= (*(const util::ui16 *)ptr1 ^ *(const util::ui16 *)ptr2) == 0;
+                    ptr1 += util::UI16_SIZE;
+                    ptr2 += util::UI16_SIZE;
+                    length -= util::UI16_SIZE;
+                }
+                // Process the last byte.
+                if (length == util::UI8_SIZE) {
+                    equal &= (*ptr1 ^ *ptr2) == 0;
+                    // No need to increment ptr1 and ptr2 and
+                    // decrement length here. We're done.
+                }
+                return equal;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

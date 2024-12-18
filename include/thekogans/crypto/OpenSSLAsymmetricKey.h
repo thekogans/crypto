@@ -291,6 +291,9 @@ namespace thekogans {
             /// \param[out] node Parent node.
             virtual void Write (util::JSON::Object &object) const override;
 
+            /// \brief
+            /// Check to make sure the key type is one we support.
+            /// \return The key is one of the supported types.
             void ValidateKey ();
 
             /// \brief

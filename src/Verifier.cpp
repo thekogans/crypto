@@ -27,12 +27,11 @@ namespace thekogans {
         Verifier::SharedPtr Verifier::CreateVerifier (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
-            std::list<std::string> verifiers;
-            GetTypes (verifiers);
-            for (std::list<std::string>::const_iterator
-                     it = verifiers.begin (),
-                     end = verifiers.end (); it != end; ++it) {
-                SharedPtr verifier = CreateType (*it);
+            ListType signers = GetTypes ();
+            for (ListType::const_iterator
+                     it = signers.begin (),
+                     end = signers.end (); it != end; ++it) {
+                SharedPtr verifier = it->second (nullptr);
                 if (verifier->HasKeyType (publicKey->GetKeyType ())) {
                     verifier->Init (publicKey, messageDigest);
                     return verifier;

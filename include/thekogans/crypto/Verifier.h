@@ -31,14 +31,19 @@ namespace thekogans {
         /// \struct Verifier Verifier.h thekogans/crypto/Verifier.h
         ///
         /// \brief
-        /// Verifier is a base for public key signature verification operation. It defines the API
-        /// a concrete verifier needs to implement.
+        /// Verifier is a base for public key signature verification operation.
+        /// It defines the API a concrete verifier needs to implement.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Verifier : public util::DynamicCreatable {
             /// \brief
-            /// Declare \see{RefCounted} pointers.
+            /// Verifier is a \see{util::DynamicCreatable} base.
             THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Verifier)
 
+            /// \struct Verifier::Parameters Verifier.h thekogans/crypto/Verifier.h
+            ///
+            /// \brief
+            /// Pass these parameters to DynamicCreatable::CreateType to
+            /// parametarize the new instance.
             struct Parameters : public util::DynamicCreatable::Parameters {
                 /// \brief
                 /// Public key.
@@ -52,13 +57,30 @@ namespace thekogans {
                 /// \param[in] publicKey_ Public key.
                 /// \param[in] messageDigest_ Message digest.
                 Parameters (
-                    AsymmetricKey::SharedPtr publicKey_,
-                    MessageDigest::SharedPtr messageDigest_) :
-                    publicKey (publicKey_),
-                    messageDigest (messageDigest_) {}
+                        AsymmetricKey::SharedPtr publicKey_,
+                        MessageDigest::SharedPtr messageDigest_) :
+                        publicKey (publicKey_),
+                        messageDigest (messageDigest_) {
+                    if (publicKey == nullptr || publicKey->IsPrivate () ||
+                            messageDigest == nullptr) {
+                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                    }
+                }
 
-                virtual void Apply (DynamicCreatable &dynamicCreatable) override {
-                    static_cast<Verifier *> (&dynamicCreatable)->Init (publicKey, messageDigest);
+                /// \brief
+                /// Apply the encapsulated parameters to the passed in instance.
+                /// \param[in] dynamicCreatable Signer instance to apply the
+                /// encapsulated parameters to.
+                virtual void Apply (DynamicCreatable::SharedPtr dynamicCreatable) override {
+                    Verifier::SharedPtr verifier = dynamicCreatable;
+                    if (verifier != nullptr) {
+                        verifier->Init (publicKey, messageDigest);
+                    }
+                    else {
+                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                    }
                 }
             };
 
@@ -115,6 +137,10 @@ namespace thekogans {
                 return messageDigest;
             }
 
+            /// \brief
+            /// Return true if the given keyType is supported by the verifier.
+            /// \param[in] keyType Key type to check for support.
+            /// \return true if keyType is supported.
             virtual bool HasKeyType (const std::string &keyType) = 0;
 
             /// \brief

@@ -36,12 +36,16 @@ namespace thekogans {
 
             /// \brief
             /// ctor.
-            /// \param[in] privateKey Private key.
-            /// \param[in] messageDigest Message digest object.
+            /// \param[in] privateKey_ Private key.
+            /// \param[in] messageDigest_ Message digest object.
             Ed25519Signer (
-                AsymmetricKey::SharedPtr privateKey = nullptr,
-                MessageDigest::SharedPtr messageDigest = nullptr);
+                AsymmetricKey::SharedPtr privateKey_ = nullptr,
+                MessageDigest::SharedPtr messageDigest_ = nullptr);
 
+            /// \brief
+            /// Return true if the given keyType is Ed25519AsymmetricKey::KEY_TYPE.
+            /// \param[in] keyType Key type to check for support.
+            /// \return true if keyType == Ed25519AsymmetricKey::KEY_TYPE.
             virtual bool HasKeyType (const std::string &keyType) override;
 
             /// \brief
