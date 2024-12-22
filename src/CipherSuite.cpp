@@ -532,11 +532,11 @@ namespace thekogans {
                 const std::string &description) const {
             if (!IsAuthenticatorEC ()) {
                 if (authenticator == AUTHENTICATOR_DSA) {
-                    return crypto::DSA::ParamsFromKeyLength (
+                    return DSA::ParamsFromKeyLength (
                         keyLength, id, name, description)->CreateKey ();
                 }
                 else if (authenticator == AUTHENTICATOR_RSA) {
-                    return crypto::RSA::CreateKey (keyLength,
+                    return RSA::CreateKey (keyLength,
                         std::move (RSAPublicExponent), id, name, description);
                 }
                 else {

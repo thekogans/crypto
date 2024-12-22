@@ -815,23 +815,23 @@ namespace thekogans {
                     length -= util::UI64_SIZE;
                 }
                 // After the above loop is done,
-                // at most 7 butes are left untested.
-                // Process the last util::UI32_SIZE.
-                if (length >= util::UI32_SIZE) {
+                // at most 7 bytes are left untested.
+                // Process the last util::ui32.
+                if ((length & util::UI32_SIZE) != 0) {
                     equal &= (*(const util::ui32 *)ptr1 ^ *(const util::ui32 *)ptr2) == 0;
                     ptr1 += util::UI32_SIZE;
                     ptr2 += util::UI32_SIZE;
                     length -= util::UI32_SIZE;
                 }
-                // Process the last util::UI16_SIZE.
-                if (length >= util::UI16_SIZE) {
+                // Process the last util::ui16.
+                if ((length & util::UI16_SIZE) != 0) {
                     equal &= (*(const util::ui16 *)ptr1 ^ *(const util::ui16 *)ptr2) == 0;
                     ptr1 += util::UI16_SIZE;
                     ptr2 += util::UI16_SIZE;
                     length -= util::UI16_SIZE;
                 }
-                // Process the last byte.
-                if (length == util::UI8_SIZE) {
+                // Process the last util::ui8.
+                if ((length & util::UI8_SIZE) != 0) {
                     equal &= (*ptr1 ^ *ptr2) == 0;
                     // No need to increment ptr1 and ptr2 and
                     // decrement length here. We're done.
@@ -1078,7 +1078,7 @@ namespace thekogans {
         PostConnectionCheck (
                 SSL *ssl,
                 const std::string &serverName) {
-            crypto::X509Ptr cert (SSL_get_peer_certificate (ssl));
+            X509Ptr cert (SSL_get_peer_certificate (ssl));
             return cert != nullptr &&
                 (CheckSubjectName (cert.get (), serverName) ||
                     CheckSubjectAltName (cert.get (), serverName)) ?
@@ -1092,7 +1092,7 @@ namespace thekogans {
                 pem_password_cb *passwordCallback,
                 void *userData) {
             if (ctx != nullptr && !caCertificates.empty ()) {
-                crypto::X509_STOREPtr newStore;
+                X509_STOREPtr newStore;
                 X509_STORE *store = SSL_CTX_get_cert_store (ctx);
                 if (store == nullptr) {
                     newStore.reset (X509_STORE_new ());
@@ -1107,10 +1107,10 @@ namespace thekogans {
                         it = caCertificates.begin (),
                         end = caCertificates.end (); it != end; ++it) {
                     if (X509_STORE_add_cert (store,
-                            crypto::ParseCertificate (
+                            ParseCertificate (
                                 it->data (),
                                 it->size (),
-                                crypto::PEM_ENCODING,
+                                PEM_ENCODING,
                                 passwordCallback,
                                 userData).get ()) != 1) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -1136,10 +1136,10 @@ namespace thekogans {
                 std::list<std::string>::const_iterator it = certificateChain.begin ();
                 const std::string &certificate = *it++;
                 if (SSL_CTX_use_certificate (ctx,
-                        crypto::ParseCertificate (
+                        ParseCertificate (
                             certificate.data (),
                             certificate.size (),
-                            crypto::PEM_ENCODING,
+                            PEM_ENCODING,
                             passwordCallback,
                             userData).get ()) == 1) {
                     SSL_CTX_clear_chain_certs (ctx);
@@ -1147,10 +1147,10 @@ namespace thekogans {
                             end = certificateChain.end (); it != end; ++it) {
                         const std::string &certificate = *it;
                         if (SSL_CTX_add1_chain_cert (ctx,
-                                crypto::ParseCertificate (
+                                ParseCertificate (
                                     certificate.data (),
                                     certificate.size (),
-                                    crypto::PEM_ENCODING,
+                                    PEM_ENCODING,
                                     passwordCallback,
                                     userData).get ()) != 1) {
                             THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -1175,10 +1175,10 @@ namespace thekogans {
                 void *userData) {
             if (ctx != nullptr && !privateKey.empty ()) {
                 if (SSL_CTX_use_PrivateKey (ctx,
-                        crypto::ParsePrivateKey (
+                        ParsePrivateKey (
                             privateKey.data (),
                             privateKey.size (),
-                            crypto::PEM_ENCODING,
+                            PEM_ENCODING,
                             passwordCallback,
                             userData).get ()) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -1217,10 +1217,10 @@ namespace thekogans {
                 if (!dhParams.empty ()) {
                     SSL_CTX_set_options (ctx, SSL_CTX_get_options (ctx) | SSL_OP_SINGLE_DH_USE);
                     if (SSL_CTX_set_tmp_dh (ctx,
-                            crypto::ParseDHParams (
+                            ParseDHParams (
                                 dhParams.data (),
                                 dhParams.size (),
-                                crypto::PEM_ENCODING,
+                                PEM_ENCODING,
                                 passwordCallback,
                                 userData).get ()) != 1) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -1246,21 +1246,21 @@ namespace thekogans {
                     SSL_CTX_set_ecdh_auto (ctx, 1);
                 }
                 else if (ecdhParamsType == "curve") {
-                    crypto::EC_KEYPtr ecdh (
+                    EC_KEYPtr ecdh (
                         EC_KEY_new_by_curve_name (OBJ_sn2nid (ecdhParams.c_str ())));
                     if (ecdh == nullptr || SSL_CTX_set_tmp_ecdh (ctx, ecdh.get ()) != 1) {
                         THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                     }
                 }
-                else if (ecdhParamsType == crypto::PEM_ENCODING) {
-                    crypto::EVP_PKEYPtr key = crypto::ParsePUBKEY (
+                else if (ecdhParamsType == PEM_ENCODING) {
+                    EVP_PKEYPtr key = ParsePUBKEY (
                         ecdhParams.data (),
                         ecdhParams.size (),
-                        crypto::PEM_ENCODING,
+                        PEM_ENCODING,
                         passwordCallback,
                         userData);
                     if (key != nullptr) {
-                        crypto::EC_KEYPtr ecdh (EVP_PKEY_get1_EC_KEY (key.get ()));
+                        EC_KEYPtr ecdh (EVP_PKEY_get1_EC_KEY (key.get ()));
                         if (ecdh == nullptr || SSL_CTX_set_tmp_ecdh (ctx, ecdh.get ()) != 1) {
                             THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                         }

@@ -293,10 +293,10 @@ namespace thekogans {
                 const std::string &name,
                 const std::string &description,
                 bool recursive) {
-            crypto::KeyExchange::SharedPtr keyExchange;
+            KeyExchange::SharedPtr keyExchange;
             if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
                     cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
-                crypto::Params::SharedPtr params = paramsOrKeyId != ID::Empty ?
+                Params::SharedPtr params = paramsOrKeyId != ID::Empty ?
                     GetKeyExchangeParams (paramsOrKeyId) :
                     GetRandomKeyExchangeParams ();
                 if (params != nullptr) {
@@ -320,7 +320,7 @@ namespace thekogans {
                 }
             }
             else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
-                crypto::AsymmetricKey::SharedPtr key = GetKeyExchangeKey (paramsOrKeyId);
+                AsymmetricKey::SharedPtr key = GetKeyExchangeKey (paramsOrKeyId);
                 if (key != nullptr && !key->IsPrivate ()) {
                     keyExchange.Reset (
                         new RSAKeyExchange (
