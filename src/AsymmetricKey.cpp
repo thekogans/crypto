@@ -16,12 +16,25 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include "thekogans/util/StringUtils.h"
+#if defined (THEKOGANS_CRYPTO_TYPE_Static)
+    #include "thekogans/crypto/OpenSSLAsymmetricKey.h"
+    #include "thekogans/crypto/Ed25519AsymmetricKey.h"
+    #include "thekogans/crypto/X25519AsymmetricKey.h"
+#endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/AsymmetricKey.h"
 
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (AsymmetricKey)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::AsymmetricKey)
+
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+        void AsymmetricKey::StaticInit () {
+            OpenSSLAsymmetricKey::StaticInit ();
+            Ed25519AsymmetricKey::StaticInit ();
+            X25519AsymmetricKey::StaticInit ();
+        }
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
         std::size_t AsymmetricKey::Size () const {
             return

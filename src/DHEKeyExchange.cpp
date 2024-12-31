@@ -30,7 +30,10 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (DHEKeyExchange::DHEParams, 1)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
+            thekogans::crypto::DHEKeyExchange::DHEParams,
+            KeyExchange::Params,
+            1)
 
         void DHEKeyExchange::DHEParams::CreateSignature (
                 AsymmetricKey::SharedPtr privateKey,

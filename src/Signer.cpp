@@ -23,13 +23,13 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (Signer)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Signer)
 
         Signer::SharedPtr Signer::CreateSigner (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
-            ListType signers = GetTypes ();
-            for (ListType::const_iterator
+            const TypeMap &signers = GetTypes ();
+            for (TypeMap::const_iterator
                      it = signers.begin (),
                      end = signers.end (); it != end; ++it) {
                 SharedPtr signer = it->second (nullptr);

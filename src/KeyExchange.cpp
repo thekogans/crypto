@@ -17,10 +17,23 @@
 
 #include "thekogans/util/Serializer.h"
 #include "thekogans/util/StringUtils.h"
+#if defined (THEKOGANS_CRYPTO_TYPE_Static)
+    #include "thekogans/crypto/DHEKeyExchange.h"
+    #include "thekogans/crypto/RSAKeyExchange.h"
+#endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/KeyExchange.h"
 
 namespace thekogans {
     namespace crypto {
+
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::KeyExchange::Params)
+
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+        void KeyExchange::Params::StaticInit () {
+            DHEKeyExchange::DHEParams::StaticInit ();
+            RSAKeyExchange::RSAParams::StaticInit ();
+        }
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
         std::size_t KeyExchange::Params::Size () const {
             return

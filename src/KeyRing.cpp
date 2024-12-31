@@ -35,7 +35,8 @@ namespace thekogans {
         #endif // !defined (THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-            KeyRing,
+            thekogans::crypto::KeyRing,
+            Serializable,
             1,
             THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 

@@ -23,7 +23,9 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (Ed25519Signer)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (
+            thekogans::crypto::Ed25519Signer,
+            Signer)
 
         Ed25519Signer::Ed25519Signer (
                 AsymmetricKey::SharedPtr privateKey_,

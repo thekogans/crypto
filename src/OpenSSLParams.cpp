@@ -36,7 +36,8 @@ namespace thekogans {
         #endif // !defined (THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE)
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-            OpenSSLParams,
+            thekogans::crypto::OpenSSLParams,
+            Params,
             1,
             THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE)
 

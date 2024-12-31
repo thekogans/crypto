@@ -22,13 +22,13 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (Verifier)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Verifier)
 
         Verifier::SharedPtr Verifier::CreateVerifier (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
-            ListType signers = GetTypes ();
-            for (ListType::const_iterator
+            const TypeMap &signers = GetTypes ();
+            for (TypeMap::const_iterator
                      it = signers.begin (),
                      end = signers.end (); it != end; ++it) {
                 SharedPtr verifier = it->second (nullptr);

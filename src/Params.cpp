@@ -15,12 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#if defined (THEKOGANS_CRYPTO_TYPE_Static)
+    #include "thekogans/crypto/OpenSSLParams.h"
+    #include "thekogans/crypto/Ed25519Params.h"
+    #include "thekogans/crypto/X25519Params.h"
+#endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/Params.h"
 
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (Params)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Params)
+
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+        void Params::StaticInit () {
+            OpenSSLParams::StaticInit ();
+            Ed25519Params::StaticInit ();
+            X25519Params::StaticInit ();
+        }
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
         std::size_t Params::Size () const {
             return Serializable::Size ();

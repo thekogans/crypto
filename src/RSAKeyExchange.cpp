@@ -31,7 +31,10 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (RSAKeyExchange::RSAParams, 1)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
+            thekogans::crypto::RSAKeyExchange::RSAParams,
+            KeyExchange::Params,
+            1)
 
         void RSAKeyExchange::RSAParams::CreateSignature (
                 AsymmetricKey::SharedPtr privateKey,

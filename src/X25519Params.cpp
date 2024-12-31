@@ -28,7 +28,8 @@ namespace thekogans {
         #endif // !defined (THEKOGANS_CRYPTO_MIN_X25519_PARAMS_IN_PAGE)
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-            X25519Params,
+            thekogans::crypto::X25519Params,
+            Params,
             1,
             THEKOGANS_CRYPTO_MIN_X25519_PARAMS_IN_PAGE)
 

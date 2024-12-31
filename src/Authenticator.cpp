@@ -68,7 +68,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Authenticator is setup for verify operation.");
+                        "%s", "Authenticator is not initialized.");
                 }
             }
             else {
@@ -91,7 +91,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Authenticator is setup for sign operation.");
+                        "%s", "Authenticator is not initialized.");
                 }
             }
             else {
@@ -104,6 +104,7 @@ namespace thekogans {
             if (signer != nullptr) {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
+                // FIXME: this may be a problem for embeded systems.
                 util::FixedArray<util::ui8, 4096> buffer;
                 for (std::size_t count = file.Read (buffer, 4096);
                         count != 0;
@@ -114,7 +115,7 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s", "Authenticator is setup for verify operation.");
+                    "%s", "Authenticator is not initialized.");
             }
         }
 
@@ -128,15 +129,15 @@ namespace thekogans {
                     util::ReadOnlyFile file (util::HostEndian, path);
                     util::FixedArray<util::ui8, 4096> buffer;
                     for (std::size_t count = file.Read (buffer, 4096);
-                            count != 0;
-                            count = file.Read (buffer, 4096)) {
+                         count != 0;
+                         count = file.Read (buffer, 4096)) {
                         verifier->Update (buffer, count);
                     }
                     return verifier->Final (signature, signatureLength);
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Authenticator is setup for sign operation.");
+                        "%s", "Authenticator is not initialized.");
                 }
             }
             else {

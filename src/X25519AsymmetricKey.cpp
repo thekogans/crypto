@@ -25,7 +25,8 @@ namespace thekogans {
         #endif // !defined (THEKOGANS_CRYPTO_MIN_X25519_ASYMMETRIC_KEYS_IN_PAGE)
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-            X25519AsymmetricKey,
+            thekogans::crypto::X25519AsymmetricKey,
+            AsymmetricKey,
             1,
             THEKOGANS_CRYPTO_MIN_X25519_ASYMMETRIC_KEYS_IN_PAGE)
 

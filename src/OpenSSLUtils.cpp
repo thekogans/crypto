@@ -341,7 +341,7 @@ namespace thekogans {
             if (cert != nullptr) {
                 const STACK_OF (DIST_POINT) *distributionPoints =
                     (STACK_OF (DIST_POINT) *)X509_get_ext_d2i (
-                        cert, NID_crl_distribution_points, 0, 0);
+                        cert, NID_crl_distribution_points, nullptr, nullptr);
                 for (int i = 0, count = sk_DIST_POINT_num (distributionPoints); i < count; ++i) {
                     const DIST_POINT_NAME *distributionPoint =
                         sk_DIST_POINT_value (distributionPoints, i)->distpoint;
@@ -390,7 +390,7 @@ namespace thekogans {
                 if (bio != nullptr) {
                     X509_CRLPtr crl (encoding == DER_ENCODING ?
                         d2i_X509_CRL_bio (bio.get (), 0) :
-                        PEM_read_bio_X509_CRL (bio.get (), 0, passwordCallback, userData));
+                        PEM_read_bio_X509_CRL (bio.get (), nullptr, passwordCallback, userData));
                     if (crl != nullptr) {
                         return crl;
                     }
@@ -454,7 +454,7 @@ namespace thekogans {
             if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     X509Ptr certificate (
-                        d2i_X509 (0, (const util::ui8 **)&buffer, (long)length));
+                        d2i_X509 (nullptr, (const util::ui8 **)&buffer, (long)length));
                     if (certificate != nullptr) {
                         return certificate;
                     }
@@ -470,7 +470,7 @@ namespace thekogans {
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
                     if (bio != nullptr) {
                         X509Ptr certificate (
-                            PEM_read_bio_X509 (bio.get (), 0, passwordCallback, userData));
+                            PEM_read_bio_X509 (bio.get (), nullptr, passwordCallback, userData));
                         if (certificate != nullptr) {
                             return certificate;
                         }
@@ -503,7 +503,7 @@ namespace thekogans {
             if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     EVP_PKEYPtr key (
-                        d2i_PUBKEY (0, (const util::ui8 **)&buffer, (long)length));
+                        d2i_PUBKEY (nullptr, (const util::ui8 **)&buffer, (long)length));
                     if (key != nullptr) {
                         return key;
                     }
@@ -519,7 +519,7 @@ namespace thekogans {
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
                     if (bio != nullptr) {
                         EVP_PKEYPtr key (
-                            PEM_read_bio_PUBKEY (bio.get (), 0, passwordCallback, userData));
+                            PEM_read_bio_PUBKEY (bio.get (), nullptr, passwordCallback, userData));
                         if (key != nullptr) {
                             return key;
                         }
@@ -552,7 +552,7 @@ namespace thekogans {
             if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     EVP_PKEYPtr key (
-                        d2i_AutoPrivateKey (0, (const util::ui8 **)&buffer, (long)length));
+                        d2i_AutoPrivateKey (nullptr, (const util::ui8 **)&buffer, (long)length));
                     if (key != nullptr) {
                         return key;
                     }
@@ -568,7 +568,7 @@ namespace thekogans {
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
                     if (bio != nullptr) {
                         EVP_PKEYPtr key (
-                            PEM_read_bio_PrivateKey (bio.get (), 0, passwordCallback, userData));
+                            PEM_read_bio_PrivateKey (bio.get (), nullptr, passwordCallback, userData));
                         if (key != nullptr) {
                             return key;
                         }
@@ -603,7 +603,7 @@ namespace thekogans {
                     {
                         const util::ui8 **ptr = (const util::ui8 **)&buffer;
                         // RSA is most common. Try it first.
-                        RSAPtr rsa (d2i_RSAPublicKey (0, ptr, (long)length));
+                        RSAPtr rsa (d2i_RSAPublicKey (nullptr, ptr, (long)length));
                         if (rsa != nullptr) {
                             EVP_PKEYPtr key (EVP_PKEY_new ());
                             if (key != nullptr &&
@@ -619,7 +619,7 @@ namespace thekogans {
                     {
                         const util::ui8 **ptr = (const util::ui8 **)&buffer;
                         // If not RSA, try DSA.
-                        DSAPtr dsa (d2i_DSAPublicKey (0, ptr, (long)length));
+                        DSAPtr dsa (d2i_DSAPublicKey (nullptr, ptr, (long)length));
                         if (dsa != nullptr) {
                             EVP_PKEYPtr key (EVP_PKEY_new ());
                             if (key != nullptr &&
@@ -635,7 +635,7 @@ namespace thekogans {
                     {
                         const util::ui8 **ptr = (const util::ui8 **)&buffer;
                         // Finally, try an Elliptic curve public key.
-                        EC_KEYPtr ec (o2i_ECPublicKey (0, ptr, (long)length));
+                        EC_KEYPtr ec (o2i_ECPublicKey (nullptr, ptr, (long)length));
                         if (ec != nullptr) {
                             EVP_PKEYPtr key (EVP_PKEY_new ());
                             if (key != nullptr &&
@@ -665,7 +665,7 @@ namespace thekogans {
                         RSAPtr rsa (
                             PEM_read_bio_RSAPublicKey (
                                 bio.get (),
-                                0,
+                                nullptr,
                                 passwordCallback,
                                 userData));
                         if (rsa != nullptr) {
@@ -708,7 +708,7 @@ namespace thekogans {
             if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     DHPtr dhParams (
-                        d2i_DHparams (0, (const util::ui8 **)&buffer, (long)length));
+                        d2i_DHparams (nullptr, (const util::ui8 **)&buffer, (long)length));
                     if (dhParams != nullptr) {
                         return dhParams;
                     }
@@ -724,7 +724,7 @@ namespace thekogans {
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
                     if (bio != nullptr) {
                         DHPtr dh (
-                            PEM_read_bio_DHparams (bio.get (), 0, passwordCallback, userData));
+                            PEM_read_bio_DHparams (bio.get (), nullptr, passwordCallback, userData));
                         if (dh != nullptr) {
                             return dh;
                         }
@@ -757,7 +757,7 @@ namespace thekogans {
             if (buffer != nullptr && length > 0) {
                 if (encoding == DER_ENCODING) {
                     DSAPtr dsaParams (
-                        d2i_DSAparams (0, (const util::ui8 **)&buffer, (long)length));
+                        d2i_DSAparams (nullptr, (const util::ui8 **)&buffer, (long)length));
                     if (dsaParams != nullptr) {
                         return dsaParams;
                     }
@@ -773,7 +773,7 @@ namespace thekogans {
                     BIOPtr bio (BIO_new_mem_buf ((util::ui8 *)buffer, (int)length));
                     if (bio != nullptr) {
                         DSAPtr dsa (
-                            PEM_read_bio_DSAparams (bio.get (), 0, passwordCallback, userData));
+                            PEM_read_bio_DSAparams (bio.get (), nullptr, passwordCallback, userData));
                         if (dsa != nullptr) {
                             return dsa;
                         }
@@ -1033,7 +1033,7 @@ namespace thekogans {
                             const ASN1_OCTET_STRING *data = X509_EXTENSION_get_data (extension);
                         #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
                             if (method->it != nullptr) {
-                                extensionData = ASN1_item_d2i (0,
+                                extensionData = ASN1_item_d2i (nullptr,
                                 #if OPENSSL_VERSION_NUMBER < 0x10100000L
                                     (const util::ui8 **)&data,
                                     extension->value->length,
@@ -1044,7 +1044,7 @@ namespace thekogans {
                                     ASN1_ITEM_ptr (method->it));
                             }
                             else {
-                                extensionData = method->d2i (0,
+                                extensionData = method->d2i (nullptr,
                                 #if OPENSSL_VERSION_NUMBER < 0x10100000L
                                     (const util::ui8 **)&data,
                                     extension->value->length);

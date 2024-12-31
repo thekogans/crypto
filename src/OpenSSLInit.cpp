@@ -27,6 +27,7 @@
 #include <openssl/x509v3.h>
 #include <openssl/dh.h>
 #include <openssl/hmac.h>
+#include "thekogans/util/Config.h"
 #include "thekogans/util/OwnerVector.h"
 #include "thekogans/util/Buffer.h"
 #include "thekogans/util/SpinLock.h"
@@ -53,6 +54,7 @@ namespace thekogans {
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void StaticInit () {
+            util::StaticInit ();
             OpenSSLAllocator::StaticInit ();
             Serializable::StaticInit ();
             Signer::StaticInit ();

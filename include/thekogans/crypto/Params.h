@@ -39,6 +39,10 @@ namespace thekogans {
             /// Declare \see{RefCounted} pointers.
             THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Params)
 
+        #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+            static void StaticInit ();
+        #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+
             /// \brief
             /// ctor.
             /// \param[in] id Optional parameters id.

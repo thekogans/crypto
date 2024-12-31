@@ -39,6 +39,10 @@ namespace thekogans {
             /// Declare \see{RefCounted} pointers.
             THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (AsymmetricKey)
 
+        #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+            static void StaticInit ();
+        #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+
         private:
             /// \brief
             /// true = contains both private and public keys.

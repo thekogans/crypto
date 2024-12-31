@@ -44,7 +44,8 @@ namespace thekogans {
         #endif // !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-            SymmetricKey,
+            thekogans::crypto::SymmetricKey,
+            Serializable,
             1,
             THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 

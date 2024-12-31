@@ -19,33 +19,25 @@
 #include "thekogans/util/LockGuard.h"
 #if defined (THEKOGANS_CRYPTO_TYPE_Static)
     #include "thekogans/crypto/KeyRing.h"
-    #include "thekogans/crypto/OpenSSLParams.h"
-    #include "thekogans/crypto/Ed25519Params.h"
-    #include "thekogans/crypto/X25519Params.h"
+    #include "thekogans/crypto/Params.h"
     #include "thekogans/crypto/SymmetricKey.h"
-    #include "thekogans/crypto/OpenSSLAsymmetricKey.h"
-    #include "thekogans/crypto/Ed25519AsymmetricKey.h"
-    #include "thekogans/crypto/X25519AsymmetricKey.h"
-    #include "thekogans/crypto/DHEKeyExchange.h"
-    #include "thekogans/crypto/RSAKeyExchange.h"
+    #include "thekogans/crypto/AsymmetricKey.h"
+    #include "thekogans/crypto/KeyExchange.h"
 #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/Serializable.h"
 
 namespace thekogans {
     namespace crypto {
 
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Serializable)
+
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Serializable::StaticInit () {
             KeyRing::StaticInit ();
-            OpenSSLParams::StaticInit ();
-            Ed25519Params::StaticInit ();
-            X25519Params::StaticInit ();
+            Params::StaticInit ();
             SymmetricKey::StaticInit ();
-            OpenSSLAsymmetricKey::StaticInit ();
-            Ed25519AsymmetricKey::StaticInit ();
-            X25519AsymmetricKey::StaticInit ();
-            DHEKeyExchange::DHEParams::StaticInit ();
-            RSAKeyExchange::RSAParams::StaticInit ();
+            AsymmetricKey::StaticInit ();
+            KeyExchange::Params::StaticInit ();
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 

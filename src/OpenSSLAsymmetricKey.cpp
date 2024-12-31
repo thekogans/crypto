@@ -36,7 +36,8 @@ namespace thekogans {
         #endif // !defined (THEKOGANS_CRYPTO_MIN_OPENSSL_ASYMMETRIC_KEYS_IN_PAGE)
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
-            OpenSSLAsymmetricKey,
+            thekogans::crypto::OpenSSLAsymmetricKey,
+            AsymmetricKey,
             1,
             THEKOGANS_CRYPTO_MIN_OPENSSL_ASYMMETRIC_KEYS_IN_PAGE)
 
