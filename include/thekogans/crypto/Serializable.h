@@ -164,7 +164,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement Serializable::SharedPtr extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (Serializable)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (Serializable)
 
         /// \def THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE(_T)
         /// Common declarations used by all Serializable derivatives.
@@ -188,7 +188,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement Serializable::SharedPtr value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::Serializable)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::Serializable)
 
     } // namespace util
 } // namespace thekogans

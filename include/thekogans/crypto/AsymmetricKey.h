@@ -140,7 +140,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement AsymmetricKey::SharedPtr extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (AsymmetricKey)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (AsymmetricKey)
 
     } // namespace crypto
 
@@ -148,7 +148,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement AsymmetricKey::SharedPtr value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::AsymmetricKey)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::AsymmetricKey)
 
     } // namespace util
 } // namespace thekogans

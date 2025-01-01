@@ -183,7 +183,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement KeyExchange::Params::SharedPtr extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (KeyExchange::Params)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (KeyExchange::Params)
 
     } // namespace crypto
 
@@ -191,7 +191,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement KeyExchange::Params::SharedPtr value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::KeyExchange::Params)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::KeyExchange::Params)
 
     } // namespace util
 } // namespace thekogans

@@ -114,7 +114,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement Params::SharedPtr extraction operators.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_EXTRACTION_OPERATORS (Params)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_EXTRACTION_OPERATORS (Params)
 
     } // namespace crypto
 
@@ -122,7 +122,7 @@ namespace thekogans {
 
         /// \brief
         /// Implement Params::SharedPtr value parser.
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_PTR_VALUE_PARSER (crypto::Params)
+        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE_VALUE_PARSER (crypto::Params)
 
     } // namespace util
 } // namespace thekogans
