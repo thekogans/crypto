@@ -104,18 +104,7 @@ namespace thekogans {
                 MessageDigest::SharedPtr messageDigest_ = nullptr) :
                 privateKey (privateKey_),
                 messageDigest (messageDigest_) {}
-            /// \brief
-            /// dtor.
-            virtual ~Signer () {}
 
-            /// \brief
-            /// Used for Verifier dynamic discovery and creation.
-            /// \param[in] publicKey Public \see{AsymmetricKey} used for signing.
-            /// \param[in] messageDigest Message digest object.
-            /// \return A Verifier based on the passed in publicKey type.
-            static SharedPtr CreateSigner (
-                AsymmetricKey::SharedPtr privateKey,
-                MessageDigest::SharedPtr messageDigest);
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             /// \brief
             /// Because Signer uses dynamic initialization, when using
@@ -125,6 +114,15 @@ namespace thekogans {
             /// to your application are the ones you explicitly link to.
             static void StaticInit ();
         #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+
+            /// \brief
+            /// Used for Verifier dynamic discovery and creation.
+            /// \param[in] publicKey Public \see{AsymmetricKey} used for signing.
+            /// \param[in] messageDigest Message digest object.
+            /// \return A Verifier based on the passed in publicKey type.
+            static SharedPtr CreateSigner (
+                AsymmetricKey::SharedPtr privateKey,
+                MessageDigest::SharedPtr messageDigest);
 
             /// \brief
             /// Return the signer private key.

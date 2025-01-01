@@ -24,13 +24,20 @@ namespace thekogans {
 
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Verifier)
 
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+        void Verifier::StaticInit () {
+            OpenSSLVerifier::StaticInit ();
+            Ed25519Verifier::StaticInit ();
+        }
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+
         Verifier::SharedPtr Verifier::CreateVerifier (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
-            const TypeMap &signers = GetTypes ();
+            const TypeMap &verifiers = GetTypes ();
             for (TypeMap::const_iterator
-                     it = signers.begin (),
-                     end = signers.end (); it != end; ++it) {
+                     it = verifiers.begin (),
+                     end = verifiers.end (); it != end; ++it) {
                 SharedPtr verifier = it->second (nullptr);
                 if (verifier->HasKeyType (publicKey->GetKeyType ())) {
                     verifier->Init (publicKey, messageDigest);
@@ -39,13 +46,6 @@ namespace thekogans {
             }
             return nullptr;
         }
-
-    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
-        void Verifier::StaticInit () {
-            OpenSSLVerifier::StaticInit ();
-            Ed25519Verifier::StaticInit ();
-        }
-    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
     } // namespace crypto
 } // namespace thekogans

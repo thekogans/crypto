@@ -25,6 +25,13 @@ namespace thekogans {
 
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Signer)
 
+    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
+        void Signer::StaticInit () {
+            OpenSSLSigner::StaticInit ();
+            Ed25519Signer::StaticInit ();
+        }
+    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
+
         Signer::SharedPtr Signer::CreateSigner (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
@@ -40,13 +47,6 @@ namespace thekogans {
             }
             return nullptr;
         }
-
-    #if defined (THEKOGANS_CRYPTO_TYPE_Static)
-        void Signer::StaticInit () {
-            OpenSSLSigner::StaticInit ();
-            Ed25519Signer::StaticInit ();
-        }
-    #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
         util::Buffer::SharedPtr Signer::Final () {
             util::Buffer::SharedPtr signature (
