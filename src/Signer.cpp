@@ -35,8 +35,8 @@ namespace thekogans {
         Signer::SharedPtr Signer::CreateSigner (
                 AsymmetricKey::SharedPtr privateKey,
                 MessageDigest::SharedPtr messageDigest) {
-            const TypeMap &signers = GetTypes ();
-            for (TypeMap::const_iterator
+            const TypeMapType &signers = GetTypes ();
+            for (TypeMapType::const_iterator
                      it = signers.begin (),
                      end = signers.end (); it != end; ++it) {
                 SharedPtr signer = it->second (nullptr);

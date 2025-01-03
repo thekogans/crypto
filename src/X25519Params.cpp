@@ -29,9 +29,9 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::X25519Params,
-            Params,
             1,
-            THEKOGANS_CRYPTO_MIN_X25519_PARAMS_IN_PAGE)
+            THEKOGANS_CRYPTO_MIN_X25519_PARAMS_IN_PAGE,
+            Params::TYPE)
 
         AsymmetricKey::SharedPtr X25519Params::CreateKey (
                 const ID &id,

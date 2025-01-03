@@ -28,9 +28,9 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::Ed25519AsymmetricKey,
-            AsymmetricKey,
             1,
-            THEKOGANS_CRYPTO_MIN_ED25519_ASYMMETRIC_KEYS_IN_PAGE)
+            THEKOGANS_CRYPTO_MIN_ED25519_ASYMMETRIC_KEYS_IN_PAGE,
+            AsymmetricKey::TYPE)
 
         Ed25519AsymmetricKey::Ed25519AsymmetricKey (
                 const util::ui8 *key_,

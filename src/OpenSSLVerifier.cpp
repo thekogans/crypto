@@ -26,7 +26,7 @@ namespace thekogans {
 
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (
             thekogans::crypto::OpenSSLVerifier,
-            Verifier)
+            Verifier::TYPE)
 
         OpenSSLVerifier::OpenSSLVerifier (
                 AsymmetricKey::SharedPtr publicKey_,

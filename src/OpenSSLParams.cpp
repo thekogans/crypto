@@ -37,9 +37,9 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::OpenSSLParams,
-            Params,
             1,
-            THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE)
+            THEKOGANS_CRYPTO_MIN_OPENSSL_PARAMS_IN_PAGE,
+            Params::TYPE)
 
         OpenSSLParams::OpenSSLParams (
                 EVP_PKEYPtr params_,

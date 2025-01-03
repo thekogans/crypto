@@ -50,7 +50,7 @@ namespace thekogans {
             struct _LIB_THEKOGANS_CRYPTO_DECL RSAParams : public KeyExchange::Params {
                 /// \brief
                 /// RSAParams is a \see{util::Serializable}.
-                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (RSAParams)
+                THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (RSAParams)
 
                 /// \brief
                 /// Private/Public \see{RSA} \see{AsymmetricKey} id.

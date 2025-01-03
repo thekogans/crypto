@@ -77,7 +77,7 @@ namespace thekogans {
                     }
                 }
             };
-            typedef std::unique_ptr<const __CFArray, CFArrayRefDeleter> CFArrayRefPtr;
+            using CFArrayRefPtr = std::unique_ptr<const __CFArray, CFArrayRefDeleter>;
 
             struct CFDictionaryRefDeleter {
                 void operator () (CFDictionaryRef dictionaryRef) {
@@ -86,7 +86,7 @@ namespace thekogans {
                     }
                 }
             };
-            typedef std::unique_ptr<const __CFDictionary, CFDictionaryRefDeleter> CFDictionaryRefPtr;
+            using CFDictionaryRefPtr = std::unique_ptr<const __CFDictionary, CFDictionaryRefDeleter>;
 
             struct CFErrorRefDeleter {
                 void operator () (CFErrorRef errorRef) {
@@ -95,7 +95,7 @@ namespace thekogans {
                     }
                 }
             };
-            typedef std::unique_ptr<__CFError, CFErrorRefDeleter> CFErrorRefPtr;
+            using CFErrorRefPtr = std::unique_ptr<__CFError, CFErrorRefDeleter>;
 
             struct CFDataRefDeleter {
                 void operator () (CFDataRef dataRef) {
@@ -104,7 +104,7 @@ namespace thekogans {
                     }
                 }
             };
-            typedef std::unique_ptr<const __CFData, CFDataRefDeleter> CFDataRefPtr;
+            using CFDataRefPtr = std::unique_ptr<const __CFData, CFDataRefDeleter>;
 
             struct CFDateRefDeleter {
                 void operator () (CFDateRef dateRef) {
@@ -113,7 +113,7 @@ namespace thekogans {
                     }
                 }
             };
-            typedef std::unique_ptr<const __CFDate, CFDateRefDeleter> CFDateRefPtr;
+            using CFDateRefPtr = std::unique_ptr<const __CFDate, CFDateRefDeleter>;
 
             bool CheckDateRange (
                     CFNumberRef notBefore,

@@ -24,7 +24,7 @@ namespace thekogans {
 
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_SINGLETON (
             thekogans::crypto::OpenSSLAllocator,
-            util::Allocator)
+            util::Allocator::TYPE)
 
         void *OpenSSLAllocator::Alloc (std::size_t size) {
             return size > 0 ? OPENSSL_malloc (size) : 0;

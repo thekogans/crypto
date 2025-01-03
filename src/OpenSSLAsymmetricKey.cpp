@@ -37,9 +37,9 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::OpenSSLAsymmetricKey,
-            AsymmetricKey,
             1,
-            THEKOGANS_CRYPTO_MIN_OPENSSL_ASYMMETRIC_KEYS_IN_PAGE)
+            THEKOGANS_CRYPTO_MIN_OPENSSL_ASYMMETRIC_KEYS_IN_PAGE,
+            AsymmetricKey::TYPE)
 
         OpenSSLAsymmetricKey::OpenSSLAsymmetricKey (
                 EVP_PKEYPtr key_,

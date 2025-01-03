@@ -195,6 +195,7 @@ TEST (thekogans, SymmetricKey) {
         std::cout << (result ? "pass" : "fail") << std::endl;
         CHECK_EQUAL (result, true);
     }
+    util::DynamicCreatable::DumpBaseMap ();
 }
 
 TESTMAIN

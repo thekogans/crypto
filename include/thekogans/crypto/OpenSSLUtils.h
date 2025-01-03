@@ -63,7 +63,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<BN_CTX, BN_CTXDeleter>.
-        typedef std::unique_ptr<BN_CTX, BN_CTXDeleter> BN_CTXPtr;
+        using BN_CTXPtr = std::unique_ptr<BN_CTX, BN_CTXDeleter>;
 
         /// \struct BIGNUMDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -77,7 +77,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<BIGNUM, BIGNUMDeleter>.
-        typedef std::unique_ptr<BIGNUM, BIGNUMDeleter> BIGNUMPtr;
+        using BIGNUMPtr = std::unique_ptr<BIGNUM, BIGNUMDeleter>;
 
         /// \struct EVP_PKEY_CTXDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -91,7 +91,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<EVP_PKEY_CTX, EVP_PKEY_CTXDeleter>.
-        typedef std::unique_ptr<EVP_PKEY_CTX, EVP_PKEY_CTXDeleter> EVP_PKEY_CTXPtr;
+        using EVP_PKEY_CTXPtr = std::unique_ptr<EVP_PKEY_CTX, EVP_PKEY_CTXDeleter>;
 
         /// \struct EVP_PKEYDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -105,7 +105,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<EVP_PKEY, EVP_PKEYDeleter>.
-        typedef std::unique_ptr<EVP_PKEY, EVP_PKEYDeleter> EVP_PKEYPtr;
+        using EVP_PKEYPtr = std::unique_ptr<EVP_PKEY, EVP_PKEYDeleter>;
 
         /// \struct EC_GROUPDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -119,7 +119,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<EC_GROUP, EC_GROUPDeleter>.
-        typedef std::unique_ptr<EC_GROUP, EC_GROUPDeleter> EC_GROUPPtr;
+        using EC_GROUPPtr = std::unique_ptr<EC_GROUP, EC_GROUPDeleter>;
 
         /// \struct EC_POINTDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -133,7 +133,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<EC_POINT, EC_POINTDeleter>.
-        typedef std::unique_ptr<EC_POINT, EC_POINTDeleter> EC_POINTPtr;
+        using EC_POINTPtr = std::unique_ptr<EC_POINT, EC_POINTDeleter>;
 
         /// \struct EC_KEYDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -147,7 +147,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<EC_KEY, EC_KEYDeleter>.
-        typedef std::unique_ptr<EC_KEY, EC_KEYDeleter> EC_KEYPtr;
+        using EC_KEYPtr = std::unique_ptr<EC_KEY, EC_KEYDeleter>;
 
         /// \struct EVP_CIPHER_CTXDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -161,7 +161,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<EVP_CIPHER_CTX, EVP_CIPHER_CTXDeleter>.
-        typedef std::unique_ptr<EVP_CIPHER_CTX, EVP_CIPHER_CTXDeleter> EVP_CIPHER_CTXPtr;
+        using EVP_CIPHER_CTXPtr = std::unique_ptr<EVP_CIPHER_CTX, EVP_CIPHER_CTXDeleter> ;
 
         /// \struct EVP_MD_CTXDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -175,7 +175,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<EVP_MD_CTX, EVP_MD_CTXDeleter>.
-        typedef std::unique_ptr<EVP_MD_CTX, EVP_MD_CTXDeleter> EVP_MD_CTXPtr;
+        using EVP_MD_CTXPtr = std::unique_ptr<EVP_MD_CTX, EVP_MD_CTXDeleter>;
 
         /// \struct BIODeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -189,7 +189,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<BIO, BIODeleter>.
-        typedef std::unique_ptr<BIO, BIODeleter> BIOPtr;
+        using BIOPtr = std::unique_ptr<BIO, BIODeleter>;
 
         /// \struct X509_STOREDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -203,7 +203,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<X509_STORE, X509_STOREDeleter>.
-        typedef std::unique_ptr<X509_STORE, X509_STOREDeleter> X509_STOREPtr;
+        using X509_STOREPtr = std::unique_ptr<X509_STORE, X509_STOREDeleter>;
 
         /// \struct X509_CRLDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -217,7 +217,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<X509_CRL, X509_CRLDeleter>.
-        typedef std::unique_ptr<X509_CRL, X509_CRLDeleter> X509_CRLPtr;
+        using X509_CRLPtr = std::unique_ptr<X509_CRL, X509_CRLDeleter>;
 
         /// \struct X509Deleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -231,7 +231,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<X509, X509Deleter>.
-        typedef std::unique_ptr<X509, X509Deleter> X509Ptr;
+        using X509Ptr = std::unique_ptr<X509, X509Deleter>;
 
         /// \struct DHDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -245,7 +245,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<DH, DHDeleter>.
-        typedef std::unique_ptr<DH, DHDeleter> DHPtr;
+        using DHPtr = std::unique_ptr<DH, DHDeleter>;
 
         /// \struct DSADeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -259,7 +259,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<DSA, DSADeleter>.
-        typedef std::unique_ptr<DSA, DSADeleter> DSAPtr;
+        using DSAPtr = std::unique_ptr<DSA, DSADeleter>;
 
         /// \struct RSADeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -273,7 +273,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<RSA, RSADeleter>.
-        typedef std::unique_ptr<RSA, RSADeleter> RSAPtr;
+        using RSAPtr = std::unique_ptr<RSA, RSADeleter>;
 
         /// \struct SSL_CTXDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -287,7 +287,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<SSL_CTX, SSL_CTXDeleter>.
-        typedef std::unique_ptr<SSL_CTX, SSL_CTXDeleter> SSL_CTXPtr;
+        using SSL_CTXPtr = std::unique_ptr<SSL_CTX, SSL_CTXDeleter>;
 
         /// \struct SSLDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -301,7 +301,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<SSL, SSLDeleter>.
-        typedef std::unique_ptr<SSL, SSLDeleter> SSLPtr;
+        using SSLPtr = std::unique_ptr<SSL, SSLDeleter>;
 
         /// \struct SSL_SESSIONDeleter OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
@@ -315,7 +315,7 @@ namespace thekogans {
         };
         /// \brief
         /// Convenient typedef for std::unique_ptr<SSL_SESSION, SSL_SESSIONDeleter>.
-        typedef std::unique_ptr<SSL_SESSION, SSL_SESSIONDeleter> SSL_SESSIONPtr;
+        using SSL_SESSIONPtr = std::unique_ptr<SSL_SESSION, SSL_SESSIONDeleter>;
 
     #if OPENSSL_VERSION_NUMBER < 0x10100000L
         /// \struct CipherContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h

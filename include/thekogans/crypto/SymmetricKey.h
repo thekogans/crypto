@@ -19,6 +19,7 @@
 #define __thekogans_crypto_SymmetricKey_h
 
 #include <cstddef>
+#include <functional>
 #include <string>
 #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
     #include <argon2.h>
@@ -46,7 +47,7 @@ namespace thekogans {
 
             /// \brief
             /// Convenient typedef for util::FixedBuffer<EVP_MAX_KEY_LENGTH>.
-            typedef util::FixedBuffer<EVP_MAX_KEY_LENGTH> KeyType;
+            using KeyType = util::FixedBuffer<EVP_MAX_KEY_LENGTH>;
 
         private:
             /// \brief
@@ -84,7 +85,7 @@ namespace thekogans {
         #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
             /// \brief
             /// Convenient typedef int (*) (argon2_context *context).
-            typedef int (*argon2_ctx_fptr) (argon2_context *context);
+            using argon2_ctx_fptr = std::function<int (argon2_context *context)>;
 
             /// \brief
             /// Use Argon2 password-hashing function to derive a key.

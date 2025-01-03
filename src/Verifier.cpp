@@ -34,8 +34,8 @@ namespace thekogans {
         Verifier::SharedPtr Verifier::CreateVerifier (
                 AsymmetricKey::SharedPtr publicKey,
                 MessageDigest::SharedPtr messageDigest) {
-            const TypeMap &verifiers = GetTypes ();
-            for (TypeMap::const_iterator
+            const TypeMapType &verifiers = GetTypes ();
+            for (TypeMapType::const_iterator
                      it = verifiers.begin (),
                      end = verifiers.end (); it != end; ++it) {
                 SharedPtr verifier = it->second (nullptr);

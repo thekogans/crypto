@@ -26,7 +26,7 @@ namespace thekogans {
 
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (
             thekogans::crypto::OpenSSLSigner,
-            Signer)
+            Signer::TYPE)
 
         OpenSSLSigner::OpenSSLSigner (
                 AsymmetricKey::SharedPtr privateKey_,

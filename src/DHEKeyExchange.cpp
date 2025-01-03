@@ -30,10 +30,15 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (
+        #if !defined (THEKOGANS_CRYPTO_MIN_DHE_KEY_EXCHANGE_PARAMS_IN_PAGE)
+            #define THEKOGANS_CRYPTO_MIN_DHE_KEY_EXCHANGE_PARAMS_IN_PAGE 16
+        #endif // !defined (THEKOGANS_CRYPTO_MIN_DHE_KEY_EXCHANGE_PARAMS_IN_PAGE)
+
+        THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::DHEKeyExchange::DHEParams,
-            KeyExchange::Params,
-            1)
+            1,
+            THEKOGANS_CRYPTO_MIN_DHE_KEY_EXCHANGE_PARAMS_IN_PAGE,
+            KeyExchange::Params::TYPE)
 
         void DHEKeyExchange::DHEParams::CreateSignature (
                 AsymmetricKey::SharedPtr privateKey,

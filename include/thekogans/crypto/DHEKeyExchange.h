@@ -54,7 +54,7 @@ namespace thekogans {
             struct _LIB_THEKOGANS_CRYPTO_DECL DHEParams : public KeyExchange::Params {
                 /// \brief
                 /// DHEParams is a \see{util::Serializable}.
-                THEKOGANS_UTIL_DECLARE_SERIALIZABLE (DHEParams)
+                THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (DHEParams)
 
                 /// \brief
                 /// \see{EC} or \see{DH} key exchange params.

@@ -24,7 +24,7 @@ namespace thekogans {
 
         THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE (
             thekogans::crypto::Ed25519Verifier,
-            Verifier)
+            Verifier::TYPE)
 
         Ed25519Verifier::Ed25519Verifier (
                 AsymmetricKey::SharedPtr publicKey_,

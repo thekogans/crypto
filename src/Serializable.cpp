@@ -19,10 +19,10 @@
 #include "thekogans/util/LockGuard.h"
 #if defined (THEKOGANS_CRYPTO_TYPE_Static)
     #include "thekogans/crypto/KeyRing.h"
-    #include "thekogans/crypto/Params.h"
     #include "thekogans/crypto/SymmetricKey.h"
-    #include "thekogans/crypto/AsymmetricKey.h"
+    #include "thekogans/crypto/Params.h"
     #include "thekogans/crypto/KeyExchange.h"
+    #include "thekogans/crypto/AsymmetricKey.h"
 #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 #include "thekogans/crypto/Serializable.h"
 
@@ -34,10 +34,10 @@ namespace thekogans {
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Serializable::StaticInit () {
             KeyRing::StaticInit ();
-            Params::StaticInit ();
             SymmetricKey::StaticInit ();
-            AsymmetricKey::StaticInit ();
+            Params::StaticInit ();
             KeyExchange::Params::StaticInit ();
+            AsymmetricKey::StaticInit ();
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 

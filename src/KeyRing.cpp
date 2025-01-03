@@ -36,7 +36,6 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::KeyRing,
-            Serializable,
             1,
             THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
@@ -436,7 +435,7 @@ namespace thekogans {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Incorrect key exchange parameters type: %s, "
                             "expected RSAKeyExchange::RSAParams.",
-                            params->Type ().c_str ());
+                            params->Type ());
                     }
                 }
                 else {

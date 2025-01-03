@@ -45,7 +45,6 @@ namespace thekogans {
 
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::SymmetricKey,
-            Serializable,
             1,
             THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
 
@@ -67,7 +66,8 @@ namespace thekogans {
                 context.out = out;
                 context.outlen = outlen;
                 if (errorCode == ARGON2_OK) {
-                    return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                    return SharedPtr (
+                        new SymmetricKey (key.data (), key.size (), id, name, description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_ARGON2_ERROR_CODE_EXCEPTION (errorCode);
