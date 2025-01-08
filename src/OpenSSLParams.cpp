@@ -259,7 +259,7 @@ namespace thekogans {
             }
             return
                 Params::Size () +
-                util::Serializer::Size (std::string (paramsType)) + // paramsType
+                util::Serializer::Size (paramsType) + // paramsType
                 // * 2 is because they get hex encoded.
                 util::SizeT (paramsLength * 2).Size () + // paramsLength
                 paramsLength * 2;
@@ -416,7 +416,7 @@ namespace thekogans {
 
         void OpenSSLParams::Write (util::Serializer &serializer) const {
             Params::Write (serializer);
-            serializer << std::string (GetKeyType ()) << WriteParams (*params);
+            serializer << GetKeyType () << WriteParams (*params);
         }
 
         const char * const OpenSSLParams::ATTR_PARAMS_TYPE = "ParamsType";
