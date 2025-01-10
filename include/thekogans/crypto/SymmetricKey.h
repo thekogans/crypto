@@ -46,7 +46,7 @@ namespace thekogans {
             THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (SymmetricKey)
 
             /// \brief
-            /// Convenient typedef for util::FixedBuffer<EVP_MAX_KEY_LENGTH>.
+            /// Alias for util::FixedBuffer<EVP_MAX_KEY_LENGTH>.
             using KeyType = util::FixedBuffer<EVP_MAX_KEY_LENGTH>;
 
         private:
@@ -84,7 +84,7 @@ namespace thekogans {
 
         #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
             /// \brief
-            /// Convenient typedef int (*) (argon2_context *context).
+            /// Alias for int (*) (argon2_context *context).
             using argon2_ctx_fptr = std::function<int (argon2_context *context)>;
 
             /// \brief

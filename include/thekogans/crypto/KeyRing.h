@@ -65,19 +65,19 @@ namespace thekogans {
             /// \see{CipherSuite} associated with this key ring.
             CipherSuite cipherSuite;
             /// \brief
-            /// Convenient typedef for std::map<ID, Params::SharedPtr>.
+            /// Alias for std::map<ID, Params::SharedPtr>.
             using ParamsMap = std::map<ID, Params::SharedPtr>;
             /// \brief
             /// \see{KeyExchange} \see{Params} map.
             ParamsMap keyExchangeParamsMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, AsymmetricKeyMap::SharedPtr>.
+            /// Alias for std::map<ID, AsymmetricKeyMap::SharedPtr>.
             using AsymmetricKeyMap = std::map<ID, AsymmetricKey::SharedPtr>;
             /// \brief
             /// \see{KeyExchange} \see{AsymmetricKey} map.
             AsymmetricKeyMap keyExchangeKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, KeyExchange::SharedPtr>.
+            /// Alias for std::map<ID, KeyExchange::SharedPtr>.
             using KeyExchangeMap = std::map<ID, KeyExchange::SharedPtr>;
             /// \brief
             /// \see{KeyExchange} map.
@@ -89,19 +89,19 @@ namespace thekogans {
             /// \see{Authenticator} \see{AsymmetricKey} map.
             AsymmetricKeyMap authenticatorKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Authenticator::SharedPtr>.
+            /// Alias for std::map<ID, Authenticator::SharedPtr>.
             using AuthenticatorMap = std::map<ID, Authenticator::SharedPtr>;
             /// \brief
             /// \see{Authenticator} map.
             AuthenticatorMap authenticatorMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, SymmetricKey::SharedPtr>.
+            /// Alias for std::map<ID, SymmetricKey::SharedPtr>.
             using SymmetricKeyMap = std::map<ID, SymmetricKey::SharedPtr>;
             /// \brief
             /// \see{Cipher} \see{SymmetricKey} map.
             SymmetricKeyMap cipherKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Cipher::SharedPtr>.
+            /// Alias for std::map<ID, Cipher::SharedPtr>.
             using CipherMap = std::map<ID, Cipher::SharedPtr>;
             /// \brief
             /// \see{Cipher} map.
@@ -110,19 +110,19 @@ namespace thekogans {
             /// \see{MAC} \see{SymmetricKeyMap} map.
             SymmetricKeyMap macKeyMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, MAC::SharedPtr>.
+            /// Alias for std::map<ID, MAC::SharedPtr>.
             using MACMap = std::map<ID, MAC::SharedPtr>;
             /// \brief
             /// \see{MAC} map.
             MACMap macMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, Serializable::SharedPtr>.
+            /// Alias for std::map<ID, Serializable::SharedPtr>.
             using SerializableMap = std::map<ID, Serializable::SharedPtr>;
             /// \brief
             /// \see{Serializable} map.
             SerializableMap userDataMap;
             /// \brief
-            /// Convenient typedef for std::map<ID, SharedPtr>.
+            /// Alias for std::map<ID, SharedPtr>.
             using KeyRingMap = std::map<ID, SharedPtr>;
             /// \brief
             /// Subrings hanging off this key ring.
