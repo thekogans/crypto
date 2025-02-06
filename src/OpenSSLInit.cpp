@@ -56,9 +56,9 @@ namespace thekogans {
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void StaticInit () {
+            util::StaticInit ();
             SymmetricKey::KeyType::StaticInit ();
             X25519AsymmetricKey::KeyType::StaticInit ();
-            util::StaticInit ();
             OpenSSLAllocator::StaticInit ();
             Serializable::StaticInit ();
             Signer::StaticInit ();
