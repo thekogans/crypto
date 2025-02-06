@@ -39,10 +39,14 @@ namespace thekogans {
             /// X25519AsymmetricKey is a \see{Serializable}.
             THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (X25519AsymmetricKey)
 
+            /// \brief
+            /// Alias for util::FixedBuffer<X25519::KEY_LENGTH>.
+            using KeyType = util::FixedBuffer<X25519::KEY_LENGTH>;
+
         private:
             /// \brief
             /// Private/Public \see{X25519} key.
-            util::FixedBuffer<X25519::KEY_LENGTH> key;
+            KeyType key;
 
             /// \brief
             /// \see{DHEKeyExchange} needs access to key.
@@ -97,7 +101,7 @@ namespace thekogans {
             /// \brief
             /// Return the serialized key size.
             /// \return Serialized key size.
-            virtual std::size_t Size () const override;
+            virtual std::size_t Size () const noexcept override;
 
             /// \brief
             /// Read the key from the given serializer.

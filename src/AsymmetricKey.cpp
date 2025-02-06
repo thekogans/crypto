@@ -36,7 +36,7 @@ namespace thekogans {
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
-        std::size_t AsymmetricKey::Size () const {
+        std::size_t AsymmetricKey::Size () const noexcept {
             return
                 Serializable::Size () +
                 util::Serializer::Size (isPrivate);

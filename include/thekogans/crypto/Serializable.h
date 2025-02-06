@@ -114,7 +114,7 @@ namespace thekogans {
             /// \brief
             /// Return the serializable size (without the header).
             /// \return Serializable size.
-            virtual std::size_t Size () const override;
+            virtual std::size_t Size () const noexcept override;
 
             /// \brief
             /// Read the serializable from the given serializer.

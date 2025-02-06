@@ -35,7 +35,7 @@ namespace thekogans {
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
-        std::size_t Params::Size () const {
+        std::size_t Params::Size () const noexcept {
             return Serializable::Size ();
         }
 

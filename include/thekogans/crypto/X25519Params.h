@@ -73,7 +73,7 @@ namespace thekogans {
             /// \brief
             /// Return the serialized params size.
             /// \return Serialized params size.
-            virtual std::size_t Size () const override;
+            virtual std::size_t Size () const noexcept override;
 
             /// \brief
             /// Read the parameters from the given serializer.

@@ -259,7 +259,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t OpenSSLAsymmetricKey::Size () const {
+        std::size_t OpenSSLAsymmetricKey::Size () const noexcept {
             return
                 AsymmetricKey::Size () +
                 util::Serializer::Size (WriteKey (IsPrivate (), key.get ())); // key

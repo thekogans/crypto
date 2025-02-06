@@ -41,7 +41,7 @@ namespace thekogans {
         }
     #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
 
-        std::size_t Serializable::Size () const {
+        std::size_t Serializable::Size () const noexcept {
             return
                 util::Serializer::Size (id) +
                 util::Serializer::Size (name) +

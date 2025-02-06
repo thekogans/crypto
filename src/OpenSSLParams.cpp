@@ -218,7 +218,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t OpenSSLParams::Size () const {
+        std::size_t OpenSSLParams::Size () const noexcept {
             std::string paramsType = GetKeyType ();
             util::i32 paramsLength = 0;
             if (paramsType == OPENSSL_PKEY_DH) {

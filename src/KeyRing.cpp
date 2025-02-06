@@ -1199,7 +1199,7 @@ namespace thekogans {
             subringMap.clear ();
         }
 
-        std::size_t KeyRing::Size () const {
+        std::size_t KeyRing::Size () const noexcept {
             std::size_t size = Serializable::Size () + cipherSuite.Size ();
             size += util::SizeT (keyExchangeParamsMap.size ()).Size ();
             for (ParamsMap::const_iterator

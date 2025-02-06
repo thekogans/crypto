@@ -37,6 +37,14 @@
 #include "thekogans/crypto/SymmetricKey.h"
 
 namespace thekogans {
+    namespace util {
+
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_T (
+            thekogans::crypto::SymmetricKey::KeyType,
+            Serializer::TYPE)
+
+    }
+
     namespace crypto {
 
         #if !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
@@ -465,7 +473,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t SymmetricKey::Size () const {
+        std::size_t SymmetricKey::Size () const noexcept {
             return
                 Serializable::Size () +
                 util::SizeT (key.GetDataAvailableForReading ()).Size () +

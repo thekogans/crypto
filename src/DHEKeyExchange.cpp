@@ -127,7 +127,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t DHEKeyExchange::DHEParams::Size () const {
+        std::size_t DHEKeyExchange::DHEParams::Size () const noexcept {
             return
                 Params::Size () +
                 params->GetSize () +

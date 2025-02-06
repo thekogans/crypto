@@ -606,7 +606,7 @@ namespace thekogans {
             /// \brief
             /// Return the serialized key ring size.
             /// \return Serialized key ring size.
-            virtual std::size_t Size () const override;
+            virtual std::size_t Size () const noexcept override;
 
             /// \brief
             /// Read the key ring from the given serializer.

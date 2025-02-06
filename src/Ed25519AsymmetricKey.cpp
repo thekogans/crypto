@@ -69,7 +69,7 @@ namespace thekogans {
                     description));
         }
 
-        std::size_t Ed25519AsymmetricKey::Size () const {
+        std::size_t Ed25519AsymmetricKey::Size () const noexcept {
             return AsymmetricKey::Size () +
                 (IsPrivate () ? Ed25519::PRIVATE_KEY_LENGTH : Ed25519::PUBLIC_KEY_LENGTH);
         }

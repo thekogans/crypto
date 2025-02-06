@@ -94,7 +94,7 @@ namespace thekogans {
             }
         }
 
-        std::size_t RSAKeyExchange::RSAParams::Size () const {
+        std::size_t RSAKeyExchange::RSAParams::Size () const noexcept {
             return
                 Params::Size () +
                 util::Serializer::Size (keyId) +

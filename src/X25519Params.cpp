@@ -43,7 +43,7 @@ namespace thekogans {
                 new X25519AsymmetricKey (privateKey.data (), true, id, name, description));
         }
 
-        std::size_t X25519Params::Size () const {
+        std::size_t X25519Params::Size () const noexcept {
             return Params::Size ();
         }
 

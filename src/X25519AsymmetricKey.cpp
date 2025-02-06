@@ -18,6 +18,14 @@
 #include "thekogans/crypto/X25519AsymmetricKey.h"
 
 namespace thekogans {
+    namespace util {
+
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_T (
+            thekogans::crypto::X25519AsymmetricKey::KeyType,
+            Serializer::TYPE)
+
+    }
+
     namespace crypto {
 
         #if !defined (THEKOGANS_CRYPTO_MIN_X25519_ASYMMETRIC_KEYS_IN_PAGE)
@@ -64,7 +72,7 @@ namespace thekogans {
                     description));
         }
 
-        std::size_t X25519AsymmetricKey::Size () const {
+        std::size_t X25519AsymmetricKey::Size () const noexcept {
             return AsymmetricKey::Size () + X25519::KEY_LENGTH;
         }
 
