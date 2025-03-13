@@ -349,7 +349,7 @@ namespace thekogans {
                         type != OPENSSL_PKEY_HMAC &&
                         type != OPENSSL_PKEY_CMAC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid key type %s.", type);
+                        "Invalid key type %s.", type.c_str ());
                 }
             }
         }

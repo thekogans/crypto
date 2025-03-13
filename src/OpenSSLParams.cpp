@@ -54,7 +54,7 @@ namespace thekogans {
                         paramsType != OPENSSL_PKEY_DSA &&
                         paramsType != OPENSSL_PKEY_EC) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Invalid parameters type %s.", paramsType);
+                        "Invalid parameters type %s.", paramsType.c_str ());
                 }
             }
         }

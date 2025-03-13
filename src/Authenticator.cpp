@@ -37,7 +37,7 @@ namespace thekogans {
                     if (signer == nullptr) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Signer for key: %s and digest: %s.",
-                            key->GetKeyType (),
+                            key->GetKeyType ().c_str (),
                             messageDigest->GetName ().c_str ());
                     }
                 }
@@ -46,7 +46,7 @@ namespace thekogans {
                     if (verifier == nullptr) {
                         THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                             "Unable to get a Verifier for key: %s and digest: %s.",
-                            key->GetKeyType (),
+                            key->GetKeyType ().c_str (),
                             messageDigest->GetName ().c_str ());
                     }
                 }
