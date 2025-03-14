@@ -22,7 +22,7 @@ namespace thekogans {
     namespace crypto {
 
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_SINGLETON (
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_S (
             thekogans::crypto::OpenSSLAllocator,
             util::Allocator::TYPE)
 

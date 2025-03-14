@@ -218,6 +218,10 @@ namespace thekogans {
             }
         }
 
+        // NOTE: At some point I must have thought it was a good idea
+        // to declare Serializable::Size noexcept. Unfortunatelly I
+        // now face the delema of ignoring exceptional conditions.
+        // This needs to be investigated more to see if its a problem.
         std::size_t OpenSSLParams::Size () const noexcept {
             std::string paramsType = GetKeyType ();
             util::i32 paramsLength = 0;
@@ -226,36 +230,39 @@ namespace thekogans {
                 if (dhParams != nullptr) {
                     paramsLength = i2d_DHparams (dhParams.get (), 0);
                     if (paramsLength <= 0) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        //THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        paramsLength = 0;
                     }
                 }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                // else {
+                //     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                // }
             }
             else if (paramsType == OPENSSL_PKEY_DSA) {
                 DSAPtr dsaParams (EVP_PKEY_get1_DSA (params.get ()));
                 if (dsaParams != nullptr) {
                     paramsLength = i2d_DSAparams (dsaParams.get (), 0);
                     if (paramsLength <= 0) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        //THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        paramsLength = 0;
                     }
                 }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                // else {
+                //     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                // }
             }
             else if (paramsType == OPENSSL_PKEY_EC) {
                 EC_KEYPtr ecParams (EVP_PKEY_get1_EC_KEY (params.get ()));
                 if (ecParams != nullptr) {
                     paramsLength = i2d_ECParameters (ecParams.get (), 0);
                     if (paramsLength <= 0) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        //THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                        paramsLength = 0;
                     }
                 }
-                else {
-                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                }
+                // else {
+                //     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
+                // }
             }
             return
                 Params::Size () +
