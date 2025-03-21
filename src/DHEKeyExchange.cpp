@@ -142,7 +142,7 @@ namespace thekogans {
         }
 
         void DHEKeyExchange::DHEParams::Read (
-                const BinHeader &header,
+                const Header &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
             serializer >>
@@ -184,7 +184,7 @@ namespace thekogans {
         }
 
         void DHEKeyExchange::DHEParams::Read (
-                const TextHeader &header,
+                const Header &header,
                 const pugi::xml_node &node) {
             Params::Read (header, node);
             salt = util::HexDecodestring (node.attribute (ATTR_SALT).value ());
@@ -223,7 +223,7 @@ namespace thekogans {
         }
 
         void DHEKeyExchange::DHEParams::Read (
-                const TextHeader &header,
+                const Header &header,
                 const util::JSON::Object &object) {
             Params::Read (header, object);
             salt = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_SALT)->value);

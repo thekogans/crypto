@@ -97,10 +97,10 @@ namespace thekogans {
                 virtual std::size_t Size () const noexcept override;
 
                 /// Read the serializable from the given serializer.
-                /// \param[in] header \see{util::Serializable::BinHeader}.
+                /// \param[in] header \see{util::Serializable::Header}.
                 /// \param[in] serializer \see{util::Serializer} to read the serializable from.
                 virtual void Read (
-                    const BinHeader &header,
+                    const Header &header,
                     util::Serializer &serializer) override;
                 /// \brief
                 /// Write the serializable to the given serializer.
@@ -109,10 +109,10 @@ namespace thekogans {
 
                 /// \brief
                 /// Read the Serializable from an XML DOM.
-                /// \param[in] header \see{util::Serializable::TextHeader}.
+                /// \param[in] header \see{util::Serializable::Header}.
                 /// \param[in] node XML DOM representation of a Serializable.
                 virtual void Read (
-                    const TextHeader &header,
+                    const Header &header,
                     const pugi::xml_node &node) override;
                 /// \brief
                 /// Write the Serializable to the XML DOM.
@@ -123,7 +123,7 @@ namespace thekogans {
                 /// Read a Serializable from an JSON DOM.
                 /// \param[in] node JSON DOM representation of a Serializable.
                 virtual void Read (
-                    const TextHeader &header,
+                    const Header &header,
                     const util::JSON::Object &object) override;
                 /// \brief
                 /// Write a Serializable to the JSON DOM.

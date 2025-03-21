@@ -77,7 +77,7 @@ namespace thekogans {
         }
 
         void X25519AsymmetricKey::Read (
-                const BinHeader &header,
+                const Header &header,
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
             key.Rewind ();
@@ -103,7 +103,7 @@ namespace thekogans {
         const char * const X25519AsymmetricKey::ATTR_KEY = "Key";
 
         void X25519AsymmetricKey::Read (
-                const TextHeader &header,
+                const Header &header,
                 const pugi::xml_node &node) {
             AsymmetricKey::Read (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
@@ -136,7 +136,7 @@ namespace thekogans {
         }
 
         void X25519AsymmetricKey::Read (
-                const TextHeader &header,
+                const Header &header,
                 const util::JSON::Object &object) {
             AsymmetricKey::Read (header, object);
             util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();

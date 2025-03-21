@@ -346,7 +346,7 @@ namespace thekogans {
         }
 
         void OpenSSLParams::Read (
-                const BinHeader &header,
+                const Header &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
             std::string paramsType;
@@ -430,7 +430,7 @@ namespace thekogans {
         const char * const OpenSSLParams::ATTR_PARAMS = "Params";
 
         void OpenSSLParams::Read (
-                const TextHeader &header,
+                const Header &header,
                 const pugi::xml_node &node) {
             Params::Read (header, node);
             params = ReadParams (
@@ -445,7 +445,7 @@ namespace thekogans {
         }
 
         void OpenSSLParams::Read (
-                const TextHeader &header,
+                const Header &header,
                 const util::JSON::Object &object) {
             Params::Read (header, object);
             params = ReadParams (

@@ -481,7 +481,7 @@ namespace thekogans {
         }
 
         void SymmetricKey::Read (
-                const BinHeader &header,
+                const Header &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             util::SizeT length;
@@ -518,7 +518,7 @@ namespace thekogans {
         const char * const SymmetricKey::ATTR_KEY = "Key";
 
         void SymmetricKey::Read (
-                const TextHeader &header,
+                const Header &header,
                 const pugi::xml_node &node) {
             Serializable::Read (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
@@ -526,7 +526,10 @@ namespace thekogans {
             if (length > 0 && length <= key.GetLength ()) {
                 key.Rewind ();
                 if (key.AdvanceWriteOffset (
-                        util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key.GetWritePtr ())) == length) {
+                        util::HexDecodeBuffer (
+                            hexKey.data (),
+                            hexKey.size (),
+                            key.GetWritePtr ())) == length) {
                     memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
                 }
                 else {
@@ -549,7 +552,7 @@ namespace thekogans {
         }
 
         void SymmetricKey::Read (
-                const TextHeader &header,
+                const Header &header,
                 const util::JSON::Object &object) {
             Serializable::Read (header, object);
             util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();

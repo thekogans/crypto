@@ -43,7 +43,7 @@ namespace thekogans {
         }
 
         void AsymmetricKey::Read (
-                const BinHeader &header,
+                const Header &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             serializer >> isPrivate;
@@ -57,7 +57,7 @@ namespace thekogans {
         const char * const AsymmetricKey::ATTR_PRIVATE = "Private";
 
         void AsymmetricKey::Read (
-                const TextHeader &header,
+                const Header &header,
                 const pugi::xml_node &node) {
             Serializable::Read (header, node);
             isPrivate = util::stringTobool (node.attribute (ATTR_PRIVATE).value ());
@@ -70,7 +70,7 @@ namespace thekogans {
         }
 
         void AsymmetricKey::Read (
-                const TextHeader &header,
+                const Header &header,
                 const util::JSON::Object &object) {
             Serializable::Read (header, object);
             isPrivate = object.Get<util::JSON::Bool> (ATTR_PRIVATE)->value;

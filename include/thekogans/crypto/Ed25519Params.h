@@ -74,10 +74,10 @@ namespace thekogans {
 
             /// \brief
             /// Read the parameters from the given serializer.
-            /// \param[in] header \see{util::Serializable::BinHeader}.
+            /// \param[in] header \see{util::Serializable::Header}.
             /// \param[in] serializer \see{util::Serializer} to read the parameters from.
             virtual void Read (
-                const BinHeader &header,
+                const Header &header,
                 util::Serializer &serializer) override;
             /// \brief
             /// Write the parameters to the given serializer.
@@ -86,10 +86,10 @@ namespace thekogans {
 
             /// \brief
             /// Read a Serializable from an XML DOM.
-            /// \param[in] header \see{util::Serializable::TextHeader}.
+            /// \param[in] header \see{util::Serializable::Header}.
             /// \param[in] node XML DOM representation of a Serializable.
             virtual void Read (
-                const TextHeader &header,
+                const Header &header,
                 const pugi::xml_node &node) override;
             /// \brief
             /// Write a Serializable to the XML DOM.
@@ -100,7 +100,7 @@ namespace thekogans {
             /// Read a Serializable from an JSON DOM.
             /// \param[in] node JSON DOM representation of a Serializable.
             virtual void Read (
-                const TextHeader &header,
+                const Header &header,
                 const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.

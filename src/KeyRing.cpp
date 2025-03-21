@@ -1253,7 +1253,7 @@ namespace thekogans {
         }
 
         void KeyRing::Read (
-                const BinHeader &header,
+                const Header &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             serializer >> cipherSuite;
@@ -1452,7 +1452,7 @@ namespace thekogans {
         const char * const KeyRing::TAG_SUB_RING = "SubRing";
 
         void KeyRing::Read (
-                const TextHeader &header,
+                const Header &header,
                 const pugi::xml_node &node) {
             Serializable::Read (header, node);
             cipherSuite = node.attribute (ATTR_CIPHER_SUITE).value ();
@@ -1704,7 +1704,7 @@ namespace thekogans {
         }
 
         void KeyRing::Read (
-                const TextHeader &header,
+                const Header &header,
                 const util::JSON::Object &object) {
             Serializable::Read (header, object);
             cipherSuite = object.Get<util::JSON::String> (ATTR_CIPHER_SUITE)->value;
