@@ -20,8 +20,9 @@
 
 #include <cstddef>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "thekogans/util/Types.h"
+#include "thekogans/util/Hash.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/ID.h"
 #include "thekogans/crypto/Serializable.h"
@@ -65,20 +66,20 @@ namespace thekogans {
             /// \see{CipherSuite} associated with this key ring.
             CipherSuite cipherSuite;
             /// \brief
-            /// Alias for std::map<ID, Params::SharedPtr>.
-            using ParamsMap = std::map<ID, Params::SharedPtr>;
+            /// Alias for std::unordered_map<ID, Params::SharedPtr>.
+            using ParamsMap = std::unordered_map<ID, Params::SharedPtr>;
             /// \brief
             /// \see{KeyExchange} \see{Params} map.
             ParamsMap keyExchangeParamsMap;
             /// \brief
-            /// Alias for std::map<ID, AsymmetricKeyMap::SharedPtr>.
-            using AsymmetricKeyMap = std::map<ID, AsymmetricKey::SharedPtr>;
+            /// Alias for std::unordered_map<ID, AsymmetricKeyMap::SharedPtr>.
+            using AsymmetricKeyMap = std::unordered_map<ID, AsymmetricKey::SharedPtr>;
             /// \brief
             /// \see{KeyExchange} \see{AsymmetricKey} map.
             AsymmetricKeyMap keyExchangeKeyMap;
             /// \brief
-            /// Alias for std::map<ID, KeyExchange::SharedPtr>.
-            using KeyExchangeMap = std::map<ID, KeyExchange::SharedPtr>;
+            /// Alias for std::unordered_map<ID, KeyExchange::SharedPtr>.
+            using KeyExchangeMap = std::unordered_map<ID, KeyExchange::SharedPtr>;
             /// \brief
             /// \see{KeyExchange} map.
             KeyExchangeMap keyExchangeMap;
@@ -89,20 +90,20 @@ namespace thekogans {
             /// \see{Authenticator} \see{AsymmetricKey} map.
             AsymmetricKeyMap authenticatorKeyMap;
             /// \brief
-            /// Alias for std::map<ID, Authenticator::SharedPtr>.
-            using AuthenticatorMap = std::map<ID, Authenticator::SharedPtr>;
+            /// Alias for std::unordered_map<ID, Authenticator::SharedPtr>.
+            using AuthenticatorMap = std::unordered_map<ID, Authenticator::SharedPtr>;
             /// \brief
             /// \see{Authenticator} map.
             AuthenticatorMap authenticatorMap;
             /// \brief
-            /// Alias for std::map<ID, SymmetricKey::SharedPtr>.
-            using SymmetricKeyMap = std::map<ID, SymmetricKey::SharedPtr>;
+            /// Alias for std::unordered_map<ID, SymmetricKey::SharedPtr>.
+            using SymmetricKeyMap = std::unordered_map<ID, SymmetricKey::SharedPtr>;
             /// \brief
             /// \see{Cipher} \see{SymmetricKey} map.
             SymmetricKeyMap cipherKeyMap;
             /// \brief
-            /// Alias for std::map<ID, Cipher::SharedPtr>.
-            using CipherMap = std::map<ID, Cipher::SharedPtr>;
+            /// Alias for std::unordered_map<ID, Cipher::SharedPtr>.
+            using CipherMap = std::unordered_map<ID, Cipher::SharedPtr>;
             /// \brief
             /// \see{Cipher} map.
             CipherMap cipherMap;
@@ -110,20 +111,20 @@ namespace thekogans {
             /// \see{MAC} \see{SymmetricKeyMap} map.
             SymmetricKeyMap macKeyMap;
             /// \brief
-            /// Alias for std::map<ID, MAC::SharedPtr>.
-            using MACMap = std::map<ID, MAC::SharedPtr>;
+            /// Alias for std::unordered_map<ID, MAC::SharedPtr>.
+            using MACMap = std::unordered_map<ID, MAC::SharedPtr>;
             /// \brief
             /// \see{MAC} map.
             MACMap macMap;
             /// \brief
-            /// Alias for std::map<ID, Serializable::SharedPtr>.
-            using SerializableMap = std::map<ID, Serializable::SharedPtr>;
+            /// Alias for std::unordered_map<ID, Serializable::SharedPtr>.
+            using SerializableMap = std::unordered_map<ID, Serializable::SharedPtr>;
             /// \brief
             /// \see{Serializable} map.
             SerializableMap userDataMap;
             /// \brief
-            /// Alias for std::map<ID, SharedPtr>.
-            using KeyRingMap = std::map<ID, SharedPtr>;
+            /// Alias for std::unordered_map<ID, SharedPtr>.
+            using KeyRingMap = std::unordered_map<ID, SharedPtr>;
             /// \brief
             /// Subrings hanging off this key ring.
             KeyRingMap subringMap;

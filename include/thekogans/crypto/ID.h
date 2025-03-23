@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <functional>
 #include <openssl/sha.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/Serializer.h"
@@ -157,5 +158,23 @@ namespace thekogans {
 
     } // namespace crypto
 } // namespace thekogans
+
+namespace std {
+
+    /// \struct hash<thekogans::crypto::ID> ID.h thekogans/crypto/ID.h
+    ///
+    /// \brief
+    /// Implementation of std::hash for thekogans::crypto::ID.
+
+    template <>
+    struct hash<thekogans::crypto::ID> {
+        size_t operator () (const thekogans::crypto::ID &id) const {
+            return thekogans::util::HashBuffer32 (
+                (const thekogans::util::ui32 *)id.data,
+                thekogans::crypto::ID::SIZE >> 2);
+        }
+    };
+
+} // namespace std
 
 #endif // !defined (__thekogans_crypto_ID_h)
