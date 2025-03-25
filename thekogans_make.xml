@@ -39,6 +39,10 @@
   <c_headers prefix = "include">
     <c_header>$(organization)/$(project_directory)/fastpbkdf2.h</c_header>
   </c_headers>
+  <c_headers prefix = "include/3rdparty/private"
+             install = "no">
+    <c_header>crypt_blowfish/crypt_blowfish.h</c_header>
+  </c_headers>
   <cpp_headers prefix = "include"
                install = "yes">
     <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_ARGON2)">
@@ -93,9 +97,13 @@
     <cpp_header>$(organization)/$(project_directory)/Version.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/X25519AsymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/X25519Params.h</cpp_header>
+    <cpp_header>$(organization)/$(project_directory)/bcrypt.h</cpp_header>
   </cpp_headers>
   <c_sources prefix = "src">
     <c_source>fastpbkdf2.c</c_source>
+  </c_sources>
+  <c_sources prefix = "src/3rdparty">
+    <c_source>crypt_blowfish/crypt_blowfish.c</c_source>
   </c_sources>
   <cpp_sources prefix = "src">
     <cpp_source>AsymmetricKey.cpp</cpp_source>
@@ -145,6 +153,7 @@
     <cpp_source>Version.cpp</cpp_source>
     <cpp_source>X25519AsymmetricKey.cpp</cpp_source>
     <cpp_source>X25519Params.cpp</cpp_source>
+    <cpp_source>bcrypt.cpp</cpp_source>
   </cpp_sources>
   <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_TESTS)">
     <cpp_tests prefix = "tests">

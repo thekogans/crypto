@@ -805,11 +805,11 @@ namespace thekogans {
                 const util::ui8 *ptr1 = (const util::ui8 *)buffer1;
                 const util::ui8 *ptr2 = (const util::ui8 *)buffer2;
                 // Prime the return value.
-                bool equal = (*ptr1++ ^ *ptr2++) == 0;
+                util::ui64 result = *ptr1++ ^ *ptr2++;
                 --length;
                 // Process 64 bit chunks.
                 while (length >= util::UI64_SIZE) {
-                    equal &= (*(const util::ui64 *)ptr1 ^ *(const util::ui64 *)ptr2) == 0;
+                    result |= *(const util::ui64 *)ptr1 ^ *(const util::ui64 *)ptr2;
                     ptr1 += util::UI64_SIZE;
                     ptr2 += util::UI64_SIZE;
                     length -= util::UI64_SIZE;
@@ -818,25 +818,25 @@ namespace thekogans {
                 // at most 7 bytes are left untested.
                 // Process the last util::ui32.
                 if ((length & util::UI32_SIZE) != 0) {
-                    equal &= (*(const util::ui32 *)ptr1 ^ *(const util::ui32 *)ptr2) == 0;
+                    result |= *(const util::ui32 *)ptr1 ^ *(const util::ui32 *)ptr2;
                     ptr1 += util::UI32_SIZE;
                     ptr2 += util::UI32_SIZE;
                     length -= util::UI32_SIZE;
                 }
                 // Process the last util::ui16.
                 if ((length & util::UI16_SIZE) != 0) {
-                    equal &= (*(const util::ui16 *)ptr1 ^ *(const util::ui16 *)ptr2) == 0;
+                    result |= *(const util::ui16 *)ptr1 ^ *(const util::ui16 *)ptr2;
                     ptr1 += util::UI16_SIZE;
                     ptr2 += util::UI16_SIZE;
                     length -= util::UI16_SIZE;
                 }
                 // Process the last util::ui8.
                 if ((length & util::UI8_SIZE) != 0) {
-                    equal &= (*ptr1 ^ *ptr2) == 0;
+                    result |= *ptr1 ^ *ptr2;
                     // No need to increment ptr1 and ptr2 and
                     // decrement length here. We're done.
                 }
-                return equal;
+                return result == 0;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

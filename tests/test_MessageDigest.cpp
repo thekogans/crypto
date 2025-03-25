@@ -58,7 +58,7 @@ namespace {
                 }
                 util::Buffer::SharedPtr buffer1 = messageDigest.HashFile (path);
                 util::Buffer::SharedPtr buffer2 = messageDigest.HashFile (path);
-                unlink (path.c_str ());
+                util::File::Delete (path.c_str ());
                 result = buffer1->GetDataAvailableForReading () ==
                     buffer2->GetDataAvailableForReading () &&
                     memcmp (
