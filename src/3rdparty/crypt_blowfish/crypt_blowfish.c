@@ -53,10 +53,7 @@
 /* Just to make sure the prototypes match the actual definitions */
 #include "crypt_blowfish/crypt_blowfish.h"
 
-#ifdef __i386__
-#define BF_ASM				1
-#define BF_SCALE			1
-#elif defined(__x86_64__) || defined(__alpha__) || defined(__hppa__)
+#if defined (__i386__) || defined(__x86_64__) || defined(__alpha__) || defined(__hppa__)
 #define BF_ASM				0
 #define BF_SCALE			1
 #else
@@ -81,7 +78,7 @@ typedef struct {
  * Magic IV for 64 Blowfish encryptions that we do at the end.
  * The string is "OrpheanBeholderScryDoubt" on big-endian.
  */
-static BF_word BF_magic_w[6] = {
+static const BF_word BF_magic_w[6] = {
 	0x4F727068, 0x65616E42, 0x65686F6C,
 	0x64657253, 0x63727944, 0x6F756274
 };
@@ -89,7 +86,7 @@ static BF_word BF_magic_w[6] = {
 /*
  * P-box and S-box tables initialized with digits of Pi.
  */
-static BF_ctx BF_init_state = {
+static const BF_ctx BF_init_state = {
 	{
 		{
 			0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7,
@@ -361,10 +358,10 @@ static BF_ctx BF_init_state = {
 	}
 };
 
-static unsigned char BF_itoa64[64 + 1] =
+static const unsigned char BF_itoa64[64 + 1] =
 	"./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-static unsigned char BF_atoi64[0x60] = {
+static const unsigned char BF_atoi64[0x60] = {
 	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 0, 1,
 	54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 64, 64, 64, 64, 64,
 	64, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
