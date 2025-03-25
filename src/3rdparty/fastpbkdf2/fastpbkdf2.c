@@ -29,7 +29,7 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#include "thekogans/crypto/fastpbkdf2.h"
+#include "fastpbkdf2/fastpbkdf2.h"
 
 #include <assert.h>
 #include <string.h>
@@ -419,4 +419,3 @@ void fastpbkdf2_hmac_sha512(const uint8_t *pw, size_t npw,
 {
   PBKDF2(sha512)(pw, npw, salt, nsalt, iterations, out, nout);
 }
-

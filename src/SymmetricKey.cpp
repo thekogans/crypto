@@ -22,6 +22,7 @@
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+#include "fastpbkdf2/fastpbkdf2.h"
 #include "thekogans/util/SizeT.h"
 #include "thekogans/util/SecureAllocator.h"
 #include "thekogans/util/RandomSource.h"
@@ -30,7 +31,6 @@
 #include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/MessageDigest.h"
 #include "thekogans/crypto/Argon2Exception.h"
-#include "thekogans/crypto/fastpbkdf2.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
 #include "thekogans/crypto/OpenSSLUtils.h"

@@ -15,9 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-    #include "crypt_blowfish/crypt_blowfish.h"
-}
+#include "crypt_blowfish/crypt_blowfish.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/crypto/OpenSSLUtils.h"

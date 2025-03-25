@@ -7,8 +7,8 @@
                 guid = "51807feb568098447581aabaefb41bf0"
                 schema_version = "2">
   <features>
-    <!--<feature>THEKOGANS_CRYPTO_HAVE_ARGON2</feature>
-    <feature>THEKOGANS_CRYPTO_HAVE_BLAKE2</feature>-->
+    <feature>THEKOGANS_CRYPTO_HAVE_ARGON2</feature>
+    <feature>THEKOGANS_CRYPTO_HAVE_BLAKE2</feature>
     <feature>THEKOGANS_CRYPTO_HAVE_TESTS</feature>
   </features>
   <dependencies>
@@ -36,12 +36,10 @@
       </when>
     </choose>
   </dependencies>
-  <c_headers prefix = "include">
-    <c_header>$(organization)/$(project_directory)/fastpbkdf2.h</c_header>
-  </c_headers>
   <c_headers prefix = "include/3rdparty/private"
              install = "no">
     <c_header>crypt_blowfish/crypt_blowfish.h</c_header>
+    <c_header>fastpbkdf2/fastpbkdf2.h</c_header>
   </c_headers>
   <cpp_headers prefix = "include"
                install = "yes">
@@ -99,11 +97,9 @@
     <cpp_header>$(organization)/$(project_directory)/X25519Params.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/bcrypt.h</cpp_header>
   </cpp_headers>
-  <c_sources prefix = "src">
-    <c_source>fastpbkdf2.c</c_source>
-  </c_sources>
   <c_sources prefix = "src/3rdparty">
     <c_source>crypt_blowfish/crypt_blowfish.c</c_source>
+    <c_source>fastpbkdf2/fastpbkdf2.c</c_source>
   </c_sources>
   <cpp_sources prefix = "src">
     <cpp_source>AsymmetricKey.cpp</cpp_source>
