@@ -36,11 +36,14 @@ namespace thekogans {
         ///
         /// Hashing a password:
         ///
+        /// \code{.cpp}
         /// bcrypt::HashType hash = bcrypt::HashPassword ("thepassword");
         /// // You can now store the hash in the database.
+        /// \endcode
         ///
         /// Verifying a password:
         ///
+        /// \code{.cpp}
         /// // Once the users password hash is retrieved
         /// // check if the suplied password matches.
         /// if (bcrypt::CheckPassword ("thepassword", hash)) {
@@ -49,6 +52,7 @@ namespace thekogans {
         /// else {
         ///     // The password does NOT match.
         /// }
+        /// \endcode
 
         struct _LIB_THEKOGANS_CRYPTO_DECL bcrypt {
             /// \brief
@@ -76,11 +80,15 @@ namespace thekogans {
             using HashType = SecureCharArray;
 
             /// \brief
+            /// Default work factor.
+            static const std::size_t DEFAULT_WORK = 12;
+
+            /// \brief
             /// Get a fresh salt vector for password hashing.
             /// \param[in] work A number between 4 and 31 that determines
             /// the amount of work done by HashPassword to twart brute force attacks.
             /// \return A fresh salt vector ready for hashing.
-            static SaltType GetSalt (std::size_t work = 12);
+            static SaltType GetSalt (std::size_t work = DEFAULT_WORK);
             /// \brief
             /// Hash the given password with the given salt vector to produce a
             /// password hash ready for long term storage.
