@@ -48,6 +48,18 @@ TEST (thekogans, bcrypt) {
             std::cout << (result ? "pass" : "fail") << std::endl;
             CHECK_EQUAL (result, true);
         }
+        {
+            std::cout << "bcrypt check hash1...";
+            bool result = crypto::bcrypt::CheckPassword (pass, hash1);
+            std::cout << (result ? "pass" : "fail") << std::endl;
+            CHECK_EQUAL (result, true);
+        }
+        {
+            std::cout << "bcrypt check hash2...";
+            bool result = crypto::bcrypt::CheckPassword (pass, hash2);
+            std::cout << (result ? "pass" : "fail") << std::endl;
+            CHECK_EQUAL (result, true);
+        }
     }
     THEKOGANS_UTIL_CATCH (util::Exception) {
         std::cout << "fail " << exception.Report ();

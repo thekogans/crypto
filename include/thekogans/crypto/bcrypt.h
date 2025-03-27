@@ -67,8 +67,8 @@ namespace thekogans {
             /// \struct bcrypt::SecureCharArray bcrypt.h thekogans/crypto/bcrypt.h
             ///
             /// \brief
-            /// SecureCharArray is a specialization of \see{util::FixedArray}.
-            /// Adds extra protection by zeroing out the memory block in the dtor.
+            /// SecureCharArray is a specialization of \see{util::SecureFixedArray}.
+            /// Adds extra protection by checking the length of the input.
             struct _LIB_THEKOGANS_CRYPTO_DECL SecureCharArray :
                     public util::SecureFixedArray<char, HASH_SIZE> {
                 /// \brief
