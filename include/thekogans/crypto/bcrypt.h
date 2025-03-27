@@ -21,7 +21,6 @@
 #include <cstring>
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/FixedArray.h"
-#include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/Config.h"
 
 namespace thekogans {
@@ -71,12 +70,12 @@ namespace thekogans {
             /// SecureCharArray is a specialization of \see{util::FixedArray}.
             /// Adds extra protection by zeroing out the memory block in the dtor.
             struct _LIB_THEKOGANS_CRYPTO_DECL SecureCharArray :
-                    public util::FixedArray<char, HASH_SIZE> {
+                    public util::SecureFixedArray<char, HASH_SIZE> {
                 /// \brief
                 /// ctor.
                 /// \param[in] array '\0' terminated char string to initialize the array with.
                 SecureCharArray (const char *array_ = nullptr) :
-                        util::FixedArray<char, HASH_SIZE> (0, 0, true) {
+                        util::SecureFixedArray<char, HASH_SIZE> (0, 0) {
                     if (array_ != nullptr) {
                         std::size_t length = std::strlen (array_);
                         if (length < Size ()) {
@@ -87,12 +86,6 @@ namespace thekogans {
                                 THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                         }
                     }
-                }
-                /// \brief
-                /// dtor.
-                /// Zero out the sensitive memory block.
-                ~SecureCharArray () {
-                    util::SecureZeroMemory (array, Size ());
                 }
             };
             /// \brief
