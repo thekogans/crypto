@@ -74,8 +74,7 @@ namespace thekogans {
                 /// \brief
                 /// ctor.
                 /// \param[in] array '\0' terminated char string to initialize the array with.
-                SecureCharArray (const char *array_ = nullptr) :
-                        util::SecureFixedArray<char, HASH_SIZE> (0, 0) {
+                SecureCharArray (const char *array_ = nullptr) {
                     if (array_ != nullptr) {
                         std::size_t length = std::strlen (array_);
                         if (length < Size ()) {
@@ -115,11 +114,11 @@ namespace thekogans {
                 const util::SecureString &password,
                 const SaltType &salt = GetSalt ());
             /// \brief
-            /// Check the given password agains the given hash.
+            /// Check the given password against the given hash.
             /// \param[in] password Password to check.
             /// \param[in] hash Hash to check.
             /// \return true == password and hash match.
-            /// false == password and hash DO NOT match.
+            /// false == password and hash do NOT match.
             static bool CheckPassword (
                 const util::SecureString &password,
                 const HashType &hash);
