@@ -18,6 +18,7 @@
 #if !defined (__thekogans_crypto_bcrypt_h)
 #define __thekogans_crypto_bcrypt_h
 
+#include <cstring>
 #include "thekogans/util/FixedArray.h"
 #include "thekogans/util/SecureAllocator.h"
 
@@ -37,16 +38,20 @@ namespace thekogans {
         /// Hashing a password:
         ///
         /// \code{.cpp}
-        /// bcrypt::HashType hash = bcrypt::HashPassword ("thepassword");
+        /// using namespace thekogans;
+        ///
+        /// crypto::bcrypt::HashType hash = crypto::bcrypt::HashPassword ("thepassword");
         /// // You can now store the hash in the database.
         /// \endcode
         ///
         /// Verifying a password:
         ///
         /// \code{.cpp}
+        /// using namespace thekogans;
+        ///
         /// // Once the users password hash is retrieved
         /// // check if the suplied password matches.
-        /// if (bcrypt::CheckPassword ("thepassword", hash)) {
+        /// if (crypto::bcrypt::CheckPassword ("thepassword", hash)) {
         ///     // The password matches.
         /// }
         /// else {
@@ -65,6 +70,12 @@ namespace thekogans {
             /// Adds extra protection by zeroing out the memory block in the dtor.
             struct _LIB_THEKOGANS_CRYPTO_DECL SecureCharArray :
                     public util::FixedArray<char, HASH_SIZE> {
+                /// \brief
+                /// ctor.
+                /// \param[in] array '\0' terminated char string to initialize the array with.
+                SecureCharArray (const char *array = nullptr) :
+                    util::FixedArray<char, HASH_SIZE> (
+                        array, array != nullptr ? std::strlen (array) : 0, true) {}
                 /// \brief
                 /// dtor.
                 /// Zero out the sensitive memory block.

@@ -31,7 +31,7 @@ namespace thekogans {
                     random.data (), random.size ()) == random.size ()) {
                 SaltType salt;
                 if (_crypt_gensalt_blowfish_rn (
-                        "$2b$",
+                        "$2a$",
                         (int)((work > 3 && work < 32) ? work : 12),
                         random.data (),
                         (int)random.size (),

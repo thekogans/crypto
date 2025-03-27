@@ -49,13 +49,11 @@ namespace {
                 ciphertext->GetDataAvailableForReading (),
                 associatedData,
                 associatedDataLength);
-            bool result = message ==
+            bool result =
                 std::string (
                     (const char *)plaintext,
-                    (const char *)plaintext + plaintextLength);
-                std::string (
-                    decryptedPlaintext->GetReadPtr (),
-                    decryptedPlaintext->GetReadPtrEnd ());
+                    (const char *)plaintext + plaintextLength) ==
+                decryptedPlaintext->Tostring ();
             std::cout << (result ? "pass" : "fail") << std::endl;
             return result;
         }
