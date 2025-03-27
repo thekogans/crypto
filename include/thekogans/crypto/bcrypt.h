@@ -22,6 +22,7 @@
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/FixedArray.h"
 #include "thekogans/util/SecureAllocator.h"
+#include "thekogans/crypto/Config.h"
 
 namespace thekogans {
     namespace crypto {

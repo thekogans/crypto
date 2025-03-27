@@ -24,11 +24,11 @@
 using namespace thekogans;
 
 namespace {
-	const char pass[] = "hi,mom";
+	const char pass[] = "foobar";
 	const crypto::bcrypt::HashType hash1 (
-        "$2a$10$VEVmGHy4F4XQMJ3eOZJAUeb.MedU0W10pTPCuf53eHdKJPiSE8sMK");
+        "$2b$12$2QuAjLghBZ2SBpiGgqV2/OCPABhxYElb3KJ11gWlQj62SqCQ1zuSi");
 	const crypto::bcrypt::HashType hash2 (
-        "$2a$10$3F0BVk5t8/aoS.3ddaB3l.fxg5qvafQ9NybxcpXLzMeAt.nVWn.NO");
+        "$2b$12$y844nkr5lTf5KCSj1xCbDemY3DGJy.9bT3ahzK8GBydLeys0HqK/y");
 }
 
 TEST (thekogans, bcrypt) {

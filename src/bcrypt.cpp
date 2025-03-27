@@ -26,12 +26,12 @@ namespace thekogans {
 
         bcrypt::SaltType bcrypt::GetSalt (std::size_t work) {
             static const std::size_t RANDOM_SIZE = 16;
-            util::SecureString random ('\0', RANDOM_SIZE);
+            util::SecureString random (RANDOM_SIZE, '\0');
             if (util::RandomSource::Instance ()->GetSeedOrBytes (
-                    random.data (), random.size ()) == random.size ()) {
+                    &random[0], random.size ()) == random.size ()) {
                 SaltType salt;
                 if (_crypt_gensalt_blowfish_rn (
-                        "$2a$",
+                        "$2b$",
                         (int)((work > 3 && work < 32) ? work : 12),
                         random.data (),
                         (int)random.size (),
