@@ -19,6 +19,7 @@
 #define __thekogans_crypto_bcrypt_h
 
 #include <cstring>
+#include "thekogans/util/Exception.h"
 #include "thekogans/util/FixedArray.h"
 #include "thekogans/util/SecureAllocator.h"
 
@@ -73,9 +74,19 @@ namespace thekogans {
                 /// \brief
                 /// ctor.
                 /// \param[in] array '\0' terminated char string to initialize the array with.
-                SecureCharArray (const char *array = nullptr) :
-                    util::FixedArray<char, HASH_SIZE> (
-                        array, array != nullptr ? std::strlen (array) : 0, true) {}
+                SecureCharArray (const char *array_ = nullptr) :
+                        util::FixedArray<char, HASH_SIZE> (0, 0, true) {
+                    if (array_ != nullptr) {
+                        std::size_t length = std::strlen (array_);
+                        if (length < Size ()) {
+                            std::strcpy (array, array_);
+                        }
+                        else {
+                            THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                                THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                        }
+                    }
+                }
                 /// \brief
                 /// dtor.
                 /// Zero out the sensitive memory block.
