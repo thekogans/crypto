@@ -51,17 +51,15 @@ namespace thekogans {
         /// birationally equivalent to Curve25519.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519 {
-            enum {
-                /// \brief
-                /// Private key length.
-                PRIVATE_KEY_LENGTH = 64,
-                /// \brief
-                /// Public key length.
-                PUBLIC_KEY_LENGTH = 32,
-                /// \brief
-                /// Signature length.
-                SIGNATURE_LENGTH = 64
-            };
+            /// \brief
+            /// Private key length.
+            static const std::size_t PRIVATE_KEY_LENGTH = 64;
+            /// \brief
+            /// Public key length.
+            static const std::size_t PUBLIC_KEY_LENGTH = 32;
+            /// \brief
+            /// Signature length.
+            static const std::size_t SIGNATURE_LENGTH = 64;
 
             /// \brief
             /// CreateKey sets privateKey to a freshly generated private key.
@@ -115,20 +113,18 @@ namespace thekogans {
         /// https://tools.ietf.org/html/draft-irtf-cfrg-curves-11.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL X25519 {
-            enum {
-                /// \brief
-                /// Private/Public key length.
-                KEY_LENGTH = 32,
-                /// \brief
-                /// Private key length.
-                PRIVATE_KEY_LENGTH = KEY_LENGTH,
-                /// \brief
-                /// Public key length.
-                PUBLIC_KEY_LENGTH = KEY_LENGTH,
-                /// \brief
-                /// Shared secret length.
-                SHARED_SECRET_LENGTH = 32
-            };
+            /// \brief
+            /// Private/Public key length.
+            static const std::size_t KEY_LENGTH = 32;
+            /// \brief
+            /// Private key length.
+            static const std::size_t PRIVATE_KEY_LENGTH = KEY_LENGTH;
+            /// \brief
+            /// Public key length.
+            static const std::size_t PUBLIC_KEY_LENGTH = KEY_LENGTH;
+            /// \brief
+            /// Shared secret length.
+            static const std::size_t SHARED_SECRET_LENGTH = 32;
 
             /// \brief
             /// CreateKey sets privateKey to a freshly generated private key.

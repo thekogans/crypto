@@ -502,12 +502,10 @@ namespace thekogans {
             /// management, performance, and global heap fragmentation.
             THEKOGANS_UTIL_DECLARE_STD_ALLOCATOR_FUNCTIONS
 
-            enum {
-                /// \brief
-                /// Default renegotiation frequency (in bytes).
-                /// NOTE: This value aggregates both reads ands writes.
-                DEFAULT_RENEGOTIATION_FREQUENCY = util::UI32_MAX
-            };
+            /// \brief
+            /// Default renegotiation frequency (in bytes).
+            /// NOTE: This value aggregates both reads ands writes.
+            static const std::size_t DEFAULT_RENEGOTIATION_FREQUENCY = util::UI32_MAX;
 
             /// \brief
             /// "SessionInfo"

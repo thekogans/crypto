@@ -48,23 +48,22 @@ namespace thekogans {
             /// Synchronization lock.
             static util::SpinLock spinLock;
 
-            enum {
-                /// \brief
-                /// Minimum entropy bytes to use for PRNG seeding
-                /// (anything less than this would weaken the crypto).
-                MIN_ENTROPY_NEEDED = 512,
-                /// \brief
-                /// Default entropy bytes to use for PRNG seeding.
-                DEFAULT_ENTROPY_NEEDED = 1024,
-                /// \brief
-                /// Default \see{util::SecureAllocator} working set size. thekogans_crypto
-                /// uses a lot of secure memory. All \see{SymmetricKey}s, IVs, shared secrets...
-                /// are allocated from \see{util::SecureAllocator}. Some OSs (specifically
-                /// Windows) severely limit the number of pages that get wired in for any
-                /// process. It's important that you pick a working set size appropriate to
-                /// your needs.
-                DEFAULT_WORKING_SET_SIZE = 1024 * 1024
-            };
+            /// \brief
+            /// Minimum entropy bytes to use for PRNG seeding
+            /// (anything less than this would weaken the crypto).
+            static const std::size_t MIN_ENTROPY_NEEDED = 512;
+            /// \brief
+            /// Default entropy bytes to use for PRNG seeding.
+            static const std::size_t DEFAULT_ENTROPY_NEEDED = 1024;
+            /// \brief
+            /// Default \see{util::SecureAllocator} working set size. thekogans_crypto
+            /// uses a lot of secure memory. All \see{SymmetricKey}s, IVs, shared secrets...
+            /// are allocated from \see{util::SecureAllocator}. Some OSs (specifically
+            /// Windows) severely limit the number of pages that get wired in for any
+            /// process. It's important that you pick a working set size appropriate to
+            /// your needs.
+            static const std::size_t DEFAULT_WORKING_SET_SIZE = 1024 * 1024;
+
             /// \brief
             /// ctor.
             /// Initialize the Open SSL library.

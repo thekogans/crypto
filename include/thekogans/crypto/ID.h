@@ -38,11 +38,10 @@ namespace thekogans {
         /// Ids are randomly generated 32 byte values. They're used by \see{Serializable}.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL ID {
-            /// \enum
+            /// \brief
             /// ID size.
-            enum {
-                SIZE = SHA256_DIGEST_LENGTH
-            };
+            static const std::size_t SIZE = SHA256_DIGEST_LENGTH;
+
             /// \brief
             /// \see{Serializable} ID.
             util::ui8 data[SIZE];

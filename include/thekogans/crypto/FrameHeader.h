@@ -45,11 +45,9 @@ namespace thekogans {
             /// Length of following ciphertext.
             util::ui32 ciphertextLength;
 
-            enum {
-                /// \brief
-                /// FrameHeader serialized size.
-                SIZE = ID::SIZE + util::UI32_SIZE
-            };
+            /// \brief
+            /// FrameHeader serialized size.
+            static const std::size_t SIZE = ID::SIZE + util::UI32_SIZE;
 
             /// \brief
             /// ctor.

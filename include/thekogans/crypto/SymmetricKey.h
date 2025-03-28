@@ -278,11 +278,9 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
-            enum {
-                /// \brief
-                /// Minimum length of random buffer to use in FromRandom.
-                MIN_RANDOM_LENGTH = 256
-            };
+            /// \brief
+            /// Minimum length of random buffer to use in FromRandom.
+            static const std::size_t MIN_RANDOM_LENGTH = 256;
 
             /// \brief
             /// Generate a random key.

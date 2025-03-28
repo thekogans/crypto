@@ -41,13 +41,12 @@ namespace thekogans {
             /// Message Authentication Code (MAC) length.
             util::ui16 macLength;
 
-            enum {
-                /// \brief
-                /// CiphertextHeader serialized size.
-                SIZE = util::UI16_SIZE +
-                    util::UI32_SIZE +
-                    util::UI16_SIZE
-            };
+            /// \brief
+            /// CiphertextHeader serialized size.
+            static const std::size_t SIZE =
+                util::UI16_SIZE +
+                util::UI32_SIZE +
+                util::UI16_SIZE;
 
             /// \brief
             /// ctor.

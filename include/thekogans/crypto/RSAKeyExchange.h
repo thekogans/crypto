@@ -140,11 +140,10 @@ namespace thekogans {
             SymmetricKey::SharedPtr symmetricKey;
 
         public:
-            /// \enum
+            /// \brief
             /// Default secret length.
-            enum {
-                DEFAULT_SECRET_LENGTH = 1024
-            };
+            static const std::size_t DEFAULT_SECRET_LENGTH = 1024;
+
             /// \brief
             /// ctor. Used by the initiator of the key exchange request (client).
             /// \param[in] id \see{KeyExchange} id (see \see{KeyRing::AddKeyExchange}).

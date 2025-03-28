@@ -79,21 +79,19 @@ namespace thekogans {
                 const EVP_CIPHER *cipher_ = THEKOGANS_CRYPTO_DEFAULT_CIPHER,
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD);
 
-            enum {
-                /// \brief
-                /// Maximum framing overhead length.
-                MAX_FRAMING_OVERHEAD_LENGTH =
-                    FrameHeader::SIZE +
-                    CiphertextHeader::SIZE +
-                    EVP_MAX_IV_LENGTH + // iv
-                    EVP_MAX_BLOCK_LENGTH + // padding
-                    EVP_MAX_MD_SIZE, // mac
-                /// \brief
-                /// Maximum plaintext length.
-                MAX_PLAINTEXT_LENGTH =
-                    util::UI32_MAX -
-                    MAX_FRAMING_OVERHEAD_LENGTH
-            };
+            /// \brief
+            /// Maximum framing overhead length.
+            static const std::size_t MAX_FRAMING_OVERHEAD_LENGTH =
+                FrameHeader::SIZE +
+                CiphertextHeader::SIZE +
+                EVP_MAX_IV_LENGTH + // iv
+                EVP_MAX_BLOCK_LENGTH + // padding
+                EVP_MAX_MD_SIZE; // mac
+            /// \brief
+            /// Maximum plaintext length.
+            static const std::size_t MAX_PLAINTEXT_LENGTH =
+                util::UI32_MAX -
+                MAX_FRAMING_OVERHEAD_LENGTH;
 
             /// \brief
             /// Return the max plaintext length that will fit in to the given payload length.
