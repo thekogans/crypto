@@ -29,7 +29,7 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Serializable)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_ABSTRACT_BASE (thekogans::crypto::Serializable)
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Serializable::StaticInit () {

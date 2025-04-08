@@ -38,8 +38,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::Serializable {
             /// \brief
-            /// Declare \see{RefCounted} pointers.
-            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Serializable)
+            /// Serializable is a \see{util::DynamicCreatable} abstract base.
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_ABSTRACT_BASE (Serializable)
 
         protected:
             /// \brief

@@ -31,13 +31,13 @@ namespace thekogans {
         /// \struct Verifier Verifier.h thekogans/crypto/Verifier.h
         ///
         /// \brief
-        /// Verifier is a base for public key signature verification operation.
-        /// It defines the API a concrete verifier needs to implement.
+        /// Verifier is an abstract base for public key signature verification
+        /// operation. It defines the API a concrete verifier needs to implement.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Verifier : public util::DynamicCreatable {
             /// \brief
-            /// Verifier is a \see{util::DynamicCreatable} base.
-            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Verifier)
+            /// Verifier is a \see{util::DynamicCreatable} abstract base.
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_ABSTRACT_BASE (Verifier)
 
             /// \struct Verifier::Parameters Verifier.h thekogans/crypto/Verifier.h
             ///

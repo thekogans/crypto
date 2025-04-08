@@ -62,7 +62,7 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL bcrypt {
             /// \brief
-            /// Size of the hash.
+            /// Hash size.
             static const std::size_t HASH_SIZE = 64;
             /// \struct bcrypt::SecureCharArray bcrypt.h thekogans/crypto/bcrypt.h
             ///

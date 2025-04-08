@@ -33,13 +33,13 @@ namespace thekogans {
         /// \struct Signer Signer.h thekogans/crypto/Signer.h
         ///
         /// \brief
-        /// Signer is a base for public key sign operation. It defines the API
-        /// a concrete signer needs to implement.
+        /// Signer is an abstract base for public key sign operation.
+        /// It defines the API a concrete signer needs to implement.
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Signer : public util::DynamicCreatable {
             /// \brief
-            /// Signer is a \see{util::DynamicCreatable} base.
-            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Signer)
+            /// Signer is a \see{util::DynamicCreatable} abstract base.
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_ABSTRACT_BASE (Signer)
 
             /// \struct Signer::Parameters Signer.h thekogans/crypto/Signer.h
             ///

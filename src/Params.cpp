@@ -25,7 +25,7 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Params)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_ABSTRACT_BASE (thekogans::crypto::Params)
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Params::StaticInit () {

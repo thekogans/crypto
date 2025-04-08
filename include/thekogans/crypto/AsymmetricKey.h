@@ -36,8 +36,8 @@ namespace thekogans {
 
         struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
             /// \brief
-            /// Declare \see{RefCounted} pointers.
-            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (AsymmetricKey)
+            /// AsymmetricKey is a \see{util::DynamicCreatable} abstract base.
+            THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_ABSTRACT_BASE (AsymmetricKey)
 
         #if defined (THEKOGANS_CRYPTO_TYPE_Static)
             static void StaticInit ();

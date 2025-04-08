@@ -22,7 +22,7 @@
 namespace thekogans {
     namespace crypto {
 
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_BASE (thekogans::crypto::Verifier)
+        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_ABSTRACT_BASE (thekogans::crypto::Verifier)
 
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void Verifier::StaticInit () {

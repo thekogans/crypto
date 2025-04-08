@@ -51,8 +51,8 @@ namespace thekogans {
             /// Key exchange parameters base.
             struct _LIB_THEKOGANS_CRYPTO_DECL Params : public util::Serializable {
                 /// \brief
-                /// Declare \see{RefCounted} pointers.
-                THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_BASE (Params)
+                /// Params is a \see{util::DynamicCreatable} abstract base.
+                THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_ABSTRACT_BASE (Params)
 
             #if defined (THEKOGANS_CRYPTO_TYPE_Static)
                 static void StaticInit ();
