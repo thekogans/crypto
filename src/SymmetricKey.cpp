@@ -507,7 +507,7 @@ namespace thekogans {
             if (length > 0 && length <= key.GetCapacity ()) {
                 key.length = serializer.Read (key, length);
                 if (key.length == length) {
-                    SecureZeroMemory (key + length, key.GetCapacity () - length);
+                    util::SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -541,7 +541,7 @@ namespace thekogans {
             if (length > 0 && length <= key.GetCapacity ()) {
                 key.length = util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key);
                 if (key.length == length) {
-                    SecureZeroMemory (key + length, key.GetCapacity () - length);
+                    util::SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -570,7 +570,7 @@ namespace thekogans {
             if (length > 0 && length <= key.GetCapacity ()) {
                 key.length = util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key);
                 if (key.length == length) {
-                    SecureZeroMemory (key + length, key.GetCapacity () - length);
+                    util::SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
