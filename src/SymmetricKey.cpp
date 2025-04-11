@@ -505,8 +505,8 @@ namespace thekogans {
             util::SizeT length;
             serializer >> length;
             if (length > 0 && length <= key.GetCapacity ()) {
-                key.length = serializer.Read (key, length);
-                if (key.length == length) {
+                key.SetLength (serializer.Read (key, length));
+                if (key.GetLength () == length) {
                     util::SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
@@ -539,8 +539,8 @@ namespace thekogans {
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
             std::size_t length = hexKey.size () / 2;
             if (length > 0 && length <= key.GetCapacity ()) {
-                key.length = util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key);
-                if (key.length == length) {
+                key.SetLength (util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key));
+                if (key.GetLength () == length) {
                     util::SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
@@ -568,8 +568,8 @@ namespace thekogans {
                 object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             std::size_t length = hexKey.size () / 2;
             if (length > 0 && length <= key.GetCapacity ()) {
-                key.length = util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key);
-                if (key.length == length) {
+                key.SetLength (util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key));
+                if (key.GetLength () == length) {
                     util::SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
