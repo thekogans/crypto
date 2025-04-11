@@ -39,11 +39,11 @@ namespace {
             key1.GetId () == key2.GetId () &&
             key1.GetName () == key2.GetName () &&
             key1.GetDescription () == key2.GetDescription () &&
-            key1.Get ().GetDataAvailableForReading () == key2.Get ().GetDataAvailableForReading () &&
+            key1.Get ().Size () == key2.Get ().Size () &&
             crypto::TimeInsensitiveCompare (
-                key1.Get ().GetReadPtr (),
-                key2.Get ().GetReadPtr (),
-                key1.Get ().GetDataAvailableForReading ());
+                key1.Get (),
+                key2.Get (),
+                key1.Get ().Size ());
     }
 }
 

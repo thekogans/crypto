@@ -27,16 +27,18 @@ namespace thekogans {
         bcrypt::SaltType bcrypt::GetSalt (std::size_t work) {
             static const std::size_t RANDOM_SIZE = 16;
             util::SecureFixedArray<char, RANDOM_SIZE>  random;
-            if (util::RandomSource::Instance ()->GetSeedOrBytes (
-                    random, random.Size ()) == random.Size ()) {
+            random.length = util::RandomSource::Instance ()->GetSeedOrBytes (
+                random, random.GetCapacity ());
+            if (random.length == random.GetCapacity ()) {
                 SaltType salt;
                 if (_crypt_gensalt_blowfish_rn (
                         "$2b$",
                         (int)((work > 3 && work < 32) ? work : 12),
                         random,
-                        (int)random.Size (),
+                        (int)random.GetLength (),
                         salt,
-                        (int)salt.Size ()) != nullptr) {
+                        (int)salt.GetCapacity ()) != nullptr) {
+                    salt.length = std::strlen (salt);
                     return salt;
                 }
                 else{
@@ -60,7 +62,8 @@ namespace thekogans {
                     password.c_str (),
                     salt,
                     hash,
-                    (int)hash.Size ()) != nullptr) {
+                    (int)hash.GetCapacity ()) != nullptr) {
+                hash.length = std::strlen (hash);
                 return hash;
             }
             else {
@@ -73,7 +76,7 @@ namespace thekogans {
                 const util::SecureString &password,
                 const HashType &hash) {
             return TimeInsensitiveCompare (
-                hash, HashPassword (password, hash), hash.Size ());
+                hash, HashPassword (password, hash), hash.GetLength ());
         }
 
     } // namespace crypto

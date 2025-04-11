@@ -33,8 +33,8 @@ namespace thekogans {
             if (key != nullptr && md != nullptr) {
                 if (HMAC_Init_ex (
                         &ctx,
-                        key->Get ().GetReadPtr (),
-                        (int)key->Get ().GetDataAvailableForReading (),
+                        key->Get (),
+                        (int)key->Get ().GetLength (),
                         md,
                         OpenSSLInit::engine) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

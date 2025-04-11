@@ -396,8 +396,8 @@ namespace thekogans {
                 else if (keyType == X25519AsymmetricKey::KEY_TYPE) {
                     secret.resize (X25519::SHARED_SECRET_LENGTH);
                     X25519::ComputeSharedSecret (
-                        ((X25519AsymmetricKey *)privateKey.Get ())->key.GetReadPtr (),
-                        ((X25519AsymmetricKey *)dheParams->publicKey.Get ())->key.GetReadPtr (),
+                        ((X25519AsymmetricKey *)privateKey.Get ())->key,
+                        ((X25519AsymmetricKey *)dheParams->publicKey.Get ())->key,
                         secret.data ());
                 }
                 util::Buffer::SharedPtr salt = initiator ?

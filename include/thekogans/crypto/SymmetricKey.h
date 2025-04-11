@@ -26,7 +26,7 @@
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
 #include "thekogans/util/Types.h"
-#include "thekogans/util/FixedBuffer.h"
+#include "thekogans/util/FixedArray.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/Serializable.h"
@@ -46,8 +46,8 @@ namespace thekogans {
             THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (SymmetricKey)
 
             /// \brief
-            /// Alias for util::FixedBuffer<EVP_MAX_KEY_LENGTH>.
-            using KeyType = util::FixedBuffer<EVP_MAX_KEY_LENGTH>;
+            /// Alias for util::SecureFixedArray<util::ui8, EVP_MAX_KEY_LENGTH>.
+            using KeyType = util::SecureFixedArray<util::ui8, EVP_MAX_KEY_LENGTH>;
 
         private:
             /// \brief
@@ -69,17 +69,13 @@ namespace thekogans {
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 Serializable (id, name, description),
-                // FixedBuffer will throw if length > EVP_MAX_KEY_LENGTH.
-                key (util::HostEndian, buffer, length, true) {}
-            ~SymmetricKey () {
-                memset (key.GetDataPtr (), 0, key.GetLength ());
-            }
+                key ((const util::ui8 *)buffer, length) {}
 
             /// \brief
             /// Return the key length (in bytes).
             /// \return Key length (in bytes).
             inline std::size_t GetKeyLength () const {
-                return key.GetDataAvailableForReading ();
+                return key.GetLength ();
             }
 
         #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)

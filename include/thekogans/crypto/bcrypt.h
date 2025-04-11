@@ -74,18 +74,9 @@ namespace thekogans {
                 /// \brief
                 /// ctor.
                 /// \param[in] array '\0' terminated char string to initialize the array with.
-                SecureCharArray (const char *array_ = nullptr) {
-                    if (array_ != nullptr) {
-                        std::size_t length = std::strlen (array_);
-                        if (length < Size ()) {
-                            std::strcpy (array, array_);
-                        }
-                        else {
-                            THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                                THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                        }
-                    }
-                }
+                SecureCharArray (const char *array = nullptr) :
+                    util::SecureFixedArray<char, HASH_SIZE> (
+                        array, array != nullptr ? std::strlen (array) : 0) {}
             };
             /// \brief
             /// Alias for SecureCharArray.

@@ -21,7 +21,7 @@
 #include <cstddef>
 #include <string>
 #include "thekogans/util/Types.h"
-#include "thekogans/util/FixedBuffer.h"
+#include "thekogans/util/FixedArray.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/Curve25519.h"
@@ -40,8 +40,8 @@ namespace thekogans {
             THEKOGANS_CRYPTO_DECLARE_SERIALIZABLE (X25519AsymmetricKey)
 
             /// \brief
-            /// Alias for util::FixedBuffer<X25519::KEY_LENGTH>.
-            using KeyType = util::FixedBuffer<X25519::KEY_LENGTH>;
+            /// Alias for util::SecureFixedBuffer<X25519::KEY_LENGTH>.
+            using KeyType = util::SecureFixedArray<util::ui8, X25519::KEY_LENGTH>;
 
         private:
             /// \brief
@@ -65,7 +65,9 @@ namespace thekogans {
                 bool isPrivate = false,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
-                const std::string &description = std::string ());
+                const std::string &description = std::string ()) :
+                AsymmetricKey (isPrivate, id, name, description),
+                key (key_, X25519::KEY_LENGTH) {}
 
             /// \brief
             /// "KeyType"

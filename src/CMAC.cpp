@@ -34,8 +34,8 @@ namespace thekogans {
             if (key != nullptr && cipher != nullptr) {
                 if (CMAC_Init (
                         &ctx,
-                        key->Get ().GetReadPtr (),
-                        key->Get ().GetDataAvailableForReading (),
+                        key->Get (),
+                        key->Get ().GetLength (),
                         cipher,
                         OpenSSLInit::engine) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;

@@ -42,8 +42,8 @@ namespace thekogans {
                         mac.Reset (
                             new HMAC (
                                 SymmetricKey::FromSecretAndSalt (
-                                    key->Get ().GetReadPtr (),
-                                    key->Get ().GetDataAvailableForReading (),
+                                    key->Get (),
+                                    key->Get ().GetLength (),
                                     0,
                                     0,
                                     GetMDLength (md),

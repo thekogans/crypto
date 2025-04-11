@@ -39,8 +39,6 @@
     #include "thekogans/crypto/Blake2s.h"
 #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 #if defined (THEKOGANS_CRYPTO_TYPE_Static)
-    #include "thekogans/crypto/SymmetricKey.h"
-    #include "thekogans/crypto/X25519AsymmetricKey.h"
     #include "thekogans/crypto/OpenSSLAllocator.h"
     #include "thekogans/crypto/Serializable.h"
     #include "thekogans/crypto/Signer.h"
@@ -57,8 +55,6 @@ namespace thekogans {
     #if defined (THEKOGANS_CRYPTO_TYPE_Static)
         void StaticInit () {
             util::StaticInit ();
-            SymmetricKey::KeyType::StaticInit ();
-            X25519AsymmetricKey::KeyType::StaticInit ();
             OpenSSLAllocator::StaticInit ();
             Serializable::StaticInit ();
             Signer::StaticInit ();

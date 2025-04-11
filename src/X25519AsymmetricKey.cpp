@@ -18,14 +18,6 @@
 #include "thekogans/crypto/X25519AsymmetricKey.h"
 
 namespace thekogans {
-    namespace util {
-
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_T (
-            thekogans::crypto::X25519AsymmetricKey::KeyType,
-            Serializer::TYPE)
-
-    }
-
     namespace crypto {
 
         #if !defined (THEKOGANS_CRYPTO_MIN_X25519_ASYMMETRIC_KEYS_IN_PAGE)
@@ -38,30 +30,18 @@ namespace thekogans {
             THEKOGANS_CRYPTO_MIN_X25519_ASYMMETRIC_KEYS_IN_PAGE,
             AsymmetricKey::TYPE)
 
-        X25519AsymmetricKey::X25519AsymmetricKey (
-                const util::ui8 *key_,
-                bool isPrivate,
-                const ID &id,
-                const std::string &name,
-                const std::string &description) :
-                AsymmetricKey (isPrivate, id, name, description) {
-            if (key_ != nullptr) {
-                key.Write (key_, X25519::KEY_LENGTH);
-            }
-        }
-
         const char * const X25519AsymmetricKey::KEY_TYPE = "X25519";
 
         AsymmetricKey::SharedPtr X25519AsymmetricKey::GetPublicKey (
                 const ID &id,
                 const std::string &name,
                 const std::string &description) const {
-            util::ui8 publicKey[X25519::PUBLIC_KEY_LENGTH];
+            util::SecureFixedArray<util::ui8, X25519::PUBLIC_KEY_LENGTH> publicKey;
             if (IsPrivate ()) {
-                X25519::GetPublicKey (key.GetReadPtr (), publicKey);
+                X25519::GetPublicKey (key, publicKey);
             }
             else {
-                memcpy (publicKey, key.GetReadPtr (), X25519::PUBLIC_KEY_LENGTH);
+                memcpy (publicKey, key, X25519::PUBLIC_KEY_LENGTH);
             }
             return AsymmetricKey::SharedPtr (
                 new X25519AsymmetricKey (
@@ -80,9 +60,7 @@ namespace thekogans {
                 const Header &header,
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
-            key.Rewind ();
-            if (key.AdvanceWriteOffset (
-                    serializer.Read (key.GetWritePtr (), X25519::KEY_LENGTH)) != X25519::KEY_LENGTH) {
+            if (serializer.Read (key, X25519::KEY_LENGTH) != X25519::KEY_LENGTH) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                     X25519::KEY_LENGTH,
@@ -92,7 +70,7 @@ namespace thekogans {
 
         void X25519AsymmetricKey::Write (util::Serializer &serializer) const {
             AsymmetricKey::Write (serializer);
-            if (serializer.Write (key.GetReadPtr (), X25519::KEY_LENGTH) != X25519::KEY_LENGTH) {
+            if (serializer.Write (key, X25519::KEY_LENGTH) != X25519::KEY_LENGTH) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Write (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
                     X25519::KEY_LENGTH,
@@ -108,14 +86,13 @@ namespace thekogans {
             AsymmetricKey::Read (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
             if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
-                key.Rewind ();
-                if (key.AdvanceWriteOffset (
-                        util::HexDecodeBuffer (
-                            hexKey.data (),
-                            hexKey.size (),
-                            key.GetWritePtr ())) != X25519::KEY_LENGTH) {
+                if (util::HexDecodeBuffer (
+                        hexKey.data (),
+                        hexKey.size (),
+                        key) != X25519::KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
+                        "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != "
+                        THEKOGANS_UTIL_SIZE_T_FORMAT,
                         X25519::KEY_LENGTH,
                         X25519::KEY_LENGTH);
                 }
@@ -132,7 +109,7 @@ namespace thekogans {
         void X25519AsymmetricKey::Write (pugi::xml_node &node) const {
             AsymmetricKey::Write (node);
             node.append_attribute (ATTR_KEY).set_value (
-                util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH).c_str ());
+                util::HexEncodeBuffer (key, X25519::KEY_LENGTH).c_str ());
         }
 
         void X25519AsymmetricKey::Read (
@@ -141,14 +118,13 @@ namespace thekogans {
             AsymmetricKey::Read (header, object);
             util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
-                key.Rewind ();
-                if (key.AdvanceWriteOffset (
-                        util::HexDecodeBuffer (
-                            hexKey.data (),
-                            hexKey.size (),
-                            key.GetWritePtr ())) != X25519::KEY_LENGTH) {
+                if (util::HexDecodeBuffer (
+                        hexKey.data (),
+                        hexKey.size (),
+                        key) != X25519::KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
+                        "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != "
+                        THEKOGANS_UTIL_SIZE_T_FORMAT,
                         X25519::KEY_LENGTH,
                         X25519::KEY_LENGTH);
                 }
@@ -166,7 +142,7 @@ namespace thekogans {
             AsymmetricKey::Write (object);
             object.Add<const std::string &> (
                 ATTR_KEY,
-                util::HexEncodeBuffer (key.GetReadPtr (), X25519::KEY_LENGTH));
+                util::HexEncodeBuffer (key, X25519::KEY_LENGTH));
         }
 
     } // namespace crypto

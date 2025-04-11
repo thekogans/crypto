@@ -34,7 +34,7 @@ namespace thekogans {
                             &context,
                             cipher,
                             OpenSSLInit::engine,
-                            key->Get ().GetReadPtr (),
+                            key->Get (),
                             0) != 1 ||
                         (GetCipherMode (cipher) == EVP_CIPH_GCM_MODE &&
                             EVP_CIPHER_CTX_ctrl (

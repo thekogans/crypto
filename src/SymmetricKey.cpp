@@ -37,14 +37,6 @@
 #include "thekogans/crypto/SymmetricKey.h"
 
 namespace thekogans {
-    namespace util {
-
-        THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_T (
-            thekogans::crypto::SymmetricKey::KeyType,
-            Serializer::TYPE)
-
-    }
-
     namespace crypto {
 
         #if !defined (THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
@@ -75,7 +67,12 @@ namespace thekogans {
                 context.outlen = outlen;
                 if (errorCode == ARGON2_OK) {
                     return SharedPtr (
-                        new SymmetricKey (key.data (), key.size (), id, name, description));
+                        new SymmetricKey (
+                            key.data (),
+                            key.size (),
+                            id,
+                            name,
+                            description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_ARGON2_ERROR_CODE_EXCEPTION (errorCode);
@@ -114,15 +111,21 @@ namespace thekogans {
                 util::ui64 start = util::HRTimer::Click ();
                 util::f64 elapsedSeconds = 0.0;
                 for (std::size_t i = 1;
-                        i < count || (timeInSeconds != 0.0 && (i % 128 != 0 || elapsedSeconds < timeInSeconds));
-                        ++i) {
+                        i < count || (timeInSeconds != 0.0 && (i % 128 != 0 ||
+                                elapsedSeconds < timeInSeconds)); ++i) {
                     messageDigest.Init ();
                     messageDigest.Update (buffer.data (), bufferLength);
                     bufferLength = messageDigest.Final (buffer.data ());
                     elapsedSeconds = util::HRTimer::ToSeconds (
                         util::HRTimer::ComputeElapsedTime (start, util::HRTimer::Click ()));
                 }
-                return SharedPtr (new SymmetricKey (buffer.data (), keyLength, id, name, description));
+                return SharedPtr (
+                    new SymmetricKey (
+                        buffer.data (),
+                        keyLength,
+                        id,
+                        name,
+                        description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -176,7 +179,13 @@ namespace thekogans {
                             (uint32_t)key.size ());
                         break;
                 }
-                return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                return SharedPtr (
+                    new SymmetricKey (
+                        key.data (),
+                        key.size (),
+                        id,
+                        name,
+                        description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -207,7 +216,13 @@ namespace thekogans {
                         md,
                         (int)key.size (),
                         key.data ()) == 1) {
-                    return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                    return SharedPtr (
+                        new SymmetricKey (
+                            key.data (),
+                            key.size (),
+                            id,
+                            name,
+                            description));
                 }
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
@@ -364,7 +379,13 @@ namespace thekogans {
                         }
                         break;
                 }
-                return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                return SharedPtr (
+                    new SymmetricKey (
+                        key.data (),
+                        key.size (),
+                        id,
+                        name,
+                        description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -409,7 +430,13 @@ namespace thekogans {
                     memcpy (&key[keyLength], buffer.data (), count);
                     keyLength += count;
                 }
-                return SharedPtr (new SymmetricKey (key.data (), key.size (), id, name, description));
+                return SharedPtr (
+                    new SymmetricKey (
+                        key.data (),
+                        key.size (),
+                        id,
+                        name,
+                        description));
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -455,17 +482,8 @@ namespace thekogans {
         void SymmetricKey::Set (
                 const void *buffer,
                 std::size_t length) {
-            if (buffer != nullptr && length <= key.GetLength ()) {
-                key.Rewind ();
-                if (key.Write (buffer, length) == length) {
-                    if (length < key.GetLength ()) {
-                        memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
-                    }
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to write " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes.", length);
-                }
+            if (buffer != nullptr && length <= key.GetCapacity ()) {
+                key = KeyType ((const util::ui8 *)buffer, length);
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -476,8 +494,8 @@ namespace thekogans {
         std::size_t SymmetricKey::Size () const noexcept {
             return
                 Serializable::Size () +
-                util::SizeT (key.GetDataAvailableForReading ()).Size () +
-                key.GetDataAvailableForReading ();
+                util::SizeT (key.Size ()).Size () +
+                key.Size ();
         }
 
         void SymmetricKey::Read (
@@ -486,11 +504,10 @@ namespace thekogans {
             Serializable::Read (header, serializer);
             util::SizeT length;
             serializer >> length;
-            if (length > 0 && length <= key.GetLength ()) {
-                key.Rewind ();
-                if (key.AdvanceWriteOffset (
-                        serializer.Read (key.GetWritePtr (), length)) == length) {
-                    memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+            if (length > 0 && length <= key.GetCapacity ()) {
+                key.length = serializer.Read (key, length);
+                if (key.length == length) {
+                    SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -505,13 +522,11 @@ namespace thekogans {
 
         void SymmetricKey::Write (util::Serializer &serializer) const {
             Serializable::Write (serializer);
-            serializer << util::SizeT (key.GetDataAvailableForReading ());
-            if (serializer.Write (
-                    key.GetReadPtr (),
-                    key.GetDataAvailableForReading ()) != key.GetDataAvailableForReading ()) {
+            serializer << util::SizeT (key.Size ());
+            if (serializer.Write (key, key.Size ()) != key.Size ()) {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Unable to write " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes for key.",
-                    key.GetDataAvailableForReading ());
+                    key.Size ());
             }
         }
 
@@ -523,14 +538,10 @@ namespace thekogans {
             Serializable::Read (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
             std::size_t length = hexKey.size () / 2;
-            if (length > 0 && length <= key.GetLength ()) {
-                key.Rewind ();
-                if (key.AdvanceWriteOffset (
-                        util::HexDecodeBuffer (
-                            hexKey.data (),
-                            hexKey.size (),
-                            key.GetWritePtr ())) == length) {
-                    memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+            if (length > 0 && length <= key.GetCapacity ()) {
+                key.length = util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key);
+                if (key.length == length) {
+                    SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -546,25 +557,20 @@ namespace thekogans {
         void SymmetricKey::Write (pugi::xml_node &node) const {
             Serializable::Write (node);
             node.append_attribute (ATTR_KEY).set_value (
-                util::HexEncodeBuffer (
-                    key.GetReadPtr (),
-                    key.GetDataAvailableForReading ()).c_str ());
+                util::HexEncodeBuffer (key, key.GetLength ()).c_str ());
         }
 
         void SymmetricKey::Read (
                 const Header &header,
                 const util::JSON::Object &object) {
             Serializable::Read (header, object);
-            util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
+            util::SecureString hexKey =
+                object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             std::size_t length = hexKey.size () / 2;
-            if (length > 0 && length <= key.GetLength ()) {
-                key.Rewind ();
-                if (key.AdvanceWriteOffset (
-                        util::HexDecodeBuffer (
-                            hexKey.data (),
-                            hexKey.size (),
-                            key.GetWritePtr ())) == length) {
-                    memset (key.GetWritePtr (), 0, key.GetDataAvailableForWriting ());
+            if (length > 0 && length <= key.GetCapacity ()) {
+                key.length = util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key);
+                if (key.length == length) {
+                    SecureZeroMemory (key + length, key.GetCapacity () - length);
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -580,10 +586,7 @@ namespace thekogans {
         void SymmetricKey::Write (util::JSON::Object &object) const {
             Serializable::Write (object);
             object.Add<const std::string &> (
-                ATTR_KEY,
-                util::HexEncodeBuffer (
-                    key.GetReadPtr (),
-                    key.GetDataAvailableForReading ()));
+                ATTR_KEY, util::HexEncodeBuffer (key, key.GetLength ()));
         }
 
     } // namespace crypto
