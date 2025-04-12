@@ -20,7 +20,6 @@
     #include <winsock2.h>
 #endif // defined (TOOLCHAIN_OS_Windows)
 #include "thekogans/util/Constants.h"
-#include "thekogans/util/FixedArray.h"
 #include "thekogans/util/File.h"
 #include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/FrameHeader.h"

@@ -38,11 +38,13 @@ namespace thekogans {
                 const std::string &description) const {
             util::SecureFixedArray<util::ui8, X25519::PUBLIC_KEY_LENGTH> publicKey;
             if (IsPrivate ()) {
-                X25519::GetPublicKey (key, publicKey);
+                publicKey.SetLength (X25519::GetPublicKey (key, publicKey));
             }
             else {
                 memcpy (publicKey, key, X25519::PUBLIC_KEY_LENGTH);
+                publicKey.SetLength (X25519::PUBLIC_KEY_LENGTH);
             }
+            assert (publicKey.GetLength () == X25519::PUBLIC_KEY_LENGTH);
             return AsymmetricKey::SharedPtr (
                 new X25519AsymmetricKey (
                     publicKey,
@@ -53,29 +55,19 @@ namespace thekogans {
         }
 
         std::size_t X25519AsymmetricKey::Size () const noexcept {
-            return AsymmetricKey::Size () + X25519::KEY_LENGTH;
+            return AsymmetricKey::Size () + key.Size ();
         }
 
         void X25519AsymmetricKey::Read (
                 const Header &header,
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
-            if (serializer.Read (key, X25519::KEY_LENGTH) != X25519::KEY_LENGTH) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
-                    X25519::KEY_LENGTH,
-                    X25519::KEY_LENGTH);
-            }
+            serializer >> key;
         }
 
         void X25519AsymmetricKey::Write (util::Serializer &serializer) const {
             AsymmetricKey::Write (serializer);
-            if (serializer.Write (key, X25519::KEY_LENGTH) != X25519::KEY_LENGTH) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Write (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != " THEKOGANS_UTIL_SIZE_T_FORMAT,
-                    X25519::KEY_LENGTH,
-                    X25519::KEY_LENGTH);
-            }
+            serializer << key;
         }
 
         const char * const X25519AsymmetricKey::ATTR_KEY = "Key";
@@ -86,10 +78,8 @@ namespace thekogans {
             AsymmetricKey::Read (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
             if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
-                if (util::HexDecodeBuffer (
-                        hexKey.data (),
-                        hexKey.size (),
-                        key) != X25519::KEY_LENGTH) {
+                key.SetLength (util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key));
+                if (key.GetLength () != X25519::KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != "
                         THEKOGANS_UTIL_SIZE_T_FORMAT,
@@ -118,10 +108,8 @@ namespace thekogans {
             AsymmetricKey::Read (header, object);
             util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
-                if (util::HexDecodeBuffer (
-                        hexKey.data (),
-                        hexKey.size (),
-                        key) != X25519::KEY_LENGTH) {
+                key.SetLength (util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key));
+                if (key.GetLength () != X25519::KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                         "Read (key, " THEKOGANS_UTIL_SIZE_T_FORMAT ") != "
                         THEKOGANS_UTIL_SIZE_T_FORMAT,

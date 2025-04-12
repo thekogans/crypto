@@ -3718,7 +3718,7 @@ namespace thekogans {
             }
         }
 
-        void Ed25519::CreateKey (util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
+        std::size_t Ed25519::CreateKey (util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
             if (privateKey != nullptr) {
                 util::RandomSource::Instance ()->GetSeedOrBytes (
                     privateKey, PRIVATE_KEY_LENGTH / 2);
@@ -3730,6 +3730,7 @@ namespace thekogans {
                 ge_p3 A;
                 ge_scalarmult_base (&A, publicKey);
                 ge_p3_tobytes (publicKey, &A);
+                return PRIVATE_KEY_LENGTH;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -3737,11 +3738,12 @@ namespace thekogans {
             }
         }
 
-        void Ed25519::GetPublicKey (
+        std::size_t Ed25519::GetPublicKey (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 util::ui8 publicKey[PUBLIC_KEY_LENGTH]) {
             if (privateKey != nullptr && publicKey != nullptr) {
                 memcpy (publicKey, privateKey + PRIVATE_KEY_LENGTH / 2, PUBLIC_KEY_LENGTH);
+                return PUBLIC_KEY_LENGTH;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
@@ -3819,10 +3821,10 @@ namespace thekogans {
             }
         }
 
-        void X25519::CreateKey (
+        std::size_t X25519::CreateKey (
                 util::ui8 privateKey[PRIVATE_KEY_LENGTH]) {
             if (privateKey != nullptr) {
-                util::RandomSource::Instance ()->GetSeedOrBytes (
+                return util::RandomSource::Instance ()->GetSeedOrBytes (
                     privateKey, PRIVATE_KEY_LENGTH);
             }
             else {
@@ -3831,7 +3833,7 @@ namespace thekogans {
             }
         }
 
-        void X25519::GetPublicKey (
+        std::size_t X25519::GetPublicKey (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 util::ui8 publicKey[PUBLIC_KEY_LENGTH]) {
             if (privateKey != nullptr && publicKey != nullptr) {
@@ -3850,6 +3852,7 @@ namespace thekogans {
                 fe_invert (zminusy_inv, zminusy);
                 fe_mul (zplusy, zplusy, zminusy_inv);
                 fe_tobytes (publicKey, zplusy);
+                return PUBLIC_KEY_LENGTH;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (

@@ -105,11 +105,12 @@ namespace thekogans {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 // FIXME: this may be a problem for embeded systems.
-                util::FixedArray<util::ui8, 4096> buffer;
-                for (std::size_t count = file.Read (buffer, 4096);
-                        count != 0;
-                        count = file.Read (buffer, 4096)) {
-                    signer->Update (buffer, count);
+                static const MAX_BUFFER_CAPACITY = 4096;
+                util::FixedArray<util::ui8, MAX_BUFFER_CAPACITY> buffer;
+                for (buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()));
+                        buffer.GetLength () != 0;
+                        buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()))) {
+                    signer->Update (buffer, buffer.GetLength ());
                 }
                 return signer->Final ();
             }
@@ -127,11 +128,13 @@ namespace thekogans {
                 if (verifier != nullptr) {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
-                    util::FixedArray<util::ui8, 4096> buffer;
-                    for (std::size_t count = file.Read (buffer, 4096);
-                         count != 0;
-                         count = file.Read (buffer, 4096)) {
-                        verifier->Update (buffer, count);
+                    // FIXME: this may be a problem for embeded systems.
+                    static const MAX_BUFFER_CAPACITY = 4096;
+                    util::FixedArray<util::ui8, MAX_BUFFER_CAPACITY> buffer;
+                    for (buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()));
+                         buffer.GetLength () != 0;
+                         buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()))) {
+                        verifier->Update (buffer, buffer.GetLength ());
                     }
                     return verifier->Final (signature, signatureLength);
                 }

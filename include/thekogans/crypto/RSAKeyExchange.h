@@ -171,7 +171,8 @@ namespace thekogans {
                 const std::string &keyDescription = std::string ());
             /// \brief
             /// ctor. Used by the receiver of the key exchange request (server).
-            /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA} \see{SymmetricKey} derivation.
+            /// \param[in] key_ Private \see{AsymmetricKey} used for \see{RSA}
+            /// \see{SymmetricKey} derivation.
             /// \param[in] params \see{RSAParams} containing the encrypted \see{SymmetricKey}.
             RSAKeyExchange (
                 AsymmetricKey::SharedPtr key_,
@@ -179,8 +180,8 @@ namespace thekogans {
 
             /// \brief
             /// Get the parameters to send to the key exchange peer.
-            /// \param[in] privateKey Optional my private \see{AsymmetricKey} used to create a signature
-            /// over the parameters.
+            /// \param[in] privateKey Optional my private \see{AsymmetricKey}
+            /// used to create a signature over the parameters.
             /// \param[in] messageDigest Optional message digest used to hash the parameters.
             /// \return \see{RSAParams} to send to the key exchange peer.
             virtual Params::SharedPtr GetParams (
@@ -191,7 +192,8 @@ namespace thekogans {
             /// Given the peer's \see{RSAParams}, derive the shared \see{SymmetricKey}.
             /// \param[in] params Peer's \see{RSAParams} parameters.
             /// \return Shared \see{SymmetricKey}.
-            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (Params::SharedPtr params) const override;
+            virtual SymmetricKey::SharedPtr DeriveSharedSymmetricKey (
+                Params::SharedPtr params) const override;
 
             /// \brief
             /// RSAKeyExchange is neither copy constructable, nor assignable.

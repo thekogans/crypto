@@ -55,14 +55,24 @@ namespace thekogans {
         public:
             /// \brief
             /// ctor.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            X25519AsymmetricKey (
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ()) :
+                AsymmetricKey (isPrivate, id, name, description) {}
+            /// \brief
+            /// ctor.
             /// \param[in] key_ Private/Public \see{X25519} key.
             /// \param[in] isPrivate true = contains both private and public keys.
             /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             X25519AsymmetricKey (
-                const util::ui8 *key_ = 0,
-                bool isPrivate = false,
+                const util::ui8 *key_,
+                bool isPrivate,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :

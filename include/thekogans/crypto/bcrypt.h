@@ -74,9 +74,8 @@ namespace thekogans {
                 /// \brief
                 /// ctor.
                 /// \param[in] array '\0' terminated char string to initialize the array with.
-                SecureCharArray (const char *array = nullptr) :
-                    util::SecureFixedArray<char, HASH_SIZE> (
-                        array, array != nullptr ? std::strlen (array) : 0) {}
+                SecureCharArray (const char *array = "") :
+                    util::SecureFixedArray<char, HASH_SIZE> (array, std::strlen (array)) {}
             };
             /// \brief
             /// Alias for SecureCharArray.

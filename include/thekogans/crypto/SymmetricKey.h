@@ -57,14 +57,24 @@ namespace thekogans {
         public:
             /// \brief
             /// ctor.
+            /// \param[in] id Optional key id.
+            /// \param[in] name Optional key name.
+            /// \param[in] description Optional key description.
+            SymmetricKey (
+                const ID &id = ID (),
+                const std::string &name = std::string (),
+                const std::string &description = std::string ()) :
+                Serializable (id, name, description) {}
+            /// \brief
+            /// ctor.
             /// \param[in] buffer Optional buffer containing the key.
             /// \param[in] length Key buffer length.
             /// \param[in] id Optional key id.
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             SymmetricKey (
-                const void *buffer = 0,
-                std::size_t length = 0,
+                const void *buffer,
+                std::size_t length,
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :

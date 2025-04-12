@@ -119,11 +119,13 @@ namespace thekogans {
         util::Buffer::SharedPtr MessageDigest::HashFile (const std::string &path) {
             util::ReadOnlyFile file (util::HostEndian, path);
             Init ();
-            util::FixedArray<util::ui8, 4096> buffer;
-            for (std::size_t count = file.Read (buffer, 4096);
-                    count != 0;
-                    count = file.Read (buffer, 4096)) {
-                Update (buffer, count);
+            // FIXME: this may be a problem for embeded systems.
+            static const MAX_BUFFER_CAPACITY = 4096;
+            util::FixedArray<util::ui8, MAX_BUFFER_CAPACITY> buffer;
+            for (buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()));
+                    buffer.GetLength () != 0;
+                    buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()))) {
+                Update (buffer, buffer.GetLength ());
             }
             util::Buffer::SharedPtr hash (new util::HostBuffer (GetMDLength (md)));
             hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));

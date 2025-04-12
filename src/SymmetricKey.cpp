@@ -492,42 +492,19 @@ namespace thekogans {
         }
 
         std::size_t SymmetricKey::Size () const noexcept {
-            return
-                Serializable::Size () +
-                util::SizeT (key.Size ()).Size () +
-                key.Size ();
+            return Serializable::Size () + key.Size ();
         }
 
         void SymmetricKey::Read (
                 const Header &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
-            util::SizeT length;
-            serializer >> length;
-            if (length > 0 && length <= key.GetCapacity ()) {
-                key.SetLength (serializer.Read (key, length));
-                if (key.GetLength () == length) {
-                    util::SecureZeroMemory (key + length, key.GetCapacity () - length);
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to read " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes for key.", length);
-                }
-            }
-            else {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Invalid key size " THEKOGANS_UTIL_SIZE_T_FORMAT ".", length);
-            }
+            serializer >> key;
         }
 
         void SymmetricKey::Write (util::Serializer &serializer) const {
             Serializable::Write (serializer);
-            serializer << util::SizeT (key.Size ());
-            if (serializer.Write (key, key.Size ()) != key.Size ()) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to write " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes for key.",
-                    key.Size ());
-            }
+            serializer << key;
         }
 
         const char * const SymmetricKey::ATTR_KEY = "Key";

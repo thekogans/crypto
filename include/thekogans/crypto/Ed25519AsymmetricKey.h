@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <string>
 #include "thekogans/util/Types.h"
+#include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/AsymmetricKey.h"
 #include "thekogans/crypto/Curve25519.h"
@@ -31,7 +32,8 @@ namespace thekogans {
         /// \struct Ed25519AsymmetricKey Ed25519AsymmetricKey.h thekogans/crypto/Ed25519AsymmetricKey.h
         ///
         /// \brief
-        /// Ed25519AsymmetricKey keys are used to perform sign/verify operations (\see{Authenticator}).
+        /// Ed25519AsymmetricKey keys are used to perform sign/verify
+        /// operations (\see{Authenticator}).
 
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519AsymmetricKey : public AsymmetricKey {
             /// \brief
@@ -77,6 +79,9 @@ namespace thekogans {
                 const ID &id = ID (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
+            ~Ed25519AsymmetricKey () {
+                util::SecureZeroMemory (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH);
+            }
 
             /// \brief
             /// "KeyType"

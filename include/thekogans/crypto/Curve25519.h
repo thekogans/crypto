@@ -64,13 +64,15 @@ namespace thekogans {
             /// \brief
             /// CreateKey sets privateKey to a freshly generated private key.
             /// \param[out] privateKey New private key.
-            static void CreateKey (util::ui8 privateKey[PRIVATE_KEY_LENGTH]);
+            /// \return Number of bytes written to privateKey (PRIVATE_KEY_LENGTH).
+            static std::size_t CreateKey (util::ui8 privateKey[PRIVATE_KEY_LENGTH]);
 
             /// \brief
             /// GetPublicKey get's the public key associated with the given private key.
             /// \param[in] privateKey Private key.
             /// \param[out] publicKey Public key to return.
-            static void GetPublicKey (
+            /// \return Number of bytes written to publicKey (PUBLIC_KEY_LENGTH).
+            static std::size_t GetPublicKey (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 util::ui8 publicKey[PUBLIC_KEY_LENGTH]);
 
@@ -129,7 +131,8 @@ namespace thekogans {
             /// \brief
             /// CreateKey sets privateKey to a freshly generated private key.
             /// \param[out] privateKey New private key.
-            static void CreateKey (
+            /// \return Number of bytes written to privateKey (PRIVATE_KEY_LENGTH).
+            static std::size_t CreateKey (
                 util::ui8 privateKey[PRIVATE_KEY_LENGTH]);
 
             /// \brief
@@ -137,7 +140,8 @@ namespace thekogans {
             /// given private key and writes it to publicKey.
             /// \param[in] privateKey Private key.
             /// \param[out] publicKey Public key to return.
-            static void GetPublicKey (
+            /// \return Number of bytes written to publicKey (PUBLIC_KEY_LENGTH).
+            static std::size_t GetPublicKey (
                 const util::ui8 privateKey[PRIVATE_KEY_LENGTH],
                 util::ui8 publicKey[PUBLIC_KEY_LENGTH]);
 

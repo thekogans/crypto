@@ -44,7 +44,7 @@ namespace thekogans {
                     memcpy (key.privateKey, key_, Ed25519::PRIVATE_KEY_LENGTH);
                 }
                 else {
-                    memset (key.publicKey.pad, 0,
+                    util::SecureZeroMemory (key.publicKey.pad,
                         Ed25519::PRIVATE_KEY_LENGTH - Ed25519::PUBLIC_KEY_LENGTH);
                     memcpy (key.publicKey.value, key_, Ed25519::PUBLIC_KEY_LENGTH);
                 }
@@ -89,6 +89,8 @@ namespace thekogans {
                 }
             }
             else {
+                util::SecureZeroMemory (key.publicKey.pad,
+                    Ed25519::PRIVATE_KEY_LENGTH - Ed25519::PUBLIC_KEY_LENGTH);
                 if (serializer.Read (key.publicKey.value,
                         Ed25519::PUBLIC_KEY_LENGTH) != Ed25519::PUBLIC_KEY_LENGTH) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
@@ -146,6 +148,8 @@ namespace thekogans {
             else {
                 std::string publicKey = node.attribute (ATTR_KEY).value ();
                 if (publicKey.size () == Ed25519::PUBLIC_KEY_LENGTH * 2) {
+                    util::SecureZeroMemory (key.publicKey.pad,
+                        Ed25519::PRIVATE_KEY_LENGTH - Ed25519::PUBLIC_KEY_LENGTH);
                     util::HexDecodestring (publicKey, key.publicKey.value);
                 }
                 else {
@@ -190,6 +194,8 @@ namespace thekogans {
             else {
                 std::string publicKey = object.Get<util::JSON::String> (ATTR_KEY)->value;
                 if (publicKey.size () == Ed25519::PUBLIC_KEY_LENGTH * 2) {
+                    util::SecureZeroMemory (key.publicKey.pad,
+                        Ed25519::PRIVATE_KEY_LENGTH - Ed25519::PUBLIC_KEY_LENGTH);
                     util::HexDecodestring (publicKey, key.publicKey.value);
                 }
                 else {
