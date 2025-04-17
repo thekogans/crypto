@@ -118,32 +118,32 @@ namespace thekogans {
             const char * const ATTR_BUFFER = "Buffer";
         }
 
-        void RSAKeyExchange::RSAParams::Read (
+        void RSAKeyExchange::RSAParams::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            Params::Read (header, node);
+            Params::ReadXML (header, node);
             keyId = ID::FromHexString (node.attribute (ATTR_KEY_ID).value ());
             buffer = util::HexDecodestring (node.attribute (ATTR_BUFFER).value ());
         }
 
-        void RSAKeyExchange::RSAParams::Write (pugi::xml_node &node) const {
-            Params::Write (node);
+        void RSAKeyExchange::RSAParams::WriteXML (pugi::xml_node &node) const {
+            Params::WriteXML (node);
             node.append_attribute (ATTR_KEY_ID).set_value (
                 keyId.ToHexString ().c_str ());
             node.append_attribute (ATTR_BUFFER).set_value (
                 util::HexEncodeBuffer (buffer.data (), buffer.size ()).c_str ());
         }
 
-        void RSAKeyExchange::RSAParams::Read (
+        void RSAKeyExchange::RSAParams::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            Params::Read (header, object);
+            Params::ReadJSON (header, object);
             keyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_KEY_ID)->value);
             buffer = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_BUFFER)->value);
         }
 
-        void RSAKeyExchange::RSAParams::Write (util::JSON::Object &object) const {
-            Params::Write (object);
+        void RSAKeyExchange::RSAParams::WriteJSON (util::JSON::Object &object) const {
+            Params::WriteJSON (object);
             object.Add<const std::string &> (
                 ATTR_KEY_ID,
                 keyId.ToHexString ());

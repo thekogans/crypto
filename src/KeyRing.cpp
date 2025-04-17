@@ -1451,10 +1451,10 @@ namespace thekogans {
         const char * const KeyRing::TAG_SUB_RINGS = "SubRings";
         const char * const KeyRing::TAG_SUB_RING = "SubRing";
 
-        void KeyRing::Read (
+        void KeyRing::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            Serializable::Read (header, node);
+            Serializable::ReadXML (header, node);
             cipherSuite = node.attribute (ATTR_CIPHER_SUITE).value ();
             keyExchangeParamsMap.clear ();
             pugi::xml_node keyExchangeParams = node.child (TAG_KEY_EXCHANGE_PARAMS);
@@ -1618,8 +1618,8 @@ namespace thekogans {
             }
         }
 
-        void KeyRing::Write (pugi::xml_node &node) const {
-            Serializable::Write (node);
+        void KeyRing::WriteXML (pugi::xml_node &node) const {
+            Serializable::WriteXML (node);
             node.append_attribute (ATTR_CIPHER_SUITE).set_value (cipherSuite.ToString ().c_str ());
             {
                 pugi::xml_node keyExchangeParams =
@@ -1703,10 +1703,10 @@ namespace thekogans {
             }
         }
 
-        void KeyRing::Read (
+        void KeyRing::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            Serializable::Read (header, object);
+            Serializable::ReadJSON (header, object);
             cipherSuite = object.Get<util::JSON::String> (ATTR_CIPHER_SUITE)->value;
             keyExchangeParamsMap.clear ();
             util::JSON::Array::SharedPtr keyExchangeParams =
@@ -1856,8 +1856,8 @@ namespace thekogans {
             }
         }
 
-        void KeyRing::Write (util::JSON::Object &object) const {
-            Serializable::Write (object);
+        void KeyRing::WriteJSON (util::JSON::Object &object) const {
+            Serializable::WriteJSON (object);
             object.Add<const std::string &> (ATTR_CIPHER_SUITE, cipherSuite.ToString ());
             {
                 util::JSON::Array::SharedPtr keyExchangeParams (new util::JSON::Array);

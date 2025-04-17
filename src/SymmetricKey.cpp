@@ -509,10 +509,10 @@ namespace thekogans {
 
         const char * const SymmetricKey::ATTR_KEY = "Key";
 
-        void SymmetricKey::Read (
+        void SymmetricKey::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            Serializable::Read (header, node);
+            Serializable::ReadXML (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
             std::size_t length = hexKey.size () / 2;
             if (length > 0 && length <= key.GetCapacity ()) {
@@ -531,16 +531,16 @@ namespace thekogans {
             }
         }
 
-        void SymmetricKey::Write (pugi::xml_node &node) const {
-            Serializable::Write (node);
+        void SymmetricKey::WriteXML (pugi::xml_node &node) const {
+            Serializable::WriteXML (node);
             node.append_attribute (ATTR_KEY).set_value (
                 util::HexEncodeBuffer (key, key.GetLength ()).c_str ());
         }
 
-        void SymmetricKey::Read (
+        void SymmetricKey::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            Serializable::Read (header, object);
+            Serializable::ReadJSON (header, object);
             util::SecureString hexKey =
                 object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             std::size_t length = hexKey.size () / 2;
@@ -560,8 +560,8 @@ namespace thekogans {
             }
         }
 
-        void SymmetricKey::Write (util::JSON::Object &object) const {
-            Serializable::Write (object);
+        void SymmetricKey::WriteJSON (util::JSON::Object &object) const {
+            Serializable::WriteJSON (object);
             object.Add<const std::string &> (
                 ATTR_KEY, util::HexEncodeBuffer (key, key.GetLength ()));
         }

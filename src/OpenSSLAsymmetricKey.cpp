@@ -306,34 +306,34 @@ namespace thekogans {
             serializer << WriteKey (IsPrivate (), key.get ());
         }
 
-        void OpenSSLAsymmetricKey::Read (
+        void OpenSSLAsymmetricKey::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            AsymmetricKey::Read (header, node);
+            AsymmetricKey::ReadXML (header, node);
             key = ReadKey (IsPrivate (), node.text ().get (), strlen (node.text ().get ()));
             ValidateKey ();
         }
 
-        void OpenSSLAsymmetricKey::Write (pugi::xml_node &node) const {
-            AsymmetricKey::Write (node);
+        void OpenSSLAsymmetricKey::WriteXML (pugi::xml_node &node) const {
+            AsymmetricKey::WriteXML (node);
             node.append_child (pugi::node_pcdata).set_value (
                 WriteKey (IsPrivate (), key.get ()).c_str ());
         }
 
         const char * const OpenSSLAsymmetricKey::TAG_KEY = "Key";
 
-        void OpenSSLAsymmetricKey::Read (
+        void OpenSSLAsymmetricKey::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            AsymmetricKey::Read (header, object);
+            AsymmetricKey::ReadJSON (header, object);
             util::SecureString keyBuffer =
                 object.Get<util::JSON::Array> (TAG_KEY)->ToString ().c_str ();
             key = ReadKey (IsPrivate (), keyBuffer.data (), keyBuffer.size ());
             ValidateKey ();
         }
 
-        void OpenSSLAsymmetricKey::Write (util::JSON::Object &object) const {
-            AsymmetricKey::Write (object);
+        void OpenSSLAsymmetricKey::WriteJSON (util::JSON::Object &object) const {
+            AsymmetricKey::WriteJSON (object);
             object.Add (TAG_KEY,
                 util::JSON::Value::SharedPtr (
                     new util::JSON::Array (WriteKey (IsPrivate (), key.get ()).c_str ())));

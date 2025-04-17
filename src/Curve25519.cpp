@@ -55,16 +55,14 @@ namespace thekogans {
             typedef util::i32 fe[10];
 
             util::ui64 load_3 (const util::ui8 *in) {
-                util::ui64 result;
-                result = (util::ui64)in[0];
+                util::ui64 result = (util::ui64)in[0];
                 result |= ((util::ui64)in[1]) << 8;
                 result |= ((util::ui64)in[2]) << 16;
                 return result;
             }
 
             util::ui64 load_4 (const util::ui8 *in) {
-                util::ui64 result;
-                result = (util::ui64)in[0];
+                util::ui64 result = (util::ui64)in[0];
                 result |= ((util::ui64)in[1]) << 8;
                 result |= ((util::ui64)in[2]) << 16;
                 result |= ((util::ui64)in[3]) << 24;

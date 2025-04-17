@@ -128,10 +128,10 @@ namespace thekogans {
 
         const char * const Ed25519AsymmetricKey::ATTR_KEY = "Key";
 
-        void Ed25519AsymmetricKey::Read (
+        void Ed25519AsymmetricKey::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            AsymmetricKey::Read (header, node);
+            AsymmetricKey::ReadXML (header, node);
             if (IsPrivate ()) {
                 std::string privateKey = node.attribute (ATTR_KEY).value ();
                 if (privateKey.size () == Ed25519::PRIVATE_KEY_LENGTH * 2) {
@@ -162,8 +162,8 @@ namespace thekogans {
             }
         }
 
-        void Ed25519AsymmetricKey::Write (pugi::xml_node &node) const {
-            AsymmetricKey::Write (node);
+        void Ed25519AsymmetricKey::WriteXML (pugi::xml_node &node) const {
+            AsymmetricKey::WriteXML (node);
             if (IsPrivate ()) {
                 node.append_attribute (ATTR_KEY).set_value (
                     util::HexEncodeBuffer (key.privateKey, Ed25519::PRIVATE_KEY_LENGTH).c_str ());
@@ -174,10 +174,10 @@ namespace thekogans {
             }
         }
 
-        void Ed25519AsymmetricKey::Read (
+        void Ed25519AsymmetricKey::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            AsymmetricKey::Read (header, object);
+            AsymmetricKey::ReadJSON (header, object);
             if (IsPrivate ()) {
                 std::string privateKey = object.Get<util::JSON::String> (ATTR_KEY)->value;
                 if (privateKey.size () == Ed25519::PRIVATE_KEY_LENGTH * 2) {
@@ -208,8 +208,8 @@ namespace thekogans {
             }
         }
 
-        void Ed25519AsymmetricKey::Write (util::JSON::Object &object) const {
-            AsymmetricKey::Write (object);
+        void Ed25519AsymmetricKey::WriteJSON (util::JSON::Object &object) const {
+            AsymmetricKey::WriteJSON (object);
             if (IsPrivate ()) {
                 object.Add<const std::string &> (
                     ATTR_KEY,

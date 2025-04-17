@@ -20,7 +20,7 @@
     #include <winsock2.h>
 #endif // defined (TOOLCHAIN_OS_Windows)
 #include "thekogans/util/Exception.h"
-#include "thekogans/util/FixedArray.h"
+#include "thekogans/util/Array.h"
 #include "thekogans/util/File.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/Authenticator.h"
@@ -104,13 +104,11 @@ namespace thekogans {
             if (signer != nullptr) {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
-                // FIXME: this may be a problem for embeded systems.
-                static const MAX_BUFFER_CAPACITY = 4096;
-                util::FixedArray<util::ui8, MAX_BUFFER_CAPACITY> buffer;
-                for (buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()));
-                        buffer.GetLength () != 0;
-                        buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()))) {
-                    signer->Update (buffer, buffer.GetLength ());
+                static const std::size_t BUFFER_CAPACITY = 4096;
+                util::Array<util::ui8> buffer (BUFFER_CAPACITY);
+                std::size_t size;
+                while ((size = file.Read (buffer, BUFFER_CAPACITY)) != 0) {
+                    signer->Update (buffer, size);
                 }
                 return signer->Final ();
             }
@@ -128,13 +126,11 @@ namespace thekogans {
                 if (verifier != nullptr) {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
-                    // FIXME: this may be a problem for embeded systems.
-                    static const MAX_BUFFER_CAPACITY = 4096;
-                    util::FixedArray<util::ui8, MAX_BUFFER_CAPACITY> buffer;
-                    for (buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()));
-                         buffer.GetLength () != 0;
-                         buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()))) {
-                        verifier->Update (buffer, buffer.GetLength ());
+                    static const std::size_t BUFFER_CAPACITY = 4096;
+                    util::Array<util::ui8> buffer (BUFFER_CAPACITY);
+                    std::size_t size;
+                    while ((size = file.Read (buffer, BUFFER_CAPACITY)) != 0) {
+                        verifier->Update (buffer, size);
                     }
                     return verifier->Final (signature, signatureLength);
                 }

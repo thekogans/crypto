@@ -62,7 +62,7 @@ namespace thekogans {
         const char * const Serializable::ATTR_NAME = "Name";
         const char * const Serializable::ATTR_DESCRIPTION = "Description";
 
-        void Serializable::Read (
+        void Serializable::ReadXML (
                 const Header & /*header*/,
                 const pugi::xml_node &node) {
             id = ID::FromHexString (node.attribute (ATTR_ID).value ());
@@ -70,13 +70,13 @@ namespace thekogans {
             description = node.attribute (ATTR_DESCRIPTION).value ();
         }
 
-        void Serializable::Write (pugi::xml_node &node) const {
+        void Serializable::WriteXML (pugi::xml_node &node) const {
             node.append_attribute (ATTR_ID).set_value (id.ToHexString ().c_str ());
             node.append_attribute (ATTR_NAME).set_value (name.c_str ());
             node.append_attribute (ATTR_DESCRIPTION).set_value (description.c_str ());
         }
 
-        void Serializable::Read (
+        void Serializable::ReadJSON (
                 const Header & /*header*/,
                 const util::JSON::Object &object) {
             id = ID::FromHexString (object.Get<util::JSON::String> (ATTR_ID)->value);
@@ -84,7 +84,7 @@ namespace thekogans {
             description = object.Get<util::JSON::String> (ATTR_DESCRIPTION)->value;
         }
 
-        void Serializable::Write (util::JSON::Object &object) const {
+        void Serializable::WriteJSON (util::JSON::Object &object) const {
             object.Add<const std::string &> (ATTR_ID, id.ToHexString ());
             object.Add<const std::string &> (ATTR_NAME, name);
             object.Add<const std::string &> (ATTR_DESCRIPTION, description);

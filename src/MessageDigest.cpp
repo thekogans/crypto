@@ -18,7 +18,7 @@
 #include <cstring>
 #include <openssl/evp.h>
 #include "thekogans/util/File.h"
-#include "thekogans/util/FixedArray.h"
+#include "thekogans/util/Array.h"
 #include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
@@ -119,13 +119,11 @@ namespace thekogans {
         util::Buffer::SharedPtr MessageDigest::HashFile (const std::string &path) {
             util::ReadOnlyFile file (util::HostEndian, path);
             Init ();
-            // FIXME: this may be a problem for embeded systems.
-            static const MAX_BUFFER_CAPACITY = 4096;
-            util::FixedArray<util::ui8, MAX_BUFFER_CAPACITY> buffer;
-            for (buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()));
-                    buffer.GetLength () != 0;
-                    buffer.SetLength (file.Read (buffer, buffer.GetCapacity ()))) {
-                Update (buffer, buffer.GetLength ());
+            static const std::size_t BUFFER_CAPACITY = 4096;
+            util::Array<util::ui8> buffer (BUFFER_CAPACITY);
+            std::size_t size;
+            while ((size = file.Read (buffer, BUFFER_CAPACITY)) != 0) {
+                Update (buffer, size);
             }
             util::Buffer::SharedPtr hash (new util::HostBuffer (GetMDLength (md)));
             hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));

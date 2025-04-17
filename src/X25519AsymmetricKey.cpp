@@ -72,10 +72,10 @@ namespace thekogans {
 
         const char * const X25519AsymmetricKey::ATTR_KEY = "Key";
 
-        void X25519AsymmetricKey::Read (
+        void X25519AsymmetricKey::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            AsymmetricKey::Read (header, node);
+            AsymmetricKey::ReadXML (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
             if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
                 key.SetLength (util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key));
@@ -96,16 +96,16 @@ namespace thekogans {
             }
         }
 
-        void X25519AsymmetricKey::Write (pugi::xml_node &node) const {
-            AsymmetricKey::Write (node);
+        void X25519AsymmetricKey::WriteXML (pugi::xml_node &node) const {
+            AsymmetricKey::WriteXML (node);
             node.append_attribute (ATTR_KEY).set_value (
                 util::HexEncodeBuffer (key, X25519::KEY_LENGTH).c_str ());
         }
 
-        void X25519AsymmetricKey::Read (
+        void X25519AsymmetricKey::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            AsymmetricKey::Read (header, object);
+            AsymmetricKey::ReadJSON (header, object);
             util::SecureString hexKey = object.Get<util::JSON::String> (ATTR_KEY)->value.c_str ();
             if (hexKey.size () == X25519::PRIVATE_KEY_LENGTH * 2) {
                 key.SetLength (util::HexDecodeBuffer (hexKey.data (), hexKey.size (), key));
@@ -126,8 +126,8 @@ namespace thekogans {
             }
         }
 
-        void X25519AsymmetricKey::Write (util::JSON::Object &object) const {
-            AsymmetricKey::Write (object);
+        void X25519AsymmetricKey::WriteJSON (util::JSON::Object &object) const {
+            AsymmetricKey::WriteJSON (object);
             object.Add<const std::string &> (
                 ATTR_KEY,
                 util::HexEncodeBuffer (key, X25519::KEY_LENGTH));

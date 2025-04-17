@@ -61,7 +61,7 @@ namespace thekogans {
             const char * const ATTR_SIGNATURE_MESSAGE_DIGEST_NAME = "SignatureMessageDigestName";
         }
 
-        void KeyExchange::Params::Read (
+        void KeyExchange::Params::ReadXML (
                 const Header & /*header*/,
                 const pugi::xml_node &node) {
             id = ID::FromHexString (node.attribute (ATTR_ID).value ());
@@ -70,7 +70,7 @@ namespace thekogans {
             signatureMessageDigestName = node.attribute (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME).value ();
         }
 
-        void KeyExchange::Params::Write (pugi::xml_node &node) const {
+        void KeyExchange::Params::WriteXML (pugi::xml_node &node) const {
             node.append_attribute (ATTR_ID).set_value (id.ToHexString ().c_str ());
             node.append_attribute (ATTR_SIGNATURE).set_value (
                 util::HexEncodeBuffer (signature.data (), signature.size ()).c_str ());
@@ -80,7 +80,7 @@ namespace thekogans {
                 signatureMessageDigestName.c_str ());
         }
 
-        void KeyExchange::Params::Read (
+        void KeyExchange::Params::ReadJSON (
                 const Header & /*header*/,
                 const util::JSON::Object &object) {
             id = ID::FromHexString (object.Get<util::JSON::String> (ATTR_ID)->value);
@@ -92,7 +92,7 @@ namespace thekogans {
                 object.Get<util::JSON::String> (ATTR_SIGNATURE_MESSAGE_DIGEST_NAME)->value;
         }
 
-        void KeyExchange::Params::Write (util::JSON::Object &object) const {
+        void KeyExchange::Params::WriteJSON (util::JSON::Object &object) const {
             object.Add<const std::string &> (
                 ATTR_ID,
                 id.ToHexString ());

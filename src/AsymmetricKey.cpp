@@ -56,28 +56,28 @@ namespace thekogans {
 
         const char * const AsymmetricKey::ATTR_PRIVATE = "Private";
 
-        void AsymmetricKey::Read (
+        void AsymmetricKey::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            Serializable::Read (header, node);
+            Serializable::ReadXML (header, node);
             isPrivate = util::stringTobool (node.attribute (ATTR_PRIVATE).value ());
         }
 
-        void AsymmetricKey::Write (pugi::xml_node &node) const {
-            Serializable::Write (node);
+        void AsymmetricKey::WriteXML (pugi::xml_node &node) const {
+            Serializable::WriteXML (node);
             node.append_attribute (ATTR_PRIVATE).set_value (
                 util::boolTostring (IsPrivate ()).c_str ());
         }
 
-        void AsymmetricKey::Read (
+        void AsymmetricKey::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            Serializable::Read (header, object);
+            Serializable::ReadJSON (header, object);
             isPrivate = object.Get<util::JSON::Bool> (ATTR_PRIVATE)->value;
         }
 
-        void AsymmetricKey::Write (util::JSON::Object &object) const {
-            Serializable::Write (object);
+        void AsymmetricKey::WriteJSON (util::JSON::Object &object) const {
+            Serializable::WriteJSON (object);
             object.Add (ATTR_PRIVATE, IsPrivate ());
         }
 

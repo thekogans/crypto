@@ -429,32 +429,32 @@ namespace thekogans {
         const char * const OpenSSLParams::ATTR_PARAMS_TYPE = "ParamsType";
         const char * const OpenSSLParams::ATTR_PARAMS = "Params";
 
-        void OpenSSLParams::Read (
+        void OpenSSLParams::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            Params::Read (header, node);
+            Params::ReadXML (header, node);
             params = ReadParams (
                 node.attribute (ATTR_PARAMS_TYPE).value (),
                 node.attribute (ATTR_PARAMS).value ());
         }
 
-        void OpenSSLParams::Write (pugi::xml_node &node) const {
-            Params::Write (node);
+        void OpenSSLParams::WriteXML (pugi::xml_node &node) const {
+            Params::WriteXML (node);
             node.append_attribute (ATTR_PARAMS_TYPE).set_value (GetKeyType ().c_str ());
             node.append_attribute (ATTR_PARAMS).set_value (WriteParams (*params).c_str ());
         }
 
-        void OpenSSLParams::Read (
+        void OpenSSLParams::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            Params::Read (header, object);
+            Params::ReadJSON (header, object);
             params = ReadParams (
                 object.Get<util::JSON::String> (ATTR_PARAMS_TYPE)->value,
                 object.Get<util::JSON::String> (ATTR_PARAMS)->value.c_str ());
         }
 
-        void OpenSSLParams::Write (util::JSON::Object &object) const {
-            Params::Write (object);
+        void OpenSSLParams::WriteJSON (util::JSON::Object &object) const {
+            Params::WriteJSON (object);
             object.Add<const std::string &> (ATTR_PARAMS_TYPE, GetKeyType ());
             object.Add<const std::string &> (ATTR_PARAMS, WriteParams (*params).c_str ());
         }

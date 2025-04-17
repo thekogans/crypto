@@ -57,24 +57,24 @@ namespace thekogans {
             Params::Write (serializer);
         }
 
-        void X25519Params::Read (
+        void X25519Params::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            Params::Read (header, node);
+            Params::ReadXML (header, node);
         }
 
-        void X25519Params::Write (pugi::xml_node &node) const {
-            Params::Write (node);
+        void X25519Params::WriteXML (pugi::xml_node &node) const {
+            Params::WriteXML (node);
         }
 
-        void X25519Params::Read (
+        void X25519Params::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            Params::Read (header, object);
+            Params::ReadJSON (header, object);
         }
 
-        void X25519Params::Write (util::JSON::Object &object) const {
-            Params::Write (object);
+        void X25519Params::WriteJSON (util::JSON::Object &object) const {
+            Params::WriteJSON (object);
         }
 
     } // namespace crypto

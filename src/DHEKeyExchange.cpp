@@ -183,10 +183,10 @@ namespace thekogans {
             const char * const TAG_PUBLIC_KEY = "PublicKey";
         }
 
-        void DHEKeyExchange::DHEParams::Read (
+        void DHEKeyExchange::DHEParams::ReadXML (
                 const Header &header,
                 const pugi::xml_node &node) {
-            Params::Read (header, node);
+            Params::ReadXML (header, node);
             salt = util::HexDecodestring (node.attribute (ATTR_SALT).value ());
             keyLength = util::stringToui64 (node.attribute (ATTR_KEY_LENGTH).value ());
             messageDigestName = node.attribute (ATTR_MESSAGE_DIGEST_NAME).value ();
@@ -200,8 +200,8 @@ namespace thekogans {
             publicKeyNode >> publicKey;
         }
 
-        void DHEKeyExchange::DHEParams::Write (pugi::xml_node &node) const {
-            Params::Write (node);
+        void DHEKeyExchange::DHEParams::WriteXML (pugi::xml_node &node) const {
+            Params::WriteXML (node);
             node.append_attribute (ATTR_SALT).set_value (
                 util::HexEncodeBuffer (salt.data (), salt.size ()).c_str ());
             node.append_attribute (ATTR_KEY_LENGTH).set_value (
@@ -222,10 +222,10 @@ namespace thekogans {
             publicKeyNode << *publicKey;
         }
 
-        void DHEKeyExchange::DHEParams::Read (
+        void DHEKeyExchange::DHEParams::ReadJSON (
                 const Header &header,
                 const util::JSON::Object &object) {
-            Params::Read (header, object);
+            Params::ReadJSON (header, object);
             salt = util::HexDecodestring (object.Get<util::JSON::String> (ATTR_SALT)->value);
             keyLength = object.Get<util::JSON::Number> (ATTR_KEY_LENGTH)->To<util::SizeT> ();
             messageDigestName = object.Get<util::JSON::String> (ATTR_MESSAGE_DIGEST_NAME)->value;
@@ -241,8 +241,8 @@ namespace thekogans {
             *publicKeyObject >> publicKey;
         }
 
-        void DHEKeyExchange::DHEParams::Write (util::JSON::Object &object) const {
-            Params::Write (object);
+        void DHEKeyExchange::DHEParams::WriteJSON (util::JSON::Object &object) const {
+            Params::WriteJSON (object);
             object.Add<const std::string &> (
                 ATTR_SALT, util::HexEncodeBuffer (salt.data (), salt.size ()));
             object.Add<const util::SizeT &> (ATTR_KEY_LENGTH, keyLength);

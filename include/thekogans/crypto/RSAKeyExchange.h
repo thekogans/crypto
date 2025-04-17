@@ -111,24 +111,24 @@ namespace thekogans {
                 /// Read the Serializable from an XML DOM.
                 /// \param[in] header \see{util::Serializable::Header}.
                 /// \param[in] node XML DOM representation of a Serializable.
-                virtual void Read (
+                virtual void ReadXML (
                     const Header &header,
                     const pugi::xml_node &node) override;
                 /// \brief
                 /// Write the Serializable to the XML DOM.
                 /// \param[out] node Parent node.
-                virtual void Write (pugi::xml_node &node) const override;
+                virtual void WriteXML (pugi::xml_node &node) const override;
 
                 /// \brief
                 /// Read a Serializable from an JSON DOM.
                 /// \param[in] node JSON DOM representation of a Serializable.
-                virtual void Read (
+                virtual void ReadJSON (
                     const Header &header,
                     const util::JSON::Object &object) override;
                 /// \brief
                 /// Write a Serializable to the JSON DOM.
                 /// \param[out] node Parent node.
-                virtual void Write (util::JSON::Object &object) const override;
+                virtual void WriteJSON (util::JSON::Object &object) const override;
             };
 
         private:
