@@ -245,7 +245,6 @@ namespace thekogans {
             }
         }
 
-        const CipherSuite CipherSuite::Empty;
         const CipherSuite CipherSuite::Strongest (
             KEY_EXCHANGE_ECDHE,
             AUTHENTICATOR_ECDSA,

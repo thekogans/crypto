@@ -180,9 +180,6 @@ namespace thekogans {
             CipherSuite (const CipherSuite &cipherSuite);
 
             /// \brief
-            /// Empty cipher suite.
-            static const CipherSuite Empty;
-            /// \brief
             /// Strongest cipher suite.
             static const CipherSuite Strongest;
             /// \brief
@@ -316,7 +313,7 @@ namespace thekogans {
                 const void *salt = 0,
                 std::size_t saltLength = 0,
                 std::size_t count = 1,
-                const ID &keyId = ID (),
+                const ID &keyId = ID::FromRandom (),
                 const std::string &keyName = std::string (),
                 const std::string &keyDescription = std::string ()) const;
             /// \brief
@@ -339,7 +336,7 @@ namespace thekogans {
                 const void *salt = 0,
                 std::size_t saltLength = 0,
                 std::size_t count = 1,
-                const ID &keyId = ID (),
+                const ID &keyId = ID::FromRandom (),
                 const std::string &keyName = std::string (),
                 const std::string &keyDescription = std::string ()) const;
             /// \brief
@@ -392,7 +389,7 @@ namespace thekogans {
             AsymmetricKey::SharedPtr CreateAuthenticatorKey (
                 std::size_t keyLength,
                 BIGNUMPtr RSAPublicExponent = BIGNUMFromui32 (65537),
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
             /// \brief
@@ -405,7 +402,7 @@ namespace thekogans {
             /// \return Private/public random key pair.
             AsymmetricKey::SharedPtr CreateAuthenticatorKey (
                 const std::string curveName,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const;
 

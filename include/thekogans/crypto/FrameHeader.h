@@ -52,7 +52,6 @@ namespace thekogans {
             /// \brief
             /// ctor.
             FrameHeader () :
-                keyId (ID::Empty),
                 ciphertextLength (0) {}
 
             /// \brief

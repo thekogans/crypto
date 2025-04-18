@@ -305,7 +305,6 @@ namespace thekogans {
         }
 
         DHEKeyExchange::DHEKeyExchange (Params::SharedPtr params) :
-                KeyExchange (ID::Empty),
                 initiator (false) {
             DHEParams::SharedPtr dheParams = params;
             if (dheParams != nullptr &&

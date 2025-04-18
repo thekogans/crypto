@@ -198,7 +198,6 @@ namespace thekogans {
         RSAKeyExchange::RSAKeyExchange (
                 AsymmetricKey::SharedPtr key_,
                 Params::SharedPtr params) :
-                KeyExchange (ID::Empty),
                 key (key_) {
             RSAParams::SharedPtr rsaParams =
                 util::dynamic_refcounted_sharedptr_cast<RSAParams> (params);

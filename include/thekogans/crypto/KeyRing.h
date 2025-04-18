@@ -138,7 +138,7 @@ namespace thekogans {
             /// \param[in] description Optional key ring description.
             KeyRing (
                 const CipherSuite &cipherSuite_ = CipherSuite::Strongest,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 Serializable (id, name, description),
@@ -295,7 +295,7 @@ namespace thekogans {
                 const void *salt = 0,
                 std::size_t saltLength = 0,
                 std::size_t count = 1,
-                const ID &keyId = ID (),
+                const ID &keyId = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string (),
                 bool recursive = true);

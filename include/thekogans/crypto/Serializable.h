@@ -59,7 +59,7 @@ namespace thekogans {
             /// \param[in] name_ Optional serializable name.
             /// \param[in] description_ Optional serializable description.
             Serializable (
-                const ID &id_ = ID (),
+                const ID &id_ = ID::FromRandom (),
                 const std::string &name_ = std::string (),
                 const std::string &description_ = std::string ()) :
                 id (id_),

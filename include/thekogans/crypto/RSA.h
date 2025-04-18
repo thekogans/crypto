@@ -49,7 +49,7 @@ namespace thekogans {
             static AsymmetricKey::SharedPtr CreateKey (
                 std::size_t keyLength,
                 BIGNUMPtr publicExponent = BIGNUMFromui32 (65537),
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 

@@ -74,9 +74,8 @@ namespace thekogans {
                 /// \brief
                 /// ctor.
                 /// \param[in] id_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
-                Params (const ID &id_ = ID ()) :
-                    id (id_),
-                    signatureKeyId (ID::Empty) {}
+                Params (const ID &id_ = ID::FromRandom ()) :
+                    id (id_) {}
 
                 /// \brief
                 /// Given my private \see{AsymmetricKey}, create a signature over the parameters.
@@ -146,7 +145,7 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// \param[in] id_ KeyExchange id (see \see{KeyRing::AddKeyExchange}).
-            explicit KeyExchange (const ID &id_) :
+            KeyExchange (const ID &id_ = ID {}) :
                 id (id_) {}
 
             /// \brief

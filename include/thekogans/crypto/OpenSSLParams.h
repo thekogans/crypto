@@ -63,7 +63,7 @@ namespace thekogans {
             /// \param[in] description Optional parameters description.
             OpenSSLParams (
                 EVP_PKEYPtr params_ = EVP_PKEYPtr (),
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -91,7 +91,7 @@ namespace thekogans {
                 util::i32 type,
                 pem_password_cb *passwordCallback = 0,
                 void *userData = 0,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -113,7 +113,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return \see{AsymmetricKey} based on parameters.
             virtual AsymmetricKey::SharedPtr CreateKey (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 

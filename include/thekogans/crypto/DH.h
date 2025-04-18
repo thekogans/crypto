@@ -49,7 +49,7 @@ namespace thekogans {
             static Params::SharedPtr ParamsFromPrimeLengthAndGenerator (
                 std::size_t primeLength,
                 std::size_t generator = DH_GENERATOR_2,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -68,7 +68,7 @@ namespace thekogans {
             static Params::SharedPtr ParamsFromPrimeAndGenerator (
                 const BIGNUM &prime,
                 const BIGNUM &generator,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -105,7 +105,7 @@ namespace thekogans {
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::SharedPtr ParamsFromRFC3526Prime (
                 RFC3526Prime prime,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -133,7 +133,7 @@ namespace thekogans {
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::SharedPtr ParamsFromRFC5114Prime (
                 RFC5114Prime prime,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -156,7 +156,7 @@ namespace thekogans {
             /// \return DH parameters suitable for key and shared secret generation.
             static Params::SharedPtr ParamsDavidPrime (
                 DavidPrime prime,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
         };

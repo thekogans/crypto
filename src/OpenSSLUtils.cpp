@@ -160,8 +160,6 @@ namespace thekogans {
         const char * const SessionInfo::ATTR_COUNT_TRANSFERED =
             "CountTransfered";
 
-        const SessionInfo SessionInfo::Empty;
-
         SessionInfo::SessionInfo (const SessionInfo &sessionInfo) :
                 serverName (sessionInfo.serverName),
                 renegotiationFrequency (sessionInfo.renegotiationFrequency),

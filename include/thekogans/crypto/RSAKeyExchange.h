@@ -66,8 +66,8 @@ namespace thekogans {
                 /// \param[in] buffer_ Encrypted \see{SymmetricKey} (client).
                 /// \see{SymmetricKey} signature (server).
                 RSAParams (
-                    const ID &id = ID (),
-                    const ID &keyId_ = ID (),
+                    const ID &id = ID::FromRandom (),
+                    const ID &keyId_ = ID::FromRandom (),
                     const std::vector<util::ui8> &buffer_ = std::vector<util::ui8> ()) :
                     Params (id),
                     keyId (keyId_),
@@ -166,7 +166,7 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
-                const ID &keyId = ID (),
+                const ID &keyId = ID::FromRandom (),
                 const std::string &keyName = std::string (),
                 const std::string &keyDescription = std::string ());
             /// \brief

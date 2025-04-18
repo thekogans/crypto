@@ -76,7 +76,7 @@ namespace thekogans {
             Ed25519AsymmetricKey (
                 const util::ui8 *key_ = 0,
                 bool isPrivate = false,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             ~Ed25519AsymmetricKey () {
@@ -109,7 +109,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public part of the privateKey (or duplicate of the pubilc key).
             virtual AsymmetricKey::SharedPtr GetPublicKey (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 

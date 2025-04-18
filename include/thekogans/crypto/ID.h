@@ -20,12 +20,11 @@
 
 #include <cstddef>
 #include <cstring>
-#include <functional>
-#include <openssl/sha.h>
 #include "thekogans/util/Types.h"
 #include "thekogans/util/Serializer.h"
 #include "thekogans/util/StringUtils.h"
 #include "thekogans/util/Exception.h"
+#include "thekogans/util/SHA2.h"
 #include "thekogans/crypto/Config.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 
@@ -40,56 +39,55 @@ namespace thekogans {
         struct _LIB_THEKOGANS_CRYPTO_DECL ID {
             /// \brief
             /// ID size.
-            static const std::size_t SIZE = SHA256_DIGEST_LENGTH;
+            static const std::size_t SIZE = util::SHA2::DIGEST_SIZE_256;
 
             /// \brief
             /// \see{Serializable} ID.
             util::ui8 data[SIZE];
 
             /// \brief
-            /// ctor. Create a random ID using \see{util::RandomSource}.
-            ID ();
-            /// \brief
-            /// ctor.
-            /// \param[in] buffer Optional data to hash in to id.
-            /// NOTE: if none is provided, ID will use random bytes.
-            /// \param[in] length Optional buffer length.
-            ID (const void *buffer,
-                std::size_t length);
-            /// \brief
             /// ctor. Initialize to a given value.
             /// \param[in] data_ Value to initialize to.
-            explicit ID (const util::ui8 data_[SIZE]) {
-                memcpy (data, data_, SIZE);
-            }
-            /// \brief
-            /// ctor.
-            /// \param[in] serializer \see{util::Serializer} containing the serialized id.
-            explicit ID (util::Serializer &serializer);
-
-            /// \brief
-            /// Empty id.
-            static const ID Empty;
+            /// If nullptr, initialize to all 0.
+            ID (const util::ui8 data_[SIZE] = nullptr);
 
             /// \brief
             /// Return the id size.
             /// \return ID size.
-            inline std::size_t Size () const {
+            inline constexpr std::size_t Size () const {
                 return SIZE;
             }
-            /// \brief
-            /// Serialize the id to the given serializer.
-            /// \param[out] serializer \see{util::Serializer} serialize the id to.
-            void Serialize (util::Serializer &serializer) const;
-
-            static ID FromHexString (const std::string &hexString);
 
             /// \brief
             /// Return a hex string representation of the id.
             /// \return Hex string representation of the id.
-            inline std::string ToHexString () const {
-                return util::HexEncodeBuffer (data, SIZE);
+            inline std::string ToHexString (bool upperCase = false) const {
+                return util::HexEncodeBuffer (data, SIZE, upperCase);
             }
+
+            /// \brief
+            /// Parse id from a hex string encoding.
+            /// \param[in] id Hex string encoding of an ID.
+            /// \return ID.
+            static ID FromHexString (const std::string &id);
+            /// \brief
+            /// Create an id for a given file. Uses \see{util::SHA2::FromFile}.
+            /// \param[in] path file to create an id from (SHA2 hash).
+            /// \return SHA2 hash of the file.
+            static ID FromFile (const std::string &path);
+            /// \brief
+            /// Create a id for a given buffer. Uses \see{SHA2::FromBuffer}.
+            /// \param[in] buffer Pointer to the beginning of the buffer.
+            /// \param[in] length Length of the buffer.
+            /// \return SHA2 hash of the buffer.
+            static ID FromBuffer (
+                const void *buffer,
+                std::size_t length);
+            /// \brief
+            /// Create a random id. Uses \see{SHA2::FromRandom}.
+            /// \param[in] length Length of random bytes.
+            /// \return SHA2 hash of the random bytes.
+            static ID FromRandom (std::size_t length = SIZE);
         };
 
         /// \brief
@@ -97,10 +95,21 @@ namespace thekogans {
         /// \param[in] id1 First id to compare.
         /// \param[in] id2 Second id to compare.
         /// \return true if id1 sorts before id2.
-        inline bool operator < (
+        inline bool _LIB_THEKOGANS_CRYPTO_API operator < (
                 const ID &id1,
                 const ID &id2) {
             return memcmp (id1.data, id2.data, ID::SIZE) < 0;
+        }
+
+        /// \brief
+        /// Return true if id1 sorts after id2.
+        /// \param[in] id1 First id to compare.
+        /// \param[in] id2 Second id to compare.
+        /// \return true if id1 sorts after id2.
+        inline bool _LIB_THEKOGANS_CRYPTO_API operator > (
+                const ID &id1,
+                const ID &id2) {
+            return memcmp (id1.data, id2.data, ID::SIZE) > 0;
         }
 
         /// \brief
@@ -108,7 +117,7 @@ namespace thekogans {
         /// \param[in] id1 First id to compare.
         /// \param[in] id2 Second id to compare.
         /// \return true if id1 is equivalent to id2.
-        inline bool operator == (
+        inline bool _LIB_THEKOGANS_CRYPTO_API operator == (
                 const ID &id1,
                 const ID &id2) {
             return TimeInsensitiveCompare (id1.data, id2.data, ID::SIZE);
@@ -119,7 +128,7 @@ namespace thekogans {
         /// \param[in] id1 First id to compare.
         /// \param[in] id2 Second id to compare.
         /// \return true if id1 is not equivalent to id2.
-        inline bool operator != (
+        inline bool _LIB_THEKOGANS_CRYPTO_API operator != (
                 const ID &id1,
                 const ID &id2) {
             return !TimeInsensitiveCompare (id1.data, id2.data, ID::SIZE);
@@ -130,7 +139,7 @@ namespace thekogans {
         /// \param[in] serializer Where to serialize the key id.
         /// \param[in] id ID to serialize.
         /// \return serializer.
-        inline util::Serializer &operator << (
+        inline util::Serializer & _LIB_THEKOGANS_CRYPTO_API operator << (
                 util::Serializer &serializer,
                 const ID &id) {
             if (serializer.Write (id.data, ID::SIZE) != ID::SIZE) {
@@ -145,7 +154,7 @@ namespace thekogans {
         /// \param[in] serializer Where to deserialize the key id.
         /// \param[out] id ID to deserialize.
         /// \return serializer.
-        inline util::Serializer &operator >> (
+        inline util::Serializer & _LIB_THEKOGANS_CRYPTO_API operator >> (
                 util::Serializer &serializer,
                 ID &id) {
             if (serializer.Read (id.data, ID::SIZE) != ID::SIZE) {

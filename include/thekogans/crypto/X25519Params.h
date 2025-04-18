@@ -46,7 +46,7 @@ namespace thekogans {
             /// \param[in] name Optional parameters name.
             /// \param[in] description Optional parameters description.
             X25519Params (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 Params (id, name, description) {}
@@ -65,7 +65,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return \see{AsymmetricKey} based on parameters.
             virtual AsymmetricKey::SharedPtr CreateKey (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 

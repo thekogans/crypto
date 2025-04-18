@@ -58,7 +58,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             AsymmetricKey (
                 bool isPrivate_ = false,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 Serializable (id, name, description),
@@ -89,7 +89,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public part of the private key (or duplicate of the pubilc key).
             virtual SharedPtr GetPublicKey (
-                const ID & /*id*/ = ID (),
+                const ID & /*id*/ = ID::FromRandom (),
                 const std::string & /*name*/ = std::string (),
                 const std::string & /*description*/ = std::string ()) const = 0;
 

@@ -543,10 +543,6 @@ namespace thekogans {
             SSL_SESSIONPtr session;
 
             /// \brief
-            /// An empty SessionInfo.
-            static const SessionInfo Empty;
-
-            /// \brief
             /// ctor.
             /// \param[in] serverName_ Server name to validate..
             /// \param[in] renegotiationFrequency_ How many bytes to

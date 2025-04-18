@@ -15,80 +15,70 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
-#include "thekogans/util/RandomSource.h"
-#include "thekogans/crypto/MessageDigest.h"
+#include <cstring>
+#include "thekogans/util/SHA2.h"
+#include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/ID.h"
 
 namespace thekogans {
     namespace crypto {
 
-        namespace {
-            const util::ui8 emptyIdData[ID::SIZE] = {
-                util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX,
-                util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX,
-                util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX,
-                util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX, util::UI8_MAX
-            };
-        }
-
-        const ID ID::Empty (emptyIdData);
-
-        ID::ID () {
-            if (util::RandomSource::Instance ()->GetBytes (data, SIZE) != SIZE) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to get " THEKOGANS_UTIL_SIZE_T_FORMAT " random bytes for ID.", SIZE);
-            }
-        }
-
-        ID::ID (const void *buffer,
-                std::size_t length) {
-            if (buffer != nullptr && length > 0) {
-                MessageDigest messageDigest (EVP_sha256 ());
-                messageDigest.Init ();
-                messageDigest.Update (buffer, length);
-                length = messageDigest.Final (data);
-                if (length != ID::SIZE) {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Incorrect ID length (" THEKOGANS_UTIL_SIZE_T_FORMAT ", "
-                        THEKOGANS_UTIL_SIZE_T_FORMAT ").",
-                        length, ID::SIZE);
-                }
+        ID::ID (const util::ui8 data_[SIZE]) {
+            if (data_ != nullptr) {
+                memcpy (data, data_, SIZE);
             }
             else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                memset (data, 0, SIZE);
             }
         }
 
-        ID::ID (util::Serializer &serializer) {
-            if (serializer.Read (data, ID::SIZE) != ID::SIZE) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to read " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes from the buffer.", ID::SIZE);
-            }
-        }
-
-        void ID::Serialize (util::Serializer &serializer) const {
-            if (serializer.Write (data, ID::SIZE) != ID::SIZE) {
-                THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "Unable to write " THEKOGANS_UTIL_SIZE_T_FORMAT " bytes to the buffer.", ID::SIZE);
-            }
-        }
-
-        ID ID::FromHexString (const std::string &hexString) {
-            if (hexString.size () == SIZE * 2) {
-                util::ui8 data[SIZE];
-                if (util::HexDecodestring (hexString, data) == SIZE) {
-                    return ID (data);
+        ID ID::FromHexString (const std::string &id) {
+            util::ui8 data[SIZE];
+            if (!id.empty ()) {
+                if (id.size () == SIZE * 2) {
+                    if (util::HexDecodestring (id, data) != SIZE) {
+                        THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
+                            "%s is not a hex encoded ID.", id.c_str ());
+                    }
                 }
                 else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s is not a hex encoded ID.", hexString.c_str ());
+                    THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
+                        THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                 }
             }
             else {
-                THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                    THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
+                memset (data, 0, SIZE);
             }
+            return ID (data);
+        }
+
+        ID ID::FromFile (const std::string &path) {
+            util::Hash::Digest digest;
+            {
+                util::SHA2 sha2;
+                sha2.FromFile (path, util::SHA2::DIGEST_SIZE_256, digest);
+            }
+            return ID (digest.data ());
+        }
+
+        ID ID::FromBuffer (
+                const void *buffer,
+                std::size_t length) {
+            util::Hash::Digest digest;
+            {
+                util::SHA2 sha2;
+                sha2.FromBuffer (buffer, length, util::SHA2::DIGEST_SIZE_256, digest);
+            }
+            return ID (digest.data ());
+        }
+
+        ID ID::FromRandom (std::size_t length) {
+            util::Hash::Digest digest;
+            {
+                util::SHA2 sha2;
+                sha2.FromRandom (length, util::SHA2::DIGEST_SIZE_256, digest);
+            }
+            return ID (digest.data ());
         }
 
     } // namespace crypto

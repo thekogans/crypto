@@ -43,7 +43,7 @@ namespace thekogans {
             /// \return DSA key parameters.
             static Params::SharedPtr ParamsFromKeyLength (
                 std::size_t keyLength,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
         };

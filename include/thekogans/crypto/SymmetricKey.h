@@ -61,7 +61,7 @@ namespace thekogans {
             /// \param[in] name Optional key name.
             /// \param[in] description Optional key description.
             SymmetricKey (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 Serializable (id, name, description) {}
@@ -75,7 +75,7 @@ namespace thekogans {
             SymmetricKey (
                 const void *buffer,
                 std::size_t length,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 Serializable (id, name, description),
@@ -111,7 +111,7 @@ namespace thekogans {
                 argon2_context &context,
                 std::size_t keyLength = GetCipherKeyLength (),
                 argon2_ctx_fptr argon2_ctx = argon2id_ctx,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
         #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
@@ -144,7 +144,7 @@ namespace thekogans {
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
                 util::f64 timeInSeconds = 0.0,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -184,7 +184,7 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 PBKDF2_HMAC hash = PBKDF2_HMAC_SHA256,
                 std::size_t count = 1,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -210,7 +210,7 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -254,7 +254,7 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 HKDF_MODE mode = HKDF_MODE_EXTRACT_AND_EXPAND,
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -280,7 +280,7 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -309,7 +309,7 @@ namespace thekogans {
                 std::size_t keyLength = GetCipherKeyLength (),
                 const EVP_MD *md = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count = 1,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 

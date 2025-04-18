@@ -61,7 +61,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             X25519AsymmetricKey (
                 bool isPrivate = false,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 AsymmetricKey (isPrivate, id, name, description) {}
@@ -75,7 +75,7 @@ namespace thekogans {
             X25519AsymmetricKey (
                 const util::ui8 *key_,
                 bool isPrivate,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) :
                 AsymmetricKey (isPrivate, id, name, description),
@@ -107,7 +107,7 @@ namespace thekogans {
             /// \param[in] description Optional key description.
             /// \return Public part of the privateKey (or duplicate of the pubilc key).
             virtual AsymmetricKey::SharedPtr GetPublicKey (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ()) const override;
 

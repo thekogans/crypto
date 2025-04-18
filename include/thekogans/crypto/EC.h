@@ -57,7 +57,7 @@ namespace thekogans {
                 const BIGNUM &gy,
                 const BIGNUM &n,
                 const BIGNUM &c,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -71,7 +71,7 @@ namespace thekogans {
             /// \return OpenSSL named elliptic curve parameters.
             static Params::SharedPtr ParamsFromNamedCurve (
                 util::i32 nid,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -103,7 +103,7 @@ namespace thekogans {
             /// \return GFp elliptic curve parameters.
             static Params::SharedPtr ParamsFromRFC5114Curve (
                 RFC5114Curve curve,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -162,7 +162,7 @@ namespace thekogans {
             /// \return GFp elliptic curve parameters.
             static Params::SharedPtr ParamsFromRFC5639Curve (
                 RFC5639Curve curve,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -173,7 +173,7 @@ namespace thekogans {
             /// \param[in] description Optional parameters description.
             /// \return \see{Ed255219} elliptic curve parameters.
             static Params::SharedPtr ParamsFromEd25519Curve (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
             /// \brief
@@ -183,7 +183,7 @@ namespace thekogans {
             /// \param[in] description Optional parameters description.
             /// \return \see{X255219} elliptic curve parameters.
             static Params::SharedPtr ParamsFromX25519Curve (
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
 
@@ -196,7 +196,7 @@ namespace thekogans {
             /// \return OpenSSL named elliptic curve parameters.
             static Params::SharedPtr ParamsFromCurveName (
                 const std::string &curveName,
-                const ID &id = ID (),
+                const ID &id = ID::FromRandom (),
                 const std::string &name = std::string (),
                 const std::string &description = std::string ());
         };

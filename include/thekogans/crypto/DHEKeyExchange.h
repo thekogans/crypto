@@ -99,13 +99,13 @@ namespace thekogans {
                 /// \param[in] keyDescription_ \see{SymmetricKey} description.
                 /// \param[in] publicKey_ Public \see{DH} \see{AsymmetricKey} used for key exchange.
                 DHEParams (
-                    const ID &id = ID (),
+                    const ID &id = ID::FromRandom (),
                     crypto::Params::SharedPtr params_ = nullptr,
                     const std::vector<util::ui8> &salt_ = std::vector<util::ui8> (),
                     std::size_t keyLength_ = 0,
                     const std::string &messageDigestName_ = std::string (),
                     std::size_t count_ = 0,
-                    const ID &keyId_ = ID (),
+                    const ID &keyId_ = ID::FromRandom (),
                     const std::string &keyName_ = std::string (),
                     const std::string &keyDescription_ = std::string (),
                     AsymmetricKey::SharedPtr publicKey_ = nullptr) :
@@ -238,7 +238,7 @@ namespace thekogans {
                 std::size_t keyLength_ = GetCipherKeyLength (),
                 const EVP_MD *md_ = THEKOGANS_CRYPTO_DEFAULT_MD,
                 std::size_t count_ = 1,
-                const ID &keyId_ = ID (),
+                const ID &keyId_ = ID::FromRandom (),
                 const std::string &keyName_ = std::string (),
                 const std::string &keyDescription_ = std::string ());
             /// \brief

@@ -296,13 +296,13 @@ namespace thekogans {
             KeyExchange::SharedPtr keyExchange;
             if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_ECDHE ||
                     cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_DHE) {
-                Params::SharedPtr params = paramsOrKeyId != ID::Empty ?
+                Params::SharedPtr params = paramsOrKeyId != ID {} ?
                     GetKeyExchangeParams (paramsOrKeyId) :
                     GetRandomKeyExchangeParams ();
                 if (params != nullptr) {
                     keyExchange.Reset (
                         new DHEKeyExchange (
-                            ID (),
+                            ID::FromRandom (),
                             params,
                             salt,
                             saltLength,
@@ -324,7 +324,7 @@ namespace thekogans {
                 if (key != nullptr && !key->IsPrivate ()) {
                     keyExchange.Reset (
                         new RSAKeyExchange (
-                            ID (),
+                            ID::FromRandom (),
                             key,
                             secretLength,
                             salt,
