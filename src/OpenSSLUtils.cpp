@@ -960,7 +960,6 @@ namespace thekogans {
                 const char *message = X509_verify_cert_error_string (error);
                 THEKOGANS_UTIL_LOG_SUBSYSTEM_ERROR (
                     THEKOGANS_CRYPTO,
-                    "%s",
                     util::FormatString (
                         "Error with certificate at depth: %i\n"
                         "  issuer = %s\n"

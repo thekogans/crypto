@@ -69,7 +69,7 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s", "Unable to generate password hash.");
+                    "Unable to generate password hash.");
             }
         }
 

@@ -79,7 +79,7 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s", "OpenSSLSigner is not initialized.");
+                    "OpenSSLSigner is not initialized.");
             }
         }
 
@@ -97,7 +97,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "OpenSSLSigner is not initialized.");
+                        "OpenSSLSigner is not initialized.");
                 }
             }
             else {
@@ -122,7 +122,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "OpenSSLSigner is not initialized.");
+                        "OpenSSLSigner is not initialized.");
                 }
             }
             else {

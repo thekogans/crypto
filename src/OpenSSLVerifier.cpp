@@ -79,7 +79,7 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s", "OpenSSLVerifier is not initialized.");
+                    "OpenSSLVerifier is not initialized.");
             }
         }
 
@@ -97,7 +97,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "OpenSSLVerifier is not initialized.");
+                        "OpenSSLVerifier is not initialized.");
                 }
             }
             else {
@@ -118,7 +118,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "OpenSSLVerifier is not initialized.");
+                        "OpenSSLVerifier is not initialized.");
                 }
             }
             else {

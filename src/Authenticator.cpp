@@ -68,7 +68,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Authenticator is not initialized.");
+                        "Authenticator is not initialized.");
                 }
             }
             else {
@@ -91,7 +91,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Authenticator is not initialized.");
+                        "Authenticator is not initialized.");
                 }
             }
             else {
@@ -114,7 +114,7 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s", "Authenticator is not initialized.");
+                    "Authenticator is not initialized.");
             }
         }
 
@@ -136,7 +136,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Authenticator is not initialized.");
+                        "Authenticator is not initialized.");
                 }
             }
             else {

@@ -288,7 +288,7 @@ namespace thekogans {
                                 ciphertextHeader.ciphertextLength,
                             ciphertextHeader.macLength)) {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Ciphertext failed mac verifacion.");
+                        "Ciphertext failed mac verifacion.");
                 }
                 decryptor.Init (buffer.GetReadPtr ());
                 buffer.AdvanceReadOffset (ciphertextHeader.ivLength);

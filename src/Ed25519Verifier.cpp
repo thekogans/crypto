@@ -58,7 +58,7 @@ namespace thekogans {
             }
             else {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                    "%s", "Ed25519Signer is not initialized.");
+                    "Ed25519Verifier is not initialized.");
             }
         }
 
@@ -71,7 +71,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Ed25519Verifier is not initialized.");
+                        "Ed25519Verifier is not initialized.");
                 }
             }
             else {
@@ -95,7 +95,7 @@ namespace thekogans {
                 }
                 else {
                     THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "%s", "Ed25519Verifier is not initialized.");
+                        "Ed25519Verifier is not initialized.");
                 }
             }
             else {
