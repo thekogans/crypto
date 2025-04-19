@@ -74,7 +74,7 @@ namespace thekogans {
                 errorCode, format, ...)\
             THEKOGANS_CRYPTO_THROW_ARGON2_ERROR_CODE_AND_MESSAGE_EXCEPTION_EX (\
                 __FILE__, __FUNCTION__, __LINE__, __DATE__ " " __TIME__,\
-                errorCode, format, __VA_ARGS__)
+                errorCode, format, ##__VA_ARGS__)
 
     } // namespace crypto
 } // namespace thekogans

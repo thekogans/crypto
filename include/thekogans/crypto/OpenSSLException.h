@@ -81,14 +81,14 @@ namespace thekogans {
             THEKOGANS_UTIL_DEBUG_BREAK\
             throw thekogans::crypto::CreateOpenSSLException (\
                 file, function, line, buildTime,\
-                thekogans::util::FormatString (format, __VA_ARGS__).c_str ())
+                thekogans::util::FormatString (format, ##__VA_ARGS__).c_str ())
         /// \def THEKOGANS_CRYPTO_THROW_OPENSSL_AND_MESSAGE_EXCEPTION(format, ...)
         /// Throw an Exception from OpenSSL error stack.
         #define THEKOGANS_CRYPTO_THROW_OPENSSL_AND_MESSAGE_EXCEPTION(\
                 format, ...)\
             THEKOGANS_CRYPTO_THROW_OPENSSL_AND_MESSAGE_EXCEPTION_EX (\
                 __FILE__, __FUNCTION__, __LINE__, __DATE__ " " __TIME__,\
-                format, __VA_ARGS__)
+                format, ##__VA_ARGS__)
 
     } // namespace crypto
 } // namespace thekogans

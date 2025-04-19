@@ -178,7 +178,7 @@ namespace thekogans {
             THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (\
                 _T,\
                 version,\
-                thekogans::crypto::Serializable::TYPE, __VA_ARGS__)\
+                thekogans::crypto::Serializable::TYPE, ##__VA_ARGS__)\
             THEKOGANS_UTIL_IMPLEMENT_HEAP_FUNCTIONS_EX (\
                 _T,\
                 thekogans::util::SpinLock,\

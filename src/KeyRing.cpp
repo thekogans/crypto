@@ -37,8 +37,7 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::KeyRing,
             1,
-            THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE,
-            "")
+            THEKOGANS_CRYPTO_MIN_KEY_RINGS_IN_PAGE)
 
         KeyRing::SharedPtr KeyRing::Load (
                 const std::string &path,
