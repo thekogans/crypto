@@ -46,7 +46,8 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::SymmetricKey,
             1,
-            THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE)
+            THEKOGANS_CRYPTO_MIN_SYMMETRIC_KEYS_IN_PAGE,
+            "")
 
     #if defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
         SymmetricKey::SharedPtr SymmetricKey::FromArgon2 (
