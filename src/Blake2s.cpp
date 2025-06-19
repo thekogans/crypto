@@ -25,6 +25,7 @@
 #include <blake2.h>
 #include <openssl/evp.h>
 #include <openssl/objects.h>
+#include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/Blake2s.h"
 
 namespace thekogans {
@@ -52,8 +53,8 @@ namespace thekogans {
                 P.xof_length = 0;
                 P.node_depth = 0;
                 P.inner_length = 0;
-                memset (P.salt, 0, sizeof (P.salt));
-                memset (P.personal, 0, sizeof (P.personal));
+                util::SecureZeroMemory (P.salt, sizeof (P.salt));
+                util::SecureZeroMemory (P.personal, sizeof (P.personal));
                 blake2s_init_param ((blake2s_state *)EVP_MD_CTX_md_data (ctx), &P);
                 return 1;
             }

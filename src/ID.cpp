@@ -18,6 +18,7 @@
 #include <cstring>
 #include "thekogans/util/SHA2.h"
 #include "thekogans/util/StringUtils.h"
+#include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/ID.h"
 
 namespace thekogans {
@@ -28,7 +29,7 @@ namespace thekogans {
                 memcpy (data, data_, SIZE);
             }
             else {
-                memset (data, 0, SIZE);
+                util::SecureZeroMemory (data, SIZE);
             }
         }
 
@@ -47,7 +48,7 @@ namespace thekogans {
                 }
             }
             else {
-                memset (data, 0, SIZE);
+                util::SecureZeroMemory (data, SIZE);
             }
             return ID (data);
         }

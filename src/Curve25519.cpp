@@ -41,6 +41,7 @@
 #include <openssl/sha.h>
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
+#include "thekogans/util/SecureAllocator.h"
 #include "thekogans/crypto/OpenSSLUtils.h"
 #include "thekogans/crypto/Curve25519.h"
 
@@ -233,12 +234,12 @@ namespace thekogans {
 
             // h = 0
             void fe_0 (fe h) {
-                memset (h, 0, sizeof (util::i32) * 10);
+                util::SecureZeroMemory (h, sizeof (util::i32) * 10);
             }
 
             // h = 1
             void fe_1 (fe h) {
-                memset (h, 0, sizeof (util::i32) * 10);
+                util::SecureZeroMemory (h, sizeof (util::i32) * 10);
                 h[0] = 1;
             }
 
