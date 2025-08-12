@@ -121,7 +121,7 @@ namespace thekogans {
 
             /// \brief
             /// Read the key from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::SerializableHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the key from.
             virtual void Read (
                 const util::SerializableHeader &header,
@@ -137,7 +137,7 @@ namespace thekogans {
 
             /// \brief
             /// Read a Serializable from an XML DOM.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::SerializableHeader}.
             /// \param[in] node XML DOM representation of a Serializable.
             virtual void ReadXML (
                 const util::SerializableHeader &header,
@@ -149,13 +149,14 @@ namespace thekogans {
 
             /// \brief
             /// Read a Serializable from an JSON DOM.
-            /// \param[in] node JSON DOM representation of a Serializable.
+            /// \param[in] header \see{util::SerializableHeader}.
+            /// \param[in] object JSON DOM representation of a Serializable.
             virtual void ReadJSON (
                 const util::SerializableHeader &header,
                 const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.
-            /// \param[out] node Parent node.
+            /// \param[out] object Parent \see{util::JSON::Object}.
             virtual void WriteJSON (util::JSON::Object &object) const override;
 
             /// \brief

@@ -363,13 +363,14 @@ namespace thekogans {
 
             /// \brief
             /// Read a Serializable from an JSON DOM.
-            /// \param[in] node JSON DOM representation of a Serializable.
+            /// \param[in] header \see{util::SerializableHeader}.
+            /// \param[in] object JSON DOM representation of a Serializable.
             virtual void ReadJSON (
                 const util::SerializableHeader &header,
                 const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.
-            /// \param[out] node Parent node.
+            /// \param[out] object Parent \see{util::JSON::Object}.
             virtual void WriteJSON (util::JSON::Object &object) const override;
 
             /// \brief

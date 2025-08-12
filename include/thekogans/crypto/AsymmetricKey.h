@@ -118,7 +118,7 @@ namespace thekogans {
             /// \brief
             /// Read the Serializable from an XML DOM.
             /// \param[in] header \see{util::SerializableHeader}.
-            /// \param[in] object XML DOM representation of a Serializable.
+            /// \param[in] node XML DOM representation of a Serializable.
             virtual void ReadXML (
                 const util::SerializableHeader &header,
                 const pugi::xml_node &node) override;

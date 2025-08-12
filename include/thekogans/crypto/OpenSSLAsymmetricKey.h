@@ -265,6 +265,10 @@ namespace thekogans {
             virtual void Write (util::Serializer &serializer) const override;
 
             /// \brief
+            /// "Key"
+            static const char * const TAG_KEY;
+
+            /// \brief
             /// Read the Serializable from an XML DOM.
             /// \param[in] header \see{util::SerializableHeader}.
             /// \param[in] node XML DOM representation of a Serializable.
@@ -277,18 +281,15 @@ namespace thekogans {
             virtual void WriteXML (pugi::xml_node &node) const override;
 
             /// \brief
-            /// "Key"
-            static const char * const TAG_KEY;
-
-            /// \brief
             /// Read a Serializable from an JSON DOM.
-            /// \param[in] node JSON DOM representation of a Serializable.
+            /// \param[in] header \see{util::SerializableHeader}.
+            /// \param[in] object JSON DOM representation of a Serializable.
             virtual void ReadJSON (
                 const util::SerializableHeader &header,
                 const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.
-            /// \param[out] node Parent node.
+            /// \param[out] object Parent \see{util::JSON::Object}.
             virtual void WriteJSON (util::JSON::Object &object) const override;
 
             /// \brief
