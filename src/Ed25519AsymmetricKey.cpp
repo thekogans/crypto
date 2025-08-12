@@ -75,7 +75,7 @@ namespace thekogans {
         }
 
         void Ed25519AsymmetricKey::Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
             if (IsPrivate ()) {
@@ -129,7 +129,7 @@ namespace thekogans {
         const char * const Ed25519AsymmetricKey::ATTR_KEY = "Key";
 
         void Ed25519AsymmetricKey::ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) {
             AsymmetricKey::ReadXML (header, node);
             if (IsPrivate ()) {
@@ -175,7 +175,7 @@ namespace thekogans {
         }
 
         void Ed25519AsymmetricKey::ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) {
             AsymmetricKey::ReadJSON (header, object);
             if (IsPrivate ()) {

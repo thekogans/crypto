@@ -292,7 +292,7 @@ namespace thekogans {
         }
 
         void OpenSSLAsymmetricKey::Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) {
             AsymmetricKey::Read (header, serializer);
             util::SecureString keyBuffer;
@@ -307,7 +307,7 @@ namespace thekogans {
         }
 
         void OpenSSLAsymmetricKey::ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) {
             AsymmetricKey::ReadXML (header, node);
             key = ReadKey (IsPrivate (), node.text ().get (), strlen (node.text ().get ()));
@@ -323,7 +323,7 @@ namespace thekogans {
         const char * const OpenSSLAsymmetricKey::TAG_KEY = "Key";
 
         void OpenSSLAsymmetricKey::ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) {
             AsymmetricKey::ReadJSON (header, object);
             util::SecureString keyBuffer =

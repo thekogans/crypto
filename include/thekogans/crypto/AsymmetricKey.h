@@ -101,10 +101,10 @@ namespace thekogans {
 
             /// \brief
             /// Read the key from the given serializer.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::SerializableHeader}.
             /// \param[in] serializer \see{util::Serializer} to read the key from.
             virtual void Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) override;
             /// \brief
             /// Serialize the key to the given serializer.
@@ -117,24 +117,26 @@ namespace thekogans {
 
             /// \brief
             /// Read the Serializable from an XML DOM.
-            /// \param[in] node XML DOM representation of a Serializable.
+            /// \param[in] header \see{util::SerializableHeader}.
+            /// \param[in] object XML DOM representation of a Serializable.
             virtual void ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) override;
             /// \brief
             /// Write the Serializable to the XML DOM.
-            /// \param[out] node Parent node.
+            /// \param[out] node Parent \see{pugi::xml_node}.
             virtual void WriteXML (pugi::xml_node &node) const override;
 
             /// \brief
             /// Read a Serializable from an JSON DOM.
-            /// \param[in] node JSON DOM representation of a Serializable.
+            /// \param[in] header \see{util::SerializableHeader}.
+            /// \param[in] object JSON DOM representation of a Serializable.
             virtual void ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.
-            /// \param[out] node Parent node.
+            /// \param[out] object Parent \see{util::JSON::Object}.
             virtual void WriteJSON (util::JSON::Object &object) const override;
         };
 

@@ -45,7 +45,7 @@ namespace thekogans {
         }
 
         void KeyExchange::Params::Read (
-                const Header & /*header*/,
+                const util::SerializableHeader & /*header*/,
                 util::Serializer &serializer) {
             serializer >> id >> signature >> signatureKeyId >> signatureMessageDigestName;
         }
@@ -62,7 +62,7 @@ namespace thekogans {
         }
 
         void KeyExchange::Params::ReadXML (
-                const Header & /*header*/,
+                const util::SerializableHeader & /*header*/,
                 const pugi::xml_node &node) {
             id = ID::FromHexString (node.attribute (ATTR_ID).value ());
             signature = util::HexDecodestring (node.attribute (ATTR_SIGNATURE).value ());
@@ -81,7 +81,7 @@ namespace thekogans {
         }
 
         void KeyExchange::Params::ReadJSON (
-                const Header & /*header*/,
+                const util::SerializableHeader & /*header*/,
                 const util::JSON::Object &object) {
             id = ID::FromHexString (object.Get<util::JSON::String> (ATTR_ID)->value);
             signature = util::HexDecodestring (

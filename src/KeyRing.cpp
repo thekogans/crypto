@@ -313,11 +313,6 @@ namespace thekogans {
                             name,
                             description));
                 }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to get params for id: %s",
-                        paramsOrKeyId.ToHexString ().c_str ());
-                }
             }
             else if (cipherSuite.keyExchange == CipherSuite::KEY_EXCHANGE_RSA) {
                 AsymmetricKey::SharedPtr key = GetKeyExchangeKey (paramsOrKeyId);
@@ -335,11 +330,6 @@ namespace thekogans {
                             keyId,
                             name,
                             description));
-                }
-                else {
-                    THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
-                        "Unable to get key for id: %s",
-                        paramsOrKeyId.ToHexString ().c_str ());
                 }
             }
             else {
@@ -1253,7 +1243,7 @@ namespace thekogans {
         }
 
         void KeyRing::Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             serializer >> cipherSuite;
@@ -1432,27 +1422,29 @@ namespace thekogans {
             }
         }
 
-        const char * const KeyRing::TAG_KEY_RING = "KeyRing";
-        const char * const KeyRing::ATTR_CIPHER_SUITE = "CipherSuite";
-        const char * const KeyRing::TAG_KEY_EXCHANGE_PARAMS = "KeyExchangeParams";
-        const char * const KeyRing::TAG_KEY_EXCHANGE_PARAM = "KeyExchangeParam";
-        const char * const KeyRing::TAG_KEY_EXCHANGE_KEYS = "KeyExchangeKeys";
-        const char * const KeyRing::TAG_KEY_EXCHANGE_KEY = "KeyExchangeKey";
-        const char * const KeyRing::TAG_AUTHENTICATOR_PARAMS = "AuthenticatorParams";
-        const char * const KeyRing::TAG_AUTHENTICATOR_PARAM = "AuthenticatorParam";
-        const char * const KeyRing::TAG_AUTHENTICATOR_KEYS = "AuthenticatorKeys";
-        const char * const KeyRing::TAG_AUTHENTICATOR_KEY = "AuthenticatorKey";
-        const char * const KeyRing::TAG_CIPHER_KEYS = "CipherKeys";
-        const char * const KeyRing::TAG_CIPHER_KEY = "CipherKey";
-        const char * const KeyRing::TAG_MAC_KEYS = "MACKeys";
-        const char * const KeyRing::TAG_MAC_KEY = "MACKey";
-        const char * const KeyRing::TAG_USER_DATAS = "UserDatas";
-        const char * const KeyRing::TAG_USER_DATA = "UserData";
-        const char * const KeyRing::TAG_SUB_RINGS = "SubRings";
-        const char * const KeyRing::TAG_SUB_RING = "SubRing";
+        namespace {
+            const char * const TAG_KEY_RING = "KeyRing";
+            const char * const ATTR_CIPHER_SUITE = "CipherSuite";
+            const char * const TAG_KEY_EXCHANGE_PARAMS = "KeyExchangeParams";
+            const char * const TAG_KEY_EXCHANGE_PARAM = "KeyExchangeParam";
+            const char * const TAG_KEY_EXCHANGE_KEYS = "KeyExchangeKeys";
+            const char * const TAG_KEY_EXCHANGE_KEY = "KeyExchangeKey";
+            const char * const TAG_AUTHENTICATOR_PARAMS = "AuthenticatorParams";
+            const char * const TAG_AUTHENTICATOR_PARAM = "AuthenticatorParam";
+            const char * const TAG_AUTHENTICATOR_KEYS = "AuthenticatorKeys";
+            const char * const TAG_AUTHENTICATOR_KEY = "AuthenticatorKey";
+            const char * const TAG_CIPHER_KEYS = "CipherKeys";
+            const char * const TAG_CIPHER_KEY = "CipherKey";
+            const char * const TAG_MAC_KEYS = "MACKeys";
+            const char * const TAG_MAC_KEY = "MACKey";
+            const char * const TAG_USER_DATAS = "UserDatas";
+            const char * const TAG_USER_DATA = "UserData";
+            const char * const TAG_SUB_RINGS = "SubRings";
+            const char * const TAG_SUB_RING = "SubRing";
+        }
 
         void KeyRing::ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) {
             Serializable::ReadXML (header, node);
             cipherSuite = node.attribute (ATTR_CIPHER_SUITE).value ();
@@ -1704,7 +1696,7 @@ namespace thekogans {
         }
 
         void KeyRing::ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) {
             Serializable::ReadJSON (header, object);
             cipherSuite = object.Get<util::JSON::String> (ATTR_CIPHER_SUITE)->value;

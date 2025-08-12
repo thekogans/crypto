@@ -102,7 +102,7 @@ namespace thekogans {
         }
 
         void RSAKeyExchange::RSAParams::Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
             serializer >> keyId >> buffer;
@@ -119,7 +119,7 @@ namespace thekogans {
         }
 
         void RSAKeyExchange::RSAParams::ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) {
             Params::ReadXML (header, node);
             keyId = ID::FromHexString (node.attribute (ATTR_KEY_ID).value ());
@@ -135,7 +135,7 @@ namespace thekogans {
         }
 
         void RSAKeyExchange::RSAParams::ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) {
             Params::ReadJSON (header, object);
             keyId = ID::FromHexString (object.Get<util::JSON::String> (ATTR_KEY_ID)->value);

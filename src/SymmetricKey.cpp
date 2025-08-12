@@ -496,7 +496,7 @@ namespace thekogans {
         }
 
         void SymmetricKey::Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
             serializer >> key;
@@ -510,7 +510,7 @@ namespace thekogans {
         const char * const SymmetricKey::ATTR_KEY = "Key";
 
         void SymmetricKey::ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) {
             Serializable::ReadXML (header, node);
             util::SecureString hexKey = node.attribute (ATTR_KEY).value ();
@@ -538,7 +538,7 @@ namespace thekogans {
         }
 
         void SymmetricKey::ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) {
             Serializable::ReadJSON (header, object);
             util::SecureString hexKey =

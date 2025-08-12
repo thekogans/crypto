@@ -48,7 +48,7 @@ namespace thekogans {
         }
 
         void X25519Params::Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) {
             Params::Read (header, serializer);
         }
@@ -58,7 +58,7 @@ namespace thekogans {
         }
 
         void X25519Params::ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) {
             Params::ReadXML (header, node);
         }
@@ -68,7 +68,7 @@ namespace thekogans {
         }
 
         void X25519Params::ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) {
             Params::ReadJSON (header, object);
         }

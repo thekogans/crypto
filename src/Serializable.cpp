@@ -49,7 +49,7 @@ namespace thekogans {
         }
 
         void Serializable::Read (
-                const Header & /*header*/,
+                const util::SerializableHeader & /*header*/,
                 util::Serializer &serializer) {
             serializer >> id >> name >> description;
         }
@@ -63,7 +63,7 @@ namespace thekogans {
         const char * const Serializable::ATTR_DESCRIPTION = "Description";
 
         void Serializable::ReadXML (
-                const Header & /*header*/,
+                const util::SerializableHeader & /*header*/,
                 const pugi::xml_node &node) {
             id = ID::FromHexString (node.attribute (ATTR_ID).value ());
             name = node.attribute (ATTR_NAME).value ();
@@ -77,7 +77,7 @@ namespace thekogans {
         }
 
         void Serializable::ReadJSON (
-                const Header & /*header*/,
+                const util::SerializableHeader & /*header*/,
                 const util::JSON::Object &object) {
             id = ID::FromHexString (object.Get<util::JSON::String> (ATTR_ID)->value);
             name = object.Get<util::JSON::String> (ATTR_NAME)->value;

@@ -197,7 +197,7 @@ namespace thekogans {
                 /// Reimplement this function to test for equality.
                 /// \param[in] t Instance to test for equality.
                 /// \return true == equal.
-                virtual bool operator () (const T & /*t*/) const throw () = 0;
+                virtual bool operator () (const T & /*t*/) const noexcept = 0;
             };
             /// \brief
             /// Return the \see{KeyExchange} \see{Params} matching the given EqualityTest.
@@ -614,7 +614,7 @@ namespace thekogans {
             /// \param[in] header \see{util::Serializable::Header}.
             /// \param[in] serializer \see{util::Serializer} to read the key ring from.
             virtual void Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) override;
             /// \brief
             /// Write the key ring to the given serializer.
@@ -622,66 +622,11 @@ namespace thekogans {
             virtual void Write (util::Serializer &serializer) const override;
 
             /// \brief
-            /// "KeyRing"
-            static const char * const TAG_KEY_RING;
-            /// \brief
-            /// "CipherSuite"
-            static const char * const ATTR_CIPHER_SUITE;
-            /// \brief
-            /// "KeyExchangeParams"
-            static const char * const TAG_KEY_EXCHANGE_PARAMS;
-            /// \brief
-            /// "KeyExchangeParam"
-            static const char * const TAG_KEY_EXCHANGE_PARAM;
-            /// \brief
-            /// "KeyExchangeKeys"
-            static const char * const TAG_KEY_EXCHANGE_KEYS;
-            /// \brief
-            /// "KeyExchangeKey"
-            static const char * const TAG_KEY_EXCHANGE_KEY;
-            /// \brief
-            /// "AuthenticatorParams"
-            static const char * const TAG_AUTHENTICATOR_PARAMS;
-            /// \brief
-            /// "AuthenticatorParam"
-            static const char * const TAG_AUTHENTICATOR_PARAM;
-            /// \brief
-            /// "AuthenticatorKeys"
-            static const char * const TAG_AUTHENTICATOR_KEYS;
-            /// \brief
-            /// "AuthenticatorKey"
-            static const char * const TAG_AUTHENTICATOR_KEY;
-            /// \brief
-            /// "CipherKeys"
-            static const char * const TAG_CIPHER_KEYS;
-            /// \brief
-            /// "CipherKey"
-            static const char * const TAG_CIPHER_KEY;
-            /// \brief
-            /// "MACKeys"
-            static const char * const TAG_MAC_KEYS;
-            /// \brief
-            /// "MACKey"
-            static const char * const TAG_MAC_KEY;
-            /// \brief
-            /// "UserDatas"
-            static const char * const TAG_USER_DATAS;
-            /// \brief
-            /// "UserData"
-            static const char * const TAG_USER_DATA;
-            /// \brief
-            /// "SubRings"
-            static const char * const TAG_SUB_RINGS;
-            /// \brief
-            /// "SubRing"
-            static const char * const TAG_SUB_RING;
-
-            /// \brief
             /// Read the Serializable from an XML DOM.
-            /// \param[in] header \see{util::Serializable::Header}.
+            /// \param[in] header \see{util::Serializable::util::SerializableHeader}.
             /// \param[in] node XML DOM representation of a Serializable.
             virtual void ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) override;
             /// \brief
             /// Write the Serializable to the XML DOM.
@@ -692,7 +637,7 @@ namespace thekogans {
             /// Read a Serializable from an JSON DOM.
             /// \param[in] node JSON DOM representation of a Serializable.
             virtual void ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) override;
             /// \brief
             /// Write a Serializable to the JSON DOM.

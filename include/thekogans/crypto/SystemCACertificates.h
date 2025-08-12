@@ -52,7 +52,7 @@ namespace thekogans {
             /// \param[in] loadSystemRootCACertificatesOnly Load only root CA (self signed) certificates.
             /// NOTE: Load is guaranteed not to throw. It will load
             /// what it can and will log certificate parsing errors.
-            void Load (bool loadSystemRootCACertificatesOnly = true) throw ();
+            void Load (bool loadSystemRootCACertificatesOnly = true) noexcept;
 
             /// \brief
             /// Load system CA certificates in to the X509_STORE of the given context.

@@ -40,7 +40,7 @@ namespace thekogans {
         }
 
         void Params::Read (
-                const Header &header,
+                const util::SerializableHeader &header,
                 util::Serializer &serializer) {
             Serializable::Read (header, serializer);
         }
@@ -50,7 +50,7 @@ namespace thekogans {
         }
 
         void Params::ReadXML (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const pugi::xml_node &node) {
             Serializable::ReadXML (header, node);
         }
@@ -60,7 +60,7 @@ namespace thekogans {
         }
 
         void Params::ReadJSON (
-                const Header &header,
+                const util::SerializableHeader &header,
                 const util::JSON::Object &object) {
             Serializable::ReadJSON (header, object);
         }
