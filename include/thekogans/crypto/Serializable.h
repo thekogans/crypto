@@ -173,12 +173,13 @@ namespace thekogans {
             THEKOGANS_UTIL_DECLARE_SERIALIZABLE (_T)\
             THEKOGANS_UTIL_DECLARE_STD_ALLOCATOR_FUNCTIONS
 
-        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(_T, version, minItemsInPage, ...)
+        /// \def THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(_T, version, classSize, minItemsInPage, ...)
         /// Common implementations used by all Value derivatives.
-        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(_T, version, minItemsInPage, ...)\
+        #define THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE(_T, version, classSize, minItemsInPage, ...)\
             THEKOGANS_UTIL_IMPLEMENT_SERIALIZABLE (\
                 _T,\
                 version,\
+                classSize,\
                 thekogans::crypto::Serializable::TYPE, ##__VA_ARGS__)\
             THEKOGANS_UTIL_IMPLEMENT_HEAP_FUNCTIONS_EX (\
                 _T,\

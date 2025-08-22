@@ -38,6 +38,7 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::RSAKeyExchange::RSAParams,
             1,
+            0,
             THEKOGANS_CRYPTO_MIN_RSA_KEY_EXCHANGE_PARAMS_IN_PAGE,
             KeyExchange::Params::TYPE)
 

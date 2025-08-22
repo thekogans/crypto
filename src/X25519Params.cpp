@@ -30,6 +30,7 @@ namespace thekogans {
         THEKOGANS_CRYPTO_IMPLEMENT_SERIALIZABLE (
             thekogans::crypto::X25519Params,
             1,
+            0,
             THEKOGANS_CRYPTO_MIN_X25519_PARAMS_IN_PAGE,
             Params::TYPE)
 
