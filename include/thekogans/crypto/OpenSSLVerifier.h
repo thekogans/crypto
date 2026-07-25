@@ -29,7 +29,6 @@ namespace thekogans {
         /// \brief
         /// OpenSSLVerifier implements the public key signature verification operation using
         /// various OpenSSL EVP_PKEY keys (RSA, DSA, EC).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLVerifier : public Verifier {
             /// \brief
             /// OpenSSLVerifier is a \see{Verifier}.

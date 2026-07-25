@@ -41,7 +41,6 @@ namespace thekogans {
         /// used to encrypt it puts a lower bound on the size of \see{RSA} keys that can be used
         /// for key exchange (512 bits). Given that today's (2018) best practice is to use
         /// \see{RSA} keys no smaller than 2048 bits, this limitation shouldn't be an issue.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL RSAKeyExchange : public KeyExchange {
             /// \struct RSAKeyExchange::RSAParams RSAKeyExchange.h thekogans/crypto/RSAKeyExchange.h
             ///

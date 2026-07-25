@@ -26,8 +26,8 @@
 #endif // defined (TOOLCHAIN_OS_Windows)
 #include <memory>
 #include <string>
+#include <vector>
 #include <openssl/ssl.h>
-#include "thekogans/util/Array.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/LoggerMgr.h"
 #if defined (TOOLCHAIN_OS_Windows)
@@ -58,14 +58,14 @@ namespace thekogans {
                     CERT_SIMPLE_NAME_STR,
                     0, 0);
                 if (size != 0) {
-                    util::Array<wchar_t> buffer (size);
+                    std::vector<wchar_t> buffer (size);
                     CertNameToStrW (
                         encoding,
                         certName,
                         CERT_SIMPLE_NAME_STR,
-                        buffer,
+                        buffer.data (),
                         size);
-                    return util::os::windows::UTF16ToUTF8 (buffer, size);
+                    return util::os::windows::UTF16ToUTF8 (buffer.data (), size);
                 }
                 return std::string ();
             }

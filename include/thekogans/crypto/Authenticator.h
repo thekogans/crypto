@@ -40,7 +40,6 @@ namespace thekogans {
         /// as many times as you need and in any order. Authenticator is designed to
         /// be reused. It will reset it's internal state after every sign/verify
         /// operation ready for the next.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Authenticator : public virtual util::RefCounted {
             /// \brief
             /// Declare \see{RefCounted} pointers.

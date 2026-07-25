@@ -33,7 +33,6 @@ namespace thekogans {
         ///
         /// \brief
         /// X25519AsymmetricKey keys are used in ECDHE key exchange (\see{DHEKeyExchange}).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL X25519AsymmetricKey : public AsymmetricKey {
             /// \brief
             /// X25519AsymmetricKey is a \see{Serializable}.

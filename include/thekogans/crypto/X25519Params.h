@@ -34,7 +34,6 @@ namespace thekogans {
         /// \brief
         /// X25519Params are used to create \see{X25519AsymmetricKey} used in
         /// ECDHE key exchange (See \see{DHEKeyExchange}).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL X25519Params : public Params {
             /// \brief
             /// X25519Params is a \see{Serializable}.

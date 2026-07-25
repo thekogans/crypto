@@ -32,7 +32,6 @@ namespace thekogans {
         /// \brief
         /// Wraps OPENSSL_malloc/free to allow OpenSSL allocated objects
         /// to be used with thekogans.net allocator machinery.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLAllocator :
                 public util::Allocator,
                 public util::RefCountedSingleton<OpenSSLAllocator> {

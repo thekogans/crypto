@@ -30,7 +30,6 @@ namespace thekogans {
         ///
         /// \brief
         /// Keeps track of usage statistics for various key components.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Stats {
             /// \brief
             /// Number of times this component was used.

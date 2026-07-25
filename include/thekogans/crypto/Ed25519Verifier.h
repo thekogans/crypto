@@ -31,7 +31,6 @@ namespace thekogans {
         /// \brief
         /// Ed25519Verifier implements the public key signature verification operation
         /// using \see{Ed25519} keys.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Verifier : public Verifier {
             /// \brief
             /// Ed25519Verifier is a \see{Verifier}.

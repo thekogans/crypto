@@ -16,9 +16,9 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstring>
+#include <vector>
 #include <openssl/evp.h>
 #include "thekogans/util/File.h"
-#include "thekogans/util/Array.h"
 #include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
@@ -120,10 +120,10 @@ namespace thekogans {
             util::ReadOnlyFile file (util::HostEndian, path);
             Init ();
             static const std::size_t BUFFER_CAPACITY = 4096;
-            util::Array<util::ui8> buffer (BUFFER_CAPACITY);
+            std::vector<util::ui8> buffer (BUFFER_CAPACITY);
             std::size_t size;
-            while ((size = file.Read (buffer, BUFFER_CAPACITY)) != 0) {
-                Update (buffer, size);
+            while ((size = file.Read (buffer.data (), BUFFER_CAPACITY)) != 0) {
+                Update (buffer.data (), size);
             }
             util::Buffer::SharedPtr hash (new util::HostBuffer (GetMDLength (md)));
             hash->AdvanceWriteOffset (Final (hash->GetWritePtr ()));

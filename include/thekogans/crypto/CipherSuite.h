@@ -70,7 +70,6 @@ namespace thekogans {
         /// Auth = ECDSA.
         /// Enc-Mode = AES-256-CBC.
         /// MD = SHA2-512.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL CipherSuite {
             /// \brief
             /// "ECDHE"

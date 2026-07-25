@@ -33,56 +33,10 @@ namespace thekogans {
         /// \brief
         /// Verifier is an abstract base for public key signature verification
         /// operation. It defines the API a concrete verifier needs to implement.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Verifier : public util::DynamicCreatable {
             /// \brief
             /// Verifier is a \see{util::DynamicCreatable} abstract base.
             THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_ABSTRACT_BASE (Verifier)
-
-            /// \struct Verifier::Parameters Verifier.h thekogans/crypto/Verifier.h
-            ///
-            /// \brief
-            /// Pass these parameters to DynamicCreatable::CreateType to
-            /// parametarize the new instance.
-            struct Parameters : public util::DynamicCreatable::Parameters {
-                /// \brief
-                /// Public key.
-                AsymmetricKey::SharedPtr publicKey;
-                /// \brief
-                /// Message digest.
-                MessageDigest::SharedPtr messageDigest;
-
-                /// \brief
-                /// ctor.
-                /// \param[in] publicKey_ Public key.
-                /// \param[in] messageDigest_ Message digest.
-                Parameters (
-                        AsymmetricKey::SharedPtr publicKey_,
-                        MessageDigest::SharedPtr messageDigest_) :
-                        publicKey (publicKey_),
-                        messageDigest (messageDigest_) {
-                    if (publicKey == nullptr || publicKey->IsPrivate () ||
-                            messageDigest == nullptr) {
-                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                    }
-                }
-
-                /// \brief
-                /// Apply the encapsulated parameters to the passed in instance.
-                /// \param[in] dynamicCreatable Signer instance to apply the
-                /// encapsulated parameters to.
-                virtual void Apply (DynamicCreatable::SharedPtr dynamicCreatable) override {
-                    Verifier::SharedPtr verifier = dynamicCreatable;
-                    if (verifier != nullptr) {
-                        verifier->Init (publicKey, messageDigest);
-                    }
-                    else {
-                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                    }
-                }
-            };
 
         protected:
             /// \brief

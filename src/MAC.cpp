@@ -76,7 +76,7 @@ namespace thekogans {
                 std::size_t computedSignatureLength =
                     SignBuffer (buffer, bufferLength, computedSignature);
                 return signatureLength == computedSignatureLength &&
-                    TimeInsensitiveCompare (
+                    util::TimeInsensitiveCompare (
                         signature,
                         computedSignature,
                         signatureLength);

@@ -3918,7 +3918,7 @@ namespace thekogans {
                 static const util::ui8 zero[SHARED_SECRET_LENGTH] = {0};
                 x25519_scalar_mult (sharedSecret, privateKey, peerPublicKey);
                 // The all-zero output results when the input is a point of small order.
-                if (TimeInsensitiveCompare (zero, sharedSecret, SHARED_SECRET_LENGTH)) {
+                if (util::TimeInsensitiveCompare (zero, sharedSecret, SHARED_SECRET_LENGTH)) {
                     THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                         THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                 }

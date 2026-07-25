@@ -35,7 +35,6 @@ namespace thekogans {
         /// Generate Diffie-Hellman (DH) parameters (prime and generator) using various
         /// given techniques. Call \see{Params::CreateKey} to derive the key. Use the
         /// derived key to perform \see{KeyExchange}.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL DH {
             /// \brief
             /// Generate a fresh prime given the prime length. This method is by far

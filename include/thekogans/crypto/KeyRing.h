@@ -55,7 +55,6 @@ namespace thekogans {
         /// later case, create a KeyRing, use it to generate permanent encryption keys, then call
         /// KeyRing::Save. Later call KeyRing::Load and use it to decrypt the data at rest. See
         /// encryptfile and decryptfile examples.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyRing : public Serializable {
             /// \brief
             /// KeyRing is a \see{Serializable}.

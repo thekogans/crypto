@@ -820,18 +820,6 @@ namespace thekogans {
                 void *userData = 0);
 
         /// \brief
-        /// Perform time insensitive compare on the given buffers.
-        /// \param[in] buffer1 First buffer to compare.
-        /// \param[in] buffer2 Second buffer to compare.
-        /// \param[in] length Length of both buffers.
-        /// \return true = identical, false = different.
-        _LIB_THEKOGANS_CRYPTO_DECL bool _LIB_THEKOGANS_CRYPTO_API
-            TimeInsensitiveCompare (
-                const void *buffer1,
-                const void *buffer2,
-                std::size_t length);
-
-        /// \brief
         /// General purpose One Time Password generator.
         /// \param[in] key Key to use with HMAC.
         /// \param[in] keyLength Key length.

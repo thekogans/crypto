@@ -32,7 +32,6 @@ namespace thekogans {
         /// Call \see{Params::CreateKey} on parameters created by ParamsFromKeyLength
         /// to create authentication keys to be used with \see{Authenticatior} for sign
         /// and verify operations.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL DSA {
             /// \brief
             /// Create DSA key parameters.

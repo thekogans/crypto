@@ -45,7 +45,6 @@ namespace thekogans {
         /// peer and not a man-in-the-middle (MITM). This is why \see{KeyExchange::Params}
         /// exposes CreateSignature and ValidateSignature. Use it to sign and validate
         /// the parameters before exchanging keys with an unknown peer.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL DHEKeyExchange : public KeyExchange {
             /// \struct DHEKeyExchange::DHEParams DHEKeyExchange.h thekogans/crypto/DHEKeyExchange.h
             ///

@@ -39,7 +39,6 @@ namespace thekogans {
         /// \see{Serializable}. OpenSSLParams makes it very convenient to serialize
         /// asymmetric key parameters for saving to files or transferring across the
         /// network.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLParams : public Params {
             /// \brief
             /// OpenSSLParams is a \see{Serializable}.

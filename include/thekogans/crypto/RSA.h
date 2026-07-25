@@ -36,7 +36,6 @@ namespace thekogans {
         /// Use RSA to generate private/public key pairs that can be used for
         /// key exchange (\see{RSAKeyExchange}) and sign/verify (\see{Authenticator})
         /// operations. RSA is also used to perform asymmetric encryption/decryption.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL RSA {
             /// \brief
             /// Create an RSA key.

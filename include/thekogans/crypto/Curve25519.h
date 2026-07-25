@@ -49,7 +49,6 @@ namespace thekogans {
         /// \brief
         /// Ed25519 is a signature scheme using a twisted-Edwards curve that is
         /// birationally equivalent to Curve25519.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519 {
             /// \brief
             /// Private key length.
@@ -111,9 +110,8 @@ namespace thekogans {
         /// \brief
         /// Curve25519 is an elliptic curve. The same name is also sometimes used for
         /// the Diffie-Hellman primitive built from it but “X25519” is a more precise
-        /// name for that, which is the one used here. See http://cr.yp.to/ecdh.html and
-        /// https://tools.ietf.org/html/draft-irtf-cfrg-curves-11.
-
+        /// name for that, which is the one used here. See http://cr.yp.to/ecdh.html
+        /// and https://tools.ietf.org/html/draft-irtf-cfrg-curves-11.
         struct _LIB_THEKOGANS_CRYPTO_DECL X25519 {
             /// \brief
             /// Private/Public key length.

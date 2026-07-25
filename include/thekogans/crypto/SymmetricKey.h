@@ -39,7 +39,6 @@ namespace thekogans {
         ///
         /// \brief
         /// SymmetricKey is used by \see{Cipher} for bulk encryption.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL SymmetricKey : public Serializable {
             /// \brief
             /// SymmetricKey is a \see{Serializable}

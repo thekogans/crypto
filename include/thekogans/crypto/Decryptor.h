@@ -39,7 +39,6 @@ namespace thekogans {
         /// encouraged to use \see{Cipher} as it uses best industry practices. At
         /// the very least you should consult \see{Cipher::Decrypt} to make sure
         /// your code is secure.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Decryptor {
         private:
             /// \brief

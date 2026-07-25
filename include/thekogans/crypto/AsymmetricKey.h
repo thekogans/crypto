@@ -33,7 +33,6 @@ namespace thekogans {
         /// \brief
         /// AsymmetricKey is the base for all PKI keys. It defines the base API
         /// that all concrete keys must implement.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL AsymmetricKey : public Serializable {
             /// \brief
             /// AsymmetricKey is a \see{util::DynamicCreatable} abstract base.

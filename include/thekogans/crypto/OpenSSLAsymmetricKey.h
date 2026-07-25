@@ -36,7 +36,6 @@ namespace thekogans {
         /// OpenSSLAsymmetricKey wraps a EVP_PKEY and provides the functionality exposed by
         /// \see{AsymmetricKey}. OpenSSLAsymmetricKey makes it very convenient to serialize
         /// OpenSSL asymmetric keys for saving to files or transferring across the network.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLAsymmetricKey : public AsymmetricKey {
             /// \brief
             /// OpenSSLAsymmetricKey is a \see{Serializable}.

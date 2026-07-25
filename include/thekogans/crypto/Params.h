@@ -33,7 +33,6 @@ namespace thekogans {
         /// \brief
         /// Params is the base for all PKI key parameters. It defines the base API
         /// that all concrete parameters must implement.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Params : public Serializable {
             /// \brief
             /// Params is a \see{util::DynamicCreatable} abstract base.

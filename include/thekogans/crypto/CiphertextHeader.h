@@ -29,7 +29,6 @@ namespace thekogans {
         ///
         /// \brief
         /// CiphertextHeader is used by \see{Cipher} to frame the generated ciphertext.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL CiphertextHeader {
             /// \brief
             /// Initialization vector (IV) length.

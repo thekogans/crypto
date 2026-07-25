@@ -32,7 +32,6 @@ namespace thekogans {
         /// OpenSSLInit encapsulates the details of initializing the OpenSSL
         /// library. Instantiate one of these before making any calls in to
         /// the library proper.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLInit {
             /// \brief
             /// OpenSSL engine object used to accelerate cryptographic operations.

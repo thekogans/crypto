@@ -35,56 +35,10 @@ namespace thekogans {
         /// \brief
         /// Signer is an abstract base for public key sign operation.
         /// It defines the API a concrete signer needs to implement.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Signer : public util::DynamicCreatable {
             /// \brief
             /// Signer is a \see{util::DynamicCreatable} abstract base.
             THEKOGANS_UTIL_DECLARE_DYNAMIC_CREATABLE_ABSTRACT_BASE (Signer)
-
-            /// \struct Signer::Parameters Signer.h thekogans/crypto/Signer.h
-            ///
-            /// \brief
-            /// Pass these parameters to DynamicCreatable::CreateType to
-            /// parametarize the new instance.
-            struct Parameters : public util::DynamicCreatable::Parameters {
-                /// \brief
-                /// Private key.
-                AsymmetricKey::SharedPtr privateKey;
-                /// \brief
-                /// Message digest.
-                MessageDigest::SharedPtr messageDigest;
-
-                /// \brief
-                /// ctor.
-                /// \param[in] privateKey_ Private key.
-                /// \param[in] messageDigest_ Message digest.
-                Parameters (
-                        AsymmetricKey::SharedPtr privateKey_,
-                        MessageDigest::SharedPtr messageDigest_) :
-                        privateKey (privateKey_),
-                        messageDigest (messageDigest_) {
-                    if (privateKey == nullptr || !privateKey->IsPrivate () ||
-                            messageDigest == nullptr) {
-                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                    }
-                }
-
-                /// \brief
-                /// Apply the encapsulated parameters to the passed in instance.
-                /// \param[in] dynamicCreatable Signer instance to apply the
-                /// encapsulated parameters to.
-                virtual void Apply (DynamicCreatable::SharedPtr dynamicCreatable) override {
-                    Signer::SharedPtr signer = dynamicCreatable;
-                    if (signer != nullptr) {
-                        signer->Init (privateKey, messageDigest);
-                    }
-                    else {
-                        THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
-                            THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
-                    }
-                }
-            };
 
         protected:
             /// \brief

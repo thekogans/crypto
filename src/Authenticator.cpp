@@ -19,8 +19,8 @@
 #if defined (TOOLCHAIN_OS_Windows)
     #include <winsock2.h>
 #endif // defined (TOOLCHAIN_OS_Windows)
+#include <vector>
 #include "thekogans/util/Exception.h"
-#include "thekogans/util/Array.h"
 #include "thekogans/util/File.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/Authenticator.h"
@@ -105,10 +105,10 @@ namespace thekogans {
                 signer->Init ();
                 util::ReadOnlyFile file (util::HostEndian, path);
                 static const std::size_t BUFFER_CAPACITY = 4096;
-                util::Array<util::ui8> buffer (BUFFER_CAPACITY);
+                std::vector<util::ui8> buffer (BUFFER_CAPACITY);
                 std::size_t size;
-                while ((size = file.Read (buffer, BUFFER_CAPACITY)) != 0) {
-                    signer->Update (buffer, size);
+                while ((size = file.Read (buffer.data (), BUFFER_CAPACITY)) != 0) {
+                    signer->Update (buffer.data (), size);
                 }
                 return signer->Final ();
             }
@@ -127,10 +127,10 @@ namespace thekogans {
                     verifier->Init ();
                     util::ReadOnlyFile file (util::HostEndian, path);
                     static const std::size_t BUFFER_CAPACITY = 4096;
-                    util::Array<util::ui8> buffer (BUFFER_CAPACITY);
+                    std::vector<util::ui8> buffer (BUFFER_CAPACITY);
                     std::size_t size;
-                    while ((size = file.Read (buffer, BUFFER_CAPACITY)) != 0) {
-                        verifier->Update (buffer, size);
+                    while ((size = file.Read (buffer.data (), BUFFER_CAPACITY)) != 0) {
+                        verifier->Update (buffer.data (), size);
                     }
                     return verifier->Final (signature, signatureLength);
                 }

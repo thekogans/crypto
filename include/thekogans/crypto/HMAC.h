@@ -31,7 +31,6 @@ namespace thekogans {
         ///
         /// \brief
         /// Implements the HMAC (Hash-based Message Authentication Code).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL HMAC : public MAC {
         private:
             /// \brief

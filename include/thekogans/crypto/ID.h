@@ -35,7 +35,6 @@ namespace thekogans {
         ///
         /// \brief
         /// Ids are crypto analogues to \see{util::GUID}s. They're used by \see{Serializable}.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL ID {
             /// \brief
             /// ID size.
@@ -120,7 +119,7 @@ namespace thekogans {
         inline bool _LIB_THEKOGANS_CRYPTO_API operator == (
                 const ID &id1,
                 const ID &id2) {
-            return TimeInsensitiveCompare (id1.data, id2.data, ID::SIZE);
+            return util::TimeInsensitiveCompare (id1.data, id2.data, ID::SIZE);
         }
 
         /// \brief
@@ -131,7 +130,7 @@ namespace thekogans {
         inline bool _LIB_THEKOGANS_CRYPTO_API operator != (
                 const ID &id1,
                 const ID &id2) {
-            return !TimeInsensitiveCompare (id1.data, id2.data, ID::SIZE);
+            return !util::TimeInsensitiveCompare (id1.data, id2.data, ID::SIZE);
         }
 
         /// \brief
@@ -173,7 +172,6 @@ namespace std {
     ///
     /// \brief
     /// Implementation of std::hash for thekogans::crypto::ID.
-
     template <>
     struct hash<thekogans::crypto::ID> {
         size_t operator () (const thekogans::crypto::ID &id) const {

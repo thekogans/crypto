@@ -39,7 +39,6 @@ namespace thekogans {
         /// will return the same \see{SymmetricKey}. If you need to exchange multiple
         /// keys, you need to instantiate multiple KeyExchange (\see{DHEKeyExchange}
         /// and/or \see{RSAKeyExchange}) instances.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL KeyExchange : public virtual util::RefCounted {
             /// \brief
             /// Declare \see{RefCounted} pointers.

@@ -28,7 +28,6 @@ namespace thekogans {
         ///
         /// \brief
         /// Ed25519Signer implements the public key sign operation using \see{Ed25519} keys.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Signer : public Signer {
             /// \brief
             /// Ed25519Signer is a \see{util::DynamicCreatable}.

@@ -42,7 +42,6 @@ namespace thekogans {
         /// are calculated over ciphertext to avoid the Cryptographic Doom Principle:
         /// https://moxie.org/blog/the-cryptographic-doom-principle/. See the description
         /// of Cipher::Encrypt for more information.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Cipher : public virtual util::RefCounted {
             /// \brief
             /// Declare \see{RefCounted} pointers.

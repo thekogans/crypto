@@ -31,7 +31,6 @@ namespace thekogans {
         ///
         /// \brief
         /// Implements the CMAC (Cipher-based Message Authentication Code).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL CMAC : public MAC {
         private:
             /// \brief

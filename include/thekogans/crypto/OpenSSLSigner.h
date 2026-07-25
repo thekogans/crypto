@@ -29,7 +29,6 @@ namespace thekogans {
         /// \brief
         /// OpenSSLSigner implements the public key sign operation using
         /// various OpenSSL EVP_PKEY keys (RSA, DSA, EC).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL OpenSSLSigner : public Signer {
             /// \brief
             /// OpenSSLSigner is a \see{util::DynamicCreatable}.

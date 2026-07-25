@@ -35,7 +35,6 @@ namespace thekogans {
         /// Serializable extends the \see{util::Serializable} to add id, name and description.
         /// It's the base class for all crypto serializables (See \see{KeyRing}, \see{Params},
         /// \see{SymmetricKey} and \see{AsymmetricKey}).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Serializable : public util::Serializable {
             /// \brief
             /// Serializable is a \see{util::DynamicCreatable} abstract base.

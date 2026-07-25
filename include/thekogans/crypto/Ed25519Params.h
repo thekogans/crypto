@@ -31,7 +31,6 @@ namespace thekogans {
         /// \brief
         /// Ed25519Params are used to create \see{Ed25519AsymmetricKey} used in
         /// Sign/Verify operations (See \see{Authenticator}).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519Params : public Params {
             /// \brief
             /// Ed25519Params is a \see{Serializable}.

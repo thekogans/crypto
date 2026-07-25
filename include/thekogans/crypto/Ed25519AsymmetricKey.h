@@ -34,7 +34,6 @@ namespace thekogans {
         /// \brief
         /// Ed25519AsymmetricKey keys are used to perform sign/verify
         /// operations (\see{Authenticator}).
-
         struct _LIB_THEKOGANS_CRYPTO_DECL Ed25519AsymmetricKey : public AsymmetricKey {
             /// \brief
             /// Ed25519AsymmetricKey is a \see{Serializable}.

@@ -31,7 +31,6 @@ namespace thekogans {
         /// Expose the system CA certificates provided by various OS. On Windows, use
         /// the HCERTSTORE api. On OS X use SecTrustSettingsCopyCertificates api. On
         /// Linux use the various system paths to load certificates and/or bundle files.
-
         struct _LIB_THEKOGANS_CRYPTO_DECL SystemCACertificates :
                 public util::Singleton<SystemCACertificates, util::SpinLock> {
         private:
