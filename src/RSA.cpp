@@ -63,7 +63,6 @@ namespace thekogans {
         namespace {
             inline bool IsValidPadding (util::i32 padding) {
                 return padding == RSA_PKCS1_PADDING ||
-                    padding == RSA_SSLV23_PADDING ||
                     padding == RSA_NO_PADDING ||
                     padding == RSA_PKCS1_OAEP_PADDING;
             }
@@ -74,8 +73,7 @@ namespace thekogans {
                 util::i32 padding) {
             if (keyLength > 0 && (keyLength & ~3) == keyLength && IsValidPadding (padding)) {
                 std::size_t paddingLength =
-                    padding == RSA_PKCS1_PADDING || padding == RSA_SSLV23_PADDING ? 12 :
-                    padding == RSA_PKCS1_OAEP_PADDING ? 42 : 0;
+                    padding == RSA_PKCS1_PADDING ? 12 : padding == RSA_PKCS1_OAEP_PADDING ? 42 : 0;
                 return (keyLength >> 3) - paddingLength;
             }
             else {
