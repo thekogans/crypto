@@ -53,7 +53,7 @@ namespace thekogans {
             // entries t[0]...t[9], represents the integer t[0]+2^26 t[1]+2^51 t[2]+2^77
             // t[3]+2^102 t[4]+...+2^230 t[9]. Bounds on each t[i] vary depending on
             // context.
-            typedef util::i32 fe[10];
+            using fe = util::i32[10];
 
             util::ui64 load_3 (const util::ui8 *in) {
                 util::ui64 result = (util::ui64)in[0];
@@ -1071,38 +1071,38 @@ namespace thekogans {
             //   ge_p1p1 (completed): ((X:Z),(Y:T)) satisfying x=X/Z, y=Y/T
             //   ge_precomp (Duif): (y+x,y-x,2dxy)
 
-            typedef struct {
+            struct ge_p2 {
                 fe X;
                 fe Y;
                 fe Z;
-            } ge_p2;
+            };
 
-            typedef struct {
-                fe X;
-                fe Y;
-                fe Z;
-                fe T;
-            } ge_p3;
-
-            typedef struct {
+            struct ge_p3 {
                 fe X;
                 fe Y;
                 fe Z;
                 fe T;
-            } ge_p1p1;
+            };
 
-            typedef struct {
+            struct ge_p1p1 {
+                fe X;
+                fe Y;
+                fe Z;
+                fe T;
+            };
+
+            struct ge_precomp {
                 fe yplusx;
                 fe yminusx;
                 fe xy2d;
-            } ge_precomp;
+            };
 
-            typedef struct {
+            struct ge_cached {
                 fe YplusX;
                 fe YminusX;
                 fe Z;
                 fe T2d;
-            } ge_cached;
+            };
 
             void ge_tobytes (
                     util::ui8 *s,

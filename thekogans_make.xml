@@ -7,32 +7,26 @@
                 guid = "51807feb568098447581aabaefb41bf0"
                 schema_version = "2">
   <features>
-    <!-- <feature>THEKOGANS_CRYPTO_HAVE_ARGON2</feature>
-    <feature>THEKOGANS_CRYPTO_HAVE_BLAKE2</feature> -->
+    <if condition = "$(is_package_installed -p:libargon2)">
+      <feature>THEKOGANS_CRYPTO_HAVE_ARGON2</feature>
+    </if>
     <feature>THEKOGANS_CRYPTO_HAVE_TESTS</feature>
   </features>
   <dependencies>
     <dependency organization = "thekogans"
                 name = "util"/>
-    <toolchain organization = "thekogans"
-               name = "openssl_ssl"/>
-    <toolchain organization = "thekogans"
-               name = "openssl_crypto"/>
+    <package name = "libcrypto"/>
+    <package name = "libssl"/>
     <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_ARGON2)">
-      <toolchain organization = "thekogans"
-                 name = "argon2"/>
-    </if>
-    <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_BLAKE2)">
-      <toolchain organization = "thekogans"
-                 name = "blake2"/>
+      <package name = "libargon2"/>
     </if>
     <choose>
       <when condition = "$(TOOLCHAIN_OS) == 'Windows'">
-        <library>Crypt32.lib</library>
+        <library name = "Crypt32.lib"/>
       </when>
       <when condition = "$(TOOLCHAIN_OS) == 'OSX'">
-        <framework>CoreFoundation</framework>
-        <framework>Security</framework>
+        <framework name = "CoreFoundation"/>
+        <framework name = "Security"/>
       </when>
     </choose>
   </dependencies>
@@ -48,10 +42,6 @@
     </if>
     <cpp_header>$(organization)/$(project_directory)/AsymmetricKey.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/Authenticator.h</cpp_header>
-    <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_BLAKE2)">
-      <cpp_header>$(organization)/$(project_directory)/Blake2b.h</cpp_header>
-      <cpp_header>$(organization)/$(project_directory)/Blake2s.h</cpp_header>
-    </if>
     <cpp_header>$(organization)/$(project_directory)/Cipher.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/CipherSuite.h</cpp_header>
     <cpp_header>$(organization)/$(project_directory)/CiphertextHeader.h</cpp_header>
@@ -104,10 +94,6 @@
   <cpp_sources prefix = "src">
     <cpp_source>AsymmetricKey.cpp</cpp_source>
     <cpp_source>Authenticator.cpp</cpp_source>
-    <if condition = "$(have_feature -f:THEKOGANS_CRYPTO_HAVE_BLAKE2)">
-      <cpp_source>Blake2b.cpp</cpp_source>
-      <cpp_source>Blake2s.cpp</cpp_source>
-    </if>
     <cpp_source>Cipher.cpp</cpp_source>
     <cpp_source>CipherSuite.cpp</cpp_source>
     <cpp_source>CMAC.cpp</cpp_source>

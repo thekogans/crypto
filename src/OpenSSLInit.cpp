@@ -34,10 +34,6 @@
 #include "thekogans/util/Thread.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
-#if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
-    #include "thekogans/crypto/Blake2b.h"
-    #include "thekogans/crypto/Blake2s.h"
-#endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 #if defined (THEKOGANS_CRYPTO_TYPE_Static)
     #include "thekogans/crypto/OpenSSLAllocator.h"
     #include "thekogans/crypto/Serializable.h"
@@ -165,14 +161,6 @@ namespace thekogans {
             SSL_library_init ();
             SSL_load_error_strings ();
             OpenSSL_add_all_algorithms ();
-        #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
-            EVP_add_digest (EVP_blake2b512 ());
-        #if OPENSSL_VERSION_NUMBER < 0x10100000L
-            EVP_add_digest (EVP_blake2b384 ());
-            EVP_add_digest (EVP_blake2b256 ());
-        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
-            EVP_add_digest (EVP_blake2s256 ());
-        #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             if (entropyNeeded >= MIN_ENTROPY_NEEDED) {
                 util::SecureHostBuffer entropy (entropyNeeded);
                 if (entropy.AdvanceWriteOffset (
@@ -233,10 +221,8 @@ namespace thekogans {
         #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
             ERR_free_strings ();
             EVP_cleanup ();
-        #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
             // WARNING: Do not uncomment!!!
             //OBJ_cleanup ();
-        #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
         }
 
     } // namespace crypto

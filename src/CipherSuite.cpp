@@ -24,10 +24,6 @@
 #include "thekogans/crypto/DSA.h"
 #include "thekogans/crypto/RSA.h"
 #include "thekogans/crypto/EC.h"
-#if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
-    #include "thekogans/crypto/Blake2b.h"
-    #include "thekogans/crypto/Blake2s.h"
-#endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 #include "thekogans/crypto/CipherSuite.h"
 
 namespace thekogans {
@@ -49,12 +45,8 @@ namespace thekogans {
         const char * const CipherSuite::CIPHER_AES_192_CBC = "AES-192-CBC";
         const char * const CipherSuite::CIPHER_AES_128_CBC = "AES-128-CBC";
 
-    #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
         const char * const CipherSuite::MESSAGE_DIGEST_BLAKE2B_512 = "BLAKE2B-512";
-        const char * const CipherSuite::MESSAGE_DIGEST_BLAKE2B_384 = "BLAKE2B-384";
-        const char * const CipherSuite::MESSAGE_DIGEST_BLAKE2B_256 = "BLAKE2B-256";
         const char * const CipherSuite::MESSAGE_DIGEST_BLAKE2S_256 = "BLAKE2S-256";
-    #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
 
         const char * const CipherSuite::MESSAGE_DIGEST_SHA2_512 = "SHA2-512";
         const char * const CipherSuite::MESSAGE_DIGEST_SHA2_384 = "SHA2-384";
@@ -154,14 +146,8 @@ namespace thekogans {
                 const char *name;
                 const EVP_MD *md;
             } const messageDigests[] = {
-            #if defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
                 {CipherSuite::MESSAGE_DIGEST_BLAKE2B_512, EVP_blake2b512 ()},
-            #if OPENSSL_VERSION_NUMBER < 0x10100000L
-                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_384, EVP_blake2b384 ()},
-                {CipherSuite::MESSAGE_DIGEST_BLAKE2B_256, EVP_blake2b256 ()},
-            #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
                 {CipherSuite::MESSAGE_DIGEST_BLAKE2S_256, EVP_blake2s256 ()},
-            #endif // defined (THEKOGANS_CRYPTO_HAVE_BLAKE2)
                 {CipherSuite::MESSAGE_DIGEST_SHA2_512, EVP_sha512 ()},
                 {CipherSuite::MESSAGE_DIGEST_SHA2_384, EVP_sha384 ()},
                 {CipherSuite::MESSAGE_DIGEST_SHA2_256, EVP_sha256 ()}
