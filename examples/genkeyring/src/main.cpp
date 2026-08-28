@@ -43,6 +43,10 @@ namespace {
     }
 }
 
+using RandomBuffer = util::FixedBuffer<256>;
+
+THEKOGANS_UTIL_IMPLEMENT_DYNAMIC_CREATABLE_T (RandomBuffer)
+
 int main (
         int argc,
         const char *argv[]) {
@@ -76,7 +80,7 @@ int main (
                     break;
                 }
                 case 'i': {
-                    id = crypto::ID (value.c_str (), value.size ());
+                    id = crypto::ID::FromHexString (value);
                     break;
                 }
                 case 'n': {
@@ -135,7 +139,7 @@ int main (
                     options.password.size ()));
             crypto::KeyRing::SharedPtr keyRing = crypto::KeyRing::Load (options.path, &cipher);
             {
-                util::FixedBuffer<256> originalPlaintext;
+                RandomBuffer originalPlaintext;
                 originalPlaintext.AdvanceWriteOffset (
                     util::RandomSource::Instance ()->GetBytes (
                         originalPlaintext.GetWritePtr (),

@@ -11,10 +11,6 @@
                 name = "util"/>
     <dependency organization = "thekogans"
                 name = "crypto"/>
-    <toolchain organization = "thekogans"
-               name = "openssl_ssl"/>
-    <toolchain organization = "thekogans"
-               name = "openssl_crypto"/>
   </dependencies>
   <cpp_sources prefix = "src">
     <cpp_source>main.cpp</cpp_source>

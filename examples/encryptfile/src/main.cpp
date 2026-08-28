@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include <vector>
 #include "thekogans/util/Environment.h"
 #if defined (TOOLCHAIN_OS_Windows)
     #include <winsock2.h>
@@ -24,7 +25,6 @@
 #include "thekogans/util/ConsoleLogger.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/File.h"
-#include "thekogans/util/Array.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/CipherSuite.h"
 #include "thekogans/crypto/KeyRing.h"
@@ -78,7 +78,7 @@ int main (
                     break;
                 }
                 case 'i': {
-                    id = crypto::ID (value.c_str (), value.size ());
+                    id = crypto::ID::FromHexString (value);
                     break;
                 }
                 case 'n': {
@@ -128,7 +128,7 @@ int main (
             util::SimpleFile::Truncate);
         crypto::KeyRing::SharedPtr keyRing;
         crypto::Cipher::SharedPtr cipher;
-        if (options.cipherSuite != crypto::CipherSuite::Empty) {
+        if (options.cipherSuite != crypto::CipherSuite ()) {
             keyRing.Reset (
                 new crypto::KeyRing (
                     options.cipherSuite,
@@ -145,11 +145,11 @@ int main (
         }
         util::ui32 blockSize = 1024 * 1024 * options.blockSize;
         toFile << blockSize;
-        util::Array<util::ui8> plaintext (blockSize);
-        util::Array<util::ui8> ciphertext (crypto::Cipher::GetMaxBufferLength (blockSize));
-        for (std::size_t plaintextLength = fromFile.Read (plaintext.array, blockSize);
+        std::vector<util::ui8> plaintext (blockSize);
+        std::vector<util::ui8> ciphertext (crypto::Cipher::GetMaxBufferLength (blockSize));
+        for (std::size_t plaintextLength = fromFile.Read (plaintext.data (), blockSize);
                 plaintextLength != 0;
-                plaintextLength = fromFile.Read (plaintext.array, blockSize)) {
+                plaintextLength = fromFile.Read (plaintext.data (), blockSize)) {
             std::size_t ciphertextLength;
             if (keyRing.Get () != 0) {
                 crypto::SymmetricKey::SharedPtr key =
@@ -163,14 +163,14 @@ int main (
                 cipher = keyRing->GetCipherSuite ().GetCipher (key);
                 ciphertextLength =
                     cipher->EncryptAndFrame (
-                        plaintext.array, plaintextLength, 0, 0, ciphertext.array);
+                        plaintext.data (), plaintextLength, 0, 0, ciphertext.data ());
             }
             else {
                 ciphertextLength =
                     cipher->EncryptAndEnlengthen (
-                        plaintext.array, plaintextLength, 0, 0, ciphertext.array);
+                        plaintext.data (), plaintextLength, 0, 0, ciphertext.data ());
             }
-            if (toFile.Write (ciphertext.array, ciphertextLength) == ciphertextLength) {
+            if (toFile.Write (ciphertext.data (), ciphertextLength) == ciphertextLength) {
                 std::cout << ".";
                 std::cout.flush ();
             }

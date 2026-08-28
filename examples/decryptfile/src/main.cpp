@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
+#include <vector>
 #include "thekogans/util/CommandLineOptions.h"
 #include "thekogans/util/LoggerMgr.h"
 #include "thekogans/util/ConsoleLogger.h"
 #include "thekogans/util/Exception.h"
 #include "thekogans/util/Path.h"
 #include "thekogans/util/File.h"
-#include "thekogans/util/Array.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/KeyRing.h"
 #include "thekogans/crypto/Cipher.h"
@@ -89,8 +89,8 @@ int main (
         }
         util::ui32 blockSize;
         fromFile >> blockSize;
-        util::Array<util::ui8> ciphertext (crypto::Cipher::GetMaxBufferLength (blockSize));
-        util::Array<util::ui8> plaintext (blockSize);
+        std::vector<util::ui8> ciphertext (crypto::Cipher::GetMaxBufferLength (blockSize));
+        std::vector<util::ui8> plaintext (blockSize);
         for (util::ui64 fromSize = fromFile.GetDataAvailableForReading (); fromSize != 0;) {
             util::ui32 ciphertextLength;
             if (keyRing.Get () != 0) {
@@ -112,10 +112,10 @@ int main (
                 fromFile >> ciphertextLength;
                 fromSize -= util::UI32_SIZE;
             }
-            if (fromFile.Read (ciphertext.array, ciphertextLength) == ciphertextLength) {
+            if (fromFile.Read (ciphertext.data (), ciphertextLength) == ciphertextLength) {
                 util::ui32 plaintextLength =
-                    (util::ui32)cipher->Decrypt (ciphertext.array, ciphertextLength, 0, 0, plaintext.array);
-                if (toFile.Write (plaintext.array, plaintextLength) == plaintextLength) {
+                    (util::ui32)cipher->Decrypt (ciphertext.data (), ciphertextLength, 0, 0, plaintext.data ());
+                if (toFile.Write (plaintext.data (), plaintextLength) == plaintextLength) {
                     std::cout << ".";
                     std::cout.flush ();
                     fromSize -= ciphertextLength;
