@@ -20,7 +20,6 @@
 
 #include <openssl/engine.h>
 #include "thekogans/util/Types.h"
-#include "thekogans/util/SpinLock.h"
 #include "thekogans/crypto/Config.h"
 
 namespace thekogans {
@@ -43,9 +42,6 @@ namespace thekogans {
             /// Used by SecureTCPSocket to associate it's SecureTCPSocket::SessionInfo
             /// pointer with SSL_SESSION.
             static int SSL_SESSIONSessionInfoIndex;
-            /// \brief
-            /// Synchronization lock.
-            static util::SpinLock spinLock;
 
             /// \brief
             /// Minimum entropy bytes to use for PRNG seeding
@@ -66,7 +62,6 @@ namespace thekogans {
             /// \brief
             /// ctor.
             /// Initialize the Open SSL library.
-            /// \param[in] multiThreaded true = initialize thread support.
             /// \param[in] entropyNeeded Number of entropy bytes to use to seed the PRNG.
             /// \param[in] workingSetSize Physical pages to reserve.
             /// NOTE: All values are in bytes.
@@ -76,7 +71,6 @@ namespace thekogans {
             /// \param[in] loadSystemRootCACertificatesOnly true == load only
             /// root CA (self signed) certificates.
             OpenSSLInit (
-                bool multiThreaded = true,
                 util::ui32 entropyNeeded = DEFAULT_ENTROPY_NEEDED,
                 util::ui64 workingSetSize = DEFAULT_WORKING_SET_SIZE,
                 ENGINE *engine_ = 0,

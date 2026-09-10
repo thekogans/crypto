@@ -58,6 +58,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         namespace {
@@ -80,6 +81,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         std::size_t RSA::Encrypt (
@@ -119,6 +121,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr RSA::Encrypt (
@@ -145,6 +148,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         std::size_t RSA::EncryptAndEnlengthen (
@@ -173,6 +177,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         namespace {
@@ -205,6 +210,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         std::size_t RSA::EncryptAndFrame (
@@ -233,6 +239,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr RSA::EncryptAndFrame (
@@ -259,6 +266,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         std::size_t RSA::Decrypt (
@@ -296,6 +304,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr RSA::Decrypt (
@@ -325,6 +334,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         namespace {
@@ -358,12 +368,12 @@ namespace thekogans {
                         header.key != nullptr) {
                     serializer << header.cipherIndex << header.keyLength;
                     serializer.Write (header.key, header.keyLength);
-                    return serializer;
                 }
                 else {
                     THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                         THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
                 }
+                return serializer;
             }
 
             inline util::Buffer &operator >> (
@@ -375,10 +385,7 @@ namespace thekogans {
                     if (header.keyLength == GetCipherKeyLength (
                             CipherSuite::GetOpenSSLCipherByIndex (header.cipherIndex))) {
                         header.key = buffer.GetReadPtr ();
-                        if (buffer.AdvanceReadOffset (header.keyLength) == header.keyLength) {
-                            return buffer;
-                        }
-                        else {
+                        if (buffer.AdvanceReadOffset (header.keyLength) != header.keyLength) {
                             THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                                 "Invalid key: %u, " THEKOGANS_UTIL_SIZE_T_FORMAT,
                                 header.cipherIndex,
@@ -396,6 +403,7 @@ namespace thekogans {
                         "Invalid cipherIndex: %u",
                         header.cipherIndex);
                 }
+                return buffer;
             }
 
             std::size_t GetCipherIndex (
@@ -460,6 +468,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::SharedPtr _LIB_THEKOGANS_CRYPTO_API
@@ -489,6 +498,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         _LIB_THEKOGANS_CRYPTO_DECL std::size_t _LIB_THEKOGANS_CRYPTO_API
@@ -535,6 +545,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         _LIB_THEKOGANS_CRYPTO_DECL util::Buffer::SharedPtr _LIB_THEKOGANS_CRYPTO_API
@@ -565,6 +576,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
     } // namespace crypto

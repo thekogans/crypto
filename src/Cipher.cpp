@@ -125,6 +125,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr Cipher::Encrypt (
@@ -151,6 +152,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         std::size_t Cipher::EncryptAndEnlengthen (
@@ -179,6 +181,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr Cipher::EncryptAndEnlengthen (
@@ -205,6 +208,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         std::size_t Cipher::EncryptAndFrame (
@@ -233,6 +237,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr Cipher::EncryptAndFrame (
@@ -259,6 +264,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         std::size_t Cipher::Decrypt (
@@ -312,6 +318,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr Cipher::Decrypt (
@@ -340,6 +347,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
     } // namespace crypto

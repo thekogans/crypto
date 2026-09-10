@@ -80,6 +80,7 @@ namespace thekogans {
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
+            return nullptr;
         }
 
         Params::SharedPtr EC::ParamsFromNamedCurve (
@@ -99,6 +100,7 @@ namespace thekogans {
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
+            return nullptr;
         }
 
         namespace {
@@ -148,6 +150,7 @@ namespace thekogans {
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
+                return nullptr;
             }
 
             // RFC5114_CURVE_192
@@ -1342,6 +1345,7 @@ namespace thekogans {
                     "Unknown curve name: %s",
                     curveName.c_str ());
             }
+            return nullptr;
         }
 
     } // namespace crypto

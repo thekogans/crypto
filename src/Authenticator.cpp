@@ -75,6 +75,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         bool Authenticator::VerifyBufferSignature (
@@ -98,6 +99,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         util::Buffer::SharedPtr Authenticator::SignFile (const std::string &path) {
@@ -116,6 +118,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Authenticator is not initialized.");
             }
+            return nullptr;
         }
 
         bool Authenticator::VerifyFileSignature (
@@ -143,6 +146,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
     } // namespace crypto

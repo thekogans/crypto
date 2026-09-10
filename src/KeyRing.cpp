@@ -251,6 +251,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         bool KeyRing::DropKeyExchangeKey (
@@ -439,6 +440,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         KeyExchange::SharedPtr KeyRing::GetKeyExchange (
@@ -522,6 +524,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         bool KeyRing::DropAuthenticatorParams (
@@ -660,6 +663,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         bool KeyRing::DropAuthenticatorKey (
@@ -829,6 +833,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         bool KeyRing::DropCipherKey (
@@ -968,6 +973,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         bool KeyRing::DropMACKey (
@@ -1149,6 +1155,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         bool KeyRing::DropSubring (

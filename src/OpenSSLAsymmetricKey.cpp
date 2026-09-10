@@ -103,6 +103,7 @@ namespace thekogans {
                     path.c_str (),
                     buffer.GetDataAvailableForReading ());
             }
+            return nullptr;
         }
 
         AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPublicKeyFromBuffer (
@@ -155,6 +156,7 @@ namespace thekogans {
                     path.c_str (),
                     buffer.GetDataAvailableForReading ());
             }
+            return nullptr;
         }
 
         AsymmetricKey::SharedPtr OpenSSLAsymmetricKey::LoadPublicKeyFromCertificate (
@@ -184,6 +186,7 @@ namespace thekogans {
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
+            return nullptr;
         }
 
         void OpenSSLAsymmetricKey::Save (
@@ -232,6 +235,7 @@ namespace thekogans {
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
+            return nullptr;
         }
 
         namespace {

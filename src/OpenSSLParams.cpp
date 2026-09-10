@@ -76,6 +76,7 @@ namespace thekogans {
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
+            return nullptr;
         }
 
         OpenSSLParams::SharedPtr OpenSSLParams::LoadFromFile (
@@ -185,6 +186,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Invalid parameters type %d.", paramsType);
             }
+            return nullptr;
         }
 
         void OpenSSLParams::Save (const std::string &path) const {
@@ -343,6 +345,7 @@ namespace thekogans {
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
+                return nullptr;
             }
         }
 

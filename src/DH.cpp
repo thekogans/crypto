@@ -46,6 +46,7 @@ namespace thekogans {
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
+            return nullptr;
         }
 
     #if OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -96,6 +97,7 @@ namespace thekogans {
             else {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
+            return nullptr;
         }
 
         namespace {
@@ -122,6 +124,7 @@ namespace thekogans {
                 else {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
+                return nullptr;
             }
 
             const util::ui8 RFC3526_PRIME_1536[192] = {

@@ -126,6 +126,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         std::size_t DHEKeyExchange::DHEParams::Size () const noexcept {
@@ -419,6 +420,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
     } // namespace crypto

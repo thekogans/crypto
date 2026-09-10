@@ -53,6 +53,7 @@ namespace thekogans {
                     "Unable to get " THEKOGANS_UTIL_UI64_FORMAT " random bytes for salt.",
                     RANDOM_SIZE);
             }
+            return SaltType ();
         }
 
         bcrypt::HashType bcrypt::HashPassword (
@@ -71,6 +72,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Unable to generate password hash.");
             }
+            return HashType ();
         }
 
         bool bcrypt::CheckPassword (

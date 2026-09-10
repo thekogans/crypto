@@ -427,6 +427,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         KeyExchange::SharedPtr CipherSuite::GetRSAKeyExchange (
@@ -458,6 +459,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         Authenticator::SharedPtr CipherSuite::GetAuthenticator (AsymmetricKey::SharedPtr key) const {
@@ -469,6 +471,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         Cipher::SharedPtr CipherSuite::GetCipher (SymmetricKey::SharedPtr key) const {
@@ -483,6 +486,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         MAC::SharedPtr CipherSuite::GetHMAC (SymmetricKey::SharedPtr key) const {
@@ -493,6 +497,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         MAC::SharedPtr CipherSuite::GetCMAC (SymmetricKey::SharedPtr key) const {
@@ -503,6 +508,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         MessageDigest::SharedPtr CipherSuite::GetMessageDigest () const {
@@ -535,6 +541,7 @@ namespace thekogans {
                     "Invalid authenticator: %s",
                     authenticator.c_str ());
             }
+            return nullptr;
         }
 
         AsymmetricKey::SharedPtr CipherSuite::CreateAuthenticatorKey (
@@ -557,6 +564,7 @@ namespace thekogans {
                     "Invalid authenticator: %s",
                     authenticator.c_str ());
             }
+            return nullptr;
         }
 
         void CipherSuite::Parse (const std::string &cipherSuite) {

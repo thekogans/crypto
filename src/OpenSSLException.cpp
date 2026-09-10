@@ -39,12 +39,14 @@ namespace thekogans {
                 while ((errorCode = ERR_get_error_line (&file, (util::i32 *)&line)) != 0) {
                     exception.NoteLocation (file, "", line, "");
                 }
+                ERR_clear_error ();
                 return exception;
             }
             else {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return util::Exception (0, "Bad input in CreateOpenSSLException.");
         }
 
     } // namespace crypto

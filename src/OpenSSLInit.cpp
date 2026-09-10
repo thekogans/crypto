@@ -25,13 +25,8 @@
 #include <openssl/rand.h>
 #include <openssl/objects.h>
 #include <openssl/x509v3.h>
-#include <openssl/dh.h>
-#include <openssl/hmac.h>
 #include "thekogans/util/Config.h"
-#include "thekogans/util/OwnerVector.h"
 #include "thekogans/util/Buffer.h"
-#include "thekogans/util/SpinLock.h"
-#include "thekogans/util/Thread.h"
 #include "thekogans/util/RandomSource.h"
 #include "thekogans/util/Exception.h"
 #if defined (THEKOGANS_CRYPTO_TYPE_Static)
@@ -61,62 +56,8 @@ namespace thekogans {
         ENGINE *OpenSSLInit::engine = 0;
         int OpenSSLInit::SSLSecureSocketIndex = -1;
         int OpenSSLInit::SSL_SESSIONSessionInfoIndex = -1;
-        util::SpinLock OpenSSLInit::spinLock;
 
         namespace {
-        #if OPENSSL_VERSION_NUMBER < 0x10100000L
-            util::OwnerVector<util::SpinLock> staticLocks;
-
-            void LockingFunction (
-                    util::i32 mode,
-                    util::i32 lockIndex,
-                    const char *file,
-                    util::i32 line) {
-                if (mode & CRYPTO_LOCK) {
-                    staticLocks[lockIndex]->Acquire ();
-                }
-                else {
-                    staticLocks[lockIndex]->Release ();
-                }
-            }
-
-            unsigned long IdFunction () {
-                return (unsigned long)(unsigned long long)util::Thread::GetCurrThreadHandle ();
-            }
-
-            struct CRYPTO_dynlock_value *DynlockCreateFunction (
-                    const char *file,
-                    util::i32 line) {
-                return (struct CRYPTO_dynlock_value *)new util::SpinLock;
-            }
-
-            void DynlockLockFunction (
-                    util::i32 mode,
-                    struct CRYPTO_dynlock_value *lock,
-                    const char *file,
-                    util::i32 line) {
-                if (mode & CRYPTO_LOCK) {
-                    reinterpret_cast<util::SpinLock *> (lock)->Acquire ();
-                }
-                else {
-                    reinterpret_cast<util::SpinLock *> (lock)->Release ();
-                }
-            }
-
-            void DynlockDestroyFunction (
-                    struct CRYPTO_dynlock_value *lock,
-                    const char *file,
-                    util::i32 line) {
-                delete reinterpret_cast<util::SpinLock *> (lock);
-            }
-
-            void ExitFunc (THEKOGANS_UTIL_THREAD_HANDLE thread) {
-                CRYPTO_THREADID threadId;
-                CRYPTO_THREADID_set_numeric (&threadId, (unsigned long)(unsigned long long)thread);
-                ERR_remove_thread_state (&threadId);
-            }
-        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
-
             void DeleteSessionInfo (
                     void *parent,
                     void *ptr,
@@ -130,7 +71,6 @@ namespace thekogans {
 
         // This is enough entropy to cover 512 bit keys.
         OpenSSLInit::OpenSSLInit (
-                bool multiThreaded,
                 util::ui32 entropyNeeded,
                 util::ui64 workingSetSize,
                 ENGINE *engine_,
@@ -140,24 +80,6 @@ namespace thekogans {
             StaticInit ();
         #endif // defined (THEKOGANS_CRYPTO_TYPE_Static)
             util::SecureAllocator::ReservePages (workingSetSize, workingSetSize);
-        #if OPENSSL_VERSION_NUMBER < 0x10100000L
-            if (multiThreaded) {
-                util::i32 lockCount = CRYPTO_num_locks ();
-                if (lockCount > 0) {
-                    staticLocks.resize (lockCount);
-                    for (util::i32 i = 0; i < lockCount; ++i) {
-                        staticLocks[i] = new util::SpinLock;
-                    }
-                }
-                // Static lock callbacks.
-                CRYPTO_set_locking_callback (LockingFunction);
-                CRYPTO_set_id_callback (IdFunction);
-                // Dynamic locks callbacks.
-                CRYPTO_set_dynlock_create_callback (DynlockCreateFunction);
-                CRYPTO_set_dynlock_lock_callback (DynlockLockFunction);
-                CRYPTO_set_dynlock_destroy_callback (DynlockDestroyFunction);
-            }
-        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
             SSL_library_init ();
             SSL_load_error_strings ();
             OpenSSL_add_all_algorithms ();
@@ -185,40 +107,26 @@ namespace thekogans {
                     MIN_ENTROPY_NEEDED);
             }
             engine = engine_;
-            {
-                util::LockGuard<util::SpinLock> guard (spinLock);
+            if (SSLSecureSocketIndex == -1) {
+                SSLSecureSocketIndex = SSL_get_ex_new_index (0, 0, 0, 0, 0);
                 if (SSLSecureSocketIndex == -1) {
-                    SSLSecureSocketIndex = SSL_get_ex_new_index (0, 0, 0, 0, 0);
-                    if (SSLSecureSocketIndex == -1) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
+            }
+            if (SSL_SESSIONSessionInfoIndex == -1) {
+                SSL_SESSIONSessionInfoIndex =
+                    SSL_SESSION_get_ex_new_index (0, 0, 0, 0, DeleteSessionInfo);
                 if (SSL_SESSIONSessionInfoIndex == -1) {
-                    SSL_SESSIONSessionInfoIndex =
-                        SSL_SESSION_get_ex_new_index (0, 0, 0, 0, DeleteSessionInfo);
-                    if (SSL_SESSIONSessionInfoIndex == -1) {
-                        THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
-                    }
+                    THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
             if (loadSystemCACertificates) {
                 SystemCACertificates::Instance ()->Load (loadSystemRootCACertificatesOnly);
             }
             // FIXME: load a CRL.
-        #if OPENSSL_VERSION_NUMBER < 0x10100000L
-            util::Thread::AddExitFunc (ExitFunc);
-        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
         }
 
         OpenSSLInit::~OpenSSLInit () {
-        #if OPENSSL_VERSION_NUMBER < 0x10100000L
-            CRYPTO_set_dynlock_destroy_callback (0);
-            CRYPTO_set_dynlock_lock_callback (0);
-            CRYPTO_set_dynlock_create_callback (0);
-            CRYPTO_set_id_callback (0);
-            CRYPTO_set_locking_callback (0);
-            staticLocks.deleteAndClear ();
-        #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
             ERR_free_strings ();
             EVP_cleanup ();
             // WARNING: Do not uncomment!!!

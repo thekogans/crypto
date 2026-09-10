@@ -49,6 +49,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_STRING_EXCEPTION (
                     "Unknown MessageDigest name: %s", name.c_str ());
             }
+            return nullptr;
         }
 
         std::string MessageDigest::GetName () const {
@@ -89,6 +90,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return 0;
         }
 
         util::Buffer::SharedPtr MessageDigest::Final () {
@@ -114,6 +116,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         util::Buffer::SharedPtr MessageDigest::HashFile (const std::string &path) {

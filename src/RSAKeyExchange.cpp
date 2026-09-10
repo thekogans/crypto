@@ -93,6 +93,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return false;
         }
 
         std::size_t RSAKeyExchange::RSAParams::Size () const noexcept {
@@ -257,8 +258,7 @@ namespace thekogans {
                 Params::SharedPtr params) const {
             assert (symmetricKey != nullptr);
             if (!key->IsPrivate ()) {
-                RSAParams::SharedPtr rsaParams =
-                    util::dynamic_refcounted_sharedptr_cast<RSAParams> (params);
+                RSAParams::SharedPtr rsaParams = params;
                 if (rsaParams != nullptr) {
                     util::SecureNetworkBuffer symmetricKeyBuffer (symmetricKey->GetSize ());
                     symmetricKeyBuffer << *symmetricKey;

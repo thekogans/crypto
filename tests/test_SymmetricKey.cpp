@@ -21,6 +21,7 @@
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <CppUnitXLite/CppUnitXLite.cpp>
 #include "thekogans/util/Buffer.h"
+#include "thekogans/util/StringUtils.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/AsymmetricKey.h"
@@ -40,7 +41,7 @@ namespace {
             key1.GetName () == key2.GetName () &&
             key1.GetDescription () == key2.GetDescription () &&
             key1.Get ().Size () == key2.Get ().Size () &&
-            crypto::TimeInsensitiveCompare (
+            util::TimeInsensitiveCompare (
                 key1.Get (),
                 key2.Get (),
                 key1.Get ().Size ());

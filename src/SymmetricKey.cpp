@@ -83,6 +83,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
     #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 
@@ -132,6 +133,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         SymmetricKey::SharedPtr SymmetricKey::FromPBKDF2 (
@@ -192,6 +194,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         SymmetricKey::SharedPtr SymmetricKey::FromOpenSSLPBKDF2 (
@@ -233,6 +236,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         namespace {
@@ -392,6 +396,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         SymmetricKey::SharedPtr SymmetricKey::FromSecretAndSalt (
@@ -443,6 +448,7 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+            return nullptr;
         }
 
         SymmetricKey::SharedPtr SymmetricKey::FromRandom (
@@ -478,6 +484,7 @@ namespace thekogans {
                     "Unable to get " THEKOGANS_UTIL_SIZE_T_FORMAT " random bytes for key.",
                     randomLength);
             }
+            return nullptr;
         }
 
         void SymmetricKey::Set (
