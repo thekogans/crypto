@@ -21,7 +21,8 @@
     #include <argon2.h>
 #endif // defined (THEKOGANS_CRYPTO_HAVE_ARGON2)
 #include <openssl/evp.h>
-#include <openssl/hmac.h>
+#include <openssl/core_names.h>
+#include <openssl/param_build.h>
 #include "fastpbkdf2/fastpbkdf2.h"
 #include "thekogans/util/SizeT.h"
 #include "thekogans/util/SecureAllocator.h"
@@ -269,13 +270,16 @@ namespace thekogans {
                     std::size_t infoLength,
                     const EVP_MD *md,
                     util::SecureVector<util::ui8> &key) {
-                HMACContext ctx;
-                if (HMAC_Init_ex (
+                MACContext ctx (MACContext::TYPE_HMAC);
+                OSSL_PARAM params[2];
+                params[0] = OSSL_PARAM_construct_utf8_string (
+                    "digest", const_cast<char *> (EVP_MD_get0_name (md)), 0);
+                params[1] = OSSL_PARAM_construct_end ();
+                if (EVP_MAC_init (
                             &ctx,
                             (const util::ui8 *)prk,
                             (int)prkLength,
-                            md,
-                            OpenSSLInit::engine) == 1) {
+                            params) == 1) {
                     std::vector<util::ui8> digest (GetMDLength (md));
                     std::size_t count = key.size () / digest.size ();
                     if ((key.size () % digest.size ()) != 0) {
@@ -283,15 +287,15 @@ namespace thekogans {
                     }
                     for (std::size_t i = 1, offset = 0; i <= count; ++i) {
                         if (i > 1) {
-                            if (HMAC_Init_ex (&ctx, 0, 0, 0, 0) != 1 ||
-                                    HMAC_Update (&ctx, digest.data (), digest.size ()) != 1) {
+                            if (EVP_MAC_init (&ctx, 0, 0, 0) != 1 ||
+                                    EVP_MAC_update (&ctx, digest.data (), digest.size ()) != 1) {
                                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                             }
                         }
                         const util::ui8 counter = (util::ui8)i;
-                        if (HMAC_Update (&ctx, (const util::ui8 *)info, infoLength) == 1 &&
-                                HMAC_Update (&ctx, &counter, 1) == 1 &&
-                                HMAC_Final (&ctx, digest.data (), 0) == 1) {
+                        if (EVP_MAC_update (&ctx, (const util::ui8 *)info, infoLength) == 1 &&
+                                EVP_MAC_update (&ctx, &counter, 1) == 1 &&
+                                EVP_MAC_final (&ctx, digest.data (), 0, EVP_MAX_MD_SIZE) == 1) {
                             std::size_t length = offset + digest.size () > key.size () ?
                                 key.size () - offset :
                                 offset;

@@ -16,6 +16,8 @@
 // along with libthekogans_crypto. If not, see <http://www.gnu.org/licenses/>.
 
 #include <openssl/evp.h>
+#include <openssl/core_names.h>
+#include <openssl/param_build.h>
 #include "thekogans/crypto/SymmetricKey.h"
 #include "thekogans/crypto/OpenSSLInit.h"
 #include "thekogans/crypto/OpenSSLException.h"
@@ -29,14 +31,18 @@ namespace thekogans {
                 SymmetricKey::SharedPtr key_,
                 const EVP_MD *md_) :
                 key (key_),
-                md (md_) {
+                md (md_),
+                ctx (MACContext::TYPE_HMAC) {
             if (key != nullptr && md != nullptr) {
-                if (HMAC_Init_ex (
+                OSSL_PARAM params[2];
+                params[0] = OSSL_PARAM_construct_utf8_string (
+                    "digest", const_cast<char *> (EVP_MD_get0_name (md)), 0);
+                params[1] = OSSL_PARAM_construct_end ();
+                if (EVP_MAC_init (
                         &ctx,
                         key->Get (),
-                        (int)key->Get ().GetLength (),
-                        md,
-                        OpenSSLInit::engine) != 1) {
+                        key->Get ().GetLength (),
+                        params) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
@@ -47,7 +53,7 @@ namespace thekogans {
         }
 
         void HMAC::Init () {
-            if (HMAC_Init_ex (&ctx, 0, 0, 0, 0) != 1) {
+            if (EVP_MAC_init (&ctx, 0, 0, 0) != 1) {
                 THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
             }
         }
@@ -56,7 +62,7 @@ namespace thekogans {
                 const void *buffer,
                 std::size_t bufferLength) {
             if (buffer != nullptr && bufferLength > 0) {
-                if (HMAC_Update (&ctx, (const util::ui8 *)buffer, bufferLength) != 1) {
+                if (EVP_MAC_update (&ctx, (const util::ui8 *)buffer, bufferLength) != 1) {
                     THEKOGANS_CRYPTO_THROW_OPENSSL_EXCEPTION;
                 }
             }
@@ -68,8 +74,8 @@ namespace thekogans {
 
         std::size_t HMAC::Final (util::ui8 *signature) {
             if (signature != nullptr) {
-                util::ui32 signatureLength = 0;
-                if (HMAC_Final (&ctx, signature, &signatureLength) == 1) {
+                std::size_t signatureLength = 0;
+                if (EVP_MAC_final (&ctx, signature, &signatureLength, EVP_MAX_MD_SIZE) == 1) {
                     return signatureLength;
                 }
                 else {

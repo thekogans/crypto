@@ -147,6 +147,9 @@ namespace thekogans {
             }
         }
 
+        const char * const MACContext::TYPE_CMAC = "CMAC";
+        const char * const MACContext::TYPE_HMAC = "HMAC";
+
         THEKOGANS_UTIL_IMPLEMENT_HEAP_FUNCTIONS (SessionInfo)
 
         const char * const SessionInfo::TAG_SESSION_INFO =

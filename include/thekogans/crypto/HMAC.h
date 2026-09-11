@@ -41,7 +41,7 @@ namespace thekogans {
             const EVP_MD *md;
             /// \brief
             /// OpenSSL HMAC context.
-            HMACContext ctx;
+            MACContext ctx;
 
         public:
             /// \brief

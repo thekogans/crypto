@@ -41,7 +41,7 @@ namespace thekogans {
             const EVP_CIPHER *cipher;
             /// \brief
             /// OpenSSL CMAC context.
-            CMACContext ctx;
+            MACContext ctx;
 
         public:
             /// \brief

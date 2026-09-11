@@ -440,6 +440,10 @@ namespace thekogans {
                 const ID &keyId,
                 const std::string &keyName,
                 const std::string &keyDescription) const {
+#if defined(__GNUC__) && !defined(__clang__)
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
             if (key != nullptr && VerifyKeyExchangeKey (*key)) {
                 return KeyExchange::SharedPtr (
                     new RSAKeyExchange (
@@ -459,6 +463,9 @@ namespace thekogans {
                 THEKOGANS_UTIL_THROW_ERROR_CODE_EXCEPTION (
                     THEKOGANS_UTIL_OS_ERROR_CODE_EINVAL);
             }
+#if defined(__GNUC__) && !defined(__clang__)
+    #pragma GCC diagnostic pop
+#endif
             return nullptr;
         }
 

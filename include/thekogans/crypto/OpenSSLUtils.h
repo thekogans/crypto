@@ -317,58 +317,6 @@ namespace thekogans {
         /// Alias for std::unique_ptr<SSL_SESSION, SSL_SESSIONDeleter>.
         using SSL_SESSIONPtr = std::unique_ptr<SSL_SESSION, SSL_SESSIONDeleter>;
 
-    #if OPENSSL_VERSION_NUMBER < 0x10100000L
-        /// \struct CipherContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
-        ///
-        /// \brief
-        /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
-        struct CipherContext : public EVP_CIPHER_CTX {
-            /// \brief
-            /// ctor.
-            CipherContext () {
-                EVP_CIPHER_CTX_init (this);
-            }
-            /// \brief
-            /// dtor.
-            ~CipherContext () {
-                EVP_CIPHER_CTX_cleanup (this);
-            }
-        };
-
-        /// \struct MDContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
-        ///
-        /// \brief
-        /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
-        struct MDContext : public EVP_MD_CTX {
-            /// \brief
-            /// ctor.
-            MDContext () {
-                EVP_MD_CTX_init (this);
-            }
-            /// \brief
-            /// dtor.
-            ~MDContext () {
-                EVP_MD_CTX_cleanup (this);
-            }
-        };
-
-        /// \struct HMACContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
-        ///
-        /// \brief
-        /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
-        struct HMACContext : public HMAC_CTX {
-            /// \brief
-            /// ctor.
-            HMACContext () {
-                HMAC_CTX_init (this);
-            }
-            /// \brief
-            /// dtor.
-            ~HMACContext () {
-                HMAC_CTX_cleanup (this);
-            }
-        };
-    #else // OPENSSL_VERSION_NUMBER < 0x10100000L
         /// \struct CipherContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
         /// \brief
@@ -423,57 +371,35 @@ namespace thekogans {
             }
         };
 
-        /// \struct HMACContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
+        /// \struct MACContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
         ///
         /// \brief
         /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
-        struct HMACContext {
+        struct MACContext {
+            EVP_MAC *mac;
             /// \brief
             /// OpenSSL message digest context.
-            HMAC_CTX *ctx;
+            EVP_MAC_CTX *ctx;
+
+            static const char * const TYPE_CMAC;
+            static const char * const TYPE_HMAC;
 
             /// \brief
             /// ctor.
-            HMACContext () :
-                ctx (HMAC_CTX_new ()) {}
+            MACContext (const char *type) :
+                mac (EVP_MAC_fetch (NULL, type, NULL)),
+                ctx (EVP_MAC_CTX_new (mac)) {}
             /// \brief
             /// dtor.
-            ~HMACContext () {
-                HMAC_CTX_free (ctx);
+            ~MACContext () {
+                EVP_MAC_CTX_free (ctx);
+                EVP_MAC_free (mac);
             }
 
             /// \brief
             /// Address of operator.
-            /// \return HMAC_CTX *.
-            HMAC_CTX *operator & () const {
-                return ctx;
-            }
-        };
-    #endif // OPENSSL_VERSION_NUMBER < 0x10100000L
-
-        /// \struct CMACContext OpenSSLUtils.h thekogans/crypto/OpenSSLUtils.h
-        ///
-        /// \brief
-        /// Adds ctor/dtor to OpenSSL's pods to provide exception safety.
-        struct CMACContext {
-            /// \brief
-            /// OpenSSL message digest context.
-            CMAC_CTX *ctx;
-
-            /// \brief
-            /// ctor.
-            CMACContext () :
-                ctx (CMAC_CTX_new ()) {}
-            /// \brief
-            /// dtor.
-            ~CMACContext () {
-                CMAC_CTX_free (ctx);
-            }
-
-            /// \brief
-            /// Address of operator.
-            /// \return CMAC_CTX *.
-            CMAC_CTX *operator & () const {
+            /// \return EVP_MAC_CTX *.
+            EVP_MAC_CTX *operator & () const {
                 return ctx;
             }
         };
