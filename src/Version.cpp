@@ -21,11 +21,20 @@ namespace thekogans {
     namespace crypto {
 
         _LIB_THEKOGANS_CRYPTO_DECL const util::Version & _LIB_THEKOGANS_CRYPTO_API GetVersion () {
-            static const util::Version *version = new util::Version (
-                THEKOGANS_CRYPTO_MAJOR_VERSION,
-                THEKOGANS_CRYPTO_MINOR_VERSION,
-                THEKOGANS_CRYPTO_PATCH_VERSION);
-            return *version;
+            util::ui32 major = 0;
+            util::ui32 minor = 0;
+            util::ui32 patch = 0;
+        #if !THEKOGANS_UTIL_IS_MACRO_EMPTY (THEKOGANS_CRYPTO_MAJOR_VERSION)
+            major = THEKOGANS_CRYPTO_MAJOR_VERSION;
+        #endif
+        #if !THEKOGANS_UTIL_IS_MACRO_EMPTY (THEKOGANS_CRYPTO_MINOR_VERSION)
+            minor = THEKOGANS_CRYPTO_MINOR_VERSION;
+        #endif
+        #if !THEKOGANS_UTIL_IS_MACRO_EMPTY (THEKOGANS_CRYPTO_PATCH_VERSION)
+            patch = THEKOGANS_CRYPTO_PATCH_VERSION;
+        #endif
+            static const util::Version version (major, minor, patch);
+            return version;
         }
 
     } // namespace crypto
